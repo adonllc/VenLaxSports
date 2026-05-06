@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Users, Calendar, Trophy, ArrowRight, Star, TrendingUp } from "lucide-react";
+import platformConfig from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -32,8 +33,8 @@ const SPORT_CONFIG = {
 const STATS = [
   { value: "1,200+", label: "Active Players", icon: Users },
   { value: "80+", label: "Active Leagues", icon: Trophy },
-  { value: "15", label: "Cities", icon: MapPin },
-  { value: "2", label: "Countries", icon: Star },
+  { value: platformConfig.statsRegion, label: "Cities", icon: MapPin },
+  { value: "3", label: "Sports", icon: Star },
 ];
 
 const STEPS = [
@@ -45,7 +46,7 @@ const STEPS = [
 export default function Home() {
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
-  const [activeSport, setActiveSport] = useState("tennis");
+  const [activeSport, setActiveSport] = useState(platformConfig.defaultSport);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -79,14 +80,14 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white w-full">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6 animate-fade-in">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-            Now live in USA & India
+            {platformConfig.heroBadge}
           </div>
           <h1 className="font-heading font-black text-5xl sm:text-6xl lg:text-7xl mb-6 leading-tight animate-fade-in delay-100">
             Play. Compete.<br />
             <span className="text-emerald-400">Champion.</span>
           </h1>
           <p className="text-xl text-gray-200 mb-10 max-w-2xl mx-auto animate-fade-in delay-200">
-            Join competitive Tennis, Cricket & Pickleball leagues across 15 cities in USA and India.
+            {platformConfig.heroSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in delay-300">
             <button
@@ -243,36 +244,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Countries */}
+      {/* Featured Cities */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 border border-blue-200 league-card-hover">
-              <div className="text-4xl mb-4">🇺🇸</div>
-              <h3 className="font-heading font-bold text-2xl text-gray-900 mb-2">United States</h3>
-              <p className="text-gray-600 text-sm mb-6">Tennis & Pickleball leagues in New York, Los Angeles, Chicago, Atlanta, San Francisco & more.</p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["Tennis", "Pickleball", "USD Pricing", "Stripe Payments"].map((t) => (
-                  <span key={t} className="px-3 py-1 bg-white text-blue-700 text-xs font-semibold rounded-full border border-blue-200">{t}</span>
-                ))}
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Where We Play</p>
+            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">{platformConfig.citySectionTitle}</h2>
+            <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm">{platformConfig.citySectionDesc}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {platformConfig.featuredCities.map((city) => (
+              <div
+                key={city.name}
+                onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
+                className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer flex items-start gap-4"
+                data-testid={`city-card-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                <div className="text-3xl flex-shrink-0">{city.icon}</div>
+                <div className="min-w-0">
+                  <h3 className="font-heading font-bold text-gray-900 mb-1">{city.name}</h3>
+                  <p className="text-xs text-gray-500 mb-2">{city.desc}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {city.sports.map((s) => (
+                      <span key={s} className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s}</span>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <button onClick={() => navigate("/leagues?country=USA")} className="flex items-center gap-2 text-sm font-semibold text-blue-700 hover:gap-4 transition-all" data-testid="usa-browse-btn">
-                Browse USA Leagues <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8 border border-orange-200 league-card-hover">
-              <div className="text-4xl mb-4">🇮🇳</div>
-              <h3 className="font-heading font-bold text-2xl text-gray-900 mb-2">India</h3>
-              <p className="text-gray-600 text-sm mb-6">Cricket leagues in Mumbai, Delhi, Bangalore, Chennai, Hyderabad, Pune & more.</p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["Cricket", "T20 & T10", "INR Pricing", "Corporate Leagues"].map((t) => (
-                  <span key={t} className="px-3 py-1 bg-white text-orange-700 text-xs font-semibold rounded-full border border-orange-200">{t}</span>
-                ))}
-              </div>
-              <button onClick={() => navigate("/leagues?country=India")} className="flex items-center gap-2 text-sm font-semibold text-orange-700 hover:gap-4 transition-all" data-testid="india-browse-btn">
-                Browse India Leagues <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button
+              onClick={() => navigate("/leagues")}
+              className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-sm font-semibold rounded-xl hover:border-black hover:text-black transition-colors"
+              data-testid="all-cities-leagues-btn"
+            >
+              View All Leagues <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>
@@ -316,7 +324,7 @@ function LeagueCard({ league }) {
       </div>
       <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2">{league.name}</h3>
       <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-        <MapPin className="w-3 h-3" /> {league.city}, {league.country}
+        <MapPin className="w-3 h-3" /> {league.city}
       </div>
       <div className="flex items-center justify-between text-xs text-gray-500">
         <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {spotsLeft} spots left</span>

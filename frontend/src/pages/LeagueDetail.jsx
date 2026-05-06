@@ -168,7 +168,7 @@ export default function LeagueDetail() {
               </div>
               <h1 className="font-heading font-black text-3xl text-gray-900 mb-2">{league.name}</h1>
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}, {league.country}</span>
+                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}</span>
                 <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {league.start_date} — {league.end_date}</span>
                 <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {league.current_players || 0}/{league.max_players} players</span>
               </div>
@@ -267,7 +267,6 @@ export default function LeagueDetail() {
                   ["Format", league.format?.charAt(0).toUpperCase() + league.format?.slice(1)],
                   ["Season", league.season],
                   ["Venue", league.venue || "TBD"],
-                  ["Country", league.country === "USA" ? "🇺🇸 United States" : "🇮🇳 India"],
                   ["City", league.city],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">

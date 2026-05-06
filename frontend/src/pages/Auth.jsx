@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Eye, EyeOff } from "lucide-react";
+import platformConfig from "../config/platformConfig";
 
 const COUNTRIES = ["USA", "India"];
 
 export default function Auth() {
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.get("mode") === "register" ? "register" : "login");
-  const [form, setForm] = useState({ email: "", password: "", name: "", country: "USA", city: "" });
+  const [form, setForm] = useState({ email: "", password: "", name: "", country: platformConfig.country, city: "" });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ export default function Auth() {
             <span className="font-heading font-black text-3xl">League<span className="text-emerald-400">Pro</span></span>
           </div>
           <h2 className="font-heading font-black text-4xl leading-tight mb-4">Your league.<br />Your rules.<br /><span className="text-emerald-400">Your win.</span></h2>
-          <p className="text-gray-400 text-base max-w-xs mx-auto">Join competitive sports leagues across Tennis, Cricket & Pickleball in USA and India.</p>
+          <p className="text-gray-400 text-base max-w-xs mx-auto">Join competitive sports leagues across Tennis, Cricket & Pickleball.</p>
           <div className="flex justify-center gap-6 mt-10">
             {["🎾 Tennis", "🏏 Cricket", "🏓 Pickleball"].map((s) => (
               <div key={s} className="text-sm text-gray-300 font-medium">{s}</div>
@@ -160,7 +161,7 @@ export default function Auth() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white"
                     data-testid="input-country"
                   >
-                    {COUNTRIES.map((c) => <option key={c} value={c}>{c === "USA" ? "🇺🇸 United States" : "🇮🇳 India"}</option>)}
+                    {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>

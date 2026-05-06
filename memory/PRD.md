@@ -26,6 +26,15 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented (MVP - May 2026)
 
+### Config-Driven Multi-Repo Architecture (Added May 2026)
+- `frontend/src/config/platformConfig.js` — single source of truth for both deployments
+- `frontend/.env.usa` — USA deployment template (Tennis + Pickleball, USD, Stripe)
+- `frontend/.env.india` — India deployment template (Cricket, INR, Razorpay)
+- `backend/.env.usa` / `backend/.env.india` — backend deployment templates with separate DBs
+- All country-specific hardcoding removed from UI — zero "USA" or "India" labels visible
+- Cities section on Home page driven by config (6 city cards per deployment)
+- Default sport, currency, featured cities, hero text all config-driven
+
 ### Backend (/app/backend/)
 - `server.py` - FastAPI app, DB connection, middleware, startup seeding
 - `models.py` - User, League, Team, Match, Standing, PlayerLeague, PaymentTransaction

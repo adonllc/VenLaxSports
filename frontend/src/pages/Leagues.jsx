@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Search, Filter, MapPin, Users, Calendar, Trophy, ChevronDown } from "lucide-react";
+import { Search, MapPin, Users, Calendar, Trophy } from "lucide-react";
+import platformConfig from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -103,16 +104,17 @@ export default function Leagues() {
             <option value="pickleball">🏓 Pickleball</option>
           </select>
 
-          {/* Country Filter */}
+          {/* City Filter */}
           <select
-            value={filters.country}
-            onChange={(e) => updateFilter("country", e.target.value)}
+            value={filters.city}
+            onChange={(e) => updateFilter("city", e.target.value)}
             className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
-            data-testid="filter-country"
+            data-testid="filter-city"
           >
-            <option value="">All Countries</option>
-            <option value="USA">🇺🇸 USA</option>
-            <option value="India">🇮🇳 India</option>
+            <option value="">All Cities</option>
+            {platformConfig.featuredCities.map((c) => (
+              <option key={c.name} value={c.name}>{c.name}</option>
+            ))}
           </select>
 
           {/* Status Filter */}
@@ -128,15 +130,14 @@ export default function Leagues() {
             <option value="completed">Completed</option>
           </select>
 
-          {(filters.sport || filters.country || filters.status) && (
+          {(filters.sport || filters.city || filters.status) && (
             <button
               onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", search: "" }); setSearchParams({}); }}
               className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border border-gray-200 rounded-xl"
               data-testid="clear-filters"
             >
               Clear Filters
-            </button>
-          )}
+            </button>)}
         </div>
 
         {/* Results count */}
@@ -200,7 +201,7 @@ function LeagueCard({ league, onClick }) {
         <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">{league.name}</h3>
 
         <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
-          <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}, {league.country}
+          <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}
         </div>
 
         <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Trophy } from "lucide-react";
+import platformConfig from "../config/platformConfig";
 
 export default function Footer() {
   return (
@@ -17,7 +18,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Competitive sports leagues for Tennis, Cricket & Pickleball across USA and India.
+              {platformConfig.footerTagline}
             </p>
           </div>
 
@@ -41,12 +42,20 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Countries */}
+          {/* Cities */}
           <div>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Regions</h3>
+            <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Cities</h3>
             <ul className="space-y-2">
-              <li><Link to="/leagues?country=USA" className="text-sm text-gray-300 hover:text-white transition-colors">🇺🇸 United States</Link></li>
-              <li><Link to="/leagues?country=India" className="text-sm text-gray-300 hover:text-white transition-colors">🇮🇳 India</Link></li>
+              {platformConfig.featuredCities.slice(0, 4).map((city) => (
+                <li key={city.name}>
+                  <Link
+                    to={`/leagues?city=${encodeURIComponent(city.name)}`}
+                    className="text-sm text-gray-300 hover:text-white transition-colors"
+                  >
+                    {city.icon} {city.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

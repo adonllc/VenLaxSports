@@ -89,9 +89,6 @@ export default function PlayerDashboard() {
             <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
               <span>{user.email}</span>
               {user.city && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.city}</span>}
-              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${user.country === "India" ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"}`}>
-                {user.country === "USA" ? "🇺🇸 USA" : "🇮🇳 India"}
-              </span>
             </div>
           </div>
           <div className="flex gap-3">
