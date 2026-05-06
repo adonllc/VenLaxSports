@@ -1,88 +1,223 @@
-from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
+load_dotenv()
+
+from fastapi import FastAPI, APIRouter, Request
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import bcrypt
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
 from datetime import datetime, timezone
 
-
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ["DB_NAME"]]
 
-# Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="Multi-Sport League Platform", version="1.0.0")
+app.state.db = db
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+api_router = APIRouter(prefix="/api", redirect_slashes=False)
+
+# Import routers
+from routes.auth_routes import router as auth_router
+from routes.league_routes import router as league_router
+from routes.match_routes import router as match_router
+from routes.payment_routes import router as payment_router
+from routes.admin_routes import router as admin_router
+
+api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(league_router, prefix="/leagues", tags=["leagues"])
+api_router.include_router(match_router, prefix="/matches", tags=["matches"])
+api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
+api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Multi-Sport League Platform API v1.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/health")
+async def health():
+    return {"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}
 
-# Include the router in the main app
+
+@api_router.get("/cities")
+async def get_cities(country: str = None):
+    query = {}
+    if country:
+        query["country"] = country
+    cities = await db.cities.find(query, {"_id": 0}).sort("name", 1).to_list(50)
+    return cities
+
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    body = await request.body()
+    signature = request.headers.get("Stripe-Signature", "")
+    api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+    host_url = str(request.base_url)
+    webhook_url = f"{host_url}api/webhook/stripe"
+
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+        stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+        event = await stripe.handle_webhook(body, signature)
+        if event.payment_status == "paid":
+            await db.payment_transactions.update_one(
+                {"session_id": event.session_id},
+                {"$set": {
+                    "payment_status": "paid",
+                    "status": "complete",
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }},
+            )
+    except Exception as e:
+        logging.getLogger(__name__).warning(f"Webhook error: {e}")
+
+    return {"received": True}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+async def seed_admin():
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@leaguepro.com")
+    admin_password = os.environ.get("ADMIN_PASSWORD", "Admin@123")
+    existing = await db.users.find_one({"email": admin_email})
+    if existing is None:
+        hashed = bcrypt.hashpw(admin_password.encode(), bcrypt.gensalt()).decode()
+        await db.users.insert_one({
+            "email": admin_email,
+            "name": "Admin",
+            "password_hash": hashed,
+            "role": "admin",
+            "country": "USA",
+            "city": "New York",
+            "sport_preferences": ["tennis", "cricket", "pickleball"],
+            "tennis_rating": 5.0,
+            "cricket_rating": 100.0,
+            "pickleball_rating": 5.0,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        logger.info(f"Admin seeded: {admin_email}")
+    elif not bcrypt.checkpw(admin_password.encode(), existing["password_hash"].encode()):
+        hashed = bcrypt.hashpw(admin_password.encode(), bcrypt.gensalt()).decode()
+        await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hashed}})
+
+
+async def create_indexes():
+    await db.users.create_index("email", unique=True)
+    await db.player_leagues.create_index([("player_id", 1), ("league_id", 1)])
+    await db.matches.create_index([("league_id", 1), ("scheduled_date", 1)])
+    await db.standings.create_index([("league_id", 1), ("points", -1)])
+    await db.payment_transactions.create_index("session_id")
+
+
+async def seed_leagues():
+    count = await db.leagues.count_documents({})
+    if count > 0:
+        return
+    admin = await db.users.find_one({"role": "admin"})
+    if not admin:
+        return
+    admin_id = str(admin["_id"])
+    now = datetime.now(timezone.utc).isoformat()
+
+    leagues = [
+        {"name": "NYC Tennis Open - Season 1", "sport": "tennis", "country": "USA", "city": "New York",
+         "format": "singles", "entry_fee": 29.99, "currency": "USD", "max_players": 16, "current_players": 0,
+         "start_date": "2025-03-01", "end_date": "2025-05-31", "status": "registration", "admin_id": admin_id,
+         "description": "Competitive singles tennis league for players rated 3.0-4.5. Weekly matches at Central Park courts.",
+         "venue": "Central Park Tennis Center", "season": "Spring 2025", "created_at": now},
+        {"name": "Mumbai Premier Cricket League", "sport": "cricket", "country": "India", "city": "Mumbai",
+         "format": "T20", "entry_fee": 1500.0, "currency": "INR", "max_players": 11, "current_players": 0,
+         "start_date": "2025-02-15", "end_date": "2025-04-30", "status": "registration", "admin_id": admin_id,
+         "description": "T20 cricket league for corporate teams. Professional grounds with umpires.",
+         "venue": "Wankhede Stadium Practice Grounds", "season": "Season 2025", "created_at": now},
+        {"name": "LA Pickleball Championship", "sport": "pickleball", "country": "USA", "city": "Los Angeles",
+         "format": "doubles", "entry_fee": 39.99, "currency": "USD", "max_players": 16, "current_players": 0,
+         "start_date": "2025-03-15", "end_date": "2025-06-15", "status": "registration", "admin_id": admin_id,
+         "description": "Doubles pickleball league for intermediate to advanced players. Indoor courts.",
+         "venue": "LA Sports Complex", "season": "Spring 2025", "created_at": now},
+        {"name": "SF Bay Area Doubles Tennis", "sport": "tennis", "country": "USA", "city": "San Francisco",
+         "format": "doubles", "entry_fee": 0.0, "currency": "USD", "max_players": 8, "current_players": 0,
+         "start_date": "2025-02-20", "end_date": "2025-04-20", "status": "registration", "admin_id": admin_id,
+         "description": "FREE doubles tennis for beginners and intermediate players. All welcome!",
+         "venue": "Golden Gate Park Courts", "season": "Winter 2025", "created_at": now},
+        {"name": "Delhi Corporate Cricket T10", "sport": "cricket", "country": "India", "city": "Delhi",
+         "format": "T10", "entry_fee": 2000.0, "currency": "INR", "max_players": 8, "current_players": 0,
+         "start_date": "2025-03-01", "end_date": "2025-04-15", "status": "registration", "admin_id": admin_id,
+         "description": "Corporate T10 cricket league with professional facilities and live scoring.",
+         "venue": "Feroz Shah Kotla Ground", "season": "Season 2025", "created_at": now},
+        {"name": "Atlanta Pickleball Mixed Doubles", "sport": "pickleball", "country": "USA", "city": "Atlanta",
+         "format": "mixed", "entry_fee": 25.00, "currency": "USD", "max_players": 16, "current_players": 0,
+         "start_date": "2025-03-10", "end_date": "2025-05-10", "status": "registration", "admin_id": admin_id,
+         "description": "Mixed doubles pickleball for all skill levels. Fun and competitive!",
+         "venue": "Atlanta Community Sports Center", "season": "Spring 2025", "created_at": now},
+        {"name": "Bangalore Cricket T20 Open", "sport": "cricket", "country": "India", "city": "Bangalore",
+         "format": "T20", "entry_fee": 1200.0, "currency": "INR", "max_players": 12, "current_players": 0,
+         "start_date": "2025-04-01", "end_date": "2025-06-30", "status": "registration", "admin_id": admin_id,
+         "description": "Open T20 cricket for amateur teams across Bangalore. Night games available.",
+         "venue": "Chinnaswamy Stadium Practice Area", "season": "Season 2025", "created_at": now},
+        {"name": "Chicago Tennis Singles Open", "sport": "tennis", "country": "USA", "city": "Chicago",
+         "format": "singles", "entry_fee": 35.00, "currency": "USD", "max_players": 16, "current_players": 0,
+         "start_date": "2025-04-15", "end_date": "2025-07-15", "status": "registration", "admin_id": admin_id,
+         "description": "Competitive singles tennis for rated players 3.5 to 5.0.",
+         "venue": "Grant Park Tennis Courts", "season": "Summer 2025", "created_at": now},
+    ]
+    for league in leagues:
+        await db.leagues.insert_one(league)
+    logger.info(f"Seeded {len(leagues)} sample leagues")
+
+
+async def seed_cities():
+    count = await db.cities.count_documents({})
+    if count > 0:
+        return
+    cities = [
+        {"name": "New York", "country": "USA", "state": "NY"},
+        {"name": "Los Angeles", "country": "USA", "state": "CA"},
+        {"name": "Chicago", "country": "USA", "state": "IL"},
+        {"name": "San Francisco", "country": "USA", "state": "CA"},
+        {"name": "Atlanta", "country": "USA", "state": "GA"},
+        {"name": "Houston", "country": "USA", "state": "TX"},
+        {"name": "Phoenix", "country": "USA", "state": "AZ"},
+        {"name": "Seattle", "country": "USA", "state": "WA"},
+        {"name": "Mumbai", "country": "India", "state": "Maharashtra"},
+        {"name": "Delhi", "country": "India", "state": "Delhi"},
+        {"name": "Bangalore", "country": "India", "state": "Karnataka"},
+        {"name": "Chennai", "country": "India", "state": "Tamil Nadu"},
+        {"name": "Hyderabad", "country": "India", "state": "Telangana"},
+        {"name": "Pune", "country": "India", "state": "Maharashtra"},
+        {"name": "Kolkata", "country": "India", "state": "West Bengal"},
+    ]
+    await db.cities.insert_many(cities)
+
+
+@app.on_event("startup")
+async def startup_event():
+    await seed_admin()
+    await create_indexes()
+    await seed_leagues()
+    await seed_cities()
+    logger.info("Application startup complete")
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

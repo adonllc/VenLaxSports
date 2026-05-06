@@ -1,0 +1,235 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import axios from "axios";
+import { Search, Filter, MapPin, Users, Calendar, Trophy, ChevronDown } from "lucide-react";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const SPORT_CONFIG = {
+  tennis: { badge: "sport-badge-tennis", color: "text-tennis", icon: "🎾", label: "Tennis" },
+  cricket: { badge: "sport-badge-cricket", color: "text-cricket", icon: "🏏", label: "Cricket" },
+  pickleball: { badge: "sport-badge-pickleball", color: "text-pickleball", icon: "🏓", label: "Pickleball" },
+};
+
+const STATUS_COLORS = {
+  registration: "bg-emerald-100 text-emerald-700",
+  active: "bg-blue-100 text-blue-700",
+  completed: "bg-gray-100 text-gray-600",
+  cancelled: "bg-red-100 text-red-600",
+};
+
+export default function Leagues() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [leagues, setLeagues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    sport: searchParams.get("sport") || "",
+    country: searchParams.get("country") || "",
+    city: searchParams.get("city") || "",
+    status: searchParams.get("status") || "",
+    search: "",
+  });
+
+  useEffect(() => {
+    fetchLeagues();
+  }, [filters.sport, filters.country, filters.city, filters.status]);
+
+  const fetchLeagues = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filters.sport) params.set("sport", filters.sport);
+      if (filters.country) params.set("country", filters.country);
+      if (filters.city) params.set("city", filters.city);
+      if (filters.status) params.set("status", filters.status);
+      params.set("limit", "50");
+      const { data } = await axios.get(`${API}/leagues?${params}`);
+      setLeagues(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateFilter = (key, val) => {
+    setFilters((f) => ({ ...f, [key]: val }));
+    const newParams = new URLSearchParams(searchParams);
+    if (val) newParams.set(key, val); else newParams.delete(key);
+    setSearchParams(newParams);
+  };
+
+  const filteredLeagues = leagues.filter((l) =>
+    !filters.search || l.name.toLowerCase().includes(filters.search.toLowerCase()) || l.city.toLowerCase().includes(filters.search.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50" data-testid="leagues-page">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="font-heading font-black text-4xl text-gray-900 mb-2">Browse Leagues</h1>
+          <p className="text-gray-500">Find and join competitive leagues across all sports and cities</p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filters */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 mb-8 flex flex-wrap gap-3">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search leagues..."
+              value={filters.search}
+              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              data-testid="filter-search"
+            />
+          </div>
+
+          {/* Sport Filter */}
+          <select
+            value={filters.sport}
+            onChange={(e) => updateFilter("sport", e.target.value)}
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="filter-sport"
+          >
+            <option value="">All Sports</option>
+            <option value="tennis">🎾 Tennis</option>
+            <option value="cricket">🏏 Cricket</option>
+            <option value="pickleball">🏓 Pickleball</option>
+          </select>
+
+          {/* Country Filter */}
+          <select
+            value={filters.country}
+            onChange={(e) => updateFilter("country", e.target.value)}
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="filter-country"
+          >
+            <option value="">All Countries</option>
+            <option value="USA">🇺🇸 USA</option>
+            <option value="India">🇮🇳 India</option>
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={filters.status}
+            onChange={(e) => updateFilter("status", e.target.value)}
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="filter-status"
+          >
+            <option value="">All Status</option>
+            <option value="registration">Open Registration</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+
+          {(filters.sport || filters.country || filters.status) && (
+            <button
+              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", search: "" }); setSearchParams({}); }}
+              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border border-gray-200 rounded-xl"
+              data-testid="clear-filters"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
+        {/* Results count */}
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-sm text-gray-600" data-testid="leagues-count">
+            {loading ? "Loading..." : `${filteredLeagues.length} league${filteredLeagues.length !== 1 ? "s" : ""} found`}
+          </p>
+        </div>
+
+        {/* League Grid */}
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-56 bg-white rounded-2xl border border-gray-200 animate-pulse" />
+            ))}
+          </div>
+        ) : filteredLeagues.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredLeagues.map((league) => (
+              <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="font-heading font-bold text-xl text-gray-700 mb-2">No leagues found</h3>
+            <p className="text-gray-500 text-sm">Try adjusting your filters</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LeagueCard({ league, onClick }) {
+  const config = SPORT_CONFIG[league.sport] || { badge: "bg-gray-100", icon: "🏆", label: league.sport };
+  const isFree = !league.entry_fee || league.entry_fee === 0;
+  const spotsLeft = league.max_players - (league.current_players || 0);
+  const currency = league.currency === "INR" ? "₹" : "$";
+  const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
+
+  return (
+    <div
+      onClick={onClick}
+      className="bg-white border border-gray-200 rounded-2xl overflow-hidden league-card-hover cursor-pointer"
+      data-testid={`league-card-${league.id}`}
+    >
+      <div className={`h-1.5 ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`} />
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-3">
+          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
+            {config.icon} {config.label}
+          </span>
+          <div className="text-right">
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${isFree ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-700"}`}>
+              {isFree ? "FREE" : `${currency}${league.entry_fee}`}
+            </span>
+          </div>
+        </div>
+
+        <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">{league.name}</h3>
+
+        <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
+          <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}, {league.country}
+        </div>
+
+        <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
+          <span className="capitalize">{league.format}</span>
+          <span>•</span>
+          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {league.start_date}</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mb-3">
+          <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+            <span>{league.current_players || 0} joined</span>
+            <span>{spotsLeft} spots left</span>
+          </div>
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
+              style={{ width: `${fillPct}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${STATUS_COLORS[league.status] || "bg-gray-100 text-gray-600"}`}>
+            {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
+          </span>
+          <span className="text-xs text-gray-400">{league.season}</span>
+        </div>
+      </div>
+    </div>
+  );
+}

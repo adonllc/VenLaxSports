@@ -1,0 +1,189 @@
+"""Backend API tests for Multi-Sport League Platform - uses cookie-based auth"""
+import pytest
+import requests
+import os
+
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
+
+
+def get_admin_session():
+    """Returns a requests.Session with admin cookies set"""
+    s = requests.Session()
+    r = s.post(f"{BASE_URL}/api/auth/login", json={
+        "email": "admin@leaguepro.com",
+        "password": "Admin@123"
+    })
+    assert r.status_code == 200, f"Admin login failed: {r.text}"
+    return s
+
+
+class TestHealth:
+    def test_api_health(self):
+        r = requests.get(f"{BASE_URL}/api/health")
+        assert r.status_code == 200
+        assert r.json()["status"] == "ok"
+
+    def test_api_root(self):
+        r = requests.get(f"{BASE_URL}/api/")
+        assert r.status_code == 200
+
+
+class TestAuth:
+    def test_register_user(self):
+        r = requests.post(f"{BASE_URL}/api/auth/register", json={
+            "email": "TEST_user1@example.com",
+            "password": "Test@1234",
+            "name": "Test User",
+            "country": "USA"
+        })
+        # 400 if already exists
+        assert r.status_code in [200, 201, 400]
+        if r.status_code in [200, 201]:
+            data = r.json()
+            assert "id" in data
+            assert data["email"] == "test_user1@example.com"
+
+    def test_login_admin(self):
+        r = requests.post(f"{BASE_URL}/api/auth/login", json={
+            "email": "admin@leaguepro.com",
+            "password": "Admin@123"
+        })
+        assert r.status_code == 200
+        data = r.json()
+        assert data["email"] == "admin@leaguepro.com"
+        assert data["role"] == "admin"
+
+    def test_login_wrong_password(self):
+        r = requests.post(f"{BASE_URL}/api/auth/login", json={
+            "email": "admin@leaguepro.com",
+            "password": "wrongpassword"
+        })
+        assert r.status_code == 401
+
+    def test_me_endpoint_with_cookie(self):
+        s = get_admin_session()
+        r = s.get(f"{BASE_URL}/api/auth/me")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["email"] == "admin@leaguepro.com"
+        assert data["role"] == "admin"
+
+
+class TestLeagues:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.session = get_admin_session()
+
+    def test_get_leagues(self):
+        r = requests.get(f"{BASE_URL}/api/leagues")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        assert len(data) > 0
+
+    def test_filter_leagues_by_sport(self):
+        for sport in ["tennis", "cricket", "pickleball"]:
+            r = requests.get(f"{BASE_URL}/api/leagues?sport={sport}")
+            assert r.status_code == 200
+            leagues = r.json()
+            for l in leagues:
+                assert l["sport"] == sport
+
+    def test_filter_leagues_by_country(self):
+        r = requests.get(f"{BASE_URL}/api/leagues?country=USA")
+        assert r.status_code == 200
+        leagues = r.json()
+        for l in leagues:
+            assert l["country"] == "USA"
+
+    def test_get_league_detail(self):
+        leagues = requests.get(f"{BASE_URL}/api/leagues").json()
+        league_id = leagues[0]["id"]
+        r = requests.get(f"{BASE_URL}/api/leagues/{league_id}")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["id"] == league_id
+
+    def test_create_league_admin(self):
+        r = self.session.post(f"{BASE_URL}/api/leagues", json={
+            "name": "TEST_New League",
+            "sport": "tennis",
+            "country": "USA",
+            "city": "New York",
+            "format": "singles",
+            "entry_fee": 0.0,
+            "currency": "USD",
+            "max_players": 8,
+            "start_date": "2025-06-01",
+            "end_date": "2025-08-01",
+            "status": "registration",
+            "description": "Test league",
+            "venue": "Test Venue",
+            "season": "Summer 2025"
+        })
+        assert r.status_code in [200, 201]
+        data = r.json()
+        assert "id" in data
+
+    def test_get_league_players(self):
+        leagues = requests.get(f"{BASE_URL}/api/leagues").json()
+        league_id = leagues[0]["id"]
+        r = requests.get(f"{BASE_URL}/api/leagues/{league_id}/players")
+        assert r.status_code == 200
+
+    def test_get_league_standings(self):
+        leagues = requests.get(f"{BASE_URL}/api/leagues").json()
+        league_id = leagues[0]["id"]
+        r = requests.get(f"{BASE_URL}/api/leagues/{league_id}/standings")
+        assert r.status_code == 200
+
+    def test_get_league_matches(self):
+        leagues = requests.get(f"{BASE_URL}/api/leagues").json()
+        league_id = leagues[0]["id"]
+        r = requests.get(f"{BASE_URL}/api/leagues/{league_id}/matches")
+        assert r.status_code == 200
+
+
+class TestAdmin:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.session = get_admin_session()
+
+    def test_admin_stats(self):
+        r = self.session.get(f"{BASE_URL}/api/admin/stats")
+        assert r.status_code == 200
+        data = r.json()
+        assert "total_users" in data
+        assert "total_leagues" in data
+        assert data["total_leagues"] >= 8
+
+    def test_admin_leagues(self):
+        r = self.session.get(f"{BASE_URL}/api/admin/leagues")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        assert len(data) >= 8
+
+    def test_admin_protected_no_cookie(self):
+        r = requests.get(f"{BASE_URL}/api/admin/stats")
+        assert r.status_code in [401, 403]
+
+
+class TestMatches:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.session = get_admin_session()
+
+    def test_my_matches(self):
+        r = self.session.get(f"{BASE_URL}/api/matches/my")
+        assert r.status_code == 200
+        assert isinstance(r.json(), list)
+
+
+class TestCities:
+    def test_get_cities(self):
+        r = requests.get(f"{BASE_URL}/api/cities")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        assert len(data) > 0

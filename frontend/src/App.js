@@ -1,53 +1,41 @@
-import { useEffect } from "react";
-import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import { AuthProvider } from "./contexts/AuthContext";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Auth from "./pages/Auth";
+import Leagues from "./pages/Leagues";
+import LeagueDetail from "./pages/LeagueDetail";
+import PlayerDashboard from "./pages/PlayerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import SportLanding from "./pages/SportLanding";
+import ScoreReport from "./pages/ScoreReport";
+import Standings from "./pages/Standings";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <div className="min-h-screen bg-white flex flex-col font-body">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/sport/:sport" element={<SportLanding />} />
+              <Route path="/leagues" element={<Leagues />} />
+              <Route path="/leagues/:id" element={<LeagueDetail />} />
+              <Route path="/dashboard" element={<PlayerDashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/matches/:id/score" element={<ScoreReport />} />
+              <Route path="/leagues/:id/standings" element={<Standings />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       </BrowserRouter>
-    </div>
+    </AuthProvider>
   );
 }
 
