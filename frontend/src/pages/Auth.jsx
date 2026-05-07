@@ -249,6 +249,12 @@ export default function Auth() {
           </p>
         </div>
       </div>
+
+      <ForgotPasswordModal
+        open={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        prefillEmail={form.email}
+      />
     </div>
   );
 }
