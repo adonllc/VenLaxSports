@@ -3,9 +3,10 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from models import Match, MatchCreate, MatchScore
 from auth_utils import get_current_user
+from rating_utils import delta_for, rating_field_for, clamp
 import email_service
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 
 
 def _serialize(doc: dict) -> dict:
@@ -28,6 +29,7 @@ async def my_matches(request: Request):
     return [_serialize(m) for m in matches]
 
 
+@router.post("")
 @router.post("/")
 async def create_match(data: MatchCreate, request: Request):
     db = request.app.state.db
@@ -111,6 +113,13 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     )
     await _update_standings(db, match["league_id"], match, score_data.winner_id)
 
+    # Rating updates (tennis / pickleball only — cricket is team-based)
+    rating_change = None
+    try:
+        rating_change = await _update_ratings(db, match, score_data.winner_id)
+    except Exception:
+        pass
+
     # Notify both players with the result
     try:
         league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
@@ -126,7 +135,10 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     except Exception:
         pass
 
-    return {"message": "Score reported successfully"}
+    resp = {"message": "Score reported successfully"}
+    if rating_change:
+        resp["rating_change"] = rating_change
+    return resp
 
 
 @router.get("/{match_id}")
@@ -152,3 +164,38 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str):
         {"league_id": league_id, "player_id": loser_id},
         {"$inc": {"losses": 1, "matches_played": 1}, "$set": {"updated_at": now}},
     )
+
+
+async def _update_ratings(db, match: dict, winner_id: str):
+    """Apply ELO-style rating delta to winner + loser for tennis/pickleball.
+
+    Returns a dict with old/new ratings so the response can surface the change.
+    """
+    sport = match["sport"]
+    field = rating_field_for(sport)
+    if not field or sport == "cricket":
+        return None  # cricket uses team NRR instead
+
+    loser_id = match["player2_id"] if winner_id == match["player1_id"] else match["player1_id"]
+    try:
+        winner = await db.users.find_one({"_id": ObjectId(winner_id)})
+        loser = await db.users.find_one({"_id": ObjectId(loser_id)})
+    except Exception:
+        return None
+    if not winner or not loser:
+        return None
+
+    w_rating = float(winner.get(field, 3.0))
+    l_rating = float(loser.get(field, 3.0))
+    w_delta, l_delta = delta_for(w_rating, l_rating)
+    w_new = clamp(w_rating + w_delta)
+    l_new = clamp(l_rating + l_delta)
+
+    await db.users.update_one({"_id": ObjectId(winner_id)}, {"$set": {field: w_new}})
+    await db.users.update_one({"_id": ObjectId(loser_id)}, {"$set": {field: l_new}})
+
+    return {
+        "sport": sport,
+        "winner": {"id": winner_id, "old": w_rating, "new": w_new, "delta": w_delta},
+        "loser": {"id": loser_id, "old": l_rating, "new": l_new, "delta": l_delta},
+    }

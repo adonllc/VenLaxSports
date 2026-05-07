@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp } from "lucide-react";
+import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
 import { activeSportIds, activeCountry } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -123,6 +123,8 @@ export default function AdminDashboard() {
     { id: "overview", label: "Overview" },
     { id: "create", label: "Create League" },
     { id: "leagues", label: "Manage Leagues" },
+    { id: "seasons", label: "Seasons" },
+    { id: "playoffs", label: "Playoffs" },
   ];
 
   return (
@@ -336,6 +338,233 @@ export default function AdminDashboard() {
                 <div className="text-center py-12 text-gray-500">No leagues yet. Create one!</div>
               )}
             </div>
+          </div>
+        )}
+
+        {tab === "seasons" && <SeasonsTab />}
+        {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
+      </div>
+    </div>
+  );
+}
+
+// ─────────── Seasons Tab ───────────
+function SeasonsTab() {
+  const [seasons, setSeasons] = useState([]);
+  const [form, setForm] = useState({ name: "", sport: activeSportIds[0] || "tennis", start_date: "", end_date: "" });
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const fetchSeasons = async () => {
+    try {
+      const { data } = await axios.get(`${API}/seasons`, { withCredentials: true });
+      setSeasons(data);
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => { fetchSeasons(); }, []);
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setBusy(true); setMsg("");
+    try {
+      await axios.post(`${API}/seasons`, form, { withCredentials: true });
+      setMsg("Season created!");
+      setForm({ name: "", sport: activeSportIds[0] || "tennis", start_date: "", end_date: "" });
+      fetchSeasons();
+    } catch (err) {
+      setMsg(err.response?.data?.detail || "Failed to create season");
+    } finally { setBusy(false); }
+  };
+
+  const updateStatus = async (id, status) => {
+    try {
+      await axios.patch(`${API}/seasons/${id}`, { status }, { withCredentials: true });
+      fetchSeasons();
+    } catch (e) { console.error(e); }
+  };
+
+  const remove = async (id) => {
+    if (!window.confirm("Delete this season?")) return;
+    try {
+      await axios.delete(`${API}/seasons/${id}`, { withCredentials: true });
+      fetchSeasons();
+    } catch (e) { console.error(e); }
+  };
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6" data-testid="seasons-tab">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-4">Create Season</h3>
+        <form onSubmit={handleCreate} className="space-y-3">
+          <input
+            type="text" required value={form.name} placeholder="e.g. Summer 2026"
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="season-name-input"
+          />
+          <select
+            value={form.sport} onChange={(e) => setForm((f) => ({ ...f, sport: e.target.value }))}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="season-sport-select"
+          >
+            {activeSportIds.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+          </select>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="date" required value={form.start_date}
+              onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
+              className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              data-testid="season-start-input"
+            />
+            <input
+              type="date" required value={form.end_date}
+              onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))}
+              className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              data-testid="season-end-input"
+            />
+          </div>
+          {msg && (
+            <div className={`text-sm px-3 py-2 rounded-lg ${msg.includes("!") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`} data-testid="season-message">
+              {msg}
+            </div>
+          )}
+          <button type="submit" disabled={busy} className="w-full py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60" data-testid="season-submit-btn">
+            {busy ? "Creating..." : "Create Season"}
+          </button>
+        </form>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-4">Seasons ({seasons.length})</h3>
+        {seasons.length === 0 ? (
+          <p className="text-sm text-gray-500">No seasons yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {seasons.map((s) => (
+              <div key={s.id} className="border border-gray-100 rounded-xl p-4 flex items-center justify-between gap-3" data-testid={`season-row-${s.id}`}>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{s.name} <span className="text-xs text-gray-400 font-normal capitalize ml-1">({s.sport})</span></p>
+                  <p className="text-xs text-gray-500 mt-0.5">{s.start_date} → {s.end_date}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={s.status} onChange={(e) => updateStatus(s.id, e.target.value)}
+                    className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white"
+                    data-testid={`season-status-${s.id}`}
+                  >
+                    <option value="upcoming">Upcoming</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                  <button onClick={() => remove(s.id)} className="text-xs text-red-500 hover:text-red-700" data-testid={`season-delete-${s.id}`}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────── Playoffs Tab ───────────
+function PlayoffsTab({ leagues }) {
+  const [leagueId, setLeagueId] = useState("");
+  const [topN, setTopN] = useState(4);
+  const [date, setDate] = useState("");
+  const [bracket, setBracket] = useState(null);
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const loadBracket = async (lid) => {
+    if (!lid) { setBracket(null); return; }
+    try {
+      const { data } = await axios.get(`${API}/playoffs/${lid}`);
+      setBracket(data);
+    } catch { setBracket(null); }
+  };
+
+  useEffect(() => { loadBracket(leagueId); }, [leagueId]);
+
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setBusy(true); setMsg("");
+    try {
+      await axios.post(
+        `${API}/playoffs`,
+        { league_id: leagueId, top_n: Number(topN), first_round_date: date },
+        { withCredentials: true },
+      );
+      setMsg("Bracket generated!");
+      loadBracket(leagueId);
+    } catch (err) {
+      setMsg(err.response?.data?.detail || "Failed to generate bracket");
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6" data-testid="playoffs-tab">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-emerald-500" /> Generate Playoff Bracket
+        </h3>
+        <form onSubmit={handleGenerate} className="space-y-3">
+          <select
+            required value={leagueId} onChange={(e) => setLeagueId(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="playoff-league-select"
+          >
+            <option value="">Choose a league...</option>
+            {leagues.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+          <select
+            value={topN} onChange={(e) => setTopN(Number(e.target.value))}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="playoff-top-n"
+          >
+            <option value={2}>Top 2 — Final only</option>
+            <option value={4}>Top 4 — Semis + Final</option>
+            <option value={8}>Top 8 — Quarters + Semis + Final</option>
+            <option value={16}>Top 16 — Round of 16 onwards</option>
+          </select>
+          <input
+            type="date" required value={date} onChange={(e) => setDate(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            data-testid="playoff-date-input"
+          />
+          {msg && (
+            <div className={`text-sm px-3 py-2 rounded-lg ${msg.includes("!") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`} data-testid="playoff-message">
+              {msg}
+            </div>
+          )}
+          <button type="submit" disabled={busy} className="w-full py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60" data-testid="playoff-submit-btn">
+            {busy ? "Generating..." : "Generate Bracket"}
+          </button>
+          <p className="text-xs text-gray-500">Requires at least N players with recorded match results in the league's standings.</p>
+        </form>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-4">Bracket Preview</h3>
+        {!bracket || !bracket.rounds?.length ? (
+          <p className="text-sm text-gray-500">Select a league with an existing bracket to preview.</p>
+        ) : (
+          <div className="space-y-5" data-testid="bracket-preview">
+            {bracket.rounds.map((r) => (
+              <div key={r.round}>
+                <p className="text-xs uppercase tracking-wide font-semibold text-gray-500 mb-2">Round {r.round}</p>
+                <div className="space-y-2">
+                  {r.matches.map((m) => (
+                    <div key={m.id} className="flex items-center justify-between text-sm border border-gray-100 rounded-lg px-3 py-2" data-testid={`bracket-match-${m.id}`}>
+                      <span className={m.winner_id === m.player1_id ? "font-semibold text-emerald-600" : "text-gray-700"}>{m.player1_name}</span>
+                      <span className="text-xs text-gray-400">vs</span>
+                      <span className={m.winner_id === m.player2_id ? "font-semibold text-emerald-600" : "text-gray-700"}>{m.player2_name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

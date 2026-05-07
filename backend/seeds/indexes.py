@@ -1,0 +1,7 @@
+async def create_indexes(db) -> None:
+    await db.users.create_index("email", unique=True)
+    await db.player_leagues.create_index([("player_id", 1), ("league_id", 1)])
+    await db.matches.create_index([("league_id", 1), ("scheduled_date", 1)])
+    await db.standings.create_index([("league_id", 1), ("points", -1)])
+    await db.payment_transactions.create_index("session_id")
+    await db.seasons.create_index([("sport", 1), ("status", 1)])

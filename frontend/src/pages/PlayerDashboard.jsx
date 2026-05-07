@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff } from "lucide-react";
+import OpponentSearch from "../components/OpponentSearch";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -218,15 +219,12 @@ export default function PlayerDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Opponent Player ID</label>
-                    <input
-                      type="text"
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Opponent</label>
+                    <OpponentSearch
+                      leagueId={scheduleLeagueId}
                       value={opponent}
-                      onChange={(e) => setOpponent(e.target.value)}
-                      placeholder="Enter opponent's user ID"
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                      required
-                      data-testid="schedule-opponent-input"
+                      onSelect={(u) => setOpponent(u?.id || "")}
+                      testId="schedule-opponent"
                     />
                   </div>
                   <div>
