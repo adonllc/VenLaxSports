@@ -5,7 +5,7 @@ Configuration (backend/.env):
   SMTP_PORT     e.g. 587 (TLS), 465 (SSL), 25 (plain)
   SMTP_USER     SMTP username
   SMTP_PASS     SMTP password (or Gmail app password)
-  SMTP_FROM     From address, e.g. "LeaguePro <noreply@leaguepro.com>"
+  SMTP_FROM     From address, e.g. "VENLAX <noreply@venlaxsports.com>"
   SMTP_TLS      "true" to use STARTTLS (default true), "false" for plain
   SMTP_SSL      "true" to use SMTPS (default false)
 
@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = "LeaguePro"
+APP_NAME = "VENLAX"
 
 
 def _get_frontend_url() -> str:
@@ -46,7 +46,7 @@ async def send_email(to: str, subject: str, html: str, text: Optional[str] = Non
     if not to:
         return False
 
-    sender = os.environ.get("SMTP_FROM", f"{APP_NAME} <noreply@leaguepro.com>")
+    sender = os.environ.get("SMTP_FROM", f"{APP_NAME} <noreply@venlaxsports.com>")
 
     if not _smtp_configured() or aiosmtplib is None:
         logger.info("[EMAIL:console] to=%s from=%s subject=%s\n%s", to, sender, subject, text or html)

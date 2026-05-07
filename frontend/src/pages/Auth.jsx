@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Eye, EyeOff } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
+import BRAND from "../config/brandConfig";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 // PHASE-DRIVEN: only the active country is offered during registration.
@@ -69,10 +70,10 @@ export default function Auth() {
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Trophy className="w-7 h-7 text-black" />
             </div>
-            <span className="font-heading font-black text-3xl">League<span className="text-emerald-400">Pro</span></span>
+            <span className="font-heading font-black text-3xl">{BRAND.full_logo.prefix}<span className="text-emerald-400">{BRAND.full_logo.accent}</span></span>
           </div>
-          <h2 className="font-heading font-black text-4xl leading-tight mb-4">Your league.<br />Your rules.<br /><span className="text-emerald-400">Your win.</span></h2>
-          <p className="text-gray-400 text-base max-w-xs mx-auto">{platformConfig.footerTagline}</p>
+          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Victory.<br />Energy.<br /><span className="text-emerald-400">eXperience.</span></h2>
+          <p className="text-gray-400 text-base max-w-xs mx-auto">{BRAND.story_short}</p>
           <div className="flex justify-center gap-6 mt-10">
             {activeSports.map((s) => (
               <div key={s.id} className="text-sm text-gray-300 font-medium">{s.icon} {s.label}</div>
@@ -106,7 +107,7 @@ export default function Auth() {
             {mode === "login" ? "Welcome back" : "Create account"}
           </h1>
           <p className="text-gray-500 text-sm mb-8">
-            {mode === "login" ? "Log in to your LeaguePro account" : "Start your competitive sports journey"}
+            {mode === "login" ? `Log in to your ${BRAND.name} account` : `Compete · Connect · Rise — join ${BRAND.name} today`}
           </p>
 
           {error && (

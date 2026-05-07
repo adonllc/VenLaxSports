@@ -211,7 +211,7 @@ async def list_payment_methods():
                 "enabled": True,
                 "config": {
                     "handle": os.environ.get("ZELLE_HANDLE", ""),
-                    "display_name": os.environ.get("ZELLE_DISPLAY_NAME", "LeaguePro"),
+                    "display_name": os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX"),
                     "placeholder": True,
                 },
             },
@@ -411,4 +411,3 @@ async def zelle_confirm(data: ZelleConfirmIn, request: Request):
         "reference_number": data.reference_number,
         "placeholder": True,
     }
-

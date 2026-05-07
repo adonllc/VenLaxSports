@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 async def seed_admin(db) -> None:
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@leaguepro.com")
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@venlaxsports.com")
     admin_password = os.environ.get("ADMIN_PASSWORD", "Admin@123")
     existing = await db.users.find_one({"email": admin_email})
     if existing is None:

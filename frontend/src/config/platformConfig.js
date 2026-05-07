@@ -59,9 +59,9 @@ const PHASE_1 = {
 
   // UI copy
   heroBadge: "Now live — Season 1 open for registration",
-  heroSubtitle: "Join competitive Tennis & Pickleball leagues across top US cities.",
-  footerTagline: "Competitive Tennis & Pickleball leagues across the USA.",
-  statsRegion: "8+ US Cities",
+  heroSubtitle: "Compete. Connect. Rise. Tennis & Pickleball leagues open across the USA.",
+  footerTagline: "Where Victory meets eXperience — Tennis & Pickleball leagues across the USA.",
+  statsRegion: "All US Cities",
 
   // City highlights shown on Home page
   featuredCities: [

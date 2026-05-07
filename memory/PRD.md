@@ -1,8 +1,21 @@
-# LeaguePro - Multi-Sport League Platform
+# VENLAX - Multi-Sport League Platform
 ## Product Requirements Document
 
 **Last Updated**: Feb 2026
-**Version**: 1.1 (Phase 1 — USA: Tennis + Pickleball)
+**Version**: 1.2 (Phase 1 — USA: Tennis + Pickleball)
+**Domain**: venlaxsports.com
+**Tagline**: Victory. Energy. eXperience.
+
+---
+
+## Brand Identity
+
+**VENLAX** is built on three pillars:
+- **🏆 Victory** — Every match, every league, every season helps players win, improve, and rise.
+- **⚡ Energy** — The heartbeat of sports — fast, dynamic, community-driven.
+- **🎮 eXperience** — Seamless digital + physical sports journey, mobile-first.
+
+**Short story**: VENLAX stands for Victory, Energy, and eXperience — a global multi-sport platform built for players who want to compete, connect, and rise.
 
 ---
 
@@ -37,6 +50,13 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 ---
 
 ## What's Been Implemented
+
+### Feb 2026 — VENLAX Rebrand
+- **Brand identity migration** from LeaguePro → VENLAX with `frontend/src/config/brandConfig.js` as single source of truth (name, domain, taglines, pillars, story).
+- All UI surfaces updated: HTML title + meta + OG tags, Navbar logo (`VEN`+`LAX` emerald), Footer, Auth left panel ("Victory. Energy. eXperience."), SportLanding, App.css.
+- Backend: email_service `APP_NAME='VENLAX'`, default sender `noreply@venlaxsports.com`, Zelle handle `payments@venlaxsports.com`, admin email default `admin@venlaxsports.com`.
+- New admin seeded `admin@venlaxsports.com / Admin@123` (legacy `admin@leaguepro.com` still works for backwards compat).
+- `.env.usa` and `.env.india` deployment templates rewritten with VENLAX domain + Atlas-ready Mongo placeholders + CORS pre-configured for `venlaxsports.com`.
 
 ### Feb 2026 — All Cities Open + Auto-League Generator + Standardized Pricing + 4 Payment Methods
 - **All cities open** — UI no longer constrains players or admins to a curated list. City inputs are free-text (Auth register, Leagues filter, Admin create-league) with seeded cities as autocomplete suggestions only. "All Cities" is a first-class option.

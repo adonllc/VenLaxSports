@@ -124,7 +124,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-bold text-2xl text-gray-900 mb-3">About {meta.label} on LeaguePro</h2>
+          <h2 className="font-heading font-bold text-2xl text-gray-900 mb-3">About {meta.label} on VENLAX</h2>
           <p className="text-gray-600 leading-relaxed">{meta.description}</p>
         </div>
 

@@ -52,7 +52,7 @@ export default function Navbar() {
               <Trophy className="w-5 h-5 text-white" />
             </div>
             <span className="font-heading font-black text-xl text-gray-900 tracking-tight">
-              League<span className="text-emerald-500">Pro</span>
+              VEN<span className="text-emerald-500">LAX</span>
             </span>
           </Link>
 
