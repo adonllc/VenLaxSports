@@ -120,6 +120,15 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     except Exception:
         pass
 
+    # Playoff advancement: if this match was a playoff match and its round is now fully
+    # scored, auto-create the next round pairing winners in bracket order.
+    next_round_created = None
+    try:
+        if match.get("is_playoff"):
+            next_round_created = await _maybe_advance_playoffs(db, match["league_id"], match.get("bracket_round", 1))
+    except Exception:
+        pass
+
     # Notify both players with the result
     try:
         league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
@@ -138,6 +147,8 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     resp = {"message": "Score reported successfully"}
     if rating_change:
         resp["rating_change"] = rating_change
+    if next_round_created:
+        resp["next_round_created"] = next_round_created
     return resp
 
 
@@ -169,7 +180,7 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str):
 async def _update_ratings(db, match: dict, winner_id: str):
     """Apply ELO-style rating delta to winner + loser for tennis/pickleball.
 
-    Returns a dict with old/new ratings so the response can surface the change.
+    Returns a dict with old/new ratings and writes rating_history snapshots.
     """
     sport = match["sport"]
     field = rating_field_for(sport)
@@ -194,8 +205,120 @@ async def _update_ratings(db, match: dict, winner_id: str):
     await db.users.update_one({"_id": ObjectId(winner_id)}, {"$set": {field: w_new}})
     await db.users.update_one({"_id": ObjectId(loser_id)}, {"$set": {field: l_new}})
 
+    now = datetime.now(timezone.utc).isoformat()
+    match_id_str = str(match.get("_id", ""))
+    await db.rating_history.insert_many([
+        {"user_id": winner_id, "sport": sport, "rating": w_new, "delta": w_delta,
+         "match_id": match_id_str, "league_id": match.get("league_id"),
+         "opponent_id": loser_id, "opponent_name": loser.get("name"),
+         "result": "win", "created_at": now},
+        {"user_id": loser_id, "sport": sport, "rating": l_new, "delta": l_delta,
+         "match_id": match_id_str, "league_id": match.get("league_id"),
+         "opponent_id": winner_id, "opponent_name": winner.get("name"),
+         "result": "loss", "created_at": now},
+    ])
+
     return {
         "sport": sport,
         "winner": {"id": winner_id, "old": w_rating, "new": w_new, "delta": w_delta},
         "loser": {"id": loser_id, "old": l_rating, "new": l_new, "delta": l_delta},
     }
+
+
+async def _maybe_advance_playoffs(db, league_id: str, round_num: int):
+    """If every match in `round_num` is complete, create next-round matches by pairing winners."""
+    round_matches = await db.matches.find(
+        {"league_id": league_id, "is_playoff": True, "bracket_round": round_num}
+    ).sort("bracket_position", 1).to_list(64)
+    if not round_matches:
+        return None
+    if any(m.get("status") != "completed" for m in round_matches):
+        return None
+    if len(round_matches) == 1:
+        # Final already played — mark league done
+        await db.leagues.update_one(
+            {"_id": ObjectId(league_id)},
+            {"$set": {"playoffs_status": "completed", "status": "completed",
+                      "updated_at": datetime.now(timezone.utc).isoformat()}},
+        )
+        return {"round": round_num, "league_completed": True}
+
+    next_round = round_num + 1
+    existing = await db.matches.count_documents(
+        {"league_id": league_id, "is_playoff": True, "bracket_round": next_round}
+    )
+    if existing > 0:
+        return None
+
+    league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    venue = league.get("venue") if league else None
+    sport = league.get("sport") if league else round_matches[0]["sport"]
+
+    base_date = round_matches[0].get("scheduled_date", datetime.now(timezone.utc).isoformat())
+    try:
+        from datetime import timedelta
+        base_dt = datetime.fromisoformat(str(base_date).replace("Z", "+00:00"))
+        new_date = (base_dt + timedelta(days=7)).isoformat()
+    except Exception:
+        new_date = base_date
+
+    # Round label depends on how many matches the next round will hold
+    next_round_size = len(round_matches) // 2
+    round_label = {1: "Final", 2: "Semifinal", 4: "Quarterfinal"}.get(
+        next_round_size, f"Round {next_round}"
+    )
+
+    now = datetime.now(timezone.utc).isoformat()
+    created_ids: list[str] = []
+    for i in range(0, len(round_matches), 2):
+        a = round_matches[i]
+        b = round_matches[i + 1]
+        winner_a_id = a["winner_id"]
+        winner_b_id = b["winner_id"]
+        winner_a_name = a.get("winner_name") or (
+            a["player1_name"] if winner_a_id == a["player1_id"] else a["player2_name"]
+        )
+        winner_b_name = b.get("winner_name") or (
+            b["player1_name"] if winner_b_id == b["player1_id"] else b["player2_name"]
+        )
+        m = Match(
+            league_id=league_id,
+            sport=sport,
+            player1_id=winner_a_id,
+            player2_id=winner_b_id,
+            player1_name=winner_a_name,
+            player2_name=winner_b_name,
+            scheduled_date=new_date,
+            venue=venue,
+            notes=f"Playoff {round_label} — Match {(i // 2) + 1}",
+        )
+        doc = m.to_mongo()
+        doc["is_playoff"] = True
+        doc["bracket_round"] = next_round
+        doc["bracket_position"] = (i // 2) + 1
+        doc["created_at"] = now
+        result = await db.matches.insert_one(doc)
+        created_ids.append(str(result.inserted_id))
+
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {"$set": {"playoffs_status": f"round_{next_round}", "updated_at": now}},
+    )
+
+    # Notify next-round players (best-effort)
+    try:
+        for mid in created_ids:
+            new_match = await db.matches.find_one({"_id": ObjectId(mid)})
+            if not new_match:
+                continue
+            p1 = await db.users.find_one({"_id": ObjectId(new_match["player1_id"])})
+            p2 = await db.users.find_one({"_id": ObjectId(new_match["player2_id"])})
+            for p, opp in ((p1, new_match["player2_name"]), (p2, new_match["player1_name"])):
+                if _should_notify(p):
+                    email_service.schedule(email_service.send_match_scheduled(
+                        p["email"], p["name"], opp, sport,
+                        new_date, venue, mid))
+    except Exception:
+        pass
+
+    return {"round": next_round, "match_ids": created_ids, "label": round_label}

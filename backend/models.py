@@ -86,6 +86,7 @@ class League(BaseDocument):
     description: Optional[str] = None
     venue: Optional[str] = None
     season: str = "Season 1"
+    season_id: Optional[str] = None
     rules: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -104,6 +105,7 @@ class LeagueCreate(BaseModel):
     description: Optional[str] = None
     venue: Optional[str] = None
     season: str = "Season 1"
+    season_id: Optional[str] = None
     rules: Optional[str] = None
 
 
@@ -114,6 +116,7 @@ class LeagueUpdate(BaseModel):
     venue: Optional[str] = None
     max_players: Optional[int] = None
     entry_fee: Optional[float] = None
+    season_id: Optional[str] = None
     rules: Optional[str] = None
 
 

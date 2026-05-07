@@ -1,0 +1,40 @@
+{
+  "summary": "Iteration 6 testing: 3 new features — playoff auto-advance, rating-history endpoint + UI chart, league↔season FK. Backend 11/11 passed. Frontend verified end-to-end: rating chart renders with all 6 data-testids, pickleball tab shows empty-state copy, /leagues filter-season dropdown present, admin Create League Season dropdown present with helper text.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/auth/me", "issue": "Exposes raw MongoDB `_id` field (not `id`) — inconsistent with /api/auth/login which correctly returns `id`. User's own record so no data leak, but every frontend consumer must special-case this. Should exclude `_id` via projection and map to `id` like the other endpoints.", "priority": "LOW"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration6.py",
+    "/app/test_reports/pytest/iteration6.xml"
+  ],
+  "action_items": [
+    "(Low) Normalise /api/auth/me to return `id` instead of `_id` for frontend consistency."
+  ],
+  "critical_code_review_comments": [
+    "match_routes._maybe_advance_playoffs: correctly idempotent (checks existing next-round matches before inserting) and emits next_round_created in the score response. Nice.",
+    "match_routes._update_ratings: rating_history snapshots are written only for tennis/pickleball — cricket correctly excluded. Snapshots include opponent_name/result/league_id/sport for chart rendering.",
+    "user_routes: GET /api/users/me/rating-history is correctly placed BEFORE GET /api/users/{user_id} so the literal `me` doesn't get captured as user_id — good route precedence.",
+    "RatingHistoryChart.jsx: `user?.[`${sport}_rating`] !== undefined` filter for eligible sports is correct — cricket is naturally excluded. Uses `withCredentials: true` for the cookie-based auth.",
+    "league_routes: added season_id query param; get_leagues is also phase-gated. Clean.",
+    "Phase 1 gating is now consistent: POST /api/leagues and POST /api/seasons both 400 on inactive sports — last iteration's minor issue is resolved.",
+    "Minor: /api/auth/me returns `_id` instead of `id` — inconsistent with other endpoints that project it out."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration6.py (new)"
+  ],
+  "success_rate": {"backend": "100% (11/11)", "frontend": "100% (all 6 rating-history testids, /leagues filter-season, and admin create-league-season verified)"},
+  "test_credentials": "admin@leaguepro.com / Admin@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Fresh users ui1_<rand>@e.com / ui2_<rand>@e.com with Test@123 via /api/auth/register for rating-history UI test. Fresh TEST_UISeason_<rand> + TEST_UILeague_<rand> linked via season_id. Playoff test creates 4 fresh players and an 8-player tennis league.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Auth endpoints return cookies (access_token/refresh_token). The Auth.jsx LOGIN form does NOT have data-testids — use input[type=email], input[type=password], button[type=submit] selectors. After UI login, navigate to /dashboard directly (redirect lands on /dashboard automatically). LeagueCreate model REQUIRES `format` field (singles/doubles/mixed/T20/T10). /api/auth/me currently returns `_id` not `id` — use /api/auth/login response for the id instead.",
+  "rca of the issue": "N/A — all 3 new features work end-to-end. Only a minor /api/auth/me inconsistency noted."
+}

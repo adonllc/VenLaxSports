@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff } from "lucide-react";
 import OpponentSearch from "../components/OpponentSearch";
+import RatingHistoryChart from "../components/RatingHistoryChart";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -194,6 +195,9 @@ export default function PlayerDashboard() {
               </div>
             )}
           </div>
+
+          {/* Rating History */}
+          <RatingHistoryChart user={user} />
 
           {/* Schedule a Match */}
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">

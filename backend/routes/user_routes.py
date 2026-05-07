@@ -58,6 +58,22 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
     return results
 
 
+@router.get("/me/rating-history")
+async def my_rating_history(request: Request, sport: Optional[str] = None, limit: int = 50):
+    """Return the current user's rating history (most recent `limit` snapshots).
+
+    Optionally filtered by sport. Snapshots are written by `_update_ratings`
+    inside match score reporting, so cricket is excluded by design.
+    """
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    query: dict = {"user_id": user["_id"]}
+    if sport:
+        query["sport"] = sport
+    cursor = db.rating_history.find(query, {"_id": 0}).sort("created_at", 1).limit(limit)
+    return await cursor.to_list(limit)
+
+
 @router.get("/{user_id}")
 async def get_user(user_id: str, request: Request):
     """Look up a public user profile by id. Auth required; password never exposed."""

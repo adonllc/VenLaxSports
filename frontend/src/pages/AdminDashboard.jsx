@@ -22,7 +22,7 @@ const DEFAULT_FORM = {
   name: "", sport: SPORTS[0] || "tennis", country: activeCountry, city: "",
   format: (FORMATS[SPORTS[0]] || ["singles"])[0],
   entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16,
-  start_date: "", end_date: "", description: "", venue: "", season: "Season 1",
+  start_date: "", end_date: "", description: "", venue: "", season: "Season 1", season_id: "",
 };
 
 export default function AdminDashboard() {
@@ -35,6 +35,7 @@ export default function AdminDashboard() {
   const [creating, setCreating] = useState(false);
   const [msg, setMsg] = useState("");
   const [cities, setCities] = useState([]);
+  const [seasons, setSeasons] = useState([]);
 
   useEffect(() => {
     if (loading) return;
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
     fetchStats();
     fetchLeagues();
     fetchCities();
+    fetchSeasons();
   }, [user, loading]);
 
   const fetchStats = async () => {
@@ -66,6 +68,13 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); }
   };
 
+  const fetchSeasons = async () => {
+    try {
+      const { data } = await axios.get(`${API}/seasons`, { withCredentials: true });
+      setSeasons(data);
+    } catch (e) { console.error(e); }
+  };
+
   const update = (k) => (e) => {
     const v = e.target.value;
     setForm((f) => {
@@ -81,7 +90,13 @@ export default function AdminDashboard() {
     setCreating(true);
     setMsg("");
     try {
-      await axios.post(`${API}/leagues`, { ...form, entry_fee: Number(form.entry_fee), max_players: Number(form.max_players) }, { withCredentials: true });
+      const payload = {
+        ...form,
+        entry_fee: Number(form.entry_fee),
+        max_players: Number(form.max_players),
+        season_id: form.season_id || null,
+      };
+      await axios.post(`${API}/leagues`, payload, { withCredentials: true });
       setMsg("League created successfully!");
       setForm(DEFAULT_FORM);
       fetchLeagues();
@@ -254,6 +269,16 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">End Date *</label>
                     <input type="date" value={form.end_date} onChange={update("end_date")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black" required data-testid="create-league-end" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Season</label>
+                    <select value={form.season_id || ""} onChange={update("season_id")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black" data-testid="create-league-season">
+                      <option value="">— None —</option>
+                      {seasons.filter((s) => s.sport === form.sport).map((s) => (
+                        <option key={s.id} value={s.id}>{s.name} ({s.status})</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-400 mt-1">Optional — link this league to a season for grouping.</p>
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Venue</label>

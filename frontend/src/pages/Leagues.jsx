@@ -29,18 +29,27 @@ export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
+  const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     sport: searchParams.get("sport") || "",
     country: searchParams.get("country") || "",
     city: searchParams.get("city") || "",
     status: searchParams.get("status") || "",
+    season_id: searchParams.get("season_id") || "",
     search: "",
   });
 
   useEffect(() => {
     fetchLeagues();
-  }, [filters.sport, filters.country, filters.city, filters.status]);
+  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id]);
+
+  useEffect(() => {
+    // Seasons endpoint requires auth, so degrade gracefully if logged out
+    axios.get(`${API}/seasons`, { withCredentials: true })
+      .then(({ data }) => setSeasons(data))
+      .catch(() => setSeasons([]));
+  }, []);
 
   const fetchLeagues = async () => {
     setLoading(true);
@@ -50,6 +59,7 @@ export default function Leagues() {
       if (filters.country) params.set("country", filters.country);
       if (filters.city) params.set("city", filters.city);
       if (filters.status) params.set("status", filters.status);
+      if (filters.season_id) params.set("season_id", filters.season_id);
       params.set("limit", "50");
       const { data } = await axios.get(`${API}/leagues?${params}`);
       setLeagues(data);
@@ -109,6 +119,22 @@ export default function Leagues() {
               <option key={s.id} value={s.id}>{s.icon} {s.label}</option>
             ))}
           </select>
+
+          {seasons.length > 0 && (
+            <select
+              value={filters.season_id}
+              onChange={(e) => updateFilter("season_id", e.target.value)}
+              className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+              data-testid="filter-season"
+            >
+              <option value="">All Seasons</option>
+              {seasons
+                .filter((s) => !filters.sport || s.sport === filters.sport)
+                .map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+            </select>
+          )}
 
           {/* City Filter */}
           <select
