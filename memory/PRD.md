@@ -38,6 +38,14 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — Player Search, Ratings, Seasons, Playoffs, Seeds Refactor
+- **Seeds refactor** — moved out of `server.py` into `/app/backend/seeds/{admin,cities,leagues,indexes}.py` for scalability
+- **Player search** — `GET /api/users/search?q=&league_id=` (2+ char min, optional league scoping, password_hash excluded); `OpponentSearch` typeahead on Player Dashboard match scheduler
+- **ELO-style rating updates** — `rating_utils.py` applies small deltas (K=0.05, logistic curve) on every completed tennis/pickleball match; response now includes `rating_change` (winner/loser old/new/delta); cricket untouched (team NRR)
+- **Seasons (admin CRUD)** — `POST/GET/PATCH/DELETE /api/seasons`, phase-gated to active sports. New Seasons tab on Admin Dashboard.
+- **Playoffs bracket generation** — `POST /api/playoffs` + `GET /api/playoffs/:league_id`. Single-elimination seeding (#1 vs #N, #2 vs #N-1, ...) for top 2/4/8/16 players from league standings. New Playoffs tab on Admin Dashboard with bracket preview.
+- **Consistent phase gating on league creation** — admin can no longer create cricket/India leagues in Phase 1 (400 error); matches season gating behavior.
+
 ### Feb 2026 — Email Notifications (open-source, aiosmtplib)
 - New `backend/email_service.py` — MIT-licensed `aiosmtplib`, console fallback when `SMTP_HOST` unset (zero-setup dev)
 - Transactional emails on 4 events:
@@ -79,15 +87,14 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 ## Prioritized Backlog
 
 ### P0 — Phase 1 Completion
-- [ ] Team management for Cricket (defer to Phase 2)
-- [ ] Player search-by-ID to improve match scheduling UX
-- [ ] Email notifications (SendGrid / Resend) for match scheduling
+- [ ] Enable real SMTP (user plugs in Gmail app password / Mailtrap / self-hosted)
+- [ ] Weekly digest email (requires SMTP)
+- [ ] Dispute resolution flow on reported scores
 
 ### P1 — High Priority
-- [ ] Rating updates after match results
-- [ ] Playoffs bracket generation
-- [ ] Season management (create/activate/end seasons)
-- [ ] Dispute resolution flow
+- [ ] Advance-round logic for playoffs (auto-create next-round matches when all current-round matches complete)
+- [ ] Rating history per user (graph on Player Dashboard)
+- [ ] Link leagues to seasons (leagues.season_id FK + filter by season on /leagues)
 - [ ] City/venue management admin pages
 
 ### P2 — Phase 2 (USA + Cricket)

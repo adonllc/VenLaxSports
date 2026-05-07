@@ -82,6 +82,11 @@ async def get_league(league_id: str, request: Request):
 async def create_league(data: LeagueCreate, request: Request):
     db = request.app.state.db
     user = await require_admin(request, db)
+    # Phase gating — keep league creation consistent with season creation
+    if data.sport not in ACTIVE_SPORTS:
+        raise HTTPException(status_code=400, detail="Sport not active in the current phase")
+    if data.country != ACTIVE_COUNTRY:
+        raise HTTPException(status_code=400, detail="Country not active in the current phase")
     league = League(
         **data.model_dump(),
         admin_id=user["_id"],
