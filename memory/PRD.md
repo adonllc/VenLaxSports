@@ -38,6 +38,13 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — All Cities Open + Auto-League Generator + Standardized Pricing + 4 Payment Methods
+- **All cities open** — UI no longer constrains players or admins to a curated list. City inputs are free-text (Auth register, Leagues filter, Admin create-league) with seeded cities as autocomplete suggestions only. "All Cities" is a first-class option.
+- **Auto-league generator** — `POST /api/admin/auto/leagues` with cadence ∈ {monthly, quarterly, half_yearly, yearly, all} creates one league per cadence × active sport × format (singles/doubles/mixed). Idempotent: re-runs skip existing. Generated leagues are tagged `auto_generated:true`, `auto_cadence`, city='All Cities'. New `Auto-Generate` tab on Admin Dashboard.
+- **Standardized pricing** — `pricing_config.py`: singles=$9.99, doubles=$19.99, mixed=$19.99. Startup migration `seeds/pricing.py` normalizes existing seed leagues idempotently.
+- **4 payment methods** — Stripe (existing checkout), Apple Pay + Google Pay (wallet stub via `POST /api/payments/wallet`), Zelle (2-step intent + reference number via `POST /api/payments/zelle/intent` → `/zelle/confirm`). All wallets/Zelle use placeholder credentials in `backend/.env` (`APPLE_PAY_MERCHANT_ID`, `GOOGLE_PAY_MERCHANT_ID`, `ZELLE_HANDLE`, etc). New `PaymentMethodModal` on League Detail picks method.
+- **Public payment-config endpoint** — `GET /api/payments/methods` exposes which methods are enabled and their (placeholder) display config so frontend can render dynamically.
+
 ### Feb 2026 — Auto-Advance Playoffs, Rating History Graph, Leagues↔Seasons FK
 - **Auto-advance playoffs** — `_maybe_advance_playoffs` triggers after each playoff score; when all matches in a round are completed, next-round matches are auto-created pairing winners in bracket order. Round labels: Final / Semifinal / Quarterfinal. Notifications fired to next-round players. Final completion marks league as completed.
 - **Rating history snapshots** — every tennis/pickleball score writes 2 entries to a new `rating_history` collection (winner + loser) with delta, opponent, result, league_id, sport.
@@ -95,13 +102,16 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 ## Prioritized Backlog
 
 ### P0 — Phase 1 Completion
-- [ ] Enable real SMTP (user plugs in Gmail app password / Mailtrap / self-hosted)
-- [ ] Public player profile page `/p/:user_id` (avatar, win-rate, current league badges, rating, share button)
+- [ ] Wire **real Stripe** account (replace test key + run checkout end-to-end)
+- [ ] Replace placeholder **Apple Pay / Google Pay** merchant IDs with real merchant accounts (Stripe Payment Request Buttons in production)
+- [ ] Replace placeholder **Zelle** handle with real business Zelle email; add admin queue to verify deposits before auto-confirm
+- [ ] Public player profile page `/p/:user_id` (avatar, win-rate, current league badges, rating)
 
 ### P1 — High Priority
+- [ ] Cron-trigger auto-generator (e.g. 1st of every month) — currently admin-button only
+- [ ] Enable real SMTP (Gmail app password / Mailtrap / self-hosted)
 - [ ] Weekly digest email (requires SMTP)
 - [ ] Dispute resolution flow on reported scores
-- [ ] Admin: bulk-import seasons / standings via CSV
 - [ ] City/venue management admin pages
 
 ### P2 — Phase 2 (USA + Cricket)

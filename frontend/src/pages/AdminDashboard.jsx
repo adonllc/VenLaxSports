@@ -250,8 +250,9 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">City *</label>
-                    <input type="text" value={form.city} onChange={update("city")} placeholder="e.g. New York" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black" required data-testid="create-league-city" list="cities-list" />
+                    <input type="text" value={form.city} onChange={update("city")} placeholder="Any city — e.g. Austin, Boise, or All Cities" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black" required data-testid="create-league-city" list="cities-list" />
                     <datalist id="cities-list">
+                      <option value="All Cities" />
                       {cities.filter((c) => c.country === form.country).map((c) => <option key={c.name} value={c.name} />)}
                     </datalist>
                   </div>
