@@ -96,7 +96,10 @@ async def logout(response: Response):
 @router.get("/me")
 async def me(request: Request):
     db = request.app.state.db
-    return await get_current_user(request, db)
+    user = await get_current_user(request, db)
+    # Normalize: expose `id` to clients (other routes still use the internal _id string)
+    user["id"] = user.pop("_id")
+    return user
 
 
 @router.post("/refresh")

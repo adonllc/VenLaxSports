@@ -38,6 +38,14 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — Auto-Advance Playoffs, Rating History Graph, Leagues↔Seasons FK
+- **Auto-advance playoffs** — `_maybe_advance_playoffs` triggers after each playoff score; when all matches in a round are completed, next-round matches are auto-created pairing winners in bracket order. Round labels: Final / Semifinal / Quarterfinal. Notifications fired to next-round players. Final completion marks league as completed.
+- **Rating history snapshots** — every tennis/pickleball score writes 2 entries to a new `rating_history` collection (winner + loser) with delta, opponent, result, league_id, sport.
+- **Rating history endpoint** — `GET /api/users/me/rating-history?sport=` (route declared before `/{user_id}` for path-precedence).
+- **Rating history graph** — `RatingHistoryChart` (recharts LineChart) on Player Dashboard with sport tabs, current rating, trend pill (+/- delta), reference line for starting rating, empty state for new users.
+- **Leagues ↔ Seasons FK** — `League.season_id: Optional[str]`. Admin Create League form shows Season dropdown filtered to current sport. `/leagues` page has Season filter dropdown. `GET /api/leagues?season_id=` filters server-side.
+- **Bonus fix** — `/api/auth/me` now returns `id` instead of `_id` for frontend consistency.
+
 ### Feb 2026 — Player Search, Ratings, Seasons, Playoffs, Seeds Refactor
 - **Seeds refactor** — moved out of `server.py` into `/app/backend/seeds/{admin,cities,leagues,indexes}.py` for scalability
 - **Player search** — `GET /api/users/search?q=&league_id=` (2+ char min, optional league scoping, password_hash excluded); `OpponentSearch` typeahead on Player Dashboard match scheduler
@@ -88,13 +96,12 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ### P0 — Phase 1 Completion
 - [ ] Enable real SMTP (user plugs in Gmail app password / Mailtrap / self-hosted)
-- [ ] Weekly digest email (requires SMTP)
-- [ ] Dispute resolution flow on reported scores
+- [ ] Public player profile page `/p/:user_id` (avatar, win-rate, current league badges, rating, share button)
 
 ### P1 — High Priority
-- [ ] Advance-round logic for playoffs (auto-create next-round matches when all current-round matches complete)
-- [ ] Rating history per user (graph on Player Dashboard)
-- [ ] Link leagues to seasons (leagues.season_id FK + filter by season on /leagues)
+- [ ] Weekly digest email (requires SMTP)
+- [ ] Dispute resolution flow on reported scores
+- [ ] Admin: bulk-import seasons / standings via CSV
 - [ ] City/venue management admin pages
 
 ### P2 — Phase 2 (USA + Cricket)
