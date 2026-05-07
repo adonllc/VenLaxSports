@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import ResetPassword from "./pages/ResetPassword";
 import Leagues from "./pages/Leagues";
 import LeagueDetail from "./pages/LeagueDetail";
 import PlayerDashboard from "./pages/PlayerDashboard";
@@ -26,6 +27,7 @@ function AppRouter() {
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/sport/:sport" element={<SportLanding />} />
       <Route path="/leagues" element={<Leagues />} />
       <Route path="/leagues/:id" element={<LeagueDetail />} />

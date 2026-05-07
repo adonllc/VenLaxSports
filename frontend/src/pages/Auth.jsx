@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Eye, EyeOff } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 // PHASE-DRIVEN: only the active country is offered during registration.
 // PHASE 3 introduces "India" via REACT_APP_PHASE=3.
@@ -15,6 +16,7 @@ export default function Auth() {
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
   const { login, register, user, formatError } = useAuth();
   const navigate = useNavigate();
 
@@ -185,6 +187,16 @@ export default function Auth() {
                   {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={() => setForgotOpen(true)}
+                  className="text-xs text-gray-500 hover:text-black font-medium mt-2"
+                  data-testid="forgot-password-link"
+                >
+                  Forgot password?
+                </button>
+              )}
             </div>
 
             {mode === "register" && (

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from auth_utils import get_current_user
 from models import PaymentTransaction, PlayerLeague, Standing
+import email_service
 import os
 
 router = APIRouter()
@@ -133,6 +134,13 @@ async def get_payment_status(session_id: str, request: Request):
                     country=player.get("country", "USA"),
                 )
                 await db.standings.insert_one(s.to_mongo())
+
+                # Notify player of paid registration
+                if player.get("email") and player.get("email_notifications", True):
+                    email_service.schedule(email_service.send_registration_confirmed(
+                        player["email"], player["name"], league["name"], league["sport"],
+                        league_id, paid=True, amount=float(txn.get("amount", 0)),
+                        currency=txn.get("currency", "USD")))
 
     return {
         "status": status.status,

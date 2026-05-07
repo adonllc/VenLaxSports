@@ -1,0 +1,56 @@
+{
+  "summary": "Tested email notification feature end-to-end. All backend endpoints work (forgot-password, reset-password, /preferences, free-league join email, match scheduled email, score reported email, opt-out enforcement). 36/36 backend pytest tests pass (27 regression + 8 email + 1 match flow). Frontend has ONE critical bug: ForgotPasswordModal component is imported in Auth.jsx but never rendered in JSX, so clicking the 'Forgot password?' link does nothing visible. Reset-password page, register-mode hides forgot link, and /dashboard email-notifications toggle (ON/OFF + persistence across reload) all work correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/auth/me", "issue": "Returns user with raw '_id' field instead of normalized 'id' (login + register endpoints return 'id'). Inconsistency only — does not break clients but should be unified."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Auth.jsx",
+        "issue": "ForgotPasswordModal is imported (line 6) and forgotOpen state exists (line 19), the link sets setForgotOpen(true) (line 193), BUT <ForgotPasswordModal open={forgotOpen} onClose={() => setForgotOpen(false)} prefillEmail={form.email} /> is NEVER rendered in JSX. Clicking 'Forgot password?' does nothing (modal element [data-testid='forgot-password-modal'] never mounts). Fix: add modal render before final closing </div>, e.g. before line 252:  {forgotOpen && <ForgotPasswordModal open={forgotOpen} onClose={() => setForgotOpen(false)} prefillEmail={form.email} />}",
+        "selector": "[data-testid='forgot-password-link'] click → no modal",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_email_notifications.py",
+    "/app/backend/tests/test_match_emails.py",
+    "/app/backend/tests/test_api.py",
+    "/app/test_reports/pytest/email_notifications.xml",
+    "/app/test_reports/pytest/match_emails.xml",
+    "/app/test_reports/pytest/regression.xml"
+  ],
+  "action_items": [
+    "Render <ForgotPasswordModal open={forgotOpen} onClose={() => setForgotOpen(false)} prefillEmail={form.email} /> inside Auth.jsx return tree (currently component imported but never mounted)",
+    "(Optional) Normalize /api/auth/me response to use 'id' instead of '_id' to match login/register"
+  ],
+  "critical_code_review_comments": [
+    "email_service.send_email correctly logs to console with prefix '[EMAIL:console]' when SMTP_HOST is unset — clean fallback design, all 4 senders (match scheduled, score reported, registration confirmed, password reset) are async fire-and-forget via asyncio.create_task",
+    "auth_routes.forgot_password correctly returns generic 200 response for both existing and non-existent emails (no enumeration), and only schedules email if user exists AND opted-in",
+    "auth_routes.reset_password validates min_length=6, JWT type='password_reset', and existence — proper 400 with specific messages",
+    "auth_routes.preferences uses get_current_user (auth-gated) and returns the new value, persists via $set in users collection — verified by /me roundtrip",
+    "match_routes._should_notify checks user.email AND user.email_notifications, applied to all match notifications correctly",
+    "league_routes.join_league free path correctly calls send_registration_confirmed only when email_notifications is True",
+    "Phase 1 gating (PHASE=1) regressions all pass: /api/cities now correctly returns [] for ?country=India (iteration_2 bug FIXED), /api/leagues phase-filtered, /api/phase returns expected payload",
+    "Frontend ForgotPasswordModal component itself is well-built (X close, success state with [data-testid='forgot-sent'], error handling, esc-to-close), but parent Auth.jsx never instantiates it"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_email_notifications.py (new — 8 tests covering forgot-password/reset-password/preferences/opt-out/free-join email)",
+    "/app/backend/tests/test_match_emails.py (new — 1 e2e test for match scheduled + score reported emails)"
+  ],
+  "success_rate": {"backend": "100% (36/36 tests)", "frontend": "80% (4/5 flows; forgot-password modal never mounts)"},
+  "test_credentials": "admin@leaguepro.com / Admin@123 (admin role)",
+  "seed_data_creation": "test_match_emails.py creates 2 TEST_match_* players + 1 TEST_MatchEmailLeague_* free tennis league per run; test_email_notifications.py creates 1 TEST_player_* user per run — all prefixed for easy cleanup",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Email feature backend is fully working — emails appear in /var/log/supervisor/backend.err.log with prefix '[EMAIL:console]'. Verified subjects: 'Reset your LeaguePro password', 'You're registered — <league>', 'New <Sport> match scheduled — vs <opp>', 'Match result — <league>'. Opt-out via PATCH /api/auth/preferences {email_notifications:false} is honored. Single bug: Auth.jsx never renders <ForgotPasswordModal/>, so the modal+success screen flow can't be tested in browser until the parent JSX is added. Reset-password page, dashboard toggle (ON/OFF + reload persistence), and register-mode hiding the link all verified working.",
+  "rca_of_the_issue": {
+    "forgot_password_modal_not_opening": "In /app/frontend/src/pages/Auth.jsx the <ForgotPasswordModal/> JSX element is missing from the return statement. The import (line 6) and useState forgotOpen (line 19) and setForgotOpen(true) onClick (line 193) are all present, but no <ForgotPasswordModal open={forgotOpen} onClose={() => setForgotOpen(false)} prefillEmail={form.email} /> exists between line 250 (</div>) and line 254 (</div>). Reproduction: Open /auth, click 'Forgot password?' link — page does not change, no overlay appears, no DOM node with [data-testid='forgot-password-modal']. Mitigation: insert the JSX render call before the final wrapper closes."
+  }
+}

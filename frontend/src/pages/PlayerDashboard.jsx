@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -13,7 +13,7 @@ const SPORT_COLORS = {
 };
 
 export default function PlayerDashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, fetchMe } = useAuth();
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
   const [matches, setMatches] = useState([]);
@@ -23,6 +23,7 @@ export default function PlayerDashboard() {
   const [scheduling, setScheduling] = useState(false);
   const [schedMsg, setSchedMsg] = useState("");
   const [leaguePlayers, setLeaguePlayers] = useState([]);
+  const [togglingNotif, setTogglingNotif] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -69,6 +70,23 @@ export default function PlayerDashboard() {
     }
   };
 
+  const toggleNotifications = async () => {
+    if (togglingNotif) return;
+    setTogglingNotif(true);
+    try {
+      await axios.patch(
+        `${API}/auth/preferences`,
+        { email_notifications: !user.email_notifications },
+        { withCredentials: true },
+      );
+      await fetchMe();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setTogglingNotif(false);
+    }
+  };
+
   if (!user) return null;
 
   const wins = matches.filter((m) => m.status === "completed" && (m.winner_id === user.id || m.winner_id === user._id)).length;
@@ -90,6 +108,20 @@ export default function PlayerDashboard() {
               <span>{user.email}</span>
               {user.city && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.city}</span>}
             </div>
+            <button
+              onClick={toggleNotifications}
+              disabled={togglingNotif}
+              className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                user.email_notifications
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                  : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+              } disabled:opacity-60`}
+              data-testid="toggle-email-notifications"
+              title="Toggle email notifications for match scheduling, score results, and league registration"
+            >
+              {user.email_notifications ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+              Email notifications: {user.email_notifications ? "ON" : "OFF"}
+            </button>
           </div>
           <div className="flex gap-3">
             <div className="text-center">

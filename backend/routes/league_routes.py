@@ -5,6 +5,7 @@ from bson import ObjectId
 from models import League, LeagueCreate, PlayerLeague, Standing
 from auth_utils import get_current_user, require_admin
 from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
+import email_service
 
 router = APIRouter(redirect_slashes=False)
 
@@ -131,6 +132,13 @@ async def join_league(league_id: str, request: Request):
 
     # Upsert standing
     await _upsert_standing(db, league_id, user["_id"], user["name"], league["sport"], user.get("country", "USA"))
+
+    # Notify player of free registration
+    if user.get("email") and user.get("email_notifications", True):
+        email_service.schedule(email_service.send_registration_confirmed(
+            user["email"], user["name"], league["name"], league["sport"],
+            league_id, paid=False))
+
     return {"message": f"Joined {league['name']} successfully", "requires_payment": False}
 
 

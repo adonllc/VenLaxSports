@@ -50,6 +50,7 @@ class User(BaseDocument):
     tennis_rating: float = 3.0
     cricket_rating: float = 50.0
     pickleball_rating: float = 3.0
+    email_notifications: bool = True
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

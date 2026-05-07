@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from models import Match, MatchCreate, MatchScore
 from auth_utils import get_current_user
+import email_service
 
 router = APIRouter()
 
@@ -10,6 +11,10 @@ router = APIRouter()
 def _serialize(doc: dict) -> dict:
     doc["id"] = str(doc.pop("_id"))
     return doc
+
+
+def _should_notify(user: dict) -> bool:
+    return bool(user and user.get("email") and user.get("email_notifications", True))
 
 
 @router.get("/my")
@@ -58,7 +63,19 @@ async def create_match(data: MatchCreate, request: Request):
         notes=data.notes,
     )
     result = await db.matches.insert_one(match.to_mongo())
-    return {"id": str(result.inserted_id), "message": "Match scheduled"}
+    match_id = str(result.inserted_id)
+
+    # Notify both players (fire-and-forget)
+    if _should_notify(user):
+        email_service.schedule(email_service.send_match_scheduled(
+            user["email"], user["name"], opponent["name"], league["sport"],
+            data.scheduled_date, data.venue or league.get("venue"), match_id))
+    if _should_notify(opponent):
+        email_service.schedule(email_service.send_match_scheduled(
+            opponent["email"], opponent["name"], user["name"], league["sport"],
+            data.scheduled_date, data.venue or league.get("venue"), match_id))
+
+    return {"id": match_id, "message": "Match scheduled"}
 
 
 @router.post("/{match_id}/score")
@@ -93,6 +110,22 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
         },
     )
     await _update_standings(db, match["league_id"], match, score_data.winner_id)
+
+    # Notify both players with the result
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
+        league_name = league.get("name", "your league") if league else "your league"
+        p1 = await db.users.find_one({"_id": ObjectId(match["player1_id"])})
+        p2 = await db.users.find_one({"_id": ObjectId(match["player2_id"])})
+        for p, opp_name in ((p1, match["player2_name"]), (p2, match["player1_name"])):
+            if _should_notify(p):
+                won = str(p["_id"]) == str(score_data.winner_id)
+                email_service.schedule(email_service.send_score_reported(
+                    p["email"], p["name"], opp_name, match["sport"],
+                    won, match["league_id"], league_name))
+    except Exception:
+        pass
+
     return {"message": "Score reported successfully"}
 
 
