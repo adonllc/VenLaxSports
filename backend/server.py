@@ -30,6 +30,7 @@ from routes.admin_routes import router as admin_router
 from routes.user_routes import router as user_router
 from routes.season_routes import router as season_router
 from routes.playoffs_routes import router as playoffs_router
+from routes.auto_league_routes import router as auto_league_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(google_auth_router, prefix="/auth", tags=["auth"])
@@ -40,6 +41,7 @@ api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
 api_router.include_router(season_router, prefix="/seasons", tags=["seasons"])
 api_router.include_router(playoffs_router, prefix="/playoffs", tags=["playoffs"])
+api_router.include_router(auto_league_router, prefix="/admin/auto", tags=["auto-leagues"])
 
 
 @api_router.get("/")
@@ -137,12 +139,18 @@ async def seed_cities_wrapper():
     await _seed(db)
 
 
+async def normalize_pricing_wrapper():
+    from seeds.pricing import normalize_pricing as _norm
+    await _norm(db)
+
+
 @app.on_event("startup")
 async def startup_event():
     await seed_admin_wrapper()
     await create_indexes_wrapper()
     await seed_leagues_wrapper()
     await seed_cities_wrapper()
+    await normalize_pricing_wrapper()
     logger.info("Application startup complete")
 
 

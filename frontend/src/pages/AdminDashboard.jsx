@@ -137,6 +137,7 @@ export default function AdminDashboard() {
   const TABS = [
     { id: "overview", label: "Overview" },
     { id: "create", label: "Create League" },
+    { id: "auto", label: "Auto-Generate" },
     { id: "leagues", label: "Manage Leagues" },
     { id: "seasons", label: "Seasons" },
     { id: "playoffs", label: "Playoffs" },
@@ -368,6 +369,7 @@ export default function AdminDashboard() {
 
         {tab === "seasons" && <SeasonsTab />}
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
+        {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
       </div>
     </div>
   );
@@ -590,6 +592,94 @@ function PlayoffsTab({ leagues }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────── Auto-Generate Leagues Tab ───────────
+function AutoGenerateTab({ onSuccess }) {
+  const [cadence, setCadence] = useState("all");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
+
+  const handleGenerate = async () => {
+    setBusy(true); setError(""); setResult(null);
+    try {
+      const { data } = await axios.post(
+        `${API}/admin/auto/leagues`,
+        { cadence },
+        { withCredentials: true },
+      );
+      setResult(data);
+      onSuccess?.();
+    } catch (err) {
+      setError(err.response?.data?.detail || "Auto-generate failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6" data-testid="auto-generate-tab">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-2">Auto-Generate Leagues</h3>
+        <p className="text-sm text-gray-500 mb-5">
+          Spin up the next cycle of leagues for every active sport &amp; format. Each generated
+          league is open to players from <strong>any USA city</strong> with standardized pricing
+          (<strong>$9.99 singles</strong> / <strong>$19.99 doubles</strong>). Re-running is safe — duplicates are skipped.
+        </p>
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Cadence</label>
+        <select
+          value={cadence}
+          onChange={(e) => setCadence(e.target.value)}
+          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black mb-4"
+          data-testid="auto-cadence-select"
+        >
+          <option value="all">All Cadences (Monthly + Quarterly + Half-Yearly + Yearly)</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="half_yearly">Half-Yearly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={busy}
+          className="w-full py-3 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60"
+          data-testid="auto-generate-btn"
+        >
+          {busy ? "Generating..." : "Generate Leagues"}
+        </button>
+        {error && (
+          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg" data-testid="auto-error">
+            {error}
+          </div>
+        )}
+      </div>
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 className="font-heading font-bold text-lg mb-4">Last Run</h3>
+        {!result ? (
+          <p className="text-sm text-gray-500">Run the generator to see what was created.</p>
+        ) : (
+          <div data-testid="auto-result">
+            <p className="text-sm font-medium text-gray-900 mb-3">{result.message}</p>
+            {result.created?.length > 0 && (
+              <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                {result.created.map((c) => (
+                  <div key={c.id} className="flex items-center justify-between text-xs px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-lg">
+                    <span className="font-medium text-emerald-900 truncate">{c.name}</span>
+                    <span className="font-mono text-emerald-700 ml-2">${c.fee.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {result.skipped?.length > 0 && (
+              <p className="text-xs text-gray-400 mt-3">{result.skipped.length} already exist (skipped)</p>
+            )}
           </div>
         )}
       </div>

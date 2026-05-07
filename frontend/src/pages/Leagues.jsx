@@ -136,18 +136,22 @@ export default function Leagues() {
             </select>
           )}
 
-          {/* City Filter */}
-          <select
+          {/* City Filter — free text, with seeded suggestions */}
+          <input
+            type="text"
             value={filters.city}
             onChange={(e) => updateFilter("city", e.target.value)}
-            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+            placeholder="Any city or 'All Cities'"
+            list="leagues-city-list"
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black w-44"
             data-testid="filter-city"
-          >
-            <option value="">All Cities</option>
+          />
+          <datalist id="leagues-city-list">
+            <option value="All Cities" />
             {platformConfig.featuredCities.map((c) => (
-              <option key={c.name} value={c.name}>{c.name}</option>
+              <option key={c.name} value={c.name} />
             ))}
-          </select>
+          </datalist>
 
           {/* Status Filter */}
           <select

@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom"
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle, Clock, TrendingUp } from "lucide-react";
+import PaymentMethodModal from "../components/PaymentMethodModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -27,6 +28,7 @@ export default function LeagueDetail() {
   const [joinMsg, setJoinMsg] = useState("");
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -107,10 +109,8 @@ export default function LeagueDetail() {
     try {
       const { data } = await axios.post(`${API}/leagues/${id}/join`, {}, { withCredentials: true });
       if (data.requires_payment) {
-        // Initiate Stripe checkout
-        const origin = window.location.origin;
-        const checkoutRes = await axios.post(`${API}/payments/checkout`, { league_id: id, origin_url: origin }, { withCredentials: true });
-        window.location.href = checkoutRes.data.url;
+        // Open payment-method picker (Stripe / Apple Pay / Google Pay / Zelle)
+        setPaymentModalOpen(true);
       } else {
         setJoinMsg(data.message || "Joined successfully!");
         setIsRegistered(true);
@@ -395,6 +395,13 @@ export default function LeagueDetail() {
           </div>
         )}
       </div>
+
+      <PaymentMethodModal
+        open={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        league={league}
+        onSuccess={() => { setIsRegistered(true); fetchLeague(); setJoinMsg("Registration complete!"); }}
+      />
     </div>
   );
 }

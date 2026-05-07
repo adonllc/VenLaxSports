@@ -218,7 +218,7 @@ export default function Auth() {
                     type="text"
                     value={form.city}
                     onChange={update("city")}
-                    placeholder={`e.g. ${platformConfig.featuredCities[0]?.name || "City"}`}
+                    placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-city"
                   />
