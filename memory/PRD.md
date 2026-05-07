@@ -38,6 +38,19 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — Email Notifications (open-source, aiosmtplib)
+- New `backend/email_service.py` — MIT-licensed `aiosmtplib`, console fallback when `SMTP_HOST` unset (zero-setup dev)
+- Transactional emails on 4 events:
+  - `/api/leagues/:id/join` — free-league registration confirmation
+  - `/api/payments/status/:session_id` (on paid) — paid registration confirmation
+  - `/api/matches` — match scheduled (both players)
+  - `/api/matches/:id/score` — match result (both players)
+- New `/api/auth/forgot-password` (enumeration-safe) + `/api/auth/reset-password` (JWT token, 30 min expiry)
+- New `/api/auth/preferences` PATCH to toggle `email_notifications`
+- New frontend: `ResetPassword` page (`/reset-password?token=...`), `ForgotPasswordModal` on Auth page
+- New Player Dashboard opt-out toggle (Bell / BellOff pill)
+- SMTP env vars (optional): `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_TLS`, `SMTP_SSL`
+
 ### Feb 2026 — Phase 1 Enforcement + Google OAuth
 - Added `backend/phase_config.py` and env var `PHASE=1`
 - `GET /api/leagues` and `GET /api/cities` are phase-filtered; cross-phase queries return `[]`
