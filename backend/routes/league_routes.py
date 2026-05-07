@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from models import League, LeagueCreate, PlayerLeague, Standing
 from auth_utils import get_current_user, require_admin
+from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
 
 router = APIRouter(redirect_slashes=False)
 
@@ -26,10 +27,19 @@ async def get_leagues(
 ):
     db = request.app.state.db
     query: dict = {}
+    # Phase gating — only show leagues for sports & country active in the current phase
     if sport:
+        if sport not in ACTIVE_SPORTS:
+            return []
         query["sport"] = sport
+    else:
+        query["sport"] = {"$in": ACTIVE_SPORTS}
     if country:
+        if country != ACTIVE_COUNTRY:
+            return []
         query["country"] = country
+    else:
+        query["country"] = ACTIVE_COUNTRY
     if city:
         query["city"] = city
     if status:

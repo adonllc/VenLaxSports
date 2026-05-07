@@ -154,4 +154,16 @@ export const activeSports = platformConfig.activeSports
   .map((id) => ALL_SPORTS[id])
   .filter(Boolean);
 
+// Map of active sport id -> sport meta (quick lookup)
+export const activeSportMap = Object.fromEntries(activeSports.map((s) => [s.id, s]));
+
+// Active sport ids (e.g., ["tennis", "pickleball"])
+export const activeSportIds = activeSports.map((s) => s.id);
+
+// Is a sport available in the current phase?
+export const isSportActive = (sportId) => activeSportIds.includes(sportId);
+
+// Active country (e.g., "USA" or "India")
+export const activeCountry = platformConfig.country;
+
 export default platformConfig;

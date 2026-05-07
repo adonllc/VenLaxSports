@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Users, Calendar, Trophy, ArrowRight, Star, TrendingUp } from "lucide-react";
-import platformConfig from "../config/platformConfig";
+import platformConfig, { activeSportIds } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const SPORT_CONFIG = {
+// PHASE-DRIVEN: only sports in the active phase are rendered on the home page.
+// PHASE 2 unlocks Cricket automatically when REACT_APP_PHASE=2.
+const ALL_SPORT_CONFIG = {
   tennis: {
     color: "text-tennis", bg: "bg-tennis-bg", badge: "sport-badge-tennis", border: "border-tennis",
     accent: "#10B981", label: "Tennis", icon: "🎾",
@@ -30,11 +32,15 @@ const SPORT_CONFIG = {
   },
 };
 
+const SPORT_CONFIG = Object.fromEntries(
+  activeSportIds.map((id) => [id, ALL_SPORT_CONFIG[id]]).filter(([, v]) => v)
+);
+
 const STATS = [
   { value: "1,200+", label: "Active Players", icon: Users },
   { value: "80+", label: "Active Leagues", icon: Trophy },
   { value: platformConfig.statsRegion, label: "Cities", icon: MapPin },
-  { value: "3", label: "Sports", icon: Star },
+  { value: String(activeSportIds.length), label: "Sports", icon: Star },
 ];
 
 const STEPS = [
@@ -69,7 +75,7 @@ export default function Home() {
     <div className="bg-white" data-testid="home-page">
       {/* Hero */}
       <section className="relative min-h-[88vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 grid grid-cols-3">
+        <div className={`absolute inset-0 grid`} style={{ gridTemplateColumns: `repeat(${Object.keys(SPORT_CONFIG).length}, minmax(0, 1fr))` }}>
           {Object.values(SPORT_CONFIG).map((s, i) => (
             <div key={i} className="relative overflow-hidden">
               <img src={s.image} alt={s.label} className="w-full h-full object-cover" />
@@ -135,9 +141,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Choose Your Sport</p>
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">Three Sports, One Platform</h2>
+            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">
+              {activeSportIds.length === 1 ? "One Sport, One Platform" : `${activeSportIds.length} Sports, One Platform`}
+            </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${activeSportIds.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
             {Object.entries(SPORT_CONFIG).map(([sport, config]) => (
               <div
                 key={sport}
@@ -290,7 +298,7 @@ export default function Home() {
         <div className="max-w-2xl mx-auto px-4">
           <TrendingUp className="w-12 h-12 text-emerald-400 mx-auto mb-6" />
           <h2 className="font-heading font-black text-4xl sm:text-5xl mb-4">Ready to compete?</h2>
-          <p className="text-gray-400 mb-8 text-lg">Join thousands of players across Tennis, Cricket & Pickleball leagues today.</p>
+          <p className="text-gray-400 mb-8 text-lg">{platformConfig.footerTagline}</p>
           <button
             onClick={() => navigate("/auth?mode=register")}
             className="px-10 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl text-base transition-colors"

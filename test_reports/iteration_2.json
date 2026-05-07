@@ -1,0 +1,62 @@
+{
+  "summary": "Phase 1 gating + Google OAuth wiring tested. 26/27 backend tests pass (1 backend gating bug found). Frontend phase-1 enforcement is mostly correct, but the /leagues page sport filter dropdown still includes a Cricket option. Google OAuth endpoint, button placement, and redirect URL all verified correctly.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "GET /api/cities?country=India",
+        "issue": "Returns India cities (7 entries) — Phase 1 gating not applied. Spec requires this to return [] when PHASE=1. /api/cities default already correctly filters to USA, but the explicit ?country=India query parameter bypasses the phase gate. Fix in /app/backend/server.py get_cities(): if country and country != ACTIVE_COUNTRY: return []",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {"endpoint": "GET /api/leagues/my", "issue": "Called by frontend even when unauthenticated, producing 401 console errors for guest users on /leagues page (carried over from iteration_1)"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Leagues.jsx — Sport filter dropdown",
+        "issue": "Sport filter <select> still lists 'Cricket' option alongside Tennis & Pickleball. Spec requires Phase 1 filter to show only active sports. Other Phase 1 UI (Home, Footer, Auth subtitle, Admin Create form, /sport/cricket redirect, navbar) all read activeSports correctly — this dropdown was missed.",
+        "selector": "/leagues select (options: ['All Sports', '🎾 Tennis', '🏏 Cricket', '🏓 Pickleball'])",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Admin Dashboard → Create League", "issues": ["Start Date / End Date use the browser-default native date picker (mm/dd/yyyy) instead of a shadcn Calendar component — inconsistent with the rest of the shadcn UI"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix GET /api/cities to enforce Phase 1 country gate when explicit ?country= is passed — return [] if country not in ACTIVE_COUNTRY (mirror logic in league_routes.get_leagues)",
+    "Fix /app/frontend/src/pages/Leagues.jsx sport filter dropdown to map over activeSports (or filter SPORTS by isSportActive) — currently still hardcoded with Cricket",
+    "(Optional / carry-over) Skip /api/leagues/my call from frontend when no auth cookie is present — eliminates 401 console noise"
+  ],
+  "critical_code_review_comments": [
+    "/app/backend/server.py get_cities() lacks the Phase-1 country guard that league_routes.py already implements — duplicated gating logic; consider extracting a helper apply_phase_filter(query, country, sport) used by both endpoints",
+    "Google OAuth endpoint properly returns 401 on invalid session_id, exchanges via Emergent /session-data, upserts user keyed by lowercased email, and reissues the same JWT cookies (consistent with existing auth middleware) — implementation looks clean",
+    "/api/phase endpoint correctly returns {phase:1, active_sports:['tennis','pickleball'], active_country:'USA', currency:'USD', payment_provider:'stripe'}",
+    "GET /api/leagues correctly returns only tennis+pickleball+USA leagues across all filter combinations (?sport=cricket → [], ?country=India → [], default → 8 leagues all USA tennis/pickleball)",
+    "Frontend Auth page correctly places Google button ABOVE the email/password form with an 'OR' divider (data-testid='google-signin-btn' present, btn y=476 < email y=604), subtitle reads 'Competitive Tennis & Pickleball leagues across the USA.', only Tennis & Pickleball badges shown",
+    "Google button click navigates to https://auth.emergentagent.com/?redirect=https%3A%2F%2Fracquet-cricket-hub.preview.emergentagent.com%2Fdashboard — correct origin-derived redirect",
+    "/sport/cricket correctly redirects to /leagues (isSportActive guard works)",
+    "Admin Dashboard create-league form: Sport=[Tennis,Pickleball], Country=[🇺🇸 USA] only — correctly phase-gated",
+    "Footer correctly lists only Tennis + Pickleball under SPORTS and shows 'Competitive Tennis & Pickleball leagues across the USA.'"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_api.py (added Phase-1 gating tests, /api/phase test, Google OAuth invalid-session test, India-blocked tests for /cities and /leagues)"
+  ],
+  "success_rate": {"backend": "96% (26/27 tests pass)", "frontend": "92% (1 cricket-in-filter bug)"},
+  "test_credentials": "admin@leaguepro.com / Admin@123 (admin role)",
+  "seed_data_creation": "TEST_E2E Tennis League form was filled in admin dashboard but submission listener race did not confirm; previous pytest test_create_league_admin POST /api/leagues returns 200 with id, so admin create flow is functional.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Phase 1 backend gating works for /api/leagues (all combos) and /api/phase. Single bug: /api/cities ignores Phase gate when ?country=India explicitly sent — returns India cities. Frontend bug: /leagues page sport filter dropdown still hardcodes Cricket. Everything else (Home, Auth Google btn, /sport/cricket redirect, Footer, Admin form, JWT login, OAuth endpoint 401 on invalid session) is correct. Tests file at /app/backend/tests/test_api.py — run with REACT_APP_BACKEND_URL exported to base URL.",
+  "rca_of_issues": {
+    "cities_india_bug": "In /app/backend/server.py get_cities(country=None): query = {'country': country if country else ACTIVE_COUNTRY}. Default branch correctly defaults to USA, but the explicit-country branch trusts whatever the client passes, never checking against ACTIVE_COUNTRY. Fix: add `if country and country != ACTIVE_COUNTRY: return []` before building the query (mirrors league_routes.py:38-39).",
+    "leagues_filter_cricket_bug": "/app/frontend/src/pages/Leagues.jsx sport filter <select> appears to render a static SPORTS array containing all three sports rather than using activeSports from platformConfig. The other Leagues.jsx code paths read activeSports correctly per the iteration spec, but this <select> was missed."
+  }
+}

@@ -81,19 +81,45 @@ class TestLeagues:
         assert isinstance(data, list)
         assert len(data) > 0
 
-    def test_filter_leagues_by_sport(self):
-        for sport in ["tennis", "cricket", "pickleball"]:
+    def test_filter_leagues_by_sport_active(self):
+        # Phase 1: tennis & pickleball active
+        for sport in ["tennis", "pickleball"]:
             r = requests.get(f"{BASE_URL}/api/leagues?sport={sport}")
             assert r.status_code == 200
             leagues = r.json()
+            assert isinstance(leagues, list)
             for l in leagues:
                 assert l["sport"] == sport
+                assert l["country"] == "USA"
 
-    def test_filter_leagues_by_country(self):
+    def test_filter_leagues_by_sport_cricket_blocked(self):
+        # Phase 1: cricket NOT active → empty list
+        r = requests.get(f"{BASE_URL}/api/leagues?sport=cricket")
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_filter_leagues_by_country_usa(self):
         r = requests.get(f"{BASE_URL}/api/leagues?country=USA")
         assert r.status_code == 200
         leagues = r.json()
+        assert len(leagues) > 0
         for l in leagues:
+            assert l["country"] == "USA"
+            assert l["sport"] in ["tennis", "pickleball"]
+
+    def test_filter_leagues_by_country_india_blocked(self):
+        # Phase 1: India NOT active → empty list
+        r = requests.get(f"{BASE_URL}/api/leagues?country=India")
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_default_leagues_only_active_phase(self):
+        r = requests.get(f"{BASE_URL}/api/leagues")
+        assert r.status_code == 200
+        leagues = r.json()
+        assert len(leagues) > 0
+        for l in leagues:
+            assert l["sport"] in ["tennis", "pickleball"]
             assert l["country"] == "USA"
 
     def test_get_league_detail(self):
@@ -187,3 +213,45 @@ class TestCities:
         data = r.json()
         assert isinstance(data, list)
         assert len(data) > 0
+        for c in data:
+            assert c["country"] == "USA"
+
+    def test_get_cities_india_blocked(self):
+        # Phase 1: India is not active → empty list
+        r = requests.get(f"{BASE_URL}/api/cities?country=India")
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_get_cities_usa_explicit(self):
+        r = requests.get(f"{BASE_URL}/api/cities?country=USA")
+        assert r.status_code == 200
+        data = r.json()
+        assert len(data) > 0
+        for c in data:
+            assert c["country"] == "USA"
+
+
+class TestPhase:
+    def test_phase_endpoint(self):
+        r = requests.get(f"{BASE_URL}/api/phase")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["phase"] == 1
+        assert set(data["active_sports"]) == {"tennis", "pickleball"}
+        assert data["active_country"] == "USA"
+        assert data["currency"] == "USD"
+        assert data["payment_provider"] == "stripe"
+
+
+class TestGoogleAuth:
+    def test_google_session_invalid(self):
+        r = requests.post(f"{BASE_URL}/api/auth/google/session", json={"session_id": "fake_invalid"})
+        # Endpoint must exist and reject invalid sessions
+        assert r.status_code == 401, f"Expected 401, got {r.status_code}: {r.text}"
+        data = r.json()
+        # Detail should indicate invalid/expired session
+        assert "Invalid" in str(data) or "expired" in str(data).lower()
+
+    def test_google_session_missing_body(self):
+        r = requests.post(f"{BASE_URL}/api/auth/google/session", json={})
+        assert r.status_code in [400, 422]

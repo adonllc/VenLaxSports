@@ -2,12 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, ChevronDown, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { activeSports } from "../config/platformConfig";
 
-const SPORTS = [
-  { id: "tennis", label: "Tennis", color: "text-tennis", bg: "hover:bg-tennis-light", icon: "🎾" },
-  { id: "cricket", label: "Cricket", color: "text-cricket", bg: "hover:bg-cricket-light", icon: "🏏" },
-  { id: "pickleball", label: "Pickleball", color: "text-pickleball", bg: "hover:bg-pickleball-light", icon: "🏓" },
-];
+// PHASE-DRIVEN: only sports in the active phase are shown in the nav.
+// PHASE 2 unlocks Cricket — controlled by REACT_APP_PHASE env var.
+const SPORTS = activeSports.map((s) => ({
+  id: s.id,
+  label: s.label,
+  color: s.color,
+  bg: s.bg,
+  icon: s.icon,
+}));
 
 export default function Navbar() {
   const { user, logout } = useAuth();

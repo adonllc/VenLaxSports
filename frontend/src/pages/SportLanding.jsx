@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowRight, MapPin, Users, Calendar, Trophy, CheckCircle } from "lucide-react";
+import { isSportActive } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -50,7 +51,8 @@ export default function SportLanding() {
   const meta = SPORT_META[sport];
 
   useEffect(() => {
-    if (!meta) { navigate("/leagues"); return; }
+    // Phase gating — redirect if sport isn't active in the current phase.
+    if (!meta || !isSportActive(sport)) { navigate("/leagues"); return; }
     fetchLeagues();
   }, [sport]);
 
@@ -62,7 +64,7 @@ export default function SportLanding() {
     finally { setLoading(false); }
   };
 
-  if (!meta) return null;
+  if (!meta || !isSportActive(sport)) return null;
 
   return (
     <div className="min-h-screen bg-white" data-testid={`sport-landing-${sport}`}>

@@ -23,12 +23,14 @@ api_router = APIRouter(prefix="/api", redirect_slashes=False)
 
 # Import routers
 from routes.auth_routes import router as auth_router
+from routes.google_auth_routes import router as google_auth_router
 from routes.league_routes import router as league_router
 from routes.match_routes import router as match_router
 from routes.payment_routes import router as payment_router
 from routes.admin_routes import router as admin_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(google_auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(league_router, prefix="/leagues", tags=["leagues"])
 api_router.include_router(match_router, prefix="/matches", tags=["matches"])
 api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
@@ -47,11 +49,23 @@ async def health():
 
 @api_router.get("/cities")
 async def get_cities(country: str = None):
-    query = {}
-    if country:
-        query["country"] = country
+    from phase_config import ACTIVE_COUNTRY
+    query = {"country": country if country else ACTIVE_COUNTRY}
     cities = await db.cities.find(query, {"_id": 0}).sort("name", 1).to_list(50)
     return cities
+
+
+@api_router.get("/phase")
+async def get_phase():
+    """Expose active phase info so frontend can confirm backend phase."""
+    from phase_config import PHASE, ACTIVE_SPORTS, ACTIVE_COUNTRY, CURRENCY, PAYMENT_PROVIDER
+    return {
+        "phase": PHASE,
+        "active_sports": ACTIVE_SPORTS,
+        "active_country": ACTIVE_COUNTRY,
+        "currency": CURRENCY,
+        "payment_provider": PAYMENT_PROVIDER,
+    }
 
 
 @api_router.post("/webhook/stripe")

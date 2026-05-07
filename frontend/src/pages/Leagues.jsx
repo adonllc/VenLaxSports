@@ -2,15 +2,21 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Users, Calendar, Trophy } from "lucide-react";
-import platformConfig from "../config/platformConfig";
+import platformConfig, { activeSports } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const SPORT_CONFIG = {
+// PHASE-DRIVEN: only active sports appear in the filter dropdown.
+// PHASE 2 unlocks Cricket automatically via REACT_APP_PHASE=2.
+const ALL_SPORT_CONFIG = {
   tennis: { badge: "sport-badge-tennis", color: "text-tennis", icon: "🎾", label: "Tennis" },
   cricket: { badge: "sport-badge-cricket", color: "text-cricket", icon: "🏏", label: "Cricket" },
   pickleball: { badge: "sport-badge-pickleball", color: "text-pickleball", icon: "🏓", label: "Pickleball" },
 };
+
+const SPORT_CONFIG = Object.fromEntries(
+  activeSports.map((s) => [s.id, ALL_SPORT_CONFIG[s.id]]).filter(([, v]) => v)
+);
 
 const STATUS_COLORS = {
   registration: "bg-emerald-100 text-emerald-700",

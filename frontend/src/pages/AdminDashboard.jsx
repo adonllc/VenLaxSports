@@ -3,21 +3,26 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp } from "lucide-react";
+import { activeSportIds, activeCountry } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const SPORTS = ["tennis", "cricket", "pickleball"];
-const FORMATS = {
+// PHASE-DRIVEN: admin can only create leagues for active sports & country.
+// PHASE 2 unlocks Cricket; PHASE 3 unlocks India.
+const SPORTS = activeSportIds;
+const ALL_FORMATS = {
   tennis: ["singles", "doubles", "mixed"],
   cricket: ["T10", "T20", "8-a-side", "11-a-side"],
   pickleball: ["singles", "doubles", "mixed"],
 };
+const FORMATS = Object.fromEntries(SPORTS.map((s) => [s, ALL_FORMATS[s]]).filter(([, v]) => v));
 const CURRENCIES = { USA: "USD", India: "INR" };
 
 const DEFAULT_FORM = {
-  name: "", sport: "tennis", country: "USA", city: "", format: "singles",
-  entry_fee: 0, currency: "USD", max_players: 16, start_date: "", end_date: "",
-  description: "", venue: "", season: "Season 1",
+  name: "", sport: SPORTS[0] || "tennis", country: activeCountry, city: "",
+  format: (FORMATS[SPORTS[0]] || ["singles"])[0],
+  entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16,
+  start_date: "", end_date: "", description: "", venue: "", season: "Season 1",
 };
 
 export default function AdminDashboard() {
@@ -221,8 +226,8 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Country *</label>
                     <select value={form.country} onChange={update("country")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black" data-testid="create-league-country">
-                      <option value="USA">🇺🇸 USA</option>
-                      <option value="India">🇮🇳 India</option>
+                      {activeCountry === "USA" && <option value="USA">🇺🇸 USA</option>}
+                      {activeCountry === "India" && <option value="India">🇮🇳 India</option>}
                     </select>
                   </div>
                   <div>

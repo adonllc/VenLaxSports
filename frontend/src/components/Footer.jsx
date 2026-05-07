@@ -1,6 +1,17 @@
 import { Link } from "react-router-dom";
 import { Trophy } from "lucide-react";
-import platformConfig from "../config/platformConfig";
+import platformConfig, { activeSports } from "../config/platformConfig";
+
+const SPORT_HOVER = {
+  tennis: "hover:text-emerald-400",
+  cricket: "hover:text-blue-400",
+  pickleball: "hover:text-orange-400",
+};
+const SPORT_DOT = {
+  tennis: "bg-emerald-500",
+  cricket: "bg-blue-500",
+  pickleball: "bg-orange-500",
+};
 
 export default function Footer() {
   return (
@@ -26,9 +37,13 @@ export default function Footer() {
           <div>
             <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Sports</h3>
             <ul className="space-y-2">
-              <li><Link to="/sport/tennis" className="text-sm text-gray-300 hover:text-emerald-400 transition-colors">Tennis</Link></li>
-              <li><Link to="/sport/cricket" className="text-sm text-gray-300 hover:text-blue-400 transition-colors">Cricket</Link></li>
-              <li><Link to="/sport/pickleball" className="text-sm text-gray-300 hover:text-orange-400 transition-colors">Pickleball</Link></li>
+              {activeSports.map((s) => (
+                <li key={s.id}>
+                  <Link to={`/sport/${s.id}`} className={`text-sm text-gray-300 ${SPORT_HOVER[s.id] || "hover:text-white"} transition-colors`}>
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -63,18 +78,12 @@ export default function Footer() {
         <div className="mt-10 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} LeaguePro. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              Tennis
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
-              Cricket
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-              <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
-              Pickleball
-            </span>
+            {activeSports.map((s) => (
+              <span key={s.id} className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <span className={`w-2 h-2 rounded-full ${SPORT_DOT[s.id] || "bg-gray-400"} inline-block`}></span>
+                {s.label}
+              </span>
+            ))}
           </div>
         </div>
       </div>
