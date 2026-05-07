@@ -50,6 +50,9 @@ async def health():
 @api_router.get("/cities")
 async def get_cities(country: str = None):
     from phase_config import ACTIVE_COUNTRY
+    # Phase gate — reject cross-phase lookups even when explicit
+    if country and country != ACTIVE_COUNTRY:
+        return []
     query = {"country": country if country else ACTIVE_COUNTRY}
     cities = await db.cities.find(query, {"_id": 0}).sort("name", 1).to_list(50)
     return cities

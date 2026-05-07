@@ -105,9 +105,9 @@ export default function Leagues() {
             data-testid="filter-sport"
           >
             <option value="">All Sports</option>
-            <option value="tennis">🎾 Tennis</option>
-            <option value="cricket">🏏 Cricket</option>
-            <option value="pickleball">🏓 Pickleball</option>
+            {activeSports.map((s) => (
+              <option key={s.id} value={s.id}>{s.icon} {s.label}</option>
+            ))}
           </select>
 
           {/* City Filter */}

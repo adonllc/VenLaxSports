@@ -1,96 +1,95 @@
 # LeaguePro - Multi-Sport League Platform
 ## Product Requirements Document
 
-**Last Updated**: May 2026  
-**Version**: 1.0 MVP
+**Last Updated**: Feb 2026
+**Version**: 1.1 (Phase 1 — USA: Tennis + Pickleball)
 
 ---
 
 ## Problem Statement
 Build a multi-sport, multi-country league platform (T2Tennis-style) supporting Tennis, Cricket, and Pickleball across USA and India. Players can join leagues, schedule matches, report scores, track standings, and compete across seasons.
 
+**Rollout model (3 phases):**
+1. **Phase 1 — USA: Tennis + Pickleball** (ACTIVE) — Stripe, USD
+2. **Phase 2 — USA: + Cricket** — Stripe, USD
+3. **Phase 3 — India: Cricket focus** — Razorpay, INR
+
 ## User Personas
-1. **Player (USA)** - Tennis/Pickleball enthusiast, 18-50, competitive amateur
-2. **Player (India)** - Cricket player, corporate league participant, 18-45
-3. **Admin** - Platform operator managing leagues, payments, and analytics
-4. **Team Captain (Cricket)** - Organizes team, registers in leagues
+1. **Player (USA)** — Tennis/Pickleball, 18-50, competitive amateur (Phase 1)
+2. **Player (India)** — Cricket, corporate, 18-45 (Phase 3)
+3. **Admin** — Platform operator managing leagues, payments, analytics
+4. **Team Captain (Cricket)** — Registers teams (Phase 2+)
 
 ## Architecture
-- **Frontend**: React + Tailwind CSS (Outfit/DM Sans fonts, sport color themes)
+- **Frontend**: React + Tailwind + shadcn/ui (Outfit/DM Sans fonts)
 - **Backend**: FastAPI (Python) on port 8001
-- **Database**: MongoDB (motor async driver)
-- **Auth**: JWT + httpOnly cookies (bcrypt password hashing)
-- **Payments**: Stripe (emergentintegrations library)
+- **Database**: MongoDB (motor async)
+- **Auth**: JWT (httpOnly cookies, bcrypt) + Google OAuth (Emergent Auth)
+- **Payments**: Stripe (emergentintegrations library) — Razorpay planned for Phase 3
+
+### Phase Gating
+- **Single config source**: `frontend/src/config/platformConfig.js` (phase 1/2/3 configs) and `backend/phase_config.py` (mirror)
+- Controlled by env vars: `REACT_APP_PHASE` (frontend) and `PHASE` (backend)
+- Public API endpoints (`/api/leagues`, `/api/cities`) filter responses by active sports + country
+- Admin endpoints remain unfiltered so cross-phase data stays visible to ops
+- Frontend UI components (Navbar, Home, Footer, Leagues filter, SportLanding, Auth, AdminDashboard) all read from `activeSports` / `activeCountry`
 
 ---
 
-## What's Been Implemented (MVP - May 2026)
+## What's Been Implemented
 
-### Config-Driven Multi-Repo Architecture (Added May 2026)
-- `frontend/src/config/platformConfig.js` — single source of truth for both deployments
-- `frontend/.env.usa` — USA deployment template (Tennis + Pickleball, USD, Stripe)
-- `frontend/.env.india` — India deployment template (Cricket, INR, Razorpay)
-- `backend/.env.usa` / `backend/.env.india` — backend deployment templates with separate DBs
-- All country-specific hardcoding removed from UI — zero "USA" or "India" labels visible
-- Cities section on Home page driven by config (6 city cards per deployment)
-- Default sport, currency, featured cities, hero text all config-driven
+### Feb 2026 — Phase 1 Enforcement + Google OAuth
+- Added `backend/phase_config.py` and env var `PHASE=1`
+- `GET /api/leagues` and `GET /api/cities` are phase-filtered; cross-phase queries return `[]`
+- New `GET /api/phase` exposes active phase config to the frontend
+- Extended `frontend/src/config/platformConfig.js` with `activeSportIds`, `activeSportMap`, `isSportActive`, `activeCountry`
+- All frontend sport/country UI reads from the config — Cricket & India are hidden in Phase 1
+- **Google OAuth (Emergent Auth)**: `POST /api/auth/google/session` exchanges `session_id` → upserts user → issues existing JWT cookies (no middleware changes)
+- `AuthCallback` page handles `#session_id=` fragment before protected routes run
+- "Continue with Google" button added to Auth page above the JWT form
 
-### Backend (/app/backend/)
-- `server.py` - FastAPI app, DB connection, middleware, startup seeding
-- `models.py` - User, League, Team, Match, Standing, PlayerLeague, PaymentTransaction
-- `auth_utils.py` - JWT creation/verification, bcrypt hashing, get_current_user dependency
-- `routes/auth_routes.py` - register, login, logout, me, refresh
-- `routes/league_routes.py` - CRUD leagues, join league, get players/standings/matches
-- `routes/match_routes.py` - Schedule matches, report scores, my matches
-- `routes/payment_routes.py` - Stripe checkout, payment status polling
-- `routes/admin_routes.py` - Stats, user management, league management
-
-### Frontend (/app/frontend/src/)
-- `App.js` - Route definitions with AuthProvider
-- `contexts/AuthContext.js` - Auth state, login/logout/register
-- `components/Navbar.jsx` - Sticky glass nav with sports dropdown
-- `components/Footer.jsx` - Footer with sport colors
-- `pages/Home.jsx` - Hero (3-sport images), stats, sport cards, featured leagues, how-it-works, countries
-- `pages/Auth.jsx` - Login/Register with country selection
-- `pages/Leagues.jsx` - Browse with sport/country/status filters
-- `pages/LeagueDetail.jsx` - League info, join flow, tabs (overview/players/matches/standings)
-- `pages/PlayerDashboard.jsx` - Profile, stats, leagues, match scheduling, results
-- `pages/AdminDashboard.jsx` - Stats, create league, manage leagues
-- `pages/SportLanding.jsx` - Sport-specific page (tennis/cricket/pickleball)
-- `pages/ScoreReport.jsx` - Sport-specific score input (sets/games/runs)
-- `pages/Standings.jsx` - Full standings table for a league
-
-### Seeded Data
-- Admin: admin@leaguepro.com / Admin@123
-- 8 sample leagues (Tennis, Cricket, Pickleball across USA & India)
-- 15 cities (8 USA, 7 India)
+### May 2026 — Initial MVP
+- Config-driven architecture (`platformConfig.js`, `.env.usa` / `.env.india` templates)
+- FastAPI backend: auth, league CRUD, match scheduling, score reporting, standings, Stripe checkout, admin panel
+- React frontend: Home, Auth, Leagues list, LeagueDetail, Player/Admin dashboards, SportLanding, ScoreReport, Standings
+- 9 seeded sample leagues, 15 seeded cities, admin account, bcrypt password hashing, JWT refresh flow
 
 ---
 
 ## Credentials
-- Admin: admin@leaguepro.com / Admin@123
+- Admin (JWT): `admin@leaguepro.com` / `Admin@123`
+- Google OAuth: Emergent Auth flow (no app-managed passwords)
+- See `/app/memory/test_credentials.md`
 
 ---
 
 ## Prioritized Backlog
 
-### P0 - Critical (Next Sprint)
-- [ ] Google OAuth Social Login integration
-- [ ] Team management for Cricket (create team, add players)
-- [ ] Email notifications (SendGrid) for match scheduling
-- [ ] Razorpay integration for India INR payments
-- [ ] Player search by ID to improve match scheduling UX
+### P0 — Phase 1 Completion
+- [ ] Team management for Cricket (defer to Phase 2)
+- [ ] Player search-by-ID to improve match scheduling UX
+- [ ] Email notifications (SendGrid / Resend) for match scheduling
 
-### P1 - High Priority
-- [ ] Rating system updates after match results
+### P1 — High Priority
+- [ ] Rating updates after match results
 - [ ] Playoffs bracket generation
 - [ ] Season management (create/activate/end seasons)
-- [ ] Dispute resolution system
-- [ ] City/venue management pages
+- [ ] Dispute resolution flow
+- [ ] City/venue management admin pages
 
-### P2 - Nice to Have
+### P2 — Phase 2 (USA + Cricket)
+- [ ] Set `PHASE=2` + `REACT_APP_PHASE=2`
+- [ ] Cricket team creation, captain management, NRR tracking
+- [ ] Cricket score reporting (overs, powerplay, wickets)
+
+### P3 — Phase 3 (India)
+- [ ] Set `PHASE=3` + `REACT_APP_PHASE=3`
+- [ ] Razorpay integration for INR payments (requires user credentials)
+- [ ] Seed India-specific cricket leagues
+- [ ] Umpire marketplace
+
+### P4 — Nice to Have
 - [ ] Corporate league packages
-- [ ] Umpire marketplace (India cricket)
 - [ ] Coaching marketplace
 - [ ] Mobile app (React Native)
 - [ ] Live scoring (WebSocket)
@@ -102,12 +101,10 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## Revenue Streams Implemented
 1. League entry fees (Stripe checkout) ✓
-2. Platform service fee structure (configurable)
 
 ## Revenue Streams Planned
-3. Razorpay for India (INR)
-4. Premium player profiles
-5. Corporate league packages
-6. Umpire marketplace
-7. Coaching marketplace
-8. Tournament photography/streaming add-ons
+2. Razorpay for India (INR) — Phase 3
+3. Premium player profiles
+4. Corporate league packages
+5. Umpire / coaching marketplace
+6. Tournament photography / streaming add-ons
