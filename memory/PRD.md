@@ -51,6 +51,13 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — Brand display update: "VENLAX" → "VENLAX Sports"
+- New reusable `<Logo />` component with size + variant props (default / light / hero); single source of truth for the wordmark.
+- Wordmark now reads **VEN**[emerald **LAX**] **SPORTS** across Navbar, Footer, Auth hero, ResetPassword.
+- HTML `<title>` and OG/Twitter meta tags now read "VENLAX Sports — Victory. Energy. eXperience."
+- Backend `APP_NAME = "VENLAX Sports"` for outbound emails; Zelle display name updated.
+- Rules page hero now reads "Play VENLAX Sports."; HowItWorks heading "How VENLAX Sports works".
+
 ### Feb 2026 — How It Works + Rules & Conduct
 - **HowItWorks** — original 6-step component (`/components/HowItWorks.jsx`) replacing the previous generic copy: Pick league → Personalized schedule → Coordinate matches → Report scores → Climb playoffs → Play all year. VENLAX-themed with emerald accents, hover lift animations, CTA to /leagues.
 - **Rules page** at `/rules` (`/pages/Rules.jsx`) with USTA-aligned tennis rules (Friend at Court & The Code) + USAP-aligned pickleball rules. Sections: Match Format · Scoring · Court Conduct · VENLAX League Specifics · Ratings · Code of Conduct · Disputes & Appeals. Sticky in-page tab nav, gradient hero ("Play hard. Play fair. Play VENLAX.").

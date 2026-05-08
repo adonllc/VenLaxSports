@@ -4,7 +4,8 @@
  */
 
 export const BRAND = {
-  name: "VENLAX",
+  name: "VENLAX Sports",
+  short_name: "VENLAX",
   full_name: "VENLAX Sports",
   domain: "venlaxsports.com",
   url: "https://venlaxsports.com",

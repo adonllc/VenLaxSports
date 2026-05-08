@@ -211,7 +211,7 @@ async def list_payment_methods():
                 "enabled": True,
                 "config": {
                     "handle": os.environ.get("ZELLE_HANDLE", ""),
-                    "display_name": os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX"),
+                    "display_name": os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX Sports"),
                     "placeholder": True,
                 },
             },
@@ -342,7 +342,7 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
         raise HTTPException(status_code=400, detail="This league is free to join")
 
     handle = os.environ.get("ZELLE_HANDLE", "payments@leaguepro.com")
-    display = os.environ.get("ZELLE_DISPLAY_NAME", "LeaguePro Payments")
+    display = os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX Sports Payments")
     memo = f"LP-{data.league_id[-6:]}-{user['_id'][-6:]}".upper()
 
     # Record a pending intent so the admin/UI can later match it to the reference

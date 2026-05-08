@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = "VENLAX"
+APP_NAME = "VENLAX Sports"
 
 
 def _get_frontend_url() -> str:

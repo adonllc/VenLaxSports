@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, ChevronDown, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
+import Logo from "./Logo";
 
 // PHASE-DRIVEN: only sports in the active phase are shown in the nav.
 // PHASE 2 unlocks Cricket — controlled by REACT_APP_PHASE env var.
@@ -51,9 +52,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center group-hover:bg-gray-800 transition-colors">
               <Trophy className="w-5 h-5 text-white" />
             </div>
-            <span className="font-heading font-black text-xl text-gray-900 tracking-tight">
-              VEN<span className="text-emerald-500">LAX</span>
-            </span>
+            <Logo size="md" variant="default" testId="nav-logo-mark" />
           </Link>
 
           {/* Desktop Nav */}

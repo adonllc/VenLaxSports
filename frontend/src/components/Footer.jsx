@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
+import Logo from "./Logo";
 
 const SPORT_HOVER = {
   tennis: "hover:text-emerald-400",
@@ -25,9 +26,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-black" />
               </div>
-              <span className="font-heading font-black text-xl">
-                {BRAND.full_logo.prefix}<span className="text-emerald-400">{BRAND.full_logo.accent}</span>
-              </span>
+              <Logo size="md" variant="light" testId="footer-logo" />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
               {BRAND.tagline_short}

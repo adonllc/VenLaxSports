@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Eye, EyeOff } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
+import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 // PHASE-DRIVEN: only the active country is offered during registration.
@@ -70,7 +71,7 @@ export default function Auth() {
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Trophy className="w-7 h-7 text-black" />
             </div>
-            <span className="font-heading font-black text-3xl">{BRAND.full_logo.prefix}<span className="text-emerald-400">{BRAND.full_logo.accent}</span></span>
+            <Logo size="hero" variant="hero" testId="auth-hero-logo" />
           </div>
           <h2 className="font-heading font-black text-4xl leading-tight mb-3">Victory.<br />Energy.<br /><span className="text-emerald-400">eXperience.</span></h2>
           <p className="text-gray-400 text-base max-w-xs mx-auto">{BRAND.story_short}</p>

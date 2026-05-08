@@ -51,7 +51,7 @@ export default function HowItWorks() {
     <section className="bg-white py-24 px-6" data-testid="how-it-works">
       <div className="max-w-6xl mx-auto">
         <div className="mb-14 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-3">How VENLAX works</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-3">How VENLAX Sports works</p>
           <h2 className="font-heading font-black text-3xl sm:text-4xl text-gray-900 mb-3">
             Six steps from <span className="text-emerald-500">signup</span> to <span className="text-emerald-500">silverware</span>.
           </h2>

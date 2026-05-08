@@ -103,10 +103,10 @@ export default function Rules() {
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-5">
             <ShieldCheck className="w-3.5 h-3.5" />
-            VENLAX Rulebook
+            VENLAX Sports Rulebook
           </div>
           <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight">
-            Play hard.<br />Play fair.<br /><span className="text-emerald-400">Play VENLAX.</span>
+            Play hard.<br />Play fair.<br /><span className="text-emerald-400">Play VENLAX Sports.</span>
           </h1>
           <p className="text-gray-400 text-base max-w-2xl">
             Our rules are aligned with <strong className="text-white">USTA</strong> (Friend at Court &amp; The Code) for Tennis and <strong className="text-white">USA Pickleball</strong> Official Rulebook for Pickleball. Anything VENLAX-specific is clearly labeled below.

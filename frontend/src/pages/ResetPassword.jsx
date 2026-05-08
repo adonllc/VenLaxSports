@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Trophy, Eye, EyeOff, CheckCircle } from "lucide-react";
+import Logo from "../components/Logo";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -44,7 +45,7 @@ export default function ResetPassword() {
           <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
             <Trophy className="w-5 h-5 text-white" />
           </div>
-          <span className="font-heading font-black text-xl">League<span className="text-emerald-500">Pro</span></span>
+          <Logo size="md" variant="default" testId="reset-logo" />
         </div>
 
         {done ? (
