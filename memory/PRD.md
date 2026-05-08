@@ -51,6 +51,11 @@ Build a multi-sport, multi-country league platform (T2Tennis-style) supporting T
 
 ## What's Been Implemented
 
+### Feb 2026 — How It Works + Rules & Conduct
+- **HowItWorks** — original 6-step component (`/components/HowItWorks.jsx`) replacing the previous generic copy: Pick league → Personalized schedule → Coordinate matches → Report scores → Climb playoffs → Play all year. VENLAX-themed with emerald accents, hover lift animations, CTA to /leagues.
+- **Rules page** at `/rules` (`/pages/Rules.jsx`) with USTA-aligned tennis rules (Friend at Court & The Code) + USAP-aligned pickleball rules. Sections: Match Format · Scoring · Court Conduct · VENLAX League Specifics · Ratings · Code of Conduct · Disputes & Appeals. Sticky in-page tab nav, gradient hero ("Play hard. Play fair. Play VENLAX.").
+- Nav + Footer links added (desktop + mobile).
+
 ### Feb 2026 — VENLAX Rebrand
 - **Brand identity migration** from LeaguePro → VENLAX with `frontend/src/config/brandConfig.js` as single source of truth (name, domain, taglines, pillars, story).
 - All UI surfaces updated: HTML title + meta + OG tags, Navbar logo (`VEN`+`LAX` emerald), Footer, Auth left panel ("Victory. Energy. eXperience."), SportLanding, App.css.

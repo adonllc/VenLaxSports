@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ResetPassword from "./pages/ResetPassword";
+import Rules from "./pages/Rules";
 import Leagues from "./pages/Leagues";
 import LeagueDetail from "./pages/LeagueDetail";
 import PlayerDashboard from "./pages/PlayerDashboard";
@@ -31,6 +32,7 @@ function AppRouter() {
       <Route path="/sport/:sport" element={<SportLanding />} />
       <Route path="/leagues" element={<Leagues />} />
       <Route path="/leagues/:id" element={<LeagueDetail />} />
+      <Route path="/rules" element={<Rules />} />
       <Route path="/dashboard" element={<PlayerDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/matches/:id/score" element={<ScoreReport />} />

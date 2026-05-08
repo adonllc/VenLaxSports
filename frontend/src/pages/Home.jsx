@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Users, Calendar, Trophy, ArrowRight, Star, TrendingUp } from "lucide-react";
 import platformConfig, { activeSportIds } from "../config/platformConfig";
+import HowItWorks from "../components/HowItWorks";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -135,6 +136,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* How It Works */}
+      <HowItWorks />
 
       {/* Sport Cards */}
       <section className="py-20 bg-gray-50">
