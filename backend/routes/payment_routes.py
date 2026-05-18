@@ -35,7 +35,10 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     if existing and existing.get("payment_status") in ["paid", "free"]:
         raise HTTPException(status_code=400, detail="Already registered")
 
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
 
     api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
     host_url = str(request.base_url)
@@ -91,7 +94,10 @@ async def get_payment_status(session_id: str, request: Request):
     if txn.get("payment_status") == "paid":
         return {"status": "complete", "payment_status": "paid"}
 
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
 
     api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
     host_url = str(request.base_url)
