@@ -165,7 +165,15 @@ async def get_league_standings(league_id: str, request: Request):
     db = request.app.state.db
     standings = await db.standings.find(
         {"league_id": league_id}, {"_id": 0}
-    ).sort([("points", -1), ("wins", -1)]).to_list(100)
+    ).to_list(100)
+
+    # Sort: points → set differential → game differential → wins (tiebreak chain)
+    def _sort_key(s):
+        set_diff = s.get("sets_won", 0) - s.get("sets_lost", 0)
+        game_diff = s.get("games_won", 0) - s.get("games_lost", 0)
+        return (-round(s.get("points", 0), 4), -set_diff, -game_diff, -s.get("wins", 0))
+
+    standings.sort(key=_sort_key)
     return standings
 
 
@@ -174,6 +182,60 @@ async def get_league_matches(league_id: str, request: Request):
     db = request.app.state.db
     matches = await db.matches.find({"league_id": league_id}).sort("scheduled_date", 1).to_list(100)
     return [_serialize(m) for m in matches]
+
+
+@router.post("/{league_id}/close")
+async def close_league(league_id: str, request: Request):
+    """Finalize season: award +2 bonus to players who completed all matches, set league status=completed."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    if league.get("status") == "completed":
+        raise HTTPException(status_code=400, detail="League already closed")
+
+    # All registered players
+    registrations = await db.player_leagues.find(
+        {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}},
+        {"player_id": 1, "_id": 0},
+    ).to_list(200)
+
+    now = datetime.now(timezone.utc).isoformat()
+    awarded: list[str] = []
+
+    for reg in registrations:
+        pid = reg["player_id"]
+        player_filter = {
+            "league_id": league_id,
+            "status": {"$ne": "cancelled"},
+            "$or": [{"player1_id": pid}, {"player2_id": pid}],
+        }
+        total = await db.matches.count_documents(player_filter)
+        if total == 0:
+            continue
+        completed = await db.matches.count_documents({**player_filter, "status": "completed"})
+        if completed == total:
+            await db.standings.update_one(
+                {"league_id": league_id, "player_id": pid},
+                {"$inc": {"bonus_points": 2.0, "points": 2.0}, "$set": {"updated_at": now}},
+            )
+            awarded.append(pid)
+
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {"$set": {"status": "completed", "updated_at": now}},
+    )
+
+    return {
+        "message": "League closed",
+        "players_awarded_bonus": len(awarded),
+        "awarded_player_ids": awarded,
+    }
 
 
 async def _upsert_standing(db, league_id: str, player_id: str, player_name: str, sport: str, country: str):

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from models import Match, MatchCreate, MatchScore
 from auth_utils import get_current_user
-from rating_utils import delta_for, rating_field_for, clamp
+from rating_utils import delta_for, rating_field_for, clamp, k_factor_for
 import email_service
 
 router = APIRouter(redirect_slashes=False)
@@ -111,7 +111,7 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
             }
         },
     )
-    await _update_standings(db, match["league_id"], match, score_data.winner_id)
+    await _update_standings(db, match["league_id"], match, score_data.winner_id, score_data.score_data)
 
     # Rating updates (tennis / pickleball only — cricket is team-based)
     rating_change = None
@@ -164,16 +164,90 @@ async def get_match(match_id: str, request: Request):
     return _serialize(match)
 
 
-async def _update_standings(db, league_id: str, match: dict, winner_id: str):
-    loser_id = match["player2_id"] if winner_id == match["player1_id"] else match["player1_id"]
+def _parse_score_stats(score_data: dict, sport: str, winner_id: str, player1_id: str):
+    """Parse score_data → (w_sets, l_sets, w_games, l_games, is_straight, is_close3).
+
+    is_straight = winner won without dropping a set (e.g. 2-0).
+    is_close3   = match went 3 sets and loser won at least one (tight match).
+    """
+    winner_is_p1 = str(winner_id) == str(player1_id)
+    w_sets = l_sets = w_games = l_games = 0
+
+    if sport == "tennis":
+        pairs = [(f"set{i}_p1", f"set{i}_p2") for i in range(1, 4)]
+    elif sport == "pickleball":
+        pairs = [(f"game{i}_p1", f"game{i}_p2") for i in range(1, 4)]
+    else:
+        return 0, 0, 0, 0, False, False
+
+    for p1_key, p2_key in pairs:
+        p1_raw = score_data.get(p1_key, "")
+        p2_raw = score_data.get(p2_key, "")
+        if p1_raw in ("", None) or p2_raw in ("", None):
+            continue
+        try:
+            p1s = int(str(p1_raw))
+            p2s = int(str(p2_raw))
+        except ValueError:
+            continue
+        if winner_is_p1:
+            w_games += p1s
+            l_games += p2s
+            if p1s > p2s:
+                w_sets += 1
+            elif p2s > p1s:
+                l_sets += 1
+        else:
+            w_games += p2s
+            l_games += p1s
+            if p2s > p1s:
+                w_sets += 1
+            elif p1s > p2s:
+                l_sets += 1
+
+    is_straight = l_sets == 0 and w_sets >= 2
+    is_close3 = (w_sets + l_sets) >= 3 and l_sets >= 1
+    return w_sets, l_sets, w_games, l_games, is_straight, is_close3
+
+
+async def _update_standings(db, league_id: str, match: dict, winner_id: str, score_data: dict = None):
+    """Update standings using formula: 3W + 1L + 0.5(SW-SL) + 0.1(GW-GL) + Bonus."""
+    sport = match.get("sport", "")
+    loser_id = match["player2_id"] if str(winner_id) == str(match["player1_id"]) else match["player1_id"]
     now = datetime.now(timezone.utc).isoformat()
+
+    w_sets = l_sets = w_games = l_games = 0
+    winner_bonus = loser_bonus = 0.0
+
+    if score_data and sport in ("tennis", "pickleball"):
+        w_sets, l_sets, w_games, l_games, is_straight, is_close3 = _parse_score_stats(
+            score_data, sport, winner_id, match["player1_id"]
+        )
+        if is_straight:
+            winner_bonus += 1.0   # straight-set win bonus
+        if is_close3:
+            loser_bonus += 0.5    # close 3-set loss bonus
+
+    winner_pts = round(3.0 + 0.5 * (w_sets - l_sets) + 0.1 * (w_games - l_games) + winner_bonus, 2)
+    loser_pts = round(1.0 + 0.5 * (l_sets - w_sets) + 0.1 * (l_games - w_games) + loser_bonus, 2)
+
     await db.standings.update_one(
         {"league_id": league_id, "player_id": winner_id},
-        {"$inc": {"wins": 1, "matches_played": 1, "points": 2}, "$set": {"updated_at": now}},
+        {"$inc": {
+            "wins": 1, "matches_played": 1, "points": winner_pts,
+            "sets_won": w_sets, "sets_lost": l_sets,
+            "games_won": w_games, "games_lost": l_games,
+            "bonus_points": winner_bonus,
+        }, "$set": {"updated_at": now}},
     )
     await db.standings.update_one(
         {"league_id": league_id, "player_id": loser_id},
-        {"$inc": {"losses": 1, "matches_played": 1}, "$set": {"updated_at": now}},
+        {"$inc": {
+            "losses": 1, "matches_played": 1, "points": loser_pts,
+            "sets_won": l_sets, "sets_lost": w_sets,
+            "games_won": l_games, "games_lost": w_games,
+            "bonus_points": loser_bonus,
+        }, "$set": {"updated_at": now}},
     )
 
 
@@ -198,7 +272,17 @@ async def _update_ratings(db, match: dict, winner_id: str):
 
     w_rating = float(winner.get(field, 3.0))
     l_rating = float(loser.get(field, 3.0))
-    w_delta, l_delta = delta_for(w_rating, l_rating)
+
+    # Staged K-factor: fetch completed match counts for each player in this sport
+    w_matches = await db.matches.count_documents(
+        {"$or": [{"player1_id": winner_id}, {"player2_id": winner_id}],
+         "status": "completed", "sport": sport}
+    )
+    l_matches = await db.matches.count_documents(
+        {"$or": [{"player1_id": loser_id}, {"player2_id": loser_id}],
+         "status": "completed", "sport": sport}
+    )
+    w_delta, l_delta = delta_for(w_rating, l_rating, w_matches, l_matches)
     w_new = clamp(w_rating + w_delta)
     l_new = clamp(l_rating + l_delta)
 

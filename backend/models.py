@@ -184,8 +184,13 @@ class Standing(BaseDocument):
     wins: int = 0
     losses: int = 0
     draws: int = 0
-    points: int = 0
+    points: float = 0.0          # float — formula: 3W+1L+0.5(SW-SL)+0.1(GW-GL)+BP
     matches_played: int = 0
+    sets_won: int = 0
+    sets_lost: int = 0
+    games_won: int = 0
+    games_lost: int = 0
+    bonus_points: float = 0.0
     nrr: float = 0.0
     country: str = "USA"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())

@@ -70,6 +70,23 @@ async def generate_bracket(data: BracketCreate, request: Request):
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
 
+    # Qualification thresholds: ≤12 players → Top 4, >12 → Top 8
+    player_count = await db.player_leagues.count_documents({
+        "league_id": data.league_id,
+        "payment_status": {"$in": ["paid", "free"]},
+    })
+    recommended_top_n = 4 if player_count <= 12 else 8
+    if data.top_n > recommended_top_n:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"League has {player_count} players. "
+                f"Maximum qualifying spots: {recommended_top_n} "
+                f"({'≤12 players → Top 4' if player_count <= 12 else '>12 players → Top 8'}). "
+                f"Set top_n ≤ {recommended_top_n}."
+            ),
+        )
+
     # Pull top-N standings
     standings = await db.standings.find(
         {"league_id": data.league_id},
