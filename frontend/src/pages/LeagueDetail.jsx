@@ -175,7 +175,7 @@ export default function LeagueDetail() {
             </div>
 
             {/* Join Card */}
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 min-w-[240px]">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 w-full lg:w-auto lg:min-w-[240px]">
               <div className="text-center mb-4">
                 <p className="text-3xl font-heading font-black text-gray-900">
                   {isFree ? "FREE" : `${currency}${league.entry_fee}`}

@@ -95,7 +95,7 @@ export default function Leagues() {
         {/* Filters */}
         <div className="bg-white rounded-2xl border border-gray-200 p-4 mb-8 flex flex-wrap gap-3">
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"

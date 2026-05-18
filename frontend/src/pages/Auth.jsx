@@ -73,7 +73,7 @@ export default function Auth() {
             </div>
             <Logo size="hero" variant="hero" testId="auth-hero-logo" />
           </div>
-          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Victory.<br />Energy.<br /><span className="text-emerald-400">eXperience.</span></h2>
+          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Compete.<br />Rise.<br /><span className="text-emerald-400">Dominate.</span></h2>
           <p className="text-gray-400 text-base max-w-xs mx-auto">{BRAND.story_short}</p>
           <div className="flex justify-center gap-6 mt-10">
             {activeSports.map((s) => (
@@ -105,10 +105,10 @@ export default function Auth() {
           </div>
 
           <h1 className="font-heading font-black text-3xl text-gray-900 mb-2">
-            {mode === "login" ? "Welcome back" : "Create account"}
+            {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
           <p className="text-gray-500 text-sm mb-8">
-            {mode === "login" ? `Log in to your ${BRAND.name} account` : `Compete · Connect · Rise — join ${BRAND.name} today`}
+            {mode === "login" ? `Log in to your ${BRAND.name} account` : "Your season starts now."}
           </p>
 
           {error && (

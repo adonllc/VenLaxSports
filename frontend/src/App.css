@@ -57,3 +57,19 @@
 .border-tennis { border-color: #10B981; }
 .border-cricket { border-color: #2563EB; }
 .border-pickleball { border-color: #F97316; }
+
+/* Responsive utilities */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Touch-friendly tap target for small interactive elements on mobile */
+@media (max-width: 640px) {
+  .league-card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .sport-card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

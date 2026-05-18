@@ -5,43 +5,43 @@ const STEPS = [
   {
     n: "01",
     icon: Trophy,
-    title: "Pick your league",
-    body: "Singles, doubles or mixed — choose the format that fits your game. New leagues spin up monthly, quarterly, half-yearly and yearly so there's always one open near you.",
+    title: "Choose your format",
+    body: "Singles. Doubles. Mixed. Monthly or seasonal — pick the league that fits your level and city.",
     accent: "text-emerald-500",
   },
   {
     n: "02",
     icon: CalendarDays,
-    title: "Get a personalized schedule",
-    body: "Once registration closes, you'll get 5 matches against players at your skill level — one a week, with a built-in makeup week for life's curveballs.",
+    title: "Get your fixture list",
+    body: "Five ranked matches against players at your skill level. Skill-matched. City-based. No soft opponents.",
     accent: "text-amber-500",
   },
   {
     n: "03",
     icon: Users,
-    title: "Schedule matches your way",
-    body: "Coordinate court time directly with your opponent — VENLAX shows you their availability, contact, and rating so you can lock in a slot in one tap.",
+    title: "Lock in your match",
+    body: "Contact your opponent directly. See their rating, availability, and location. One tap to confirm.",
     accent: "text-sky-500",
   },
   {
     n: "04",
     icon: BarChart3,
-    title: "Report scores & track progress",
-    body: "Log results in seconds. Watch your rating curve, win rate and standings update in real time on your dashboard — every match counts.",
+    title: "Log. Rank. Repeat.",
+    body: "Submit results in seconds. Your rating and standings update in real time — every match counts.",
     accent: "text-purple-500",
   },
   {
     n: "05",
     icon: Zap,
-    title: "Climb to the playoffs",
-    body: "Top performers in each division earn an auto-generated playoff bracket — single-elim seeding, with the next round spawning the moment results are in.",
+    title: "Earn your playoff spot",
+    body: "Top performers advance to the bracket. Single-elimination. Auto-seeded. No second chances.",
     accent: "text-pink-500",
   },
   {
     n: "06",
     icon: Repeat,
-    title: "Play all season, every season",
-    body: "Spring, summer, fall, winter — VENLAX runs leagues all year so your competitive momentum never stops. Defend your title, rise a division, build the streak.",
+    title: "Never stop competing",
+    body: "New seasons drop year-round. Spring. Summer. Fall. Winter. Defend your rank. Chase the title.",
     accent: "text-rose-500",
   },
 ];
@@ -51,12 +51,12 @@ export default function HowItWorks() {
     <section className="bg-white py-24 px-6" data-testid="how-it-works">
       <div className="max-w-6xl mx-auto">
         <div className="mb-14 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-3">How VENLAX Sports works</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-3">The Process</p>
           <h2 className="font-heading font-black text-3xl sm:text-4xl text-gray-900 mb-3">
-            Six steps from <span className="text-emerald-500">signup</span> to <span className="text-emerald-500">silverware</span>.
+            Six moves. One <span className="text-emerald-500">championship season.</span>
           </h2>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            Built for players who want to compete, connect, and rise — without the spreadsheet headaches.
+            No admin chaos. No spreadsheets. Just ranked competition, handled.
           </p>
         </div>
 
@@ -88,10 +88,10 @@ export default function HowItWorks() {
             className="inline-flex items-center gap-2 text-sm font-semibold bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
             data-testid="how-cta-leagues"
           >
-            Browse open leagues <ArrowRight className="w-4 h-4" />
+            See open leagues <ArrowRight className="w-4 h-4" />
           </Link>
           <p className="text-xs text-gray-400 mt-3">
-            Standard pricing — $9.99 singles · $19.99 doubles · open to every USA city.
+            $9.99 singles · $19.99 doubles · All US cities · No commitment.
           </p>
         </div>
       </div>

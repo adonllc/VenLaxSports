@@ -125,6 +125,19 @@ export default function AdminDashboard() {
     } catch (e) { alert("Failed to update status"); }
   };
 
+  const handleCloseLeague = async (id, name) => {
+    if (!window.confirm(`Finalize "${name}"? This awards +2 bonus to players who completed all matches and sets the league to Completed.`)) return;
+    try {
+      const { data } = await axios.post(`${API}/leagues/${id}/close`, {}, { withCredentials: true });
+      alert(`League closed. ${data.players_awarded_bonus} player(s) received the +2 completion bonus.`);
+      fetchLeagues();
+      fetchStats();
+    } catch (e) {
+      const d = e.response?.data?.detail;
+      alert(typeof d === "string" ? d : "Failed to close league");
+    }
+  };
+
   if (!user || user.role !== "admin") return null;
 
   const STAT_CARDS = stats ? [
@@ -158,12 +171,12 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-0">
+          <div className="flex gap-0 overflow-x-auto scrollbar-none">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`px-5 py-4 text-sm font-semibold border-b-2 transition-colors ${tab === t.id ? "border-black text-black" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+                className={`px-4 sm:px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${tab === t.id ? "border-black text-black" : "border-transparent text-gray-500 hover:text-gray-700"}`}
                 data-testid={`admin-tab-${t.id}`}
               >
                 {t.label}
@@ -352,6 +365,16 @@ export default function AdminDashboard() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
                           <Link to={`/leagues/${l.id}`} className="text-xs text-blue-600 hover:underline">View</Link>
+                          {l.status !== "completed" && (
+                            <button
+                              onClick={() => handleCloseLeague(l.id, l.name)}
+                              className="text-xs text-emerald-600 hover:text-emerald-800 font-medium"
+                              data-testid={`close-league-${l.id}`}
+                              title="Finalize season — awards +2 completion bonus"
+                            >
+                              Finalize
+                            </button>
+                          )}
                           <button onClick={() => handleDelete(l.id)} className="text-xs text-red-500 hover:text-red-700" data-testid={`delete-league-${l.id}`}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

@@ -58,22 +58,22 @@ const PHASE_1 = {
   paymentProvider: "stripe",      // PHASE 3: change to "razorpay"
 
   // UI copy
-  heroBadge: "Now live — Season 1 open for registration",
-  heroSubtitle: "Compete. Connect. Rise. Tennis & Pickleball leagues open across the USA.",
-  footerTagline: "Where Victory meets eXperience — Tennis & Pickleball leagues across the USA.",
+  heroBadge: "Season 1 is live — spots filling fast",
+  heroSubtitle: "Ranked leagues for Tennis & Pickleball players across the USA. Enter your city's circuit.",
+  footerTagline: "Ranked leagues. Real competition. Every city. Every season.",
   statsRegion: "All US Cities",
 
   // City highlights shown on Home page
   featuredCities: [
-    { name: "New York",      icon: "🏙️", sports: ["Tennis", "Pickleball"], desc: "Central Park courts & top indoor facilities." },
-    { name: "Los Angeles",   icon: "🌴", sports: ["Pickleball", "Tennis"], desc: "Year-round outdoor play at top LA venues." },
-    { name: "Chicago",       icon: "🌆", sports: ["Tennis", "Pickleball"], desc: "Competitive leagues at Grant Park & beyond." },
-    { name: "San Francisco", icon: "🌉", sports: ["Tennis"],               desc: "Golden Gate Park courts & indoor clubs." },
-    { name: "Atlanta",       icon: "🏟️", sports: ["Pickleball", "Tennis"], desc: "Fastest-growing pickleball scene in the South." },
-    { name: "Houston",       icon: "🤠", sports: ["Tennis", "Pickleball"], desc: "Year-round leagues at Houston's top clubs." },
+    { name: "New York",      icon: "🏙️", sports: ["Tennis", "Pickleball"], desc: "Ranked circuits at premier indoor & outdoor courts." },
+    { name: "Los Angeles",   icon: "🌴", sports: ["Pickleball", "Tennis"], desc: "Year-round competition at LA's top venues." },
+    { name: "Chicago",       icon: "🌆", sports: ["Tennis", "Pickleball"], desc: "Seasons running across Chicago's best courts." },
+    { name: "San Francisco", icon: "🌉", sports: ["Tennis"],               desc: "Competitive singles & doubles. Join the circuit." },
+    { name: "Atlanta",       icon: "🏟️", sports: ["Pickleball", "Tennis"], desc: "The South's fastest-rising pickleball scene." },
+    { name: "Houston",       icon: "🤠", sports: ["Tennis", "Pickleball"], desc: "Ranked leagues at Houston's elite clubs." },
   ],
-  citySectionTitle: "Find a League Near You",
-  citySectionDesc: "Tennis & Pickleball leagues now running across top US cities — new seasons starting regularly.",
+  citySectionTitle: "Pick Your City. Enter Your Season.",
+  citySectionDesc: "Ranked Tennis & Pickleball leagues running across the USA. New seasons open year-round.",
 };
 
 // ─────────────────────────────────────────────────────────────────────

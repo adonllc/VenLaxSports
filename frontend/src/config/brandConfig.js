@@ -13,7 +13,7 @@ export const BRAND = {
   payments_email: "payments@venlaxsports.com",
 
   tagline_short: "Victory. Energy. eXperience.",
-  tagline_long: "Where Victory Meets Experience.",
+  tagline_long: "Where champions are made.",
 
   // Acronym breakdown (used on About / Auth left panel)
   pillars: [
@@ -24,13 +24,13 @@ export const BRAND = {
 
   // Brand story for marketing copy
   story_short:
-    "VENLAX stands for Victory, Energy, and eXperience — a global multi-sport platform built for players who want to compete, connect, and rise.",
+    "Ranked leagues. Real competition. Every city. Every season.",
   story_long:
     "VENLAX is built on a simple belief: sports should be accessible, competitive, and unforgettable. From the USA to India, from Tennis to Cricket to Pickleball, we connect players, venues, and leagues into one unified ecosystem. This is more than a platform — it's a movement.",
 
   // Phase-specific copy
   hero_title: "Your league. Your rules. Your win.",
-  hero_subtitle: "Compete. Connect. Rise.",
+  hero_subtitle: "Compete. Rise. Dominate.",
 
   // Render helper for consumers
   full_logo: { prefix: "VEN", accent: "LAX" },

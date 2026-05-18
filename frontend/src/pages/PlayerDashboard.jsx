@@ -100,43 +100,45 @@ export default function PlayerDashboard() {
     <div className="min-h-screen bg-gray-50" data-testid="player-dashboard">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
-          </div>
-          <div className="flex-1">
-            <h1 className="font-heading font-black text-2xl text-gray-900">{user.name}</h1>
-            <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
-              <span>{user.email}</span>
-              {user.city && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{user.city}</span>}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
-            <button
-              onClick={toggleNotifications}
-              disabled={togglingNotif}
-              className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                user.email_notifications
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                  : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
-              } disabled:opacity-60`}
-              data-testid="toggle-email-notifications"
-              title="Toggle email notifications for match scheduling, score results, and league registration"
-            >
-              {user.email_notifications ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
-              Email notifications: {user.email_notifications ? "ON" : "OFF"}
-            </button>
-          </div>
-          <div className="flex gap-3">
-            <div className="text-center">
-              <p className="font-heading font-black text-2xl text-emerald-600">{user.tennis_rating || 3.0}</p>
-              <p className="text-xs text-gray-500">Tennis</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-heading font-black text-2xl text-gray-900">{user.name}</h1>
+              <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
+                <span className="truncate">{user.email}</span>
+                {user.city && <span className="flex items-center gap-1 flex-shrink-0"><MapPin className="w-3 h-3" />{user.city}</span>}
+              </div>
+              <button
+                onClick={toggleNotifications}
+                disabled={togglingNotif}
+                className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  user.email_notifications
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                    : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+                } disabled:opacity-60`}
+                data-testid="toggle-email-notifications"
+                title="Toggle email notifications for match scheduling, score results, and league registration"
+              >
+                {user.email_notifications ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+                Email notifications: {user.email_notifications ? "ON" : "OFF"}
+              </button>
             </div>
-            <div className="text-center">
-              <p className="font-heading font-black text-2xl text-blue-600">{user.cricket_rating || 50}</p>
-              <p className="text-xs text-gray-500">Cricket</p>
-            </div>
-            <div className="text-center">
-              <p className="font-heading font-black text-2xl text-orange-600">{user.pickleball_rating || 3.0}</p>
-              <p className="text-xs text-gray-500">Pickleball</p>
+            <div className="flex gap-4 sm:gap-3 flex-wrap sm:flex-nowrap">
+              <div className="text-center">
+                <p className="font-heading font-black text-2xl text-emerald-600">{user.tennis_rating || 3.0}</p>
+                <p className="text-xs text-gray-500">Tennis</p>
+              </div>
+              <div className="text-center">
+                <p className="font-heading font-black text-2xl text-blue-600">{user.cricket_rating || 50}</p>
+                <p className="text-xs text-gray-500">Cricket</p>
+              </div>
+              <div className="text-center">
+                <p className="font-heading font-black text-2xl text-orange-600">{user.pickleball_rating || 3.0}</p>
+                <p className="text-xs text-gray-500">Pickleball</p>
+              </div>
             </div>
           </div>
         </div>

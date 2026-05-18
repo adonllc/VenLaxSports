@@ -69,27 +69,27 @@ export default function SportLanding() {
   return (
     <div className="min-h-screen bg-white" data-testid={`sport-landing-${sport}`}>
       {/* Hero */}
-      <section className="relative h-80 overflow-hidden">
+      <section className="relative h-64 sm:h-80 overflow-hidden">
         <img src={meta.image} alt={meta.label} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-5xl">{meta.icon}</span>
-              <h1 className="font-heading font-black text-5xl">{meta.label}</h1>
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full">
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <span className="text-3xl sm:text-5xl">{meta.icon}</span>
+              <h1 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl">{meta.label}</h1>
             </div>
-            <p className="text-lg text-gray-200 max-w-lg">{meta.tagline}</p>
-            <div className="flex gap-3 mt-6">
+            <p className="text-sm sm:text-lg text-gray-200 max-w-lg">{meta.tagline}</p>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
               <button
                 onClick={() => navigate(`/leagues?sport=${sport}`)}
-                className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-colors text-sm"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-colors text-sm"
                 data-testid="view-leagues-btn"
               >
                 View All {meta.label} Leagues
               </button>
               <button
                 onClick={() => navigate("/auth?mode=register")}
-                className="px-6 py-3 border border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 border border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm"
                 data-testid="join-now-btn"
               >
                 Join Now
