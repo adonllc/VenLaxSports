@@ -240,6 +240,7 @@ class PlayerLeague(BaseDocument):
     payment_status: str = "pending"  # pending, paid, free
     session_id: Optional[str] = None
     joined_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    waiver_accepted_at: Optional[str] = None  # ISO timestamp of explicit waiver consent
 
 
 # ─── Payment Transaction ──────────────────────────────

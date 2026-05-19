@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from bson import ObjectId
 from datetime import datetime, timezone
+from pydantic import BaseModel
 from auth_utils import get_current_user
 
 router = APIRouter(redirect_slashes=False)
@@ -418,10 +419,17 @@ async def invite_partner(league_id: str, request: Request):
     return {"invited": True, "message": "Invite sent to " + partner_email}
 
 
+class AcceptInviteBody(BaseModel):
+    waiver_accepted: bool = False
+
+
 @router.post("/invite/{token}/accept")
-async def accept_invite(token: str, request: Request):
+async def accept_invite(token: str, body: AcceptInviteBody, request: Request):
     db = request.app.state.db
     user = await get_current_user(request, db)
+
+    if not body.waiver_accepted:
+        raise HTTPException(status_code=400, detail="You must accept the Liability Waiver to join")
 
     invite = await db.doubles_invites.find_one({"token": token})
     if not invite:
@@ -458,6 +466,17 @@ async def accept_invite(token: str, request: Request):
         raise HTTPException(status_code=400, detail="League is full")
 
     now_iso = datetime.now(timezone.utc).isoformat()
+    waiver_ts = now_iso  # partner's consent captured at accept time
+
+    # Also record consent in waiver_consents for auditability
+    await db.waiver_consents.insert_one({
+        "user_id": user["_id"],
+        "league_id": league_id,
+        "waiver_accepted_at": waiver_ts,
+        "ip": request.client.host if request.client else None,
+        "via": "rr_invite",
+    })
+
     team_entry = {
         "player_id": inviter_id,
         "player_name": invite["inviter_name"],
@@ -489,6 +508,7 @@ async def accept_invite(token: str, request: Request):
             "payment_status": "free",
             "inviter_id": inviter_id,
             "joined_at": now_iso,
+            "waiver_accepted_at": waiver_ts,
         })
 
     await db.doubles_invites.update_one({"token": token}, {"$set": {"status": "accepted"}})

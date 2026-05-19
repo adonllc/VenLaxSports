@@ -126,6 +126,11 @@ async def get_payment_status(session_id: str, request: Request):
             league = await db.leagues.find_one({"_id": ObjectId(league_id)})
             player = await db.users.find_one({"_id": ObjectId(user_id)})
             if league and player:
+                # Retrieve waiver consent recorded at join time
+                consent = await db.waiver_consents.find_one(
+                    {"user_id": user_id, "league_id": league_id},
+                    sort=[("waiver_accepted_at", -1)],
+                )
                 pl = PlayerLeague(
                     player_id=user_id,
                     player_name=player["name"],
@@ -133,6 +138,7 @@ async def get_payment_status(session_id: str, request: Request):
                     sport=league["sport"],
                     payment_status="paid",
                     session_id=session_id,
+                    waiver_accepted_at=consent["waiver_accepted_at"] if consent else now,
                 )
                 await db.player_leagues.insert_one(pl.to_mongo())
                 await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
@@ -245,12 +251,17 @@ async def _confirm_player_registered(db, league: dict, league_id: str, user: dic
     if already:
         return False
 
+    consent = await db.waiver_consents.find_one(
+        {"user_id": user_id, "league_id": league_id},
+        sort=[("waiver_accepted_at", -1)],
+    )
     pl = PlayerLeague(
         player_id=user_id,
         player_name=user["name"],
         league_id=league_id,
         sport=league["sport"],
         payment_status="paid",
+        waiver_accepted_at=consent["waiver_accepted_at"] if consent else datetime.now(timezone.utc).isoformat(),
     )
     await db.player_leagues.insert_one(pl.to_mongo())
     await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})

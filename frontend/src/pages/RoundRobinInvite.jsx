@@ -48,7 +48,7 @@ export default function RoundRobinInvite() {
     try {
       const res = await axios.post(
         `${API}/round-robin/invite/${token}/accept`,
-        {},
+        { waiver_accepted: waiverAccepted },
         { withCredentials: true }
       );
       setAccepted(true);

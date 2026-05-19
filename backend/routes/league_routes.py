@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Request
 from typing import Optional
 from datetime import datetime, timezone
 from bson import ObjectId
+from pydantic import BaseModel
 from models import League, LeagueCreate, PlayerLeague, Standing
 from auth_utils import get_current_user, require_admin
 from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
@@ -98,10 +99,18 @@ async def create_league(data: LeagueCreate, request: Request):
     return {"id": str(result.inserted_id), "message": "League created", **data.model_dump()}
 
 
+class JoinLeagueRequest(BaseModel):
+    waiver_accepted: bool = False
+
+
 @router.post("/{league_id}/join")
-async def join_league(league_id: str, request: Request):
+async def join_league(league_id: str, body: JoinLeagueRequest, request: Request):
     db = request.app.state.db
     user = await get_current_user(request, db)
+
+    if not body.waiver_accepted:
+        raise HTTPException(status_code=400, detail="You must accept the Liability Waiver to register")
+
     try:
         league = await db.leagues.find_one({"_id": ObjectId(league_id)})
     except Exception:
@@ -117,8 +126,17 @@ async def join_league(league_id: str, request: Request):
     if existing and existing.get("payment_status") in ["paid", "free"]:
         raise HTTPException(status_code=400, detail="Already registered in this league")
 
+    waiver_ts = datetime.now(timezone.utc).isoformat()
+
     entry_fee = float(league.get("entry_fee", 0))
     if entry_fee > 0:
+        # Persist waiver intent so the payment route can stamp it on confirmation
+        await db.waiver_consents.insert_one({
+            "user_id": user["_id"],
+            "league_id": league_id,
+            "waiver_accepted_at": waiver_ts,
+            "ip": request.client.host if request.client else None,
+        })
         return {
             "requires_payment": True,
             "league_id": league_id,
@@ -134,6 +152,7 @@ async def join_league(league_id: str, request: Request):
         league_id=league_id,
         sport=league["sport"],
         payment_status="free",
+        waiver_accepted_at=waiver_ts,
     )
     await db.player_leagues.insert_one(pl.to_mongo())
     await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})

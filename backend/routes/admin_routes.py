@@ -174,6 +174,10 @@ async def approve_zelle(session_id: str, request: Request):
         {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}
     )
     if not already:
+        consent = await db.waiver_consents.find_one(
+            {"user_id": user_id, "league_id": league_id},
+            sort=[("waiver_accepted_at", -1)],
+        )
         pl = PlayerLeague(
             player_id=user_id,
             player_name=player["name"],
@@ -181,6 +185,7 @@ async def approve_zelle(session_id: str, request: Request):
             sport=league["sport"],
             payment_status="paid",
             session_id=session_id,
+            waiver_accepted_at=consent["waiver_accepted_at"] if consent else datetime.now(timezone.utc).isoformat(),
         )
         await db.player_leagues.insert_one(pl.to_mongo())
         await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})

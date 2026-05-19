@@ -108,7 +108,7 @@ export default function LeagueDetail() {
     setJoining(true);
     setJoinMsg("");
     try {
-      const { data } = await axios.post(`${API}/leagues/${id}/join`, {}, { withCredentials: true });
+      const { data } = await axios.post(`${API}/leagues/${id}/join`, { waiver_accepted: waiverAccepted }, { withCredentials: true });
       if (data.requires_payment) {
         // Open payment-method picker (Stripe / Apple Pay / Google Pay / Zelle)
         setPaymentModalOpen(true);
