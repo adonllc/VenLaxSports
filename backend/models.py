@@ -51,6 +51,7 @@ class User(BaseDocument):
     cricket_rating: float = 50.0
     pickleball_rating: float = 3.0
     email_notifications: bool = True
+    profile_public: bool = True
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -91,6 +92,7 @@ class League(BaseDocument):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     league_type: str = "flex"               # "flex" | "round_robin"
     rr_config: Optional[Dict] = None
+    is_public: bool = True
 
 
 class LeagueCreate(BaseModel):
@@ -258,3 +260,14 @@ class PaymentTransaction(BaseDocument):
     metadata: Optional[Dict] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: Optional[str] = None
+
+
+# ─── Challenge ───────────────────────────────────────
+class Challenge(BaseDocument):
+    challenger_id: str
+    challenger_name: str
+    challenged_id: str
+    league_id: Optional[str] = None
+    status: str = "pending"          # pending, accepted, expired
+    delivery_method: str = "email"   # email | whatsapp
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())

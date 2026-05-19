@@ -17,3 +17,19 @@ class TestOptionalAuth:
         r = requests.get(f"{BASE_URL}/api/health")
         assert r.status_code == 200
         assert "401" not in r.text
+
+
+class TestModels:
+    def test_challenge_model_import(self):
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+        from models import Challenge
+        c = Challenge(
+            challenger_id="aaa",
+            challenger_name="Alice",
+            challenged_id="bbb",
+        )
+        assert c.status == "pending"
+        assert c.delivery_method == "email"
+        d = c.to_mongo()
+        assert d["challenger_id"] == "aaa"
