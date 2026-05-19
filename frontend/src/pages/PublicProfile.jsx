@@ -54,7 +54,10 @@ export default function PublicProfile() {
   };
 
   const handleShare = () => {
-    const url = `${window.location.href}?utm_source=venlax&utm_medium=profile`;
+    const u = new URL(window.location.href);
+    u.searchParams.set("utm_source", "venlax");
+    u.searchParams.set("utm_medium", "profile");
+    const url = u.toString();
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
