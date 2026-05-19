@@ -144,3 +144,189 @@ async def get_rr_matches(league_id: str, request: Request):
     db = request.app.state.db
     matches = await db.matches.find({"league_id": league_id, "is_rr": True}).to_list(500)
     return [_ser(m) for m in matches]
+
+
+async def _run_generate_schedule(db, league_id: str) -> dict:
+    """Generate the round-robin schedule and create Match documents.
+    Called internally after join/accept when min_players is reached.
+    """
+    from rr_scheduler import generate_schedule, scoring_format_for
+    from datetime import timedelta
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        return {"generated": False, "reason": "league not found"}
+
+    rr = league.get("rr_config", {})
+    if rr.get("schedule_generated"):
+        return {"generated": False, "reason": "already generated"}
+
+    division_type = rr.get("division_type", "singles")
+
+    if division_type == "singles":
+        regs = await db.player_leagues.find({"league_id": league_id}).to_list(100)
+        players = [{"id": r["player_id"], "name": r["player_name"]} for r in regs]
+    else:
+        regs = await db.player_leagues.find(
+            {"league_id": league_id, "partner_id": {"$exists": True, "$ne": None}}
+        ).to_list(100)
+        players = [
+            {
+                "id": r["player_id"],
+                "name": r["player_name"],
+                "partner_id": r.get("partner_id"),
+                "partner_name": r.get("partner_name"),
+            }
+            for r in regs
+        ]
+
+    if len(players) < rr.get("min_players", 6):
+        return {"generated": False, "reason": "not enough players"}
+
+    scoring_format = scoring_format_for(league["sport"])
+    start_date = datetime.fromisoformat(league["start_date"].replace("Z", "+00:00"))
+
+    rounds_raw = generate_schedule(players)
+    rounds_doc = []
+    for k, pairs in enumerate(rounds_raw, start=1):
+        week_start = start_date + timedelta(days=(k - 1) * 7)
+        week_end = week_start + timedelta(days=6)
+        round_matches = []
+        for p1, p2 in pairs:
+            if p1 is None or p2 is None:
+                continue                        # BYE — skip match creation
+            match_doc = {
+                "league_id": league_id,
+                "sport": league["sport"],
+                "player1_id": p1["id"],
+                "player2_id": p2["id"],
+                "player1_name": p1["name"],
+                "player2_name": p2["name"],
+                "scheduled_date": week_start.isoformat(),
+                "status": "scheduled",
+                "round": k,
+                "is_rr": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+            if division_type == "doubles":
+                match_doc.update({
+                    "team1_partner_id": p1.get("partner_id"),
+                    "team1_partner_name": p1.get("partner_name"),
+                    "team2_partner_id": p2.get("partner_id"),
+                    "team2_partner_name": p2.get("partner_name"),
+                })
+            result = await db.matches.insert_one(match_doc)
+            round_matches.append({
+                "player1_id": p1["id"],
+                "player1_name": p1["name"],
+                "player2_id": p2["id"],
+                "player2_name": p2["name"],
+                "match_id": str(result.inserted_id),
+            })
+        rounds_doc.append({
+            "round": k,
+            "week_start": week_start.date().isoformat(),
+            "week_end": week_end.date().isoformat(),
+            "matches": round_matches,
+        })
+
+    await db.rr_schedules.insert_one({
+        "league_id": league_id,
+        "rounds": rounds_doc,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {
+            "$set": {
+                "status": "active",
+                "rr_config.schedule_generated": True,
+                "rr_config.scoring_format": scoring_format,
+                "rr_config.auto_started_at": datetime.now(timezone.utc).isoformat(),
+            }
+        },
+    )
+
+    import email_service
+    all_player_ids = [p["id"] for p in players]
+    for pid in all_player_ids:
+        try:
+            user = await db.users.find_one({"_id": ObjectId(pid)})
+            if user and user.get("email") and user.get("email_notifications", True):
+                email_service.schedule(email_service.send_league_started(
+                    user["email"], user["name"], league["name"], league_id
+                ))
+        except Exception:
+            pass
+
+    return {"generated": True, "rounds": len(rounds_doc)}
+
+
+@router.post("/{league_id}/generate-schedule")
+async def generate_schedule_endpoint(league_id: str, request: Request):
+    db = request.app.state.db
+    return await _run_generate_schedule(db, league_id)
+
+
+@router.post("/{league_id}/join")
+async def join_rr_league(league_id: str, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    _require_rr(league)
+
+    rr = league.get("rr_config", {})
+    if rr.get("division_type") != "singles":
+        raise HTTPException(status_code=400, detail="Use invite-partner for doubles leagues")
+    if rr.get("schedule_generated"):
+        raise HTTPException(status_code=400, detail="League already started — registration closed")
+
+    current = league.get("current_players", 0)
+    if current >= rr.get("max_players", 12):
+        raise HTTPException(status_code=400, detail="League is full")
+
+    existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": league_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Already registered")
+
+    entry_fee = league.get("entry_fee", 0)
+    if entry_fee > 0:
+        try:
+            from routes.payment_routes import _create_checkout_session
+            session = await _create_checkout_session(
+                user, league_id, league["name"], entry_fee, league.get("currency", "USD"),
+                request
+            )
+            return {"redirect": True, "checkout_url": session["url"]}
+        except Exception:
+            raise HTTPException(status_code=503, detail="Payment service unavailable")
+
+    await db.player_leagues.insert_one({
+        "player_id": user["_id"],
+        "player_name": user["name"],
+        "league_id": league_id,
+        "sport": league["sport"],
+        "payment_status": "free",
+        "joined_at": datetime.now(timezone.utc).isoformat(),
+    })
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {"$inc": {"current_players": 1}}
+    )
+
+    import email_service
+    email_service.schedule(email_service.send_registration_confirmed(
+        user["email"], user["name"], league["name"], league["sport"], league_id, False
+    ))
+
+    new_count = current + 1
+    if new_count >= rr.get("min_players", 6) and not rr.get("schedule_generated"):
+        await _run_generate_schedule(db, league_id)
+
+    return {"registered": True, "message": "Joined league"}
