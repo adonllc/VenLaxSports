@@ -524,3 +524,92 @@ async def force_close_rr(league_id: str, request: Request):
     )
     await _run_check_playoffs(db, league_id)
     return {"closed": True}
+
+
+async def _run_check_playoffs(db, league_id: str) -> dict:
+    """Check if all RR matches complete; if so, auto-generate playoffs."""
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        return {"triggered": False}
+
+    if not league or league.get("league_type") != "round_robin":
+        return {"triggered": False}
+
+    rr = league.get("rr_config", {})
+    if rr.get("playoff_generated"):
+        return {"triggered": False, "reason": "already generated"}
+
+    total = await db.matches.count_documents({"league_id": league_id, "is_rr": True})
+    done = await db.matches.count_documents(
+        {"league_id": league_id, "is_rr": True, "status": {"$in": ["completed", "cancelled"]}}
+    )
+    if total == 0 or done < total:
+        return {"triggered": False, "reason": f"{done}/{total} matches done"}
+
+    standings = await db.standings.find({"league_id": league_id}).to_list(100)
+    standings.sort(
+        key=lambda s: (
+            -s.get("wins", 0),
+            -(s.get("games_won", 0) - s.get("games_lost", 0)),
+            -s.get("points", 0),
+        )
+    )
+
+    threshold = rr.get("playoff_threshold", 4)
+    qualifiers = standings[:threshold]
+    if len(qualifiers) < 2:
+        return {"triggered": False, "reason": "not enough qualifiers"}
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    playoff_matches = []
+
+    if len(qualifiers) >= 4:
+        pairs = [(qualifiers[0], qualifiers[3]), (qualifiers[1], qualifiers[2])]
+        bracket_round = "SF"
+    else:
+        pairs = [(qualifiers[0], qualifiers[1])]
+        bracket_round = "F"
+
+    for p1, p2 in pairs:
+        match_doc = {
+            "league_id": league_id,
+            "sport": league["sport"],
+            "player1_id": p1["player_id"],
+            "player2_id": p2["player_id"],
+            "player1_name": p1["player_name"],
+            "player2_name": p2["player_name"],
+            "scheduled_date": now_iso,
+            "status": "scheduled",
+            "is_playoff": True,
+            "is_rr": False,
+            "bracket_round": 1,
+            "round": bracket_round,
+            "created_at": now_iso,
+        }
+        result = await db.matches.insert_one(match_doc)
+        playoff_matches.append(str(result.inserted_id))
+
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {"$set": {"rr_config.playoff_generated": True}}
+    )
+
+    import email_service
+    for i, q in enumerate(qualifiers, start=1):
+        try:
+            user = await db.users.find_one({"_id": ObjectId(q["player_id"])})
+            if user and user.get("email") and user.get("email_notifications", True):
+                email_service.schedule(email_service.send_playoff_qualified(
+                    user["email"], user["name"], league["name"], league_id, i
+                ))
+        except Exception:
+            pass
+
+    return {"triggered": True, "playoff_matches": playoff_matches}
+
+
+@router.post("/{league_id}/check-playoffs")
+async def check_playoffs_endpoint(league_id: str, request: Request):
+    db = request.app.state.db
+    return await _run_check_playoffs(db, league_id)

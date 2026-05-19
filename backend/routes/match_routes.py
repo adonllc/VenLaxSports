@@ -129,6 +129,15 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     except Exception:
         pass
 
+    # RR playoff check: after every RR score, see if playoffs can be generated
+    rr_playoffs_triggered = None
+    try:
+        if match.get("is_rr"):
+            from routes.round_robin_routes import _run_check_playoffs
+            rr_playoffs_triggered = await _run_check_playoffs(db, match["league_id"])
+    except Exception:
+        pass
+
     # Notify both players with the result
     try:
         league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
@@ -149,6 +158,8 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
         resp["rating_change"] = rating_change
     if next_round_created:
         resp["next_round_created"] = next_round_created
+    if rr_playoffs_triggered and rr_playoffs_triggered.get("triggered"):
+        resp["rr_playoffs_triggered"] = True
     return resp
 
 
