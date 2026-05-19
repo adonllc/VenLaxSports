@@ -154,7 +154,6 @@ export default function LeagueDetail() {
   const config = SPORT_CONFIG[league.sport] || {};
   const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
-  const currency = league.currency === "INR" ? "₹" : "$";
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
 
   const TABS = [
@@ -201,13 +200,6 @@ export default function LeagueDetail() {
                 </div>
               ) : (
                 <>
-                  <div className="text-center mb-4">
-                    <p className="text-3xl font-heading font-black text-gray-900">
-                      {isFree ? "FREE" : `${currency}${league.entry_fee}`}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">Entry Fee</p>
-                  </div>
-
                   {/* Spots bar */}
                   <div className="mb-4">
                     <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -265,7 +257,7 @@ export default function LeagueDetail() {
                         className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
                         data-testid="join-league-btn"
                       >
-                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : `Join — ${currency}${league.entry_fee}`}
+                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : "Register Now"}
                       </button>
                       {!isFree && (
                         <p className="text-[11px] text-center text-gray-400 mt-2">
