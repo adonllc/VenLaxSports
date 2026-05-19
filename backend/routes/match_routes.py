@@ -250,6 +250,7 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str, sco
             "games_won": w_games, "games_lost": l_games,
             "bonus_points": winner_bonus,
         }, "$set": {"updated_at": now}},
+        upsert=True,
     )
     await db.standings.update_one(
         {"league_id": league_id, "player_id": loser_id},
@@ -259,6 +260,7 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str, sco
             "games_won": l_games, "games_lost": w_games,
             "bonus_points": loser_bonus,
         }, "$set": {"updated_at": now}},
+        upsert=True,
     )
 
 

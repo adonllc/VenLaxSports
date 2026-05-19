@@ -298,15 +298,42 @@ async def join_rr_league(league_id: str, request: Request):
     entry_fee = league.get("entry_fee", 0)
     if entry_fee > 0:
         try:
-            from routes.payment_routes import _create_checkout_session
-            session = await _create_checkout_session(
-                user, league_id, league["name"], entry_fee, league.get("currency", "USD"),
-                request
-            )
-            return {"redirect": True, "checkout_url": session["url"]}
+            from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+        except ImportError:
+            raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
+        import os as _os
+        from models import PaymentTransaction
+        api_key = _os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+        host_url = str(request.base_url)
+        stripe_client = StripeCheckout(api_key=api_key, webhook_url=f"{host_url}api/webhook/stripe")
+        origin = request.headers.get("origin", host_url.rstrip("/"))
+        checkout_req = CheckoutSessionRequest(
+            amount=float(entry_fee),
+            currency="usd",
+            success_url=f"{origin}/round-robin/{league_id}?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{origin}/round-robin/{league_id}",
+            metadata={"league_id": league_id, "user_id": user["_id"], "user_email": user["email"]},
+        )
+        try:
+            session = await stripe_client.create_checkout_session(checkout_req)
         except Exception:
             raise HTTPException(status_code=503, detail="Payment service unavailable")
+        txn = PaymentTransaction(
+            user_id=user["_id"],
+            user_email=user["email"],
+            league_id=league_id,
+            league_name=league["name"],
+            session_id=session.session_id,
+            amount=float(entry_fee),
+            currency="USD",
+            status="initiated",
+            payment_status="unpaid",
+            metadata={"league_id": league_id, "user_id": user["_id"]},
+        )
+        await db.payment_transactions.insert_one(txn.to_mongo())
+        return {"redirect": True, "checkout_url": session.url}
 
+    from models import Standing
     await db.player_leagues.insert_one({
         "player_id": user["_id"],
         "player_name": user["name"],
@@ -319,6 +346,12 @@ async def join_rr_league(league_id: str, request: Request):
         {"_id": ObjectId(league_id)},
         {"$inc": {"current_players": 1}}
     )
+    s = Standing(
+        league_id=league_id, player_id=user["_id"],
+        player_name=user["name"], sport=league["sport"],
+        country=user.get("country", "USA"),
+    )
+    await db.standings.insert_one(s.to_mongo())
 
     import email_service
     email_service.schedule(email_service.send_registration_confirmed(
@@ -435,10 +468,28 @@ async def accept_invite(token: str, request: Request):
         "partner_name": user["name"],
         "joined_at": now_iso,
     }
+    from models import Standing
     existing = await db.player_leagues.find_one({"player_id": inviter_id, "league_id": league_id})
     if not existing:
         await db.player_leagues.insert_one(team_entry)
         await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
+        s = Standing(
+            league_id=league_id, player_id=inviter_id,
+            player_name=invite["inviter_name"], sport=league["sport"], country="USA",
+        )
+        await db.standings.insert_one(s.to_mongo())
+
+    partner_existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": league_id})
+    if not partner_existing:
+        await db.player_leagues.insert_one({
+            "player_id": user["_id"],
+            "player_name": user["name"],
+            "league_id": league_id,
+            "sport": league["sport"],
+            "payment_status": "free",
+            "inviter_id": inviter_id,
+            "joined_at": now_iso,
+        })
 
     await db.doubles_invites.update_one({"token": token}, {"$set": {"status": "accepted"}})
 
@@ -448,6 +499,14 @@ async def accept_invite(token: str, request: Request):
         if inviter and inviter.get("email"):
             email_service.schedule(email_service.send_registration_confirmed(
                 inviter["email"], inviter["name"], league["name"], league["sport"], league_id, False
+            ))
+    except Exception:
+        pass
+
+    try:
+        if user.get("email") and user.get("email_notifications", True):
+            email_service.schedule(email_service.send_registration_confirmed(
+                user["email"], user["name"], league["name"], league["sport"], league_id, False
             ))
     except Exception:
         pass
