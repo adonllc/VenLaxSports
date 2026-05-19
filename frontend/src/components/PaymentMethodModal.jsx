@@ -124,6 +124,17 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
         )}
 
         {!activeMethod && !zelleIntent && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 mb-3 flex items-start gap-2" data-testid="payment-waiver-notice">
+            <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
+            <p className="text-[11px] text-amber-900 leading-relaxed">
+              By completing payment you confirm your agreement to the{" "}
+              <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold">Liability Waiver & Assumption of Risk</a>,
+              including unsupervised play, player-selected courts, and weather hazards.
+            </p>
+          </div>
+        )}
+
+        {!activeMethod && !zelleIntent && (
           <div className="space-y-2">
             {methods.map((m) => {
               const v = METHOD_VISUALS[m.id] || METHOD_VISUALS.stripe;

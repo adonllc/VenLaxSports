@@ -62,8 +62,24 @@ const SECTIONS = [
     ],
   },
   {
+    id: "waiver",
+    title: "8. Liability Waiver & Assumption of Risk",
+    body: [
+      "READ CAREFULLY BEFORE REGISTERING. By registering for any VENLAX Sports league, you voluntarily agree to the terms of this waiver.",
+      "ASSUMPTION OF RISK: You acknowledge that participation in tennis and pickleball involves inherent risks of physical injury, including but not limited to: sprains, fractures, concussions, heat-related illness, eye injuries, and cardiovascular events. You voluntarily and knowingly assume all such risks.",
+      "UNSUPERVISED PLAY: All VENLAX Sports matches are self-organized. No VENLAX Sports staff, official, or administrator is present at any match. There is no on-site supervision, first aid, or safety monitoring. You acknowledge that you participate without any supervision by VENLAX Sports.",
+      "PLAYER-ARRANGED COURT SAFETY: You are solely responsible for inspecting and assessing the safety of any court facility you choose to use. VENLAX Sports does not inspect, certify, maintain, or approve any court or venue. You accept all risks arising from court conditions, including but not limited to: wet surfaces, uneven footing, poor lighting, net height, and any facility-specific hazards.",
+      "WEATHER HAZARDS: You are solely responsible for monitoring weather conditions before and during your match. VENLAX Sports does not monitor weather, issue weather warnings, or cancel matches due to weather. You accept all risks arising from weather conditions, including extreme heat, lightning, rain, wind, and cold.",
+      "MEDICAL FITNESS: By registering, you represent that you are in adequate physical condition to participate in competitive tennis or pickleball and that no medical condition prevents your safe participation. VENLAX Sports does not verify medical fitness. Consult a physician before participating if you have any health concerns.",
+      "RELEASE OF LIABILITY: To the fullest extent permitted by applicable law, you release, waive, discharge, and covenant not to sue VENLAX Sports, VENLAX LLC, its officers, employees, agents, volunteers, and assigns from any and all claims, demands, or causes of action arising out of or related to any loss, damage, or injury (including death) that may be sustained during participation in any VENLAX Sports league or related activity.",
+      "INDEMNIFICATION: You agree to indemnify and hold harmless VENLAX Sports and VENLAX LLC from any claims, liabilities, costs, and expenses (including attorney fees) arising from your participation, your conduct, or your breach of these Terms.",
+      "GOVERNING LAW: This waiver is governed by the laws of the State of Texas. Any disputes shall be resolved in the courts of Travis County, Texas.",
+      "If you do not agree to this waiver in full, do not register for or participate in any VENLAX Sports league.",
+    ],
+  },
+  {
     id: "changes",
-    title: "7. Changes to These Terms",
+    title: "9. Changes to These Terms",
     body: [
       "VENLAX Sports may update these Terms at any time. Material changes will be communicated via email to registered users at least 7 days before taking effect.",
       "Continued use of the platform after changes take effect constitutes acceptance of the updated Terms.",
@@ -96,14 +112,30 @@ export default function Terms() {
       <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
         {SECTIONS.map((s) => (
           <section key={s.id} id={s.id}>
-            <h2 className="font-heading font-bold text-xl text-gray-900 mb-4">{s.title}</h2>
-            <ul className="space-y-3">
-              {s.body.map((para, i) => (
-                <li key={i} className="text-gray-700 text-sm leading-relaxed pl-4 border-l-2 border-gray-100">
-                  {para}
-                </li>
-              ))}
-            </ul>
+            {s.id === "waiver" ? (
+              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+                <h2 className="font-heading font-bold text-xl text-red-900 mb-1">{s.title}</h2>
+                <p className="text-xs font-semibold text-red-600 uppercase tracking-wider mb-4">Waiver — Read before registering</p>
+                <ul className="space-y-3">
+                  {s.body.map((para, i) => (
+                    <li key={i} className={`text-sm leading-relaxed pl-4 border-l-2 ${i === 0 ? "font-bold text-red-800 border-red-400" : "text-red-900 border-red-200"}`}>
+                      {para}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <>
+                <h2 className="font-heading font-bold text-xl text-gray-900 mb-4">{s.title}</h2>
+                <ul className="space-y-3">
+                  {s.body.map((para, i) => (
+                    <li key={i} className="text-gray-700 text-sm leading-relaxed pl-4 border-l-2 border-gray-100">
+                      {para}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </section>
         ))}
 

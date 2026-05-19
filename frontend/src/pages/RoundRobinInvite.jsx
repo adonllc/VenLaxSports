@@ -16,6 +16,7 @@ export default function RoundRobinInvite() {
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState("");
   const [accepted, setAccepted] = useState(false);
+  const [waiverAccepted, setWaiverAccepted] = useState(false);
 
   useEffect(() => {
     fetchInvite();
@@ -124,14 +125,32 @@ export default function RoundRobinInvite() {
             </Link>
           </div>
         ) : (
-          <button
-            data-testid="btn-accept-invite"
-            onClick={handleAccept}
-            disabled={accepting}
-            className="w-full bg-black text-white rounded-md py-2.5 text-sm font-bold hover:bg-gray-800 transition disabled:opacity-50"
-          >
-            {accepting ? "Accepting..." : "Accept & Join as Partner"}
-          </button>
+          <div className="space-y-3">
+            <label className="flex items-start gap-2.5 cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="rr-waiver-checkbox-label">
+              <input
+                type="checkbox"
+                checked={waiverAccepted}
+                onChange={(e) => setWaiverAccepted(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
+                data-testid="rr-waiver-checkbox"
+              />
+              <span className="text-[11px] text-amber-900 leading-relaxed">
+                I have read and agree to the{" "}
+                <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
+                  Liability Waiver & Assumption of Risk
+                </a>
+                . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
+              </span>
+            </label>
+            <button
+              data-testid="btn-accept-invite"
+              onClick={handleAccept}
+              disabled={accepting || !waiverAccepted}
+              className="w-full bg-black text-white rounded-md py-2.5 text-sm font-bold hover:bg-gray-800 transition disabled:opacity-50"
+            >
+              {accepting ? "Accepting..." : "Accept & Join as Partner"}
+            </button>
+          </div>
         )}
         {error && <p className="text-red-500 text-xs mt-3">{error}</p>}
       </div>

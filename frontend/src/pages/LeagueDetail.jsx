@@ -29,6 +29,7 @@ export default function LeagueDetail() {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [waiverAccepted, setWaiverAccepted] = useState(false);
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -217,9 +218,26 @@ export default function LeagueDetail() {
 
               {!isRegistered && league.status === "registration" && (
                 <>
+                  {/* Waiver checkbox — required for all leagues, free or paid */}
+                  <label className="flex items-start gap-2.5 cursor-pointer mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={waiverAccepted}
+                      onChange={(e) => setWaiverAccepted(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
+                      data-testid="waiver-checkbox"
+                    />
+                    <span className="text-[11px] text-amber-900 leading-relaxed">
+                      I have read and agree to the{" "}
+                      <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
+                        Liability Waiver & Assumption of Risk
+                      </a>
+                      . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
+                    </span>
+                  </label>
                   <button
                     onClick={handleJoin}
-                    disabled={joining || spotsLeft <= 0}
+                    disabled={joining || spotsLeft <= 0 || !waiverAccepted}
                     className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
                     data-testid="join-league-btn"
                   >
@@ -227,9 +245,8 @@ export default function LeagueDetail() {
                   </button>
                   {!isFree && (
                     <p className="text-[11px] text-center text-gray-400 mt-2">
-                      By joining you agree to our{" "}
-                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms</a>.
-                      {" "}Entry fees are <strong>non-refundable</strong> once the league starts.
+                      Entry fees are <strong>non-refundable</strong> once the league starts.{" "}
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Full Terms</a>
                     </p>
                   )}
                 </>
