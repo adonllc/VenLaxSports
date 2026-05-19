@@ -36,6 +36,13 @@ export default function AdminDashboard() {
   const [msg, setMsg] = useState("");
   const [cities, setCities] = useState([]);
   const [seasons, setSeasons] = useState([]);
+  const [showRRForm, setShowRRForm] = useState(false);
+  const [rrFormData, setRRFormData] = useState({
+    name: "", sport: "tennis", country: "USA", city: "",
+    format: "singles", entry_fee: 0, start_date: "", end_date: "",
+    description: "",
+    rr_config: { min_players: 6, max_players: 12, division_type: "singles", playoff_threshold: 4 }
+  });
 
   useEffect(() => {
     if (loading) return;
@@ -324,9 +331,18 @@ export default function AdminDashboard() {
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
               <h2 className="font-heading font-bold text-lg">All Leagues ({leagues.length})</h2>
-              <button onClick={() => setTab("create")} className="flex items-center gap-1.5 text-sm font-semibold bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition-colors" data-testid="add-league-btn">
-                <Plus className="w-4 h-4" /> Add League
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  data-testid="btn-create-rr-league"
+                  onClick={() => setShowRRForm(true)}
+                  className="px-4 py-2 border border-emerald-500 text-emerald-600 rounded-md text-sm font-medium hover:bg-emerald-50 transition"
+                >
+                  + Create Round Robin League
+                </button>
+                <button onClick={() => setTab("create")} className="flex items-center gap-1.5 text-sm font-semibold bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition-colors" data-testid="add-league-btn">
+                  <Plus className="w-4 h-4" /> Add League
+                </button>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -395,6 +411,110 @@ export default function AdminDashboard() {
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
         {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
       </div>
+
+      {showRRForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full my-8">
+            <h2 className="font-bold text-lg text-gray-900 mb-4">Create Round Robin League</h2>
+            <div className="space-y-4">
+              {[
+                { label: "Name", field: "name", type: "text" },
+                { label: "City", field: "city", type: "text" },
+                { label: "Entry Fee ($)", field: "entry_fee", type: "number" },
+                { label: "Start Date", field: "start_date", type: "date" },
+                { label: "End Date", field: "end_date", type: "date" },
+                { label: "Description", field: "description", type: "text" },
+              ].map(({ label, field, type }) => (
+                <div key={field}>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+                  <input
+                    data-testid={`rr-form-${field}`}
+                    type={type}
+                    value={rrFormData[field]}
+                    onChange={e => setRRFormData(d => ({ ...d, [field]: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Sport</label>
+                <select
+                  data-testid="rr-form-sport"
+                  value={rrFormData.sport}
+                  onChange={e => setRRFormData(d => ({ ...d, sport: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="tennis">Tennis</option>
+                  <option value="pickleball">Pickleball</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Division Type</label>
+                <select
+                  data-testid="rr-form-division"
+                  value={rrFormData.rr_config.division_type}
+                  onChange={e => setRRFormData(d => ({
+                    ...d,
+                    format: e.target.value,
+                    rr_config: { ...d.rr_config, division_type: e.target.value }
+                  }))}
+                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="singles">Singles</option>
+                  <option value="doubles">Fixed-Partner Doubles</option>
+                </select>
+              </div>
+              {[
+                { label: "Min Players", field: "min_players" },
+                { label: "Max Players", field: "max_players" },
+                { label: "Playoff Qualifiers (top N)", field: "playoff_threshold" },
+              ].map(({ label, field }) => (
+                <div key={field}>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+                  <input
+                    data-testid={`rr-form-${field}`}
+                    type="number"
+                    value={rrFormData.rr_config[field]}
+                    onChange={e => setRRFormData(d => ({
+                      ...d,
+                      rr_config: { ...d.rr_config, [field]: parseInt(e.target.value) || 0 }
+                    }))}
+                    className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                data-testid="btn-submit-rr-league"
+                onClick={async () => {
+                  try {
+                    await axios.post(`${API}/round-robin`, rrFormData, { withCredentials: true });
+                    setShowRRForm(false);
+                    setRRFormData({
+                      name: "", sport: "tennis", country: "USA", city: "",
+                      format: "singles", entry_fee: 0, start_date: "", end_date: "",
+                      description: "",
+                      rr_config: { min_players: 6, max_players: 12, division_type: "singles", playoff_threshold: 4 }
+                    });
+                  } catch (e) {
+                    alert(e.response?.data?.detail || "Failed to create league");
+                  }
+                }}
+                className="flex-1 bg-black text-white rounded-md py-2 text-sm font-bold hover:bg-gray-800 transition"
+              >
+                Create League
+              </button>
+              <button
+                onClick={() => setShowRRForm(false)}
+                className="flex-1 border border-gray-300 rounded-md py-2 text-sm font-medium hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
