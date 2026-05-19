@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SportLanding from "./pages/SportLanding";
 import ScoreReport from "./pages/ScoreReport";
 import Standings from "./pages/Standings";
+import Terms from "./pages/Terms";
 import "./App.css";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
@@ -43,6 +44,7 @@ function AppRouter() {
       <Route path="/leagues/:id/standings" element={<Standings />} />
       <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
       <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
+      <Route path="/terms" element={<Terms />} />
     </Routes>
   );
 }

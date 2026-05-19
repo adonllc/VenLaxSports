@@ -50,22 +50,7 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
     }
   };
 
-  const handleWallet = async (method) => {
-    setLoading(true); setError(""); setSuccess("");
-    try {
-      // Placeholder token — real Apple/GPay flows return a wallet payment token via JS SDK
-      const token = `placeholder_${method}_${Date.now()}`;
-      await axios.post(`${API}/payments/wallet`, {
-        league_id: league.id, method, token,
-      }, { withCredentials: true });
-      setSuccess(`Paid via ${method.replace("_", " ").replace(/\b\w/g, (m) => m.toUpperCase())}`);
-      setTimeout(() => { onSuccess?.(); onClose(); }, 1200);
-    } catch (err) {
-      setError(err.response?.data?.detail || "Wallet payment failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const WALLET_DISABLED = ["apple_pay", "google_pay"];
 
   const handleZelleStart = async () => {
     setLoading(true); setError("");
@@ -89,8 +74,8 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
       await axios.post(`${API}/payments/zelle/confirm`, {
         league_id: league.id, reference_number: zelleRef,
       }, { withCredentials: true });
-      setSuccess("Zelle confirmation recorded");
-      setTimeout(() => { onSuccess?.(); onClose(); }, 1500);
+      setSuccess("Zelle reference recorded — your spot is reserved pending admin verification.");
+      setTimeout(() => { onClose(); }, 3000);
     } catch (err) {
       setError(err.response?.data?.detail || "Could not confirm Zelle payment");
     } finally {
@@ -142,29 +127,45 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
           <div className="space-y-2">
             {methods.map((m) => {
               const v = METHOD_VISUALS[m.id] || METHOD_VISUALS.stripe;
-              const onClick =
+              const isDisabled = WALLET_DISABLED.includes(m.id);
+              const onClick = isDisabled ? undefined :
                 m.id === "stripe" ? handleStripe :
                 m.id === "zelle" ? handleZelleStart :
-                () => handleWallet(m.id);
+                undefined;
               return (
                 <button
                   key={m.id}
                   type="button"
                   onClick={onClick}
-                  disabled={loading}
-                  className={`w-full flex items-center gap-3 px-4 py-3.5 border rounded-xl text-sm font-semibold transition-colors hover:scale-[1.01] disabled:opacity-60 ${v.color}`}
+                  disabled={loading || isDisabled}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 border rounded-xl text-sm font-semibold transition-colors ${isDisabled ? "opacity-40 cursor-not-allowed bg-gray-50 text-gray-400 border-gray-200" : `hover:scale-[1.01] ${v.color}`} disabled:opacity-60`}
                   data-testid={`pay-method-${m.id}`}
+                  title={isDisabled ? "Coming soon" : undefined}
                 >
                   <span className="w-7 h-7 rounded-md flex items-center justify-center bg-white/50">
                     {v.icon}
                   </span>
                   <span className="flex-1 text-left">{m.label}</span>
-                  {m.config?.placeholder && (
-                    <span className="text-[10px] uppercase tracking-wider opacity-60">Placeholder</span>
-                  )}
+                  {isDisabled
+                    ? <span className="text-[10px] uppercase tracking-wider opacity-70 bg-gray-200 text-gray-500 rounded px-1.5 py-0.5">Coming soon</span>
+                    : m.id === "zelle" && <span className="text-[10px] uppercase tracking-wider opacity-60">Admin verified</span>
+                  }
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {!activeMethod && !zelleIntent && (
+          <div className="mt-4 space-y-1.5">
+            <p className="text-[11px] text-center text-gray-400 flex items-center justify-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
+              Secured by Stripe — we never store or see your card details.
+            </p>
+            <p className="text-[11px] text-center text-gray-400">
+              Entry fees are <strong>non-refundable</strong> once the league starts.{" "}
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms</a>
+            </p>
           </div>
         )}
 

@@ -40,7 +40,9 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     except ImportError:
         raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
 
-    api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+    api_key = os.environ.get("STRIPE_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="Payment processing is not configured. Please contact support.")
     host_url = str(request.base_url)
     webhook_url = f"{host_url}api/webhook/stripe"
     stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
@@ -99,7 +101,9 @@ async def get_payment_status(session_id: str, request: Request):
     except ImportError:
         raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
 
-    api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+    api_key = os.environ.get("STRIPE_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="Payment processing is not configured.")
     host_url = str(request.base_url)
     webhook_url = f"{host_url}api/webhook/stripe"
     stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
@@ -283,44 +287,11 @@ async def _confirm_player_registered(db, league: dict, league_id: str, user: dic
 
 @router.post("/wallet")
 async def pay_with_wallet(data: WalletPaymentIn, request: Request):
-    """Apple Pay / Google Pay placeholder flow.
-
-    In production this would verify the wallet token via Stripe Payment Request
-    Buttons. For now we accept any non-empty token while merchant IDs remain
-    placeholders and immediately mark the player as paid.
-    """
-    if data.method not in ("apple_pay", "google_pay"):
-        raise HTTPException(status_code=400, detail="Unsupported wallet method")
-    if not data.token:
-        raise HTTPException(status_code=400, detail="Missing wallet token")
-
-    db = request.app.state.db
-    user = await get_current_user(request, db)
-    try:
-        league = await db.leagues.find_one({"_id": ObjectId(data.league_id)})
-    except Exception:
-        raise HTTPException(status_code=404, detail="League not found")
-    if not league:
-        raise HTTPException(status_code=404, detail="League not found")
-
-    fee = float(league.get("entry_fee", 0))
-    if fee <= 0:
-        raise HTTPException(status_code=400, detail="This league is free to join")
-
-    confirmed = await _confirm_player_registered(
-        db, league, data.league_id, user, data.method, fee,
-        txn_extra={"wallet_token_prefix": data.token[:8]},
+    """Apple Pay / Google Pay — not yet live. Merchant IDs pending."""
+    raise HTTPException(
+        status_code=503,
+        detail="Apple Pay and Google Pay are not yet available. Please use card payment via Stripe.",
     )
-    if not confirmed:
-        return {"message": "Already registered"}
-
-    return {
-        "message": f"Payment confirmed via {data.method.replace('_', ' ').title()}",
-        "league_id": data.league_id,
-        "amount": fee,
-        "currency": "USD",
-        "placeholder": True,
-    }
 
 
 class ZelleIntentIn(BaseModel):
@@ -384,10 +355,10 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
 
 @router.post("/zelle/confirm")
 async def zelle_confirm(data: ZelleConfirmIn, request: Request):
-    """Player submits the Zelle confirmation number — registers them as paid (placeholder).
+    """Player submits the Zelle confirmation number.
 
-    In production an admin would verify the reference matches a real Zelle deposit
-    before confirming; here we trust + flag for review.
+    Does NOT register the player. Sets transaction to pending_admin so an admin
+    must verify the deposit before registration is confirmed.
     """
     db = request.app.state.db
     user = await get_current_user(request, db)
@@ -404,16 +375,28 @@ async def zelle_confirm(data: ZelleConfirmIn, request: Request):
     if not data.reference_number or len(data.reference_number) < 4:
         raise HTTPException(status_code=400, detail="Reference number too short")
 
-    confirmed = await _confirm_player_registered(
-        db, league, data.league_id, user, "zelle", fee,
-        txn_extra={"reference_number": data.reference_number, "needs_admin_review": True},
+    already_registered = await db.player_leagues.find_one(
+        {"player_id": user["_id"], "league_id": data.league_id, "payment_status": "paid"}
     )
-    if not confirmed:
+    if already_registered:
         return {"message": "Already registered"}
 
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.payment_transactions.update_one(
+        {"user_id": user["_id"], "league_id": data.league_id, "method": "zelle", "status": "pending_zelle"},
+        {"$set": {
+            "reference_number": data.reference_number,
+            "status": "pending_admin",
+            "needs_admin_review": True,
+            "updated_at": now,
+        }},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="No pending Zelle intent found. Please start the Zelle flow again.")
+
     return {
-        "message": "Zelle reference recorded — your registration is provisional and will be auto-confirmed once we match the deposit.",
+        "message": "Your Zelle reference has been recorded. Registration will be confirmed after admin verifies the deposit.",
         "league_id": data.league_id,
         "reference_number": data.reference_number,
-        "placeholder": True,
+        "status": "pending_admin",
     }

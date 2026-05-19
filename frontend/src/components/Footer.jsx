@@ -56,6 +56,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><Link to="/leagues" className="text-sm text-gray-300 hover:text-white transition-colors">Browse Leagues</Link></li>
               <li><Link to="/rules" className="text-sm text-gray-300 hover:text-white transition-colors">Rules &amp; Conduct</Link></li>
+              <li><Link to="/terms" className="text-sm text-gray-300 hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
               <li><Link to="/dashboard" className="text-sm text-gray-300 hover:text-white transition-colors">My Dashboard</Link></li>
               <li><Link to="/auth" className="text-sm text-gray-300 hover:text-white transition-colors">Sign Up</Link></li>
             </ul>

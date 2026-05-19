@@ -216,14 +216,23 @@ export default function LeagueDetail() {
               )}
 
               {!isRegistered && league.status === "registration" && (
-                <button
-                  onClick={handleJoin}
-                  disabled={joining || spotsLeft <= 0}
-                  className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
-                  data-testid="join-league-btn"
-                >
-                  {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : `Join — ${currency}${league.entry_fee}`}
-                </button>
+                <>
+                  <button
+                    onClick={handleJoin}
+                    disabled={joining || spotsLeft <= 0}
+                    className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                    data-testid="join-league-btn"
+                  >
+                    {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : `Join — ${currency}${league.entry_fee}`}
+                  </button>
+                  {!isFree && (
+                    <p className="text-[11px] text-center text-gray-400 mt-2">
+                      By joining you agree to our{" "}
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms</a>.
+                      {" "}Entry fees are <strong>non-refundable</strong> once the league starts.
+                    </p>
+                  )}
+                </>
               )}
 
               {isRegistered && (
