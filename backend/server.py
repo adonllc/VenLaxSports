@@ -32,6 +32,7 @@ from routes.season_routes import router as season_router
 from routes.playoffs_routes import router as playoffs_router
 from routes.auto_league_routes import router as auto_league_router
 from routes.round_robin_routes import router as rr_router
+from routes.public_routes import router as public_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(google_auth_router, prefix="/auth", tags=["auth"])
@@ -44,6 +45,7 @@ api_router.include_router(season_router, prefix="/seasons", tags=["seasons"])
 api_router.include_router(playoffs_router, prefix="/playoffs", tags=["playoffs"])
 api_router.include_router(auto_league_router, prefix="/admin/auto", tags=["auto-leagues"])
 api_router.include_router(rr_router, prefix="/round-robin", tags=["round-robin"])
+api_router.include_router(public_router, prefix="/public", tags=["public"])
 
 
 @api_router.get("/")

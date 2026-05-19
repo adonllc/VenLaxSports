@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from models import User, UserCreate, UserLogin
@@ -134,7 +135,8 @@ class ResetPasswordIn(BaseModel):
 
 
 class UpdatePreferencesIn(BaseModel):
-    email_notifications: bool
+    email_notifications: Optional[bool] = None
+    profile_public: Optional[bool] = None
 
 
 def _create_reset_token(user_id: str, email: str) -> str:
@@ -195,11 +197,18 @@ async def reset_password(body: ResetPasswordIn, request: Request):
 
 @router.patch("/preferences")
 async def update_preferences(body: UpdatePreferencesIn, request: Request):
-    """Toggle email notifications (and future per-user preferences)."""
+    """Toggle email notifications and/or profile visibility."""
     db = request.app.state.db
     user = await get_current_user(request, db)
-    await db.users.update_one(
-        {"_id": ObjectId(user["_id"])},
-        {"$set": {"email_notifications": body.email_notifications}},
-    )
-    return {"email_notifications": body.email_notifications}
+    update = {}
+    if body.email_notifications is not None:
+        update["email_notifications"] = body.email_notifications
+    if body.profile_public is not None:
+        update["profile_public"] = body.profile_public
+    if update:
+        await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
+    merged = {**user, **update}
+    return {
+        "email_notifications": merged.get("email_notifications", True),
+        "profile_public": merged.get("profile_public", True),
+    }
