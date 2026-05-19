@@ -228,6 +228,13 @@ export default function Auth() {
               </>
             )}
 
+            {mode === "register" && (
+              <p className="text-xs text-gray-400 text-center">
+                By registering, your match results will be publicly visible.{" "}
+                <span className="text-gray-500">You can make your profile private anytime in Settings.</span>
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={loading}
