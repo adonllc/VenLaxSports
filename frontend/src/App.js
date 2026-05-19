@@ -18,6 +18,9 @@ import SportLanding from "./pages/SportLanding";
 import ScoreReport from "./pages/ScoreReport";
 import Standings from "./pages/Standings";
 import Terms from "./pages/Terms";
+import LeagueSpectator from "./pages/LeagueSpectator";
+import CityLeaderboard from "./pages/CityLeaderboard";
+import PublicProfile from "./pages/PublicProfile";
 import "./App.css";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
@@ -45,6 +48,9 @@ function AppRouter() {
       <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
       <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
+      <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
+      <Route path="/players/:id" element={<PublicProfile />} />
     </Routes>
   );
 }
