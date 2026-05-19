@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import {
-  MapPin, Users, Calendar, Trophy, ArrowRight,
-  TrendingUp, Target, Zap, Shield, Activity,
+  MapPin, Users, Calendar, ArrowRight,
+  Target, Zap, Shield, Activity,
 } from "lucide-react";
 import platformConfig, { activeSportIds } from "../config/platformConfig";
 import HowItWorks from "../components/HowItWorks";
@@ -45,10 +45,10 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 const STATS = [
-  { value: "1,200+", label: "Players Ranked", icon: Users },
-  { value: "80+", label: "Active Leagues", icon: Trophy },
-  { value: platformConfig.statsRegion, label: "US Cities", icon: MapPin },
-  { value: String(activeSportIds.length), label: "Sports", icon: Activity },
+  { value: "1,200+", label: "Players Ranked" },
+  { value: "80+", label: "Active Leagues" },
+  { value: platformConfig.statsRegion, label: "US Cities" },
+  { value: String(activeSportIds.length), label: "Sports" },
 ];
 
 export default function Home() {
@@ -77,34 +77,45 @@ export default function Home() {
     <div className="bg-white" data-testid="home-page">
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="bg-white" data-testid="hero-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-1.5 text-sm font-medium text-emerald-700 mb-6 animate-fade-in">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+      <section className="hero-dark relative overflow-hidden" data-testid="hero-section">
+        {/* Ambient glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse 70% 60% at 95% 10%, rgba(16,185,129,0.13) 0%, transparent 55%), radial-gradient(ellipse 40% 50% at 5% 95%, rgba(16,185,129,0.06) 0%, transparent 50%)"
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-0">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 mb-8 animate-fade-in">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
               {platformConfig.heroBadge}
             </div>
 
-            <h1 className="font-heading font-black text-5xl sm:text-6xl lg:text-7xl text-gray-900 leading-none mb-6 animate-fade-in delay-100">
+            <h1
+              className="font-heading font-black text-white leading-[0.9] tracking-tight mb-6 animate-fade-in delay-100"
+              style={{ fontSize: "clamp(3.5rem, 9vw, 7.5rem)" }}
+            >
               Compete. Rise.<br />
-              <span className="text-emerald-500">Dominate.</span>
+              <span className="text-emerald-400">Dominate.</span>
             </h1>
 
-            <p className="text-lg text-gray-500 mb-8 leading-relaxed animate-fade-in delay-200">
+            <p className="text-gray-400 text-lg mb-10 leading-relaxed max-w-xl mx-auto animate-fade-in delay-200">
               {platformConfig.heroSubtitle}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10 animate-fade-in delay-300">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-in delay-300">
               <button
                 onClick={() => navigate("/leagues")}
-                className="px-8 py-4 bg-gray-900 text-white font-semibold rounded-md hover:bg-gray-800 transition-colors text-base cursor-pointer"
+                className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-md transition-colors text-base cursor-pointer"
                 data-testid="hero-browse-btn"
               >
                 Find My League
               </button>
               <button
                 onClick={() => navigate("/auth?mode=register")}
-                className="px-8 py-4 border border-gray-200 text-gray-900 font-semibold rounded-md hover:border-gray-900 transition-colors text-base cursor-pointer"
+                className="px-8 py-4 border border-white/20 hover:border-white/40 text-white font-semibold rounded-md transition-colors text-base cursor-pointer"
                 data-testid="hero-signup-btn"
               >
                 Join Free
@@ -119,7 +130,7 @@ export default function Home() {
                   <button
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition-all cursor-pointer"
                     data-testid={`hero-sport-pill-${sport}`}
                   >
                     <Icon className="w-4 h-4" style={{ color: config.accent }} />
@@ -132,8 +143,8 @@ export default function Home() {
         </div>
 
         {/* Sport image strip */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-0">
-          <div className={`grid gap-4 ${Object.keys(SPORT_CONFIG).length <= 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-0">
+          <div className={`grid gap-3 ${Object.keys(SPORT_CONFIG).length <= 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
             {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
               const Icon = SPORT_ICONS[sport] || Activity;
               return (
@@ -146,18 +157,21 @@ export default function Home() {
                   <img
                     src={config.image}
                     alt={config.label}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: config.accent }}
-                    >
-                      <Icon className="w-4 h-4 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: config.accent }}
+                      >
+                        <Icon className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="font-heading font-bold text-white">{config.label}</span>
                     </div>
-                    <span className="font-heading font-bold text-white text-sm drop-shadow">{config.label}</span>
+                    <span className="text-gray-300 text-xs font-medium opacity-80">{config.tagline}</span>
                   </div>
                 </div>
               );
@@ -167,19 +181,15 @@ export default function Home() {
       </section>
 
       {/* ── Stats ───────────────────────────────────────────────────── */}
-      <section className="bg-gray-50 border-y border-gray-100 py-14" data-testid="stats-section">
+      <section className="bg-white py-16 border-b border-gray-100" data-testid="stats-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {STATS.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div key={s.label} className="text-center" data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}>
-                  <Icon className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
-                  <p className="stat-counter text-3xl sm:text-4xl text-gray-900 mb-1">{s.value}</p>
-                  <p className="text-sm text-gray-500 font-medium">{s.label}</p>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+            {STATS.map((s) => (
+              <div key={s.label} className="text-center px-6 py-6" data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}>
+                <p className="stat-counter text-4xl sm:text-5xl text-gray-900 mb-2">{s.value}</p>
+                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -191,7 +201,7 @@ export default function Home() {
       <section className="py-20 bg-gray-50" data-testid="sport-cards-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Choose Your Sport</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Choose Your Sport</p>
             <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">
               {activeSportIds.length === 1 ? "One Sport, One Platform" : `${activeSportIds.length} Sports, One Platform`}
             </h2>
@@ -204,7 +214,7 @@ export default function Home() {
                 <div
                   key={sport}
                   onClick={() => navigate(`/sport/${sport}`)}
-                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden sport-card-hover cursor-pointer group"
+                  className={`bg-white rounded-2xl border border-gray-200 overflow-hidden card-glow-${sport} cursor-pointer group`}
                   data-testid={`sport-card-${sport}`}
                 >
                   <div className="h-48 overflow-hidden relative">
@@ -246,7 +256,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Season Open</p>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">Season Open</p>
               <h2 className="font-heading font-bold text-3xl text-gray-900">Active Leagues</h2>
             </div>
             <Link
@@ -259,16 +269,16 @@ export default function Home() {
           </div>
 
           {/* Sport Tabs */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
             {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
               const Icon = SPORT_ICONS[sport] || Activity;
               return (
                 <button
                   key={sport}
                   onClick={() => setActiveSport(sport)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     activeSport === sport
-                      ? "text-white"
+                      ? "text-white shadow-sm"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                   style={activeSport === sport ? { backgroundColor: config.accent } : {}}
@@ -306,7 +316,7 @@ export default function Home() {
       <section className="py-20 bg-gray-50" data-testid="cities-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Your City. Your Circuit.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Your City. Your Circuit.</p>
             <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">{platformConfig.citySectionTitle}</h2>
             <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm">{platformConfig.citySectionDesc}</p>
           </div>
@@ -348,14 +358,17 @@ export default function Home() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-emerald-500 text-center" data-testid="cta-section">
-        <div className="max-w-2xl mx-auto px-4">
-          <TrendingUp className="w-12 h-12 text-white/70 mx-auto mb-6" />
-          <h2 className="font-heading font-black text-4xl sm:text-5xl text-white mb-4">Your season starts here.</h2>
-          <p className="text-emerald-100 mb-8 text-lg">{platformConfig.footerTagline}</p>
+      <section className="py-24 bg-emerald-500 relative overflow-hidden text-center" data-testid="cta-section">
+        <div className="absolute inset-0 pointer-events-none cta-pattern" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-400/25 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-600/20 pointer-events-none" />
+        <div className="relative max-w-2xl mx-auto px-4">
+          <p className="text-emerald-200 text-xs font-bold uppercase tracking-[0.2em] mb-4">Get Started Today</p>
+          <h2 className="font-heading font-black text-4xl sm:text-5xl text-white mb-5 leading-tight">Your season starts here.</h2>
+          <p className="text-emerald-100 mb-10 text-lg leading-relaxed">{platformConfig.footerTagline}</p>
           <button
             onClick={() => navigate("/auth?mode=register")}
-            className="px-10 py-4 bg-white text-emerald-700 font-bold rounded-md text-base hover:bg-emerald-50 transition-colors cursor-pointer"
+            className="px-10 py-4 bg-white text-emerald-700 font-bold rounded-md text-base hover:bg-emerald-50 transition-colors cursor-pointer shadow-xl shadow-emerald-700/20"
             data-testid="cta-signup-btn"
           >
             Enter the Season
@@ -371,7 +384,6 @@ function LeagueCard({ league }) {
   const navigate = useNavigate();
   const config = SPORT_CONFIG[league.sport] || {};
   const Icon = SPORT_ICONS[league.sport] || Activity;
-  const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
 
   return (
@@ -385,8 +397,8 @@ function LeagueCard({ league }) {
           <Icon className="w-3 h-3" />
           {config.label}
         </span>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isFree ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-700"}`}>
-          {isFree ? "FREE" : `${league.currency === "INR" ? "₹" : "$"}${league.entry_fee}`}
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+          {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
         </span>
       </div>
       <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2">{league.name}</h3>

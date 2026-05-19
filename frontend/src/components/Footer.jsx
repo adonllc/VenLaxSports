@@ -18,6 +18,8 @@ const SPORT_DOT = {
 export default function Footer() {
   return (
     <footer className="bg-gray-950 text-white mt-auto" data-testid="footer">
+      {/* Accent top strip */}
+      <div className="h-px bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}

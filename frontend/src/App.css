@@ -4,6 +4,7 @@
     font-family: "Outfit", sans-serif;
 }
 
+/* ─── Sport Card Hover (legacy) ─────────────────────────────── */
 .sport-card-hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -13,6 +14,7 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
+/* ─── League Card Hover ──────────────────────────────────────── */
 .league-card-hover {
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -22,22 +24,27 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
+/* ─── Stat Counter ───────────────────────────────────────────── */
 .stat-counter {
     font-family: "Outfit", sans-serif;
     font-weight: 900;
     line-height: 1;
+    letter-spacing: -0.035em;
 }
 
-.hero-gradient {
-    background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 50%, #0A0A0A 100%);
+/* ─── Dark Hero ─────────────────────────────────────────────── */
+.hero-dark {
+    background: #0A0A0A;
 }
 
+/* ─── Glass Nav (upgraded) ───────────────────────────────────── */
 .glass-nav {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
+/* ─── Fade In Animation ──────────────────────────────────────── */
 .animate-fade-in {
     animation: fadeInUp 0.6s ease-out forwards;
 }
@@ -53,22 +60,56 @@
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
 
-/* Sport color borders */
-.border-tennis { border-color: #10B981; }
-.border-cricket { border-color: #2563EB; }
-.border-pickleball { border-color: #F97316; }
+/* ─── Sport Color Borders ────────────────────────────────────── */
+.border-tennis    { border-color: #10B981; }
+.border-cricket   { border-color: #2563EB; }
+.border-pickleball{ border-color: #F97316; }
 
-/* Responsive utilities */
+/* ─── Sport Glow Cards ───────────────────────────────────────── */
+.card-glow-tennis,
+.card-glow-cricket,
+.card-glow-pickleball {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-glow-tennis:hover     { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(16, 185, 129, 0.20), 0 4px 12px rgba(0,0,0,0.04); }
+.card-glow-cricket:hover    { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(37, 99, 235, 0.20),  0 4px 12px rgba(0,0,0,0.04); }
+.card-glow-pickleball:hover { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(249, 115, 22, 0.20), 0 4px 12px rgba(0,0,0,0.04); }
+
+/* ─── CTA Decoration ─────────────────────────────────────────── */
+.cta-pattern {
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 50%, rgba(255,255,255,0.05) 0%, transparent 40%);
+}
+
+/* ─── Gradient Text ──────────────────────────────────────────── */
+.text-gradient-emerald {
+    background: linear-gradient(120deg, #34D399 0%, #10B981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ─── Legacy Hero Gradient (kept for other pages) ─────────────── */
+.hero-gradient {
+    background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 50%, #0A0A0A 100%);
+}
+
+/* ─── Scrollbar Hide ─────────────────────────────────────────── */
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
 .scrollbar-none::-webkit-scrollbar { display: none; }
 
-/* Touch-friendly tap target for small interactive elements on mobile */
+/* ─── Touch-Friendly Overrides ───────────────────────────────── */
 @media (max-width: 640px) {
   .league-card-hover:hover {
     transform: none;
     box-shadow: none;
   }
-  .sport-card-hover:hover {
+  .sport-card-hover:hover,
+  .card-glow-tennis:hover,
+  .card-glow-cricket:hover,
+  .card-glow-pickleball:hover {
     transform: none;
     box-shadow: none;
   }

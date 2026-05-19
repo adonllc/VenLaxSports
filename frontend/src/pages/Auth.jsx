@@ -14,7 +14,7 @@ const COUNTRIES = [activeCountry];
 export default function Auth() {
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.get("mode") === "register" ? "register" : "login");
-  const [form, setForm] = useState({ email: "", password: "", name: "", country: platformConfig.country, city: "" });
+  const [form, setForm] = useState({ email: "", password: "", name: "", country: platformConfig.country, city: "", skill_level: "" });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -224,6 +224,26 @@ export default function Auth() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-city"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Skill Level (optional)</label>
+                  <select
+                    value={form.skill_level}
+                    onChange={update("skill_level")}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                    data-testid="input-skill-level"
+                  >
+                    <option value="">Select your USTA/USAPA level</option>
+                    <option value="2.0">2.0 — Beginner</option>
+                    <option value="2.5">2.5 — Beginner+</option>
+                    <option value="3.0">3.0 — Intermediate</option>
+                    <option value="3.5">3.5 — Intermediate+</option>
+                    <option value="4.0">4.0 — Advanced Intermediate</option>
+                    <option value="4.5">4.5 — Advanced</option>
+                    <option value="5.0">5.0 — Expert</option>
+                    <option value="5.5">5.5 — Expert+</option>
+                    <option value="6.0+">6.0+ — Open / Pro</option>
+                  </select>
                 </div>
               </>
             )}

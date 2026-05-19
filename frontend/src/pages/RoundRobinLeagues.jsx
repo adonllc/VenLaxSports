@@ -44,12 +44,14 @@ export default function RoundRobinLeagues() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-gray-900">Round Robin Leagues</h1>
-          <p className="text-gray-500 mt-1">Auto-scheduled leagues for busy players. Every matchup assigned a week.</p>
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">Structured Format</p>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl text-gray-900 mb-2">Round Robin Leagues</h1>
+          <p className="text-gray-500 max-w-lg">Auto-scheduled leagues for busy players. Every matchup assigned a week.</p>
         </div>
-
+      </div>
+      <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex flex-wrap gap-3 mb-8">
           <select
             data-testid="filter-sport"
@@ -121,8 +123,8 @@ export default function RoundRobinLeagues() {
                       <Trophy size={14} />
                       {rr.division_type === "doubles" ? "Doubles" : "Singles"}
                     </span>
-                    <span className="font-semibold text-black">
-                      {lg.entry_fee > 0 ? `$${lg.entry_fee}` : "Free"}
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${lg.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
+                      {lg.status === "registration" ? "Open" : lg.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
                 </Link>

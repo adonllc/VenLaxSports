@@ -150,7 +150,7 @@ const PICKLEBALL_RULES = [
       "Each player gets ~5 matches over 6 weeks plus a makeup week.",
       "DUPR rating updates are applied after every reported match.",
       "Mixed doubles uses the same scoring rules as standard doubles.",
-      "Entry fee: $9.99 singles · $19.99 doubles & mixed.",
+      "Entry fees vary by league — shown at registration.",
     ],
   },
 ];

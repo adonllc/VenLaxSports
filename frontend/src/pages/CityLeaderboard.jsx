@@ -132,8 +132,7 @@ export default function CityLeaderboard() {
                   <div>
                     <p className="font-medium text-gray-900 text-sm">{league.name}</p>
                     <p className="text-xs text-gray-500">
-                      {league.current_players}/{league.max_players} players ·{" "}
-                      {league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
+                      {league.current_players}/{league.max_players} players
                     </p>
                   </div>
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize shrink-0 ${

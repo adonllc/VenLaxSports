@@ -24,6 +24,7 @@ export default function Navbar() {
   const [userOpen, setUserOpen] = useState(false);
   const sportsRef = useRef(null);
   const userRef = useRef(null);
+  const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
     const handler = (e) => {
@@ -84,7 +85,7 @@ export default function Navbar() {
 
             <Link
               to="/leagues"
-              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/leagues") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
               data-testid="nav-leagues"
             >
               Flex League
@@ -93,14 +94,14 @@ export default function Navbar() {
             <Link
               to="/leagues/round-robin"
               data-testid="nav-round-robin"
-              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/leagues/round-robin") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
             >
               Round Robin
             </Link>
 
             <Link
               to="/rules"
-              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/rules") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
               data-testid="nav-rules"
             >
               Rules

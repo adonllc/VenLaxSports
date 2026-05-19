@@ -69,14 +69,14 @@ export default function HowItWorks() {
                 className="group bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 data-testid={`how-step-${s.n}`}
               >
-                <div className="flex items-start gap-4 mb-3">
-                  <span className="font-heading font-black text-3xl text-gray-200 group-hover:text-gray-300 transition-colors">{s.n}</span>
-                  <div className={`w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center ${s.accent}`}>
+                <div className="flex items-start gap-3 mb-4">
+                  <span className="font-heading font-black text-5xl leading-none text-gray-100 group-hover:text-gray-200 transition-colors mt-1 select-none">{s.n}</span>
+                  <div className={`w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 group-hover:shadow-sm transition-shadow ${s.accent}`}>
                     <Icon className="w-5 h-5" />
                   </div>
                 </div>
                 <h3 className="font-heading font-bold text-lg text-gray-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{s.body}</p>
+                <p className="text-sm text-gray-500 leading-relaxed">{s.body}</p>
               </div>
             );
           })}
@@ -90,9 +90,6 @@ export default function HowItWorks() {
           >
             See open leagues <ArrowRight className="w-4 h-4" />
           </Link>
-          <p className="text-xs text-gray-400 mt-3">
-            $9.99 singles · $19.99 doubles · All US cities · No commitment.
-          </p>
         </div>
       </div>
     </section>

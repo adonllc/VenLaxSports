@@ -52,6 +52,7 @@ class User(BaseDocument):
     pickleball_rating: float = 3.0
     email_notifications: bool = True
     profile_public: bool = True
+    skill_level: Optional[str] = None  # USTA/USAPA level: "2.0", "2.5", ..., "5.5", "6.0+"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -62,6 +63,7 @@ class UserCreate(BaseModel):
     country: str = "USA"
     city: Optional[str] = None
     phone: Optional[str] = None
+    skill_level: Optional[str] = None
 
 
 class UserLogin(BaseModel):

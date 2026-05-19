@@ -38,6 +38,7 @@ async def register(user_data: UserCreate, response: Response, request: Request):
         country=user_data.country,
         city=user_data.city,
         phone=user_data.phone,
+        skill_level=user_data.skill_level,
         role="player",
     )
     result = await db.users.insert_one(user.to_mongo())

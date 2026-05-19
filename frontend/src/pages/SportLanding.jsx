@@ -69,32 +69,33 @@ export default function SportLanding() {
   return (
     <div className="min-h-screen bg-white" data-testid={`sport-landing-${sport}`}>
       {/* Hero */}
-      <section className="relative h-64 sm:h-80 overflow-hidden">
-        <img src={meta.image} alt={meta.label} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/55" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <span className="text-3xl sm:text-5xl">{meta.icon}</span>
-              <h1 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl">{meta.label}</h1>
+      <section className="relative min-h-[55vh] overflow-hidden flex items-center">
+        <img src={meta.image} alt={meta.label} className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full py-20">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: meta.color }}>
+              <span className="text-xl leading-none">{meta.icon}</span>
             </div>
-            <p className="text-sm sm:text-lg text-gray-200 max-w-lg">{meta.tagline}</p>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
-              <button
-                onClick={() => navigate(`/leagues?sport=${sport}`)}
-                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-colors text-sm"
-                data-testid="view-leagues-btn"
-              >
-                View All {meta.label} Leagues
-              </button>
-              <button
-                onClick={() => navigate("/auth?mode=register")}
-                className="px-5 sm:px-6 py-2.5 sm:py-3 border border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm"
-                data-testid="join-now-btn"
-              >
-                Join Now
-              </button>
-            </div>
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-gray-300">VENLAX Sports</span>
+          </div>
+          <h1 className="font-heading font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.9] tracking-tight mb-4">{meta.label}</h1>
+          <p className="text-gray-300 text-lg max-w-lg mb-8 leading-relaxed">{meta.tagline}</p>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+            <button
+              onClick={() => navigate(`/leagues?sport=${sport}`)}
+              className="px-6 py-3 bg-white text-black font-bold rounded-md hover:bg-gray-100 transition-colors text-sm"
+              data-testid="view-leagues-btn"
+            >
+              View All {meta.label} Leagues
+            </button>
+            <button
+              onClick={() => navigate("/auth?mode=register")}
+              className="px-6 py-3 border border-white/30 hover:border-white/60 text-white font-semibold rounded-md transition-colors text-sm"
+              data-testid="join-now-btn"
+            >
+              Join Now
+            </button>
           </div>
         </div>
       </section>
@@ -172,7 +173,7 @@ export default function SportLanding() {
                 >
                   <div className="flex justify-between mb-3">
                     <span className={`text-xs px-2 py-1 rounded-full font-semibold ${meta.badgeClass}`}>{meta.icon} {meta.label}</span>
-                    <span className="text-xs font-bold">{!l.entry_fee ? "FREE" : `${l.currency === "INR" ? "₹" : "$"}${l.entry_fee}`}</span>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>{l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">{l.name}</h3>
                   <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{l.city}</p>

@@ -85,9 +85,10 @@ export default function Leagues() {
     <div className="min-h-screen bg-gray-50" data-testid="leagues-page">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="font-heading font-black text-4xl text-gray-900 mb-2">Browse Leagues</h1>
-          <p className="text-gray-500">Find and join competitive leagues across all sports and cities</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">All Leagues</p>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl text-gray-900 mb-2">Browse Leagues</h1>
+          <p className="text-gray-500 max-w-lg">Find and join competitive leagues across all sports and cities</p>
         </div>
       </div>
 
@@ -210,15 +211,14 @@ export default function Leagues() {
 
 function LeagueCard({ league, onClick }) {
   const config = SPORT_CONFIG[league.sport] || { badge: "bg-gray-100", icon: "🏆", label: league.sport };
-  const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
-  const currency = league.currency === "INR" ? "₹" : "$";
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
+  const isEnded = league.status === "completed" || league.status === "cancelled";
 
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-2xl overflow-hidden league-card-hover cursor-pointer"
+      className={`bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer ${isEnded ? "opacity-60" : "league-card-hover"}`}
       data-testid={`league-card-${league.id}`}
     >
       <div className={`h-1.5 ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`} />
@@ -227,11 +227,11 @@ function LeagueCard({ league, onClick }) {
           <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
             {config.icon} {config.label}
           </span>
-          <div className="text-right">
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${isFree ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-700"}`}>
-              {isFree ? "FREE" : `${currency}${league.entry_fee}`}
+          {isEnded && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">
+              Season Ended
             </span>
-          </div>
+          )}
         </div>
 
         <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">{league.name}</h3>

@@ -50,6 +50,13 @@ export default function LeagueDetail() {
     if (tab === "standings") fetchStandings();
   }, [tab]);
 
+  // Check if user is already registered when league data loads
+  useEffect(() => {
+    if (user && league && !isRegistered) {
+      checkRegistration();
+    }
+  }, [user, league]);
+
   const fetchLeague = async () => {
     try {
       const { data } = await axios.get(`${API}/leagues/${id}`);
@@ -65,6 +72,15 @@ export default function LeagueDetail() {
     try {
       const { data } = await axios.get(`${API}/leagues/${id}/players`);
       setPlayers(data);
+    } catch (e) { console.error(e); }
+  };
+
+  const checkRegistration = async () => {
+    try {
+      const { data } = await axios.get(`${API}/leagues/${id}/players`);
+      setPlayers(data);
+      const userId = user?.id || user?._id;
+      setIsRegistered(data.some((p) => p.player_id === userId));
     } catch (e) { console.error(e); }
   };
 
@@ -177,86 +193,96 @@ export default function LeagueDetail() {
 
             {/* Join Card */}
             <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 w-full lg:w-auto lg:min-w-[240px]">
-              <div className="text-center mb-4">
-                <p className="text-3xl font-heading font-black text-gray-900">
-                  {isFree ? "FREE" : `${currency}${league.entry_fee}`}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Entry Fee</p>
-              </div>
-
-              {/* Spots bar */}
-              <div className="mb-4">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>{spotsLeft} spots remaining</span>
-                  <span>{fillPct}% filled</span>
+              {(league.status === "completed" || league.status === "cancelled") ? (
+                <div className="text-center py-4">
+                  <Trophy className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="font-semibold text-gray-600 text-sm">Season Ended</p>
+                  <p className="text-xs text-gray-400 mt-1">This league is no longer active.</p>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full bg-black transition-all" style={{ width: `${fillPct}%` }} />
-                </div>
-              </div>
-
-              {/* Payment/join status */}
-              {sessionId && !paymentStatus && (
-                <div className="flex items-center gap-2 text-sm text-blue-600 mb-3 justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-                  Checking payment...
-                </div>
-              )}
-
-              {paymentStatus?.payment_status === "paid" && (
-                <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0" /> Payment confirmed!
-                </div>
-              )}
-
-              {joinMsg && (
-                <div className={`flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3 ${joinMsg.includes("success") || joinMsg.includes("joined") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`} data-testid="join-message">
-                  {joinMsg.includes("success") || joinMsg.includes("joined") ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                  {joinMsg}
-                </div>
-              )}
-
-              {!isRegistered && league.status === "registration" && (
+              ) : (
                 <>
-                  {/* Waiver checkbox — required for all leagues, free or paid */}
-                  <label className="flex items-start gap-2.5 cursor-pointer mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={waiverAccepted}
-                      onChange={(e) => setWaiverAccepted(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
-                      data-testid="waiver-checkbox"
-                    />
-                    <span className="text-[11px] text-amber-900 leading-relaxed">
-                      I have read and agree to the{" "}
-                      <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
-                        Liability Waiver & Assumption of Risk
-                      </a>
-                      . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
-                    </span>
-                  </label>
-                  <button
-                    onClick={handleJoin}
-                    disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                    className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
-                    data-testid="join-league-btn"
-                  >
-                    {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : `Join — ${currency}${league.entry_fee}`}
-                  </button>
-                  {!isFree && (
-                    <p className="text-[11px] text-center text-gray-400 mt-2">
-                      Entry fees are <strong>non-refundable</strong> once the league starts.{" "}
-                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Full Terms</a>
+                  <div className="text-center mb-4">
+                    <p className="text-3xl font-heading font-black text-gray-900">
+                      {isFree ? "FREE" : `${currency}${league.entry_fee}`}
                     </p>
+                    <p className="text-xs text-gray-500 mt-1">Entry Fee</p>
+                  </div>
+
+                  {/* Spots bar */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>{spotsLeft} spots remaining</span>
+                      <span>{fillPct}% filled</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-black transition-all" style={{ width: `${fillPct}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Payment/join status */}
+                  {sessionId && !paymentStatus && (
+                    <div className="flex items-center gap-2 text-sm text-blue-600 mb-3 justify-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+                      Checking payment...
+                    </div>
+                  )}
+
+                  {paymentStatus?.payment_status === "paid" && (
+                    <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" /> Payment confirmed!
+                    </div>
+                  )}
+
+                  {joinMsg && (
+                    <div className={`flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3 ${joinMsg.includes("success") || joinMsg.includes("joined") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`} data-testid="join-message">
+                      {joinMsg.includes("success") || joinMsg.includes("joined") ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                      {joinMsg}
+                    </div>
+                  )}
+
+                  {!isRegistered && league.status === "registration" && (
+                    <>
+                      {/* Waiver checkbox — required for all leagues, free or paid */}
+                      <label className="flex items-start gap-2.5 cursor-pointer mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={waiverAccepted}
+                          onChange={(e) => setWaiverAccepted(e.target.checked)}
+                          className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
+                          data-testid="waiver-checkbox"
+                        />
+                        <span className="text-[11px] text-amber-900 leading-relaxed">
+                          I have read and agree to the{" "}
+                          <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
+                            Liability Waiver & Assumption of Risk
+                          </a>
+                          . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
+                        </span>
+                      </label>
+                      <button
+                        onClick={handleJoin}
+                        disabled={joining || spotsLeft <= 0 || !waiverAccepted}
+                        className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                        data-testid="join-league-btn"
+                      >
+                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : `Join — ${currency}${league.entry_fee}`}
+                      </button>
+                      {!isFree && (
+                        <p className="text-[11px] text-center text-gray-400 mt-2">
+                          Entry fees are <strong>non-refundable</strong> once the league starts.{" "}
+                          <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Full Terms</a>
+                        </p>
+                      )}
+                    </>
+                  )}
+
+                  {isRegistered && (
+                    <div className="text-center text-sm font-semibold text-emerald-700">
+                      <CheckCircle className="w-5 h-5 mx-auto mb-1" />
+                      You're registered!
+                    </div>
                   )}
                 </>
-              )}
-
-              {isRegistered && (
-                <div className="text-center text-sm font-semibold text-emerald-700">
-                  <CheckCircle className="w-5 h-5 mx-auto mb-1" />
-                  You're registered!
-                </div>
               )}
             </div>
           </div>
@@ -320,7 +346,13 @@ export default function LeagueDetail() {
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-heading font-bold text-lg">Registered Players ({players.length})</h3>
             </div>
-            {players.length === 0 ? (
+            {!isRegistered && league.status !== "completed" ? (
+              <div className="text-center py-16 px-6">
+                <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                <p className="font-semibold text-gray-700 mb-1">Player roster is private</p>
+                <p className="text-sm text-gray-500">Register for this league to see who's playing.</p>
+              </div>
+            ) : players.length === 0 ? (
               <div className="text-center py-12 text-gray-500">No players registered yet</div>
             ) : (
               <div className="divide-y divide-gray-100">
