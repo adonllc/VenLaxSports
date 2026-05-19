@@ -26,6 +26,7 @@ export default function PlayerDashboard() {
   const [schedMsg, setSchedMsg] = useState("");
   const [leaguePlayers, setLeaguePlayers] = useState([]);
   const [togglingNotif, setTogglingNotif] = useState(false);
+  const [togglingPrivacy, setTogglingPrivacy] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -89,6 +90,23 @@ export default function PlayerDashboard() {
     }
   };
 
+  const togglePrivacy = async () => {
+    if (togglingPrivacy) return;
+    setTogglingPrivacy(true);
+    try {
+      await axios.patch(
+        `${API}/auth/preferences`,
+        { profile_public: user.profile_public === false },
+        { withCredentials: true },
+      );
+      await fetchMe();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setTogglingPrivacy(false);
+    }
+  };
+
   if (!user) return null;
 
   const wins = matches.filter((m) => m.status === "completed" && (m.winner_id === user.id || m.winner_id === user._id)).length;
@@ -124,6 +142,19 @@ export default function PlayerDashboard() {
               >
                 {user.email_notifications ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
                 Email notifications: {user.email_notifications ? "ON" : "OFF"}
+              </button>
+              <button
+                onClick={togglePrivacy}
+                disabled={togglingPrivacy}
+                className={`mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  user.profile_public !== false
+                    ? "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                    : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+                } disabled:opacity-60`}
+                data-testid="toggle-profile-public"
+                title="Control who can see your public profile and match history"
+              >
+                {user.profile_public !== false ? "🌐 Profile: Public" : "🔒 Profile: Private"}
               </button>
             </div>
             <div className="flex gap-4 sm:gap-3 flex-wrap sm:flex-nowrap">

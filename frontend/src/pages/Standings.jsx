@@ -65,7 +65,15 @@ export default function Standings() {
                       <td className="px-6 py-4 text-gray-400 font-heading font-bold">
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900">{s.player_name}</td>
+                      <td className="px-6 py-4 font-semibold text-gray-900">
+                        <Link
+                          to={`/players/${s.player_id}`}
+                          className="hover:underline"
+                          data-testid={`standings-player-link-${i}`}
+                        >
+                          {s.player_name}
+                        </Link>
+                      </td>
                       <td className="px-4 py-4 text-center font-semibold text-emerald-600">{s.wins}</td>
                       <td className="px-4 py-4 text-center text-red-500">{s.losses}</td>
                       <td className="px-4 py-4 text-center text-gray-500">{s.draws || 0}</td>
