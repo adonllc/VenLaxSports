@@ -91,6 +91,14 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/leagues/round-robin"
+              data-testid="nav-round-robin"
+              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              Round Robin
+            </Link>
+
+            <Link
               to="/rules"
               className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
               data-testid="nav-rules"
@@ -184,6 +192,7 @@ export default function Navbar() {
             </Link>
           ))}
           <Link to="/leagues" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50">Leagues</Link>
+          <Link to="/leagues/round-robin" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-round-robin-mobile">Round Robin</Link>
           <Link to="/rules" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-rules-mobile">Rules</Link>
           {user ? (
             <>

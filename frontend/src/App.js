@@ -9,6 +9,9 @@ import ResetPassword from "./pages/ResetPassword";
 import Rules from "./pages/Rules";
 import Leagues from "./pages/Leagues";
 import LeagueDetail from "./pages/LeagueDetail";
+import RoundRobinLeagues from "./pages/RoundRobinLeagues";
+import RoundRobinDetail from "./pages/RoundRobinDetail";
+import RoundRobinInvite from "./pages/RoundRobinInvite";
 import PlayerDashboard from "./pages/PlayerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SportLanding from "./pages/SportLanding";
@@ -31,12 +34,15 @@ function AppRouter() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/sport/:sport" element={<SportLanding />} />
       <Route path="/leagues" element={<Leagues />} />
+      <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
       <Route path="/leagues/:id" element={<LeagueDetail />} />
       <Route path="/rules" element={<Rules />} />
       <Route path="/dashboard" element={<PlayerDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/matches/:id/score" element={<ScoreReport />} />
       <Route path="/leagues/:id/standings" element={<Standings />} />
+      <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
+      <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
     </Routes>
   );
 }
