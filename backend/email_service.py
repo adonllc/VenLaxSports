@@ -184,6 +184,48 @@ async def send_password_reset(to: str, player_name: str, reset_url: str) -> None
                      _wrap("Password reset", body, "Reset password", reset_url))
 
 
+async def send_partner_invite(to: str, inviter_name: str, league_name: str,
+                               sport: str, entry_fee: float, accept_url: str) -> None:
+    fee_line = f"<li><strong>Entry fee:</strong> ${entry_fee:.2f} (split or per team)</li>" if entry_fee > 0 else ""
+    body = f"""
+      <p><strong>{inviter_name}</strong> has invited you to join them as a doubles partner in a VENLAX Round Robin league.</p>
+      <ul style="padding-left:18px;margin:0 0 12px">
+        <li><strong>League:</strong> {league_name}</li>
+        <li><strong>Sport:</strong> {sport.title()}</li>
+        {fee_line}
+      </ul>
+      <p>Click below to accept and confirm your spot. This invite expires in 72 hours.</p>
+    """
+    await send_email(
+        to,
+        f"{inviter_name} invited you to a Round Robin doubles league",
+        _wrap("You're invited!", body, "Accept & Join", accept_url),
+    )
+
+
+async def send_league_started(to: str, player_name: str, league_name: str, league_id: str) -> None:
+    url = f"{_get_frontend_url()}/round-robin/{league_id}" if _get_frontend_url() else f"/round-robin/{league_id}"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Your Round Robin league <strong>{league_name}</strong> has reached minimum players and the schedule has been generated!</p>
+      <p>Check your schedule and start coordinating match times with your opponents.</p>
+    """
+    await send_email(to, f"Schedule generated — {league_name}",
+                     _wrap("Your league has started!", body, "View schedule", url))
+
+
+async def send_playoff_qualified(to: str, player_name: str, league_name: str,
+                                  league_id: str, seed: int) -> None:
+    url = f"{_get_frontend_url()}/round-robin/{league_id}" if _get_frontend_url() else f"/round-robin/{league_id}"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Congratulations! You've qualified for the playoffs in <strong>{league_name}</strong> as seed #{seed}.</p>
+      <p>Playoff brackets are now live — check the Playoffs tab to see your matchup.</p>
+    """
+    await send_email(to, f"You qualified for playoffs — {league_name}",
+                     _wrap("Playoffs qualification confirmed!", body, "View bracket", url))
+
+
 # Fire-and-forget helper so route handlers don't block on SMTP
 def schedule(coro) -> None:
     """Schedule an email coroutine without awaiting (best-effort delivery)."""
