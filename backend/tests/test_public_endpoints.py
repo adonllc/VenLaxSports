@@ -33,3 +33,37 @@ class TestModels:
         assert c.delivery_method == "email"
         d = c.to_mongo()
         assert d["challenger_id"] == "aaa"
+
+
+class TestPublicEndpointsRoutes:
+    def test_city_leaderboard_no_auth(self):
+        r = requests.get(f"{BASE_URL}/api/public/city/New York/sport/tennis")
+        assert r.status_code == 200
+        data = r.json()
+        assert "leaders" in data
+        assert "active_leagues" in data
+        assert "city" in data
+
+    def test_city_leaderboard_empty_city_returns_200_not_404(self):
+        r = requests.get(f"{BASE_URL}/api/public/city/ZzzzNoSuchCity9999/sport/tennis")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["leaders"] == []
+        assert data["active_leagues"] == []
+
+    def test_city_leaderboard_no_pii(self):
+        r = requests.get(f"{BASE_URL}/api/public/city/New York/sport/tennis")
+        assert r.status_code == 200
+        assert "email" not in r.text
+        assert "password" not in r.text
+        assert "google_id" not in r.text
+
+    def test_league_spectator_invalid_id(self):
+        r = requests.get(f"{BASE_URL}/api/public/league/notanobjectid")
+        assert r.status_code == 404
+
+    def test_challenge_requires_auth(self):
+        r = requests.post(f"{BASE_URL}/api/public/challenge", json={
+            "challenged_id": "000000000000000000000001"
+        })
+        assert r.status_code == 401
