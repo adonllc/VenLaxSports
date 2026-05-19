@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Users, Calendar } from "lucide-react";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import RRScheduleView from "../components/RRScheduleView";
 import RRBracketView from "../components/RRBracketView";
 
@@ -13,7 +13,7 @@ const TABS = ["Overview", "Schedule", "Standings", "Playoffs"];
 export default function RoundRobinDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
   const [league, setLeague] = useState(null);
   const [schedule, setSchedule] = useState(null);
