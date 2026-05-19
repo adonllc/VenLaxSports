@@ -107,7 +107,7 @@ export default function LeagueSpectator() {
             <Trophy className="w-4 h-4 text-yellow-500" />
             <h2 className="font-heading font-bold text-gray-900">Standings</h2>
           </div>
-          {data.standings.length === 0 ? (
+          {(data.standings?.length ?? 0) === 0 ? (
             <div className="py-12 text-center text-gray-400 text-sm">
               Season starting soon — check back after matches begin!
             </div>
@@ -125,7 +125,7 @@ export default function LeagueSpectator() {
                 </thead>
                 <tbody>
                   {data.standings.map((s, i) => (
-                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
+                    <tr key={s.player_id ?? i} className="border-b border-gray-50 hover:bg-gray-50">
                       <td className="px-4 py-3 text-gray-400 font-medium">{i + 1}</td>
                       <td className="px-4 py-3">
                         <Link
@@ -149,7 +149,7 @@ export default function LeagueSpectator() {
         </div>
 
         {/* Recent results */}
-        {data.recent_matches.length > 0 && (
+        {(data.recent_matches?.length ?? 0) > 0 && (
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-gray-400" />
