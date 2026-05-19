@@ -193,7 +193,7 @@ export default function Rules() {
           </h1>
           <p className="text-gray-400 text-sm sm:text-base max-w-2xl">
             Every match is governed. Every call is fair. Every result counts.
-            Tennis format combines <strong className="text-white">T2Tennis</strong>, <strong className="text-white">UTR Flex</strong>, and <strong className="text-white">USTA</strong> best practices.
+            Tennis format inspired by <strong className="text-white">UTR Flex</strong> and <strong className="text-white">USTA</strong> best practices.
             Pickleball aligned with <strong className="text-white">USA Pickleball</strong> Official Rulebook.
           </p>
         </div>
@@ -222,7 +222,7 @@ export default function Rules() {
               <h2 className="font-heading font-black text-2xl text-gray-900">Tennis Rules</h2>
               <p className="text-xs text-gray-400 mt-0.5">Flex League + Playoffs · Primary Format</p>
             </div>
-            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">T2Tennis · UTR Flex · USTA</span>
+            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">UTR Flex · USTA</span>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">

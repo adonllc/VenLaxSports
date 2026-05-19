@@ -20,7 +20,7 @@
 ---
 
 ## Problem Statement
-Build a multi-sport, multi-country league platform (T2Tennis-style) supporting Tennis, Cricket, and Pickleball across USA and India. Players can join leagues, schedule matches, report scores, track standings, and compete across seasons.
+Build a multi-sport, multi-country flex league platform supporting Tennis, Cricket, and Pickleball across USA and India. Players can join leagues, schedule matches, report scores, track standings, and compete across seasons.
 
 **Rollout model (3 phases):**
 1. **Phase 1 — USA: Tennis + Pickleball** (ACTIVE) — Stripe, USD
