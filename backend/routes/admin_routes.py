@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Request
 from datetime import datetime, timezone
 from bson import ObjectId
 from auth_utils import require_admin
-from models import LeagueUpdate
+from models import LeagueUpdate, PlayerLeague, Standing
+import email_service
 
 router = APIRouter()
 
@@ -133,3 +134,110 @@ async def seed_data(request: Request):
             await db.cities.insert_one(city)
 
     return {"message": "Seed data added"}
+
+
+# ─── Zelle admin approval queue ──────────────────────────────
+
+@router.get("/zelle/pending")
+async def list_pending_zelle(request: Request):
+    """Return all payment_transactions with status=pending_admin (Zelle awaiting verification)."""
+    db = request.app.state.db
+    await require_admin(request, db)
+    txns = await db.payment_transactions.find(
+        {"status": "pending_admin", "method": "zelle"},
+        {"_id": 0},
+    ).sort("created_at", -1).to_list(200)
+    return txns
+
+
+@router.post("/zelle/{session_id}/approve")
+async def approve_zelle(session_id: str, request: Request):
+    """Admin approves Zelle deposit — registers player and marks transaction paid."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    txn = await db.payment_transactions.find_one({"session_id": session_id})
+    if not txn:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    if txn.get("status") not in ("pending_admin", "pending_zelle"):
+        raise HTTPException(status_code=400, detail=f"Transaction status is '{txn.get('status')}', cannot approve")
+
+    league_id = txn["league_id"]
+    user_id = txn["user_id"]
+
+    league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    player = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not league or not player:
+        raise HTTPException(status_code=404, detail="League or player not found")
+
+    already = await db.player_leagues.find_one(
+        {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}
+    )
+    if not already:
+        pl = PlayerLeague(
+            player_id=user_id,
+            player_name=player["name"],
+            league_id=league_id,
+            sport=league["sport"],
+            payment_status="paid",
+            session_id=session_id,
+        )
+        await db.player_leagues.insert_one(pl.to_mongo())
+        await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
+
+        standing = Standing(
+            league_id=league_id,
+            player_id=user_id,
+            player_name=player["name"],
+            sport=league["sport"],
+            country=player.get("country", "USA"),
+        )
+        await db.standings.insert_one(standing.to_mongo())
+
+        if player.get("email") and player.get("email_notifications", True):
+            email_service.schedule(email_service.send_registration_confirmed(
+                player["email"], player["name"], league["name"], league["sport"],
+                league_id, paid=True, amount=float(txn.get("amount", 0)), currency="USD"))
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.payment_transactions.update_one(
+        {"session_id": session_id},
+        {"$set": {"status": "complete", "payment_status": "paid", "admin_approved": True, "updated_at": now}},
+    )
+    return {"message": "Approved", "user_id": user_id, "league_id": league_id}
+
+
+@router.post("/zelle/{session_id}/reject")
+async def reject_zelle(session_id: str, request: Request):
+    """Admin rejects Zelle — marks transaction rejected, player NOT registered."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    txn = await db.payment_transactions.find_one({"session_id": session_id})
+    if not txn:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.payment_transactions.update_one(
+        {"session_id": session_id},
+        {"$set": {"status": "rejected", "payment_status": "failed", "admin_approved": False, "updated_at": now}},
+    )
+
+    # Notify player their Zelle was not verified
+    player = await db.users.find_one({"_id": ObjectId(txn["user_id"])})
+    if player and player.get("email") and player.get("email_notifications", True):
+        league_name = txn.get("league_name", "the league")
+        email_service.schedule(email_service.send_generic(
+            player["email"],
+            subject=f"Zelle payment not verified — {league_name}",
+            body=(
+                f"Hi {player['name']},\n\n"
+                f"We could not verify your Zelle payment for {league_name}. "
+                f"Your registration has not been confirmed.\n\n"
+                f"Please contact support@venlaxsports.com if you believe this is an error "
+                f"and include your Zelle reference number: {txn.get('reference_number', 'N/A')}.\n\n"
+                f"— VENLAX Sports"
+            ),
+        ))
+
+    return {"message": "Rejected", "session_id": session_id}

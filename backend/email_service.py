@@ -226,6 +226,11 @@ async def send_playoff_qualified(to: str, player_name: str, league_name: str,
                      _wrap("Playoffs qualification confirmed!", body, "View bracket", url))
 
 
+async def send_generic(to: str, subject: str, body: str) -> None:
+    html_body = "".join(f"<p>{line}</p>" for line in body.split("\n\n") if line.strip())
+    await send_email(to, subject, _wrap(subject, html_body, None, None))
+
+
 # Fire-and-forget helper so route handlers don't block on SMTP
 def schedule(coro) -> None:
     """Schedule an email coroutine without awaiting (best-effort delivery)."""

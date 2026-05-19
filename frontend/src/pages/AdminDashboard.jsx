@@ -161,6 +161,7 @@ export default function AdminDashboard() {
     { id: "leagues", label: "Manage Leagues" },
     { id: "seasons", label: "Seasons" },
     { id: "playoffs", label: "Playoffs" },
+    { id: "zelle", label: "Zelle Queue" },
   ];
 
   return (
@@ -410,6 +411,7 @@ export default function AdminDashboard() {
         {tab === "seasons" && <SeasonsTab />}
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
         {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
+        {tab === "zelle" && <ZelleQueueTab />}
       </div>
 
       {showRRForm && (
@@ -827,6 +829,119 @@ function AutoGenerateTab({ onSuccess }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─────────── Zelle Queue Tab ───────────
+function ZelleQueueTab() {
+  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const [queue, setQueue] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actioning, setActioning] = useState(null);
+  const [msg, setMsg] = useState("");
+
+  const fetchQueue = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API}/admin/zelle/pending`, { withCredentials: true });
+      setQueue(data);
+    } catch {
+      setQueue([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchQueue(); }, []);
+
+  const act = async (sessionId, action) => {
+    setActioning(sessionId);
+    setMsg("");
+    try {
+      const { data } = await axios.post(`${API}/admin/zelle/${sessionId}/${action}`, {}, { withCredentials: true });
+      setMsg(data.message);
+      fetchQueue();
+    } catch (err) {
+      setMsg(err.response?.data?.detail || `${action} failed`);
+    } finally {
+      setActioning(null);
+    }
+  };
+
+  if (loading) return <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>;
+
+  return (
+    <div className="space-y-4" data-testid="zelle-queue-tab">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-heading font-bold text-xl">Zelle Approval Queue</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Verify each Zelle deposit in your bank app, then approve or reject.
+          </p>
+        </div>
+        <button onClick={fetchQueue} className="text-xs text-gray-500 hover:text-gray-700 underline" data-testid="zelle-refresh-btn">
+          Refresh
+        </button>
+      </div>
+
+      {msg && (
+        <div className={`text-sm px-4 py-3 rounded-xl border ${msg.toLowerCase().includes("reject") ? "bg-red-50 border-red-200 text-red-700" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`}>
+          {msg}
+        </div>
+      )}
+
+      {queue.length === 0 ? (
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center text-sm text-gray-500">
+          No pending Zelle payments.
+        </div>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                {["Player", "League", "Amount", "Memo", "Reference #", "Submitted", "Actions"].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {queue.map((txn) => (
+                <tr key={txn.session_id} className="hover:bg-gray-50" data-testid={`zelle-row-${txn.session_id}`}>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-gray-900">{txn.user_email}</div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">{txn.league_name}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-900">${Number(txn.amount).toFixed(2)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-600">{txn.memo || "—"}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-purple-700 font-semibold">{txn.reference_number || "—"}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">{txn.updated_at ? new Date(txn.updated_at).toLocaleDateString() : new Date(txn.created_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => act(txn.session_id, "approve")}
+                        disabled={actioning === txn.session_id}
+                        className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-60"
+                        data-testid={`zelle-approve-${txn.session_id}`}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => act(txn.session_id, "reject")}
+                        disabled={actioning === txn.session_id}
+                        className="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-60"
+                        data-testid={`zelle-reject-${txn.session_id}`}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
