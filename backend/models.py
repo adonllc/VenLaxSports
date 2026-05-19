@@ -89,6 +89,8 @@ class League(BaseDocument):
     season_id: Optional[str] = None
     rules: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    league_type: str = "flex"               # "flex" | "round_robin"
+    rr_config: Optional[Dict] = None
 
 
 class LeagueCreate(BaseModel):
@@ -107,6 +109,8 @@ class LeagueCreate(BaseModel):
     season: str = "Season 1"
     season_id: Optional[str] = None
     rules: Optional[str] = None
+    league_type: str = "flex"
+    rr_config: Optional[Dict] = None
 
 
 class LeagueUpdate(BaseModel):
@@ -118,6 +122,30 @@ class LeagueUpdate(BaseModel):
     entry_fee: Optional[float] = None
     season_id: Optional[str] = None
     rules: Optional[str] = None
+
+
+# ─── Round Robin Config ───────────────────────────────
+class RRConfig(BaseModel):
+    min_players: int = 6
+    max_players: int = 12
+    division_type: str = "singles"          # "singles" | "doubles"
+    scoring_format: Optional[str] = None    # auto-set on schedule generation
+    playoff_threshold: int = 4
+    schedule_generated: bool = False
+    playoff_generated: bool = False
+    auto_started_at: Optional[str] = None
+
+
+# ─── Doubles Invite ──────────────────────────────────
+class DoublesInvite(BaseDocument):
+    league_id: str
+    inviter_id: str
+    inviter_name: str
+    partner_email: str
+    token: str
+    status: str = "pending"                 # "pending" | "accepted" | "expired"
+    expires_at: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 # ─── Team (Cricket) ──────────────────────────────────
@@ -160,6 +188,12 @@ class Match(BaseDocument):
     notes: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: Optional[str] = None
+    round: Optional[int] = None             # week number in RR; None for flex
+    is_rr: bool = False
+    team1_partner_id: Optional[str] = None
+    team1_partner_name: Optional[str] = None
+    team2_partner_id: Optional[str] = None
+    team2_partner_name: Optional[str] = None
 
 
 class MatchCreate(BaseModel):
