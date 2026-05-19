@@ -457,3 +457,70 @@ async def accept_invite(token: str, request: Request):
         await _run_generate_schedule(db, league_id)
 
     return {"accepted": True, "league_id": league_id}
+
+
+@router.post("")
+@router.post("/")
+async def create_rr_league(request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    if user.get("role") not in ("admin", "city_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    body = await request.json()
+
+    required = ["name", "sport", "country", "city", "format", "start_date", "end_date", "rr_config"]
+    for f in required:
+        if f not in body:
+            raise HTTPException(status_code=400, detail=f"Missing field: {f}")
+
+    rr_cfg = body["rr_config"]
+    for rf in ["min_players", "max_players", "division_type", "playoff_threshold"]:
+        if rf not in rr_cfg:
+            raise HTTPException(status_code=400, detail=f"rr_config missing: {rf}")
+
+    rr_cfg.setdefault("schedule_generated", False)
+    rr_cfg.setdefault("playoff_generated", False)
+    rr_cfg.setdefault("scoring_format", None)
+    rr_cfg.setdefault("auto_started_at", None)
+
+    league_doc = {
+        "name": body["name"],
+        "sport": body["sport"],
+        "country": body.get("country", "USA"),
+        "city": body["city"],
+        "format": body.get("format", rr_cfg["division_type"]),
+        "entry_fee": body.get("entry_fee", 0.0),
+        "currency": body.get("currency", "USD"),
+        "max_players": rr_cfg["max_players"],
+        "current_players": 0,
+        "start_date": body["start_date"],
+        "end_date": body["end_date"],
+        "status": "registration",
+        "admin_id": user["_id"],
+        "description": body.get("description"),
+        "venue": body.get("venue"),
+        "season": body.get("season", "Season 1"),
+        "season_id": body.get("season_id"),
+        "rules": body.get("rules"),
+        "league_type": "round_robin",
+        "rr_config": rr_cfg,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    result = await db.leagues.insert_one(league_doc)
+    return {"id": str(result.inserted_id), "message": "Round Robin league created"}
+
+
+@router.post("/{league_id}/force-close")
+async def force_close_rr(league_id: str, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    if user.get("role") not in ("admin", "city_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    await db.matches.update_many(
+        {"league_id": league_id, "is_rr": True, "status": "scheduled"},
+        {"$set": {"status": "cancelled", "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    await _run_check_playoffs(db, league_id)
+    return {"closed": True}
