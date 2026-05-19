@@ -112,6 +112,7 @@ def serialize_public_user(user: dict) -> dict:
         "country": user.get("country", "USA"),
         "tennis_rating": user.get("tennis_rating", 3.0),
         "pickleball_rating": user.get("pickleball_rating", 3.0),
+        "cricket_rating": user.get("cricket_rating", 3.0),
         "avatar": user.get("avatar"),
         "profile_public": user.get("profile_public", True),
     }
