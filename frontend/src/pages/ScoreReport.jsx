@@ -209,9 +209,23 @@ export default function ScoreReport() {
 
   // Success state — shown after submit
   if (submitted && submittedResult) {
+    const loserName =
+      submittedResult.winnerName === match.player1_name
+        ? match.player2_name
+        : match.player1_name;
+    const sportEmoji = match.sport === "tennis" ? "🎾" : match.sport === "pickleball" ? "🏓" : "🏏";
+    const shareText = encodeURIComponent(
+      `${sportEmoji} ${submittedResult.winnerName} defeated ${loserName}${submittedResult.summary ? ` ${submittedResult.summary}` : ""}\n` +
+      `📍 VenLax Sports · ${match.sport}\n` +
+      `👉 https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card`
+    );
+    const waUrl = `https://wa.me/?text=${shareText}`;
+    const spectatorUrl = `https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card`;
+
     return (
       <div className="min-h-screen bg-gray-50" data-testid="score-report-page">
-        <div className="max-w-xl mx-auto px-4 py-8">
+        <div className="max-w-xl mx-auto px-4 py-8 space-y-4">
+          {/* Result confirmation */}
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className={`h-1.5 w-full ${config.accentClass}`} />
             <div className="p-8 text-center">
@@ -227,11 +241,40 @@ export default function ScoreReport() {
                   <p className="text-sm text-gray-500 mt-1 font-mono">{submittedResult.summary}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2 justify-center text-xs text-gray-400 mb-3">
-                <Clock className="w-3.5 h-3.5 shrink-0" />
-                <span>24-hour dispute window is open for both players</span>
-              </div>
-              <p className="text-xs text-gray-400">Redirecting to dashboard...</p>
+              <p className="text-xs text-gray-400">Redirecting to dashboard in a few seconds...</p>
+            </div>
+          </div>
+
+          {/* Share card */}
+          <div className="bg-gray-900 rounded-2xl p-6 text-center" data-testid="share-card">
+            <p className="text-gray-400 text-xs uppercase tracking-widest mb-3">Share your result</p>
+            <div className="text-4xl mb-2">{sportEmoji}</div>
+            <p className="text-white font-heading font-black text-xl mb-1">
+              {submittedResult.winnerName} won
+            </p>
+            <p className="text-gray-400 text-sm mb-5">
+              {submittedResult.summary && `${submittedResult.summary} · `}
+              {match.sport} · VenLax Sports
+            </p>
+            <div className="flex gap-2 justify-center flex-wrap">
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold transition"
+                data-testid="share-wa-btn"
+              >
+                Share on WhatsApp
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(spectatorUrl);
+                }}
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition"
+                data-testid="share-copy-btn"
+              >
+                Copy link
+              </button>
             </div>
           </div>
         </div>
