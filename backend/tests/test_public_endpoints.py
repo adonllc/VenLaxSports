@@ -67,3 +67,31 @@ class TestPublicEndpointsRoutes:
             "challenged_id": "000000000000000000000001"
         })
         assert r.status_code == 401
+
+
+class TestWhatsApp:
+    def test_wa_webhook_verify(self):
+        """Meta pings this URL to verify the webhook. Must echo back hub.challenge."""
+        import os
+        verify_token = os.environ.get("WHATSAPP_VERIFY_TOKEN", "test_token_123")
+        r = requests.get(
+            f"{BASE_URL}/api/webhook/whatsapp/webhook",
+            params={
+                "hub.mode": "subscribe",
+                "hub.verify_token": verify_token,
+                "hub.challenge": "CHALLENGE_VALUE",
+            },
+        )
+        assert r.status_code == 200
+        assert r.text == "CHALLENGE_VALUE"
+
+    def test_wa_webhook_wrong_token(self):
+        r = requests.get(
+            f"{BASE_URL}/api/webhook/whatsapp/webhook",
+            params={
+                "hub.mode": "subscribe",
+                "hub.verify_token": "wrong_token",
+                "hub.challenge": "xyz",
+            },
+        )
+        assert r.status_code == 403

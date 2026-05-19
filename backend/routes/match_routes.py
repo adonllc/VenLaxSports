@@ -67,6 +67,26 @@ async def create_match(data: MatchCreate, request: Request):
     result = await db.matches.insert_one(match.to_mongo())
     match_id = str(result.inserted_id)
 
+    # WA match reminder — fires only when WA is configured and player has phone
+    try:
+        from whatsapp_service import schedule_wa, is_configured
+        if is_configured():
+            for pid, pname, oname in [
+                (user["_id"], user["name"], opponent.get("name")),
+                (opponent["_id"], opponent.get("name"), user["name"]),
+            ]:
+                player_doc = await db.users.find_one({"_id": ObjectId(pid)}, {"phone": 1})
+                if player_doc and player_doc.get("phone"):
+                    schedule_wa(
+                        player_doc["phone"],
+                        f"Hi {pname}! Your match vs {oname} is scheduled on VenLax Sports. "
+                        f"Complete it by the deadline and submit your score. "
+                        f"— VENLAX Sports",
+                    )
+    except Exception as e:
+        import logging as _log
+        _log.getLogger(__name__).warning(f"WA reminder failed: {e}")
+
     # Notify both players (fire-and-forget)
     if _should_notify(user):
         email_service.schedule(email_service.send_match_scheduled(
