@@ -33,7 +33,9 @@ async def wa_receive(request: Request):
     body = await request.body()
     sig = request.headers.get("X-Hub-Signature-256", "")
 
-    if os.environ.get("META_APP_SECRET") and not verify_signature(body, sig):
+    if not os.environ.get("META_APP_SECRET"):
+        logger.warning("META_APP_SECRET not set — webhook signature verification disabled")
+    elif not verify_signature(body, sig):
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     try:

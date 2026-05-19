@@ -164,6 +164,9 @@ async def send_challenge(data: ChallengeIn, request: Request):
     if count >= 3:
         raise HTTPException(status_code=429, detail="Challenge limit reached (3 per day). Try again tomorrow.")
 
+    if challenger["_id"] == data.challenged_id:
+        raise HTTPException(status_code=400, detail="Cannot challenge yourself")
+
     if not ObjectId.is_valid(data.challenged_id):
         raise HTTPException(status_code=404, detail="Player not found")
     challenged = await db.users.find_one({"_id": ObjectId(data.challenged_id)})
