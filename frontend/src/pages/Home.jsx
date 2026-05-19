@@ -22,7 +22,7 @@ const ALL_SPORT_CONFIG = {
     accent: "#10B981", label: "Tennis",
     tagline: "Singles. Doubles. Mixed.",
     image: "https://images.unsplash.com/photo-1696661115319-a9b6801e2571?w=800&q=80",
-    stats: ["Best-of-3 Sets", "NTRP Rating", "3.0 – 5.0+"],
+    stats: ["Best-of-3 Sets", "Skill Rating", "2.0 – 5.0+"],
   },
   cricket: {
     color: "text-cricket", bg: "bg-cricket-bg", badge: "sport-badge-cricket", border: "border-cricket",

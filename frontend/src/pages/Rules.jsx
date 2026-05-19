@@ -63,7 +63,7 @@ const TENNIS_RULES = [
     title: "Equipment & Surfaces",
     items: [
       "Home player provides new, unopened balls for the match.",
-      "Approved surfaces: hard court, clay, turf, indoor carpet — any ITF-approved surface.",
+      "Approved surfaces: hard court, clay, turf, indoor carpet (standard tennis court surfaces).",
       "Players provide their own racquet. No restrictions on string type or tension.",
       "Appropriate tennis footwear required.",
     ],
@@ -159,11 +159,11 @@ const PICKLEBALL_RULES = [
 const RATINGS = [
   {
     sport: "Tennis",
-    body: "VENLAX uses a hybrid NTRP-aligned rating (1.0–7.0). Self-rating on sign-up, then updated after every match based on result, opponent strength, margin of victory, and recent form. Staged K-factor: aggressive for new players, conservative for veterans.",
+    body: "VENLAX uses a skill rating scale of 1.0–7.0, aligned with widely recognized tennis rating conventions. Self-rating on sign-up, then updated after every match based on result, opponent strength, margin of victory, and recent form. Staged K-factor: aggressive for new players, conservative for veterans.",
   },
   {
     sport: "Pickleball",
-    body: "VENLAX uses a DUPR-aligned 1.0–7.0 rating. New players self-select an entry rating; the system corrects it within 5–10 matches based on results and opponent strength.",
+    body: "VENLAX uses a 1.0–7.0 skill rating scale for pickleball. New players self-select an entry rating; the system corrects it within 5–10 matches based on results and opponent strength.",
   },
 ];
 
@@ -193,8 +193,11 @@ export default function Rules() {
           </h1>
           <p className="text-gray-400 text-sm sm:text-base max-w-2xl">
             Every match is governed. Every call is fair. Every result counts.
-            Tennis format inspired by <strong className="text-white">UTR Flex</strong> and <strong className="text-white">USTA</strong> best practices.
-            Pickleball aligned with <strong className="text-white">USA Pickleball</strong> Official Rulebook.
+            Tennis uses a Fast-4 flex format with standard scoring conventions.
+            Pickleball follows standard rally-scoring rules.
+          </p>
+          <p className="text-gray-500 text-xs max-w-2xl mt-3">
+            VENLAX Sports is an independent platform not affiliated with, licensed by, or endorsed by the USTA, USA Pickleball, Universal Tennis, DUPR, or the ITF.
           </p>
         </div>
       </section>
@@ -222,7 +225,7 @@ export default function Rules() {
               <h2 className="font-heading font-black text-2xl text-gray-900">Tennis Rules</h2>
               <p className="text-xs text-gray-400 mt-0.5">Flex League + Playoffs · Primary Format</p>
             </div>
-            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">UTR Flex · USTA</span>
+            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">Fast-4 Flex Format</span>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -363,7 +366,7 @@ export default function Rules() {
           <div className="flex items-center gap-3 mb-6">
             <span className="text-3xl">🏓</span>
             <h2 className="font-heading font-black text-2xl text-gray-900">Pickleball Rules</h2>
-            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">USA Pickleball Official Rulebook</span>
+            <span className="ml-auto text-xs text-gray-400 font-medium hidden sm:block">Standard Pickleball Rules</span>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
             {PICKLEBALL_RULES.map((g) => (
