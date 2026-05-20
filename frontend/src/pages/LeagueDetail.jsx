@@ -330,31 +330,13 @@ export default function LeagueDetail() {
         {tab === "players" && (
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-5 border-b border-gray-100">
-              <h3 className="font-heading font-bold text-lg">Registered Players ({players.length})</h3>
+              <h3 className="font-heading font-bold text-lg">Registered Players</h3>
             </div>
-            {!isRegistered && league.status !== "completed" ? (
-              <div className="text-center py-16 px-6">
-                <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <p className="font-semibold text-gray-700 mb-1">Player roster is private</p>
-                <p className="text-sm text-gray-500">Register for this league to see who's playing.</p>
-              </div>
-            ) : players.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">No players registered yet</div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {players.map((p, i) => (
-                  <div key={i} className="flex items-center gap-3 px-5 py-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-700">
-                      {p.player_name?.[0]?.toUpperCase()}
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{p.player_name}</span>
-                    <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${p.payment_status === "paid" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
-                      {p.payment_status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="text-center py-16 px-6">
+              <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="font-semibold text-gray-700 mb-1">Player roster is private</p>
+              <p className="text-sm text-gray-500">Roster is not publicly visible.</p>
+            </div>
           </div>
         )}
 
