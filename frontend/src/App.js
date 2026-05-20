@@ -21,6 +21,9 @@ import Terms from "./pages/Terms";
 import LeagueSpectator from "./pages/LeagueSpectator";
 import CityLeaderboard from "./pages/CityLeaderboard";
 import PublicProfile from "./pages/PublicProfile";
+import VerifyEmail from "./pages/VerifyEmail";
+import ProfileSetup from "./pages/ProfileSetup";
+import JoinFlow from "./pages/JoinFlow";
 import "./App.css";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
@@ -51,6 +54,9 @@ function AppRouter() {
       <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
       <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
       <Route path="/players/:id" element={<PublicProfile />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/profile-setup" element={<ProfileSetup />} />
+      <Route path="/join" element={<JoinFlow />} />
     </Routes>
   );
 }

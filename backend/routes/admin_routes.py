@@ -73,6 +73,12 @@ async def get_all_leagues(request: Request, skip: int = 0, limit: int = 50):
 async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     db = request.app.state.db
     await require_admin(request, db)
+
+    # Capture previous status to detect activation
+    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1})
+    if not prev:
+        raise HTTPException(status_code=404, detail="League not found")
+
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     try:
@@ -81,6 +87,24 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="League not found")
+
+    # If status just became active, notify all registered flex-league players
+    if update_data.get("status") == "active" and prev.get("status") != "active":
+        league_type = prev.get("league_type", "flex")
+        if league_type == "flex":
+            regs = await db.player_leagues.find(
+                {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}},
+            ).to_list(200)
+            for reg in regs:
+                player = await db.users.find_one(
+                    {"_id": ObjectId(reg["player_id"])}, {"email": 1, "name": 1}
+                ) if ObjectId.is_valid(reg["player_id"]) else None
+                if player and player.get("email_notifications", True):
+                    email_service.schedule(email_service.send_schedule_released(
+                        player["email"], player["name"],
+                        prev["name"], league_id, league_type,
+                    ))
+
     return {"message": "League updated"}
 
 

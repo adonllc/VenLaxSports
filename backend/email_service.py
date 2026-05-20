@@ -226,6 +226,32 @@ async def send_playoff_qualified(to: str, player_name: str, league_name: str,
                      _wrap("Playoffs qualification confirmed!", body, "View bracket", url))
 
 
+async def send_otp(to: str, player_name: str, otp: str) -> None:
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Your verification code is:</p>
+      <p style="font-size:36px;font-weight:900;letter-spacing:8px;text-align:center;
+                background:#f3f4f6;border-radius:12px;padding:16px 0;margin:20px 0">
+        {otp}
+      </p>
+      <p>This code expires in <strong>10 minutes</strong>. If you didn't create a VENLAX account, you can safely ignore this email.</p>
+    """
+    await send_email(to, f"Your VENLAX verification code: {otp}",
+                     _wrap("Verify your email", body))
+
+
+async def send_schedule_released(to: str, player_name: str, league_name: str, league_id: str, league_type: str = "flex") -> None:
+    path = f"/round-robin/{league_id}" if league_type == "round_robin" else f"/leagues/{league_id}"
+    url = f"{_get_frontend_url()}{path}" if _get_frontend_url() else path
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>The schedule for <strong>{league_name}</strong> is now live!</p>
+      <p>Log in to view your matches, coordinate times with opponents, and track standings.</p>
+    """
+    await send_email(to, f"Schedule released — {league_name}",
+                     _wrap("Your schedule is ready", body, "View schedule", url))
+
+
 async def send_generic(to: str, subject: str, body: str) -> None:
     html_body = "".join(f"<p>{line}</p>" for line in body.split("\n\n") if line.strip())
     await send_email(to, subject, _wrap(subject, html_body, None, None))

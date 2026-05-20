@@ -45,11 +45,12 @@ export default function Auth() {
     try {
       if (mode === "login") {
         await login(form.email, form.password);
+        navigate("/dashboard");
       } else {
         if (!form.name.trim()) { setError("Name is required"); setLoading(false); return; }
         await register(form);
+        navigate("/verify-email");
       }
-      navigate("/dashboard");
     } catch (err) {
       setError(formatError(err));
     } finally {

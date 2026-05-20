@@ -53,6 +53,11 @@ class User(BaseDocument):
     email_notifications: bool = True
     profile_public: bool = True
     skill_level: Optional[str] = None  # USTA/USAPA level: "2.0", "2.5", ..., "5.5", "6.0+"
+    email_verified: bool = False
+    otp_code: Optional[str] = None      # bcrypt-hashed 6-digit OTP
+    otp_expires_at: Optional[str] = None
+    home_court: Optional[str] = None
+    profile_complete: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

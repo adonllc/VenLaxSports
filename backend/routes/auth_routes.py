@@ -12,6 +12,8 @@ from auth_utils import (
 import jwt as pyjwt
 import email_service
 import os
+import random
+import string
 
 router = APIRouter()
 
@@ -45,6 +47,16 @@ async def register(user_data: UserCreate, response: Response, request: Request):
     user_id = str(result.inserted_id)
     _set_tokens(response, user_id, user.email, user.role)
 
+    # Send OTP verification email (best-effort, non-blocking)
+    otp = "".join(random.choices(string.digits, k=6))
+    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    hashed_otp = hash_password(otp)
+    await db.users.update_one(
+        {"_id": result.inserted_id},
+        {"$set": {"otp_code": hashed_otp, "otp_expires_at": otp_expires}},
+    )
+    email_service.schedule(email_service.send_otp(user.email, user.name, otp))
+
     return {
         "id": user_id,
         "email": user.email,
@@ -57,6 +69,8 @@ async def register(user_data: UserCreate, response: Response, request: Request):
         "cricket_rating": 50.0,
         "pickleball_rating": 3.0,
         "email_notifications": True,
+        "email_verified": False,
+        "profile_complete": False,
     }
 
 
@@ -99,8 +113,10 @@ async def logout(response: Response):
 async def me(request: Request):
     db = request.app.state.db
     user = await get_current_user(request, db)
-    # Normalize: expose `id` to clients (other routes still use the internal _id string)
     user["id"] = user.pop("_id")
+    # Strip internal OTP fields before sending to client
+    user.pop("otp_code", None)
+    user.pop("otp_expires_at", None)
     return user
 
 
@@ -123,6 +139,50 @@ async def refresh(request: Request, response: Response):
         return {"message": "Token refreshed"}
     except pyjwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+
+# ── OTP Email Verification ──────────────────────────────────────────────
+
+class OTPVerifyIn(BaseModel):
+    otp: str
+
+
+@router.post("/send-otp")
+async def send_otp(request: Request):
+    """Resend OTP to the currently logged-in user (if not yet verified)."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    if user.get("email_verified"):
+        return {"message": "Email already verified"}
+    otp = "".join(random.choices(string.digits, k=6))
+    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    await db.users.update_one(
+        {"_id": ObjectId(user["_id"])},
+        {"$set": {"otp_code": hash_password(otp), "otp_expires_at": otp_expires}},
+    )
+    email_service.schedule(email_service.send_otp(user["email"], user["name"], otp))
+    return {"message": "Verification code sent"}
+
+
+@router.post("/verify-otp")
+async def verify_otp(body: OTPVerifyIn, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    if user.get("email_verified"):
+        return {"message": "Already verified", "email_verified": True}
+    stored = user.get("otp_code")
+    expires = user.get("otp_expires_at")
+    if not stored or not expires:
+        raise HTTPException(status_code=400, detail="No OTP pending — request a new code")
+    if datetime.fromisoformat(expires) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Code expired — request a new one")
+    if not verify_password(body.otp.strip(), stored):
+        raise HTTPException(status_code=400, detail="Invalid code")
+    await db.users.update_one(
+        {"_id": ObjectId(user["_id"])},
+        {"$set": {"email_verified": True}, "$unset": {"otp_code": "", "otp_expires_at": ""}},
+    )
+    return {"message": "Email verified", "email_verified": True}
 
 
 # Password Reset

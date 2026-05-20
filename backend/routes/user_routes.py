@@ -1,6 +1,7 @@
 """User search and profile lookups (non-admin)."""
 from fastapi import APIRouter, HTTPException, Request
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel
 from bson import ObjectId
 from auth_utils import get_current_user
 
@@ -56,6 +57,31 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
             "pickleball_rating": u.get("pickleball_rating"),
         })
     return results
+
+
+class ProfileSetupIn(BaseModel):
+    sport_preferences: Optional[List[str]] = None
+    skill_level: Optional[str] = None
+    home_court: Optional[str] = None
+    city: Optional[str] = None
+
+
+@router.patch("/me/setup")
+async def profile_setup(body: ProfileSetupIn, request: Request):
+    """Complete player profile setup after registration."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    update: dict = {"profile_complete": True}
+    if body.sport_preferences is not None:
+        update["sport_preferences"] = body.sport_preferences
+    if body.skill_level is not None:
+        update["skill_level"] = body.skill_level
+    if body.home_court is not None:
+        update["home_court"] = body.home_court
+    if body.city is not None:
+        update["city"] = body.city
+    await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
+    return {"message": "Profile updated", "profile_complete": True}
 
 
 @router.get("/me/rating-history")

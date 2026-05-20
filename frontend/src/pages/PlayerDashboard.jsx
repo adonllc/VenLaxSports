@@ -190,12 +190,27 @@ export default function PlayerDashboard() {
           ))}
         </div>
 
+        {/* Find a League CTA */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-heading font-bold text-gray-900 text-sm">Ready to compete?</p>
+            <p className="text-xs text-gray-500 mt-0.5">Find a league that fits your sport, format, and division.</p>
+          </div>
+          <Link
+            to="/join"
+            className="flex-shrink-0 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+            data-testid="dashboard-find-league-btn"
+          >
+            Find a League
+          </Link>
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
               <h2 className="font-heading font-bold text-lg">My Leagues</h2>
-              <Link to="/leagues" className="text-xs font-semibold text-gray-500 hover:text-black">Browse More</Link>
+              <Link to="/join" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Find a League</Link>
             </div>
             {leagues.length === 0 ? (
               <div className="text-center py-10">

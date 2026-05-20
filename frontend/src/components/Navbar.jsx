@@ -100,6 +100,14 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/join"
+              className={`px-3 py-2 text-sm font-semibold rounded-md transition-colors ${isActive("/join") ? "bg-emerald-50 text-emerald-700" : "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"}`}
+              data-testid="nav-join"
+            >
+              Find a League
+            </Link>
+
+            <Link
               to="/rules"
               className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/rules") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
               data-testid="nav-rules"
@@ -192,6 +200,7 @@ export default function Navbar() {
               <span>{s.icon}</span> {s.label}
             </Link>
           ))}
+          <Link to="/join" className="block px-3 py-2 text-sm font-semibold text-emerald-600 rounded-lg hover:bg-emerald-50" data-testid="nav-join-mobile">Find a League</Link>
           <Link to="/leagues" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50">Flex League</Link>
           <Link to="/leagues/round-robin" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-round-robin-mobile">Round Robin</Link>
           <Link to="/rules" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-rules-mobile">Rules</Link>
