@@ -355,9 +355,9 @@ export default function LeagueDetail() {
             ) : (
               <div className="divide-y divide-gray-100">
                 {matches.map((m) => (
-                  <div key={m.id} className="flex items-center justify-between px-5 py-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{m.player1_name} vs {m.player2_name}</p>
+                  <div key={m.id} className="flex items-center justify-between px-5 py-4 gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
                       <p className="text-xs text-gray-500">{m.scheduled_date}</p>
                     </div>
                     <div className="flex items-center gap-2">

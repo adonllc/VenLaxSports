@@ -100,7 +100,7 @@ export default function RoundRobinDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -152,7 +152,7 @@ export default function RoundRobinDetail() {
             )}
           </div>
         </div>
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6 border-b border-gray-200">
             {TABS.map(tab => (
               <button
@@ -170,7 +170,7 @@ export default function RoundRobinDetail() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === "Overview" && (
           <div className="space-y-6">
             {league.description && (
@@ -205,6 +205,7 @@ export default function RoundRobinDetail() {
 
         {activeTab === "Standings" && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -232,6 +233,7 @@ export default function RoundRobinDetail() {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 

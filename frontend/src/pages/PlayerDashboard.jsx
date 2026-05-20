@@ -314,9 +314,9 @@ export default function PlayerDashboard() {
               <div className="divide-y divide-gray-100">
                 {upcoming.slice(0, 5).map((m) => (
                   <div key={m.id} className="px-5 py-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">{m.player1_name} vs {m.player2_name}</p>
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
                         <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {new Date(m.scheduled_date).toLocaleString()}
                         </p>
@@ -351,8 +351,8 @@ export default function PlayerDashboard() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isWin ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"}`}>
                         {isWin ? "W" : "L"}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{m.player1_name} vs {m.player2_name}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
                         {m.winner_name && <p className="text-xs text-gray-500">{m.winner_name} won</p>}
                       </div>
                     </div>

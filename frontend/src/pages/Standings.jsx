@@ -29,7 +29,7 @@ export default function Standings() {
 
   return (
     <div className="min-h-screen bg-gray-50" data-testid="standings-page">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button onClick={() => navigate(`/leagues/${leagueId}`)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6" data-testid="back-to-league">
           <ArrowLeft className="w-4 h-4" /> Back to League
         </button>

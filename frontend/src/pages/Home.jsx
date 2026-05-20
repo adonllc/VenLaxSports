@@ -183,9 +183,9 @@ export default function Home() {
       {/* ── Stats ───────────────────────────────────────────────────── */}
       <section className="bg-white py-16 border-b border-gray-100" data-testid="stats-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100">
             {STATS.map((s) => (
-              <div key={s.label} className="text-center px-6 py-6" data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}>
+              <div key={s.label} className="text-center px-6 py-6 bg-white" data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}>
                 <p className="stat-counter text-4xl sm:text-5xl text-gray-900 mb-2">{s.value}</p>
                 <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{s.label}</p>
               </div>

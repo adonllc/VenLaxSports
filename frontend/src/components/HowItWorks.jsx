@@ -48,8 +48,8 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="bg-white py-24 px-6" data-testid="how-it-works">
-      <div className="max-w-6xl mx-auto">
+    <section className="bg-white py-24" data-testid="how-it-works">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-14 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-3">The Process</p>
           <h2 className="font-heading font-black text-3xl sm:text-4xl text-gray-900 mb-3">

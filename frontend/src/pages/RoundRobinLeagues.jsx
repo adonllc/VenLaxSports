@@ -51,7 +51,7 @@ export default function RoundRobinLeagues() {
           <p className="text-gray-500 max-w-lg">Auto-scheduled leagues for busy players. Every matchup assigned a week.</p>
         </div>
       </div>
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-wrap gap-3 mb-8">
           <select
             data-testid="filter-sport"
