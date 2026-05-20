@@ -112,7 +112,6 @@ export default function RoundRobinDetail() {
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
                 <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>
                 <span className="flex items-center gap-1"><Calendar size={14} /> Starts {league.start_date}</span>
-                <span className="font-semibold text-black">{league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}</span>
               </div>
             </div>
             {!isStarted && !isFull && (

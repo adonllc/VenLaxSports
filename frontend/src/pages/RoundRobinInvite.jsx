@@ -105,12 +105,6 @@ export default function RoundRobinInvite() {
             <span className="text-gray-500">Sport</span>
             <span className="font-medium text-gray-900">{invite?.sport?.toUpperCase()}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Entry fee</span>
-            <span className="font-medium text-gray-900">
-              {invite?.entry_fee > 0 ? `$${invite.entry_fee}` : "Free"}
-            </span>
-          </div>
         </div>
 
         {!user ? (

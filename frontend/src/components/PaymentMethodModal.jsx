@@ -33,8 +33,6 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
   }, [open]);
 
   if (!open || !league) return null;
-  const fee = Number(league.entry_fee || 0).toFixed(2);
-  const currencySymbol = league.currency === "INR" ? "₹" : "$";
 
   const handleStripe = async () => {
     setLoading(true); setError("");
@@ -103,12 +101,9 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
         </button>
 
         <div className="mb-5">
-          <p className="text-xs uppercase tracking-wider font-semibold text-gray-500">Pay to join</p>
+          <p className="text-xs uppercase tracking-wider font-semibold text-gray-500">Complete registration</p>
           <h2 className="font-heading font-black text-xl text-gray-900 mt-1 truncate">{league.name}</h2>
-          <p className="text-3xl font-heading font-black mt-2">
-            {currencySymbol}{fee}
-            <span className="text-sm font-medium text-gray-500 ml-2">/ {league.format}</span>
-          </p>
+          <p className="text-sm text-gray-500 mt-1 capitalize">{league.format} · {league.city}</p>
         </div>
 
         {success && (
