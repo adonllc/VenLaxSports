@@ -22,7 +22,6 @@ api_router = APIRouter(prefix="/api", redirect_slashes=False)
 
 # Import routers
 from routes.auth_routes import router as auth_router
-from routes.google_auth_routes import router as google_auth_router
 from routes.league_routes import router as league_router
 from routes.match_routes import router as match_router
 from routes.payment_routes import router as payment_router
@@ -36,7 +35,6 @@ from routes.public_routes import router as public_router
 from routes.whatsapp_routes import router as wa_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
-api_router.include_router(google_auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(league_router, prefix="/leagues", tags=["leagues"])
 api_router.include_router(match_router, prefix="/matches", tags=["matches"])
 api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
