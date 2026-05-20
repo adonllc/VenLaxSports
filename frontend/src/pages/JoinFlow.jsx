@@ -29,6 +29,19 @@ const DIVISIONS = [
 
 const STEPS = ["Sport", "Format", "Division", "Pick League"];
 
+function ProgressBar({ step }) {
+  return (
+    <div className="flex items-center gap-1 mb-8 justify-center">
+      {STEPS.map((s, i) => (
+        <div key={s} className="flex items-center gap-1">
+          <div className={`h-1.5 rounded-full transition-[width,background-color] ${i <= step ? "bg-black w-8" : "bg-gray-200 w-5"}`} />
+        </div>
+      ))}
+      <span className="text-xs text-gray-400 ml-2">{STEPS[step]}</span>
+    </div>
+  );
+}
+
 export default function JoinFlow() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -67,17 +80,6 @@ export default function JoinFlow() {
 
   const back = () => setStep((s) => Math.max(0, s - 1));
 
-  const ProgressBar = () => (
-    <div className="flex items-center gap-1 mb-8 justify-center">
-      {STEPS.map((s, i) => (
-        <div key={s} className="flex items-center gap-1">
-          <div className={`h-1.5 rounded-full transition-[width,background-color] ${i <= step ? "bg-black w-8" : "bg-gray-200 w-5"}`} />
-        </div>
-      ))}
-      <span className="text-xs text-gray-400 ml-2">{STEPS[step]}</span>
-    </div>
-  );
-
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50 py-10 px-4" data-testid="join-flow-page">
       <div className="max-w-xl mx-auto">
@@ -86,7 +88,7 @@ export default function JoinFlow() {
           <h1 className="font-heading font-black text-3xl text-gray-900">Let's get you competing</h1>
         </div>
 
-        <ProgressBar />
+        <ProgressBar step={step} />
 
         <div className="bg-white rounded-2xl border border-gray-200 p-8">
           {/* Step 0 — Sport */}

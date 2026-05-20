@@ -50,17 +50,22 @@ export default function LeagueDetail() {
     if (tab === "standings") fetchStandings();
   }, [tab]);
 
-  // Check if user is already registered when league data loads
+  // Derive registration status from already-fetched players when user resolves
   useEffect(() => {
-    if (user && league && !isRegistered) {
-      checkRegistration();
+    if (user && players.length > 0) {
+      const userId = user?.id || user?._id;
+      setIsRegistered(players.some((p) => p.player_id === userId));
     }
-  }, [user, league]);
+  }, [user, players]);
 
   const fetchLeague = async () => {
     try {
-      const { data } = await axios.get(`${API}/leagues/${id}`);
-      setLeague(data);
+      const [leagueRes, playersRes] = await Promise.all([
+        axios.get(`${API}/leagues/${id}`),
+        axios.get(`${API}/leagues/${id}/players`),
+      ]);
+      setLeague(leagueRes.data);
+      setPlayers(playersRes.data);
     } catch {
       navigate("/leagues");
     } finally {
@@ -72,15 +77,6 @@ export default function LeagueDetail() {
     try {
       const { data } = await axios.get(`${API}/leagues/${id}/players`);
       setPlayers(data);
-    } catch (e) { console.error(e); }
-  };
-
-  const checkRegistration = async () => {
-    try {
-      const { data } = await axios.get(`${API}/leagues/${id}/players`);
-      setPlayers(data);
-      const userId = user?.id || user?._id;
-      setIsRegistered(data.some((p) => p.player_id === userId));
     } catch (e) { console.error(e); }
   };
 
