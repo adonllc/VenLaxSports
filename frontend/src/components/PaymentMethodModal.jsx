@@ -86,9 +86,12 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
       data-testid="payment-method-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-modal-title"
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-md p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-md p-6 relative overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -102,7 +105,7 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
 
         <div className="mb-5">
           <p className="text-xs uppercase tracking-wider font-semibold text-gray-500">Complete registration</p>
-          <h2 className="font-heading font-black text-xl text-gray-900 mt-1 truncate">{league.name}</h2>
+          <h2 id="payment-modal-title" className="font-heading font-black text-xl text-gray-900 mt-1 truncate">{league.name}</h2>
           <p className="text-sm text-gray-500 mt-1 capitalize">{league.format} · {league.city}</p>
         </div>
 
@@ -195,6 +198,8 @@ export default function PaymentMethodModal({ open, onClose, league, onSuccess })
               onChange={(e) => setZelleRef(e.target.value)}
               placeholder="Zelle confirmation #"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              aria-label="Zelle confirmation number"
+              autoComplete="off"
               data-testid="zelle-reference-input"
             />
             <button

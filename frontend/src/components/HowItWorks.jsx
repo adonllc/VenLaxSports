@@ -66,7 +66,7 @@ export default function HowItWorks() {
             return (
               <div
                 key={s.n}
-                className="group bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 rounded-2xl p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                 data-testid={`how-step-${s.n}`}
               >
                 <div className="flex items-start gap-3 mb-4">

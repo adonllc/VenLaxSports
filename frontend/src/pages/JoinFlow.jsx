@@ -71,7 +71,7 @@ export default function JoinFlow() {
     <div className="flex items-center gap-1 mb-8 justify-center">
       {STEPS.map((s, i) => (
         <div key={s} className="flex items-center gap-1">
-          <div className={`h-1.5 rounded-full transition-all ${i <= step ? "bg-black w-8" : "bg-gray-200 w-5"}`} />
+          <div className={`h-1.5 rounded-full transition-[width,background-color] ${i <= step ? "bg-black w-8" : "bg-gray-200 w-5"}`} />
         </div>
       ))}
       <span className="text-xs text-gray-400 ml-2">{STEPS[step]}</span>
@@ -98,7 +98,7 @@ export default function JoinFlow() {
                   <button
                     key={s.id}
                     onClick={() => { setSport(s.id); setStep(1); }}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left hover:border-gray-400 ${sport === s.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left hover:border-gray-400 ${sport === s.id ? "border-black bg-gray-50" : "border-gray-200"}`}
                     data-testid={`pick-sport-${s.id}`}
                   >
                     <span className="text-3xl">{s.icon}</span>
@@ -119,7 +119,7 @@ export default function JoinFlow() {
                   <button
                     key={lt.id}
                     onClick={() => { setLeagueType(lt.id); setStep(2); }}
-                    className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left hover:border-gray-400 ${leagueType === lt.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 transition text-left hover:border-gray-400 ${leagueType === lt.id ? "border-black bg-gray-50" : "border-gray-200"}`}
                     data-testid={`pick-type-${lt.id}`}
                   >
                     <span className="text-2xl mt-0.5">{lt.icon}</span>
@@ -145,7 +145,7 @@ export default function JoinFlow() {
                   <button
                     key={d.id}
                     onClick={() => { setDivision(d.id); setStep(3); }}
-                    className={`flex flex-col items-center gap-2 p-6 rounded-xl border-2 transition-all hover:border-gray-400 ${division === d.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`flex flex-col items-center gap-2 p-6 rounded-xl border-2 transition hover:border-gray-400 ${division === d.id ? "border-black bg-gray-50" : "border-gray-200"}`}
                     data-testid={`pick-division-${d.id}`}
                   >
                     <span className="text-3xl">{d.icon}</span>
@@ -195,7 +195,7 @@ export default function JoinFlow() {
                       <button
                         key={lg.id}
                         onClick={() => navigate(detailPath)}
-                        className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-black hover:-translate-y-0.5 hover:shadow-md transition-all"
+                        className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-black hover:-translate-y-0.5 hover:shadow-md transition"
                         data-testid={`league-option-${lg.id}`}
                       >
                         <p className="font-semibold text-gray-900 text-sm mb-1">{lg.name}</p>

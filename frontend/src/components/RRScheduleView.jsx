@@ -27,6 +27,7 @@ export default function RRScheduleView({ rounds = [], currentUserId }) {
             <button
               data-testid={`rr-round-toggle-${rnd.round}`}
               onClick={() => setOpenRound(isOpen ? null : rnd.round)}
+              aria-expanded={isOpen}
               className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors"
             >
               <div className="text-left">

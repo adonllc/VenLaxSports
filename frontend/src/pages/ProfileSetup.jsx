@@ -84,7 +84,7 @@ export default function ProfileSetup() {
                     <button
                       key={s.id}
                       onClick={() => toggleSport(s.id)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${selected ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
+                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${selected ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
                       data-testid={`sport-${s.id}`}
                     >
                       <span className="text-2xl">{s.icon}</span>
@@ -116,7 +116,7 @@ export default function ProfileSetup() {
                   <button
                     key={sl.value}
                     onClick={() => setForm((f) => ({ ...f, skill_level: sl.value }))}
-                    className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition-all ${form.skill_level === sl.value ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
+                    className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition ${form.skill_level === sl.value ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
                     data-testid={`skill-${sl.value}`}
                   >
                     <span className="font-heading font-black text-lg text-gray-900">{sl.label}</span>
@@ -154,6 +154,7 @@ export default function ProfileSetup() {
                     placeholder="e.g. Westside Tennis Club, Central Park Courts"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-home-court"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -165,6 +166,7 @@ export default function ProfileSetup() {
                     placeholder="Your city"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-city-setup"
+                    autoComplete="address-level2"
                   />
                 </div>
               </div>

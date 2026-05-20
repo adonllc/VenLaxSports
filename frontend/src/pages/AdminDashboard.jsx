@@ -415,9 +415,14 @@ export default function AdminDashboard() {
       </div>
 
       {showRRForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-6 max-w-lg w-full my-8">
-            <h2 className="font-bold text-lg text-gray-900 mb-4">Create Round Robin League</h2>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rr-modal-title"
+        >
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full my-8 overscroll-contain">
+            <h2 id="rr-modal-title" className="font-bold text-lg text-gray-900 mb-4">Create Round Robin League</h2>
             <div className="space-y-4">
               {[
                 { label: "Name", field: "name", type: "text" },
@@ -574,6 +579,7 @@ function SeasonsTab() {
             type="text" required value={form.name} placeholder="e.g. Summer 2026"
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            aria-label="Season name"
             data-testid="season-name-input"
           />
           <select
@@ -588,12 +594,14 @@ function SeasonsTab() {
               type="date" required value={form.start_date}
               onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
               className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              aria-label="Season start date"
               data-testid="season-start-input"
             />
             <input
               type="date" required value={form.end_date}
               onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))}
               className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              aria-label="Season end date"
               data-testid="season-end-input"
             />
           </div>

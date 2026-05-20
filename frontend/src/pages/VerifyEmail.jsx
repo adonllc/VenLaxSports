@@ -110,6 +110,7 @@ export default function VerifyEmail() {
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
               className="w-12 h-14 text-center text-xl font-bold border-2 border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
+              aria-label={`Digit ${i + 1} of 6`}
               data-testid={`otp-digit-${i}`}
               autoFocus={i === 0}
             />

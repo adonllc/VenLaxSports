@@ -254,7 +254,7 @@ function LeagueCard({ league, onClick }) {
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
+              className={`h-full rounded-full transition-[width] ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
               style={{ width: `${fillPct}%` }}
             />
           </div>

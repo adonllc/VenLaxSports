@@ -91,14 +91,14 @@ export default function Auth() {
           <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
             <button
               onClick={() => { setMode("login"); setError(""); }}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${mode === "login" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "login" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
               data-testid="login-tab"
             >
               Log In
             </button>
             <button
               onClick={() => { setMode("register"); setError(""); }}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${mode === "register" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "register" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
               data-testid="register-tab"
             >
               Sign Up
@@ -151,6 +151,7 @@ export default function Auth() {
                   placeholder="John Smith"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   data-testid="input-name"
+                  autoComplete="name"
                   required
                 />
               </div>
@@ -165,6 +166,7 @@ export default function Auth() {
                 placeholder="you@example.com"
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 data-testid="input-email"
+                autoComplete="email"
                 required
               />
             </div>
@@ -179,6 +181,7 @@ export default function Auth() {
                   placeholder="Min. 6 characters"
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   data-testid="input-password"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                   required
                   minLength={6}
                 />
@@ -224,6 +227,7 @@ export default function Auth() {
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-city"
+                    autoComplete="address-level2"
                   />
                 </div>
                 <div>

@@ -150,7 +150,7 @@ export default function SportLanding() {
             <h2 className="font-heading font-bold text-2xl text-gray-900">Open {meta.label} Leagues</h2>
             <Link
               to={`/leagues?sport=${sport}`}
-              className="text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all"
+              className="text-sm font-semibold flex items-center gap-1 transition-colors"
               style={{ color: meta.color }}
               data-testid="all-leagues-link"
             >

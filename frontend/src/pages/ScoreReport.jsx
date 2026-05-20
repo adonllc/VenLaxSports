@@ -379,7 +379,7 @@ export default function ScoreReport() {
                       type="button"
                       onClick={() => setWinnerId(p.id)}
                       aria-label={`Select ${p.name} as winner`}
-                      className={`py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all ring-offset-2 ${
+                      className={`py-3 px-4 rounded-xl border-2 text-sm font-semibold transition ring-offset-2 ${
                         winnerId === p.id
                           ? `border-black bg-black text-white ring-2 ${config.ringClass}`
                           : "border-gray-200 text-gray-700 hover:border-gray-400"
@@ -442,6 +442,7 @@ export default function ScoreReport() {
                             onChange={(e) => updateScore(`set${set}_p1`, e.target.value)}
                             disabled={disabled}
                             className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            aria-label={`Set ${set} score for ${match.player1_name}`}
                             data-testid={`set${set}-p1`}
                           />
                           <span className="text-gray-400 font-bold shrink-0">-</span>
@@ -455,6 +456,7 @@ export default function ScoreReport() {
                             onChange={(e) => updateScore(`set${set}_p2`, e.target.value)}
                             disabled={disabled}
                             className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            aria-label={`Set ${set} score for ${match.player2_name}`}
                             data-testid={`set${set}-p2`}
                           />
                         </div>
@@ -493,6 +495,7 @@ export default function ScoreReport() {
                             onChange={(e) => updateScore(`game${game}_p1`, e.target.value)}
                             disabled={disabled}
                             className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            aria-label={`Game ${game} score for ${match.player1_name}`}
                             data-testid={`game${game}-p1`}
                           />
                           <span className="text-gray-400 font-bold shrink-0">-</span>
@@ -506,6 +509,7 @@ export default function ScoreReport() {
                             onChange={(e) => updateScore(`game${game}_p2`, e.target.value)}
                             disabled={disabled}
                             className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            aria-label={`Game ${game} score for ${match.player2_name}`}
                             data-testid={`game${game}-p2`}
                           />
                         </div>

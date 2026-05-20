@@ -207,7 +207,7 @@ export default function LeagueDetail() {
                       <span>{fillPct}% filled</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-black transition-all" style={{ width: `${fillPct}%` }} />
+                      <div className="h-full rounded-full bg-black transition-[width]" style={{ width: `${fillPct}%` }} />
                     </div>
                   </div>
 

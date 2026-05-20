@@ -95,6 +95,7 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
           placeholder={leagueId ? "Search league members by name or email" : "Type a name or email (min 2 chars)"}
           className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
           data-testid={`${testId}-input`}
+          aria-label="Search opponent"
           autoComplete="off"
         />
       </div>

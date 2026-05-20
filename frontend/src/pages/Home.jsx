@@ -130,7 +130,7 @@ export default function Home() {
                   <button
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition cursor-pointer"
                     data-testid={`hero-sport-pill-${sport}`}
                   >
                     <Icon className="w-4 h-4" style={{ color: config.accent }} />
@@ -240,7 +240,7 @@ export default function Home() {
                         <span key={stat} className={`px-2.5 py-1 text-xs font-medium rounded-full ${config.badge}`}>{stat}</span>
                       ))}
                     </div>
-                    <div className={`flex items-center gap-1.5 text-sm font-semibold ${config.color} group-hover:gap-3 transition-all`}>
+                    <div className={`flex items-center gap-1.5 text-sm font-semibold ${config.color} transition-colors`}>
                       Enter the League <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export default function Home() {
                 <button
                   key={sport}
                   onClick={() => setActiveSport(sport)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition cursor-pointer ${
                     activeSport === sport
                       ? "text-white shadow-sm"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"

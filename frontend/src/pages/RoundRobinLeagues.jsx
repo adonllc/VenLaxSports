@@ -101,7 +101,7 @@ export default function RoundRobinLeagues() {
                   key={lg.id}
                   to={`/round-robin/${lg.id}`}
                   data-testid={`rr-league-card-${lg.id}`}
-                  className="bg-white border border-gray-200 rounded-xl p-5 hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+                  className="bg-white border border-gray-200 rounded-xl p-5 hover:-translate-y-1 hover:shadow-lg transition duration-200"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
