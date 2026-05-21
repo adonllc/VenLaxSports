@@ -58,6 +58,7 @@ class User(BaseDocument):
     home_court: Optional[str] = None
     profile_complete: bool = False
     founding_member: bool = False
+    oauth_providers: List[dict] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

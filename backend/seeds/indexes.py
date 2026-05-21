@@ -16,3 +16,5 @@ async def create_indexes(db) -> None:
     await db.users.create_index("founding_member")
     await db.auth_codes.create_index("code", unique=True)
     await db.auth_codes.create_index("expires_at", expireAfterSeconds=0)
+    await db.oauth_states.create_index("state", unique=True)
+    await db.oauth_states.create_index("expires_at", expireAfterSeconds=0)

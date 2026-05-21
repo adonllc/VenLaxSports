@@ -33,8 +33,10 @@ from routes.auto_league_routes import router as auto_league_router
 from routes.round_robin_routes import router as rr_router
 from routes.public_routes import router as public_router
 from routes.whatsapp_routes import router as wa_router
+from routes.social_auth_routes import router as social_auth_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(social_auth_router, prefix="/auth", tags=["social-auth"])
 api_router.include_router(league_router, prefix="/leagues", tags=["leagues"])
 api_router.include_router(match_router, prefix="/matches", tags=["matches"])
 api_router.include_router(payment_router, prefix="/payments", tags=["payments"])

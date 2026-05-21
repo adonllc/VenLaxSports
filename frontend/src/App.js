@@ -23,6 +23,7 @@ import PublicProfile from "./pages/PublicProfile";
 import VerifyEmail from "./pages/VerifyEmail";
 import ProfileSetup from "./pages/ProfileSetup";
 import JoinFlow from "./pages/JoinFlow";
+import OAuthCallback from "./pages/OAuthCallback";
 import "./App.css";
 
 function AppRouter() {
@@ -49,6 +50,7 @@ function AppRouter() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/join" element={<JoinFlow />} />
+      <Route path="/auth/callback" element={<OAuthCallback />} />
     </Routes>
   );
 }
