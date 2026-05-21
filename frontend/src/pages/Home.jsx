@@ -10,11 +10,7 @@ import HowItWorks from "../components/HowItWorks";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const SPORT_ICONS = {
-  tennis: Target,
-  pickleball: Zap,
-  cricket: Shield,
-};
+const SPORT_ICONS = { tennis: Target, pickleball: Zap, cricket: Shield };
 
 const ALL_SPORT_CONFIG = {
   tennis: {
@@ -23,6 +19,7 @@ const ALL_SPORT_CONFIG = {
     tagline: "Singles. Doubles. Mixed.",
     image: "https://images.unsplash.com/photo-1696661115319-a9b6801e2571?w=800&q=80",
     stats: ["Best-of-3 Sets", "Skill Rating", "2.0 – 5.0+"],
+    num: "01",
   },
   cricket: {
     color: "text-cricket", bg: "bg-cricket-bg", badge: "sport-badge-cricket", border: "border-cricket",
@@ -30,6 +27,7 @@ const ALL_SPORT_CONFIG = {
     tagline: "T10. T20. Beyond.",
     image: "https://images.pexels.com/photos/3602833/pexels-photo-3602833.jpeg?w=800",
     stats: ["T10 & T20 Formats", "NRR Tracking", "Corporate Leagues"],
+    num: "02",
   },
   pickleball: {
     color: "text-pickleball", bg: "bg-pickleball-bg", badge: "sport-badge-pickleball", border: "border-pickleball",
@@ -37,6 +35,7 @@ const ALL_SPORT_CONFIG = {
     tagline: "Singles. Doubles. Mixed.",
     image: "https://images.unsplash.com/photo-1777382141965-68d47862eaf9?w=800&q=80",
     stats: ["Rally Scoring", "Win-by-2", "DUPR Rating"],
+    num: "03",
   },
 };
 
@@ -72,122 +71,162 @@ export default function Home() {
   }, []);
 
   const filteredLeagues = leagues.filter((l) => l.sport === activeSport).slice(0, 3);
+  const sportEntries = Object.entries(SPORT_CONFIG);
 
   return (
     <div className="bg-white" data-testid="home-page">
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="hero-dark relative overflow-hidden" data-testid="hero-section">
+        {/* Subtle dot texture */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)",
+            backgroundSize: "28px 28px",
+          }}
+        />
         {/* Ambient glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse 70% 60% at 95% 10%, rgba(16,185,129,0.13) 0%, transparent 55%), radial-gradient(ellipse 40% 50% at 5% 95%, rgba(16,185,129,0.06) 0%, transparent 50%)"
+            background:
+              "radial-gradient(ellipse 55% 65% at 90% 40%, rgba(16,185,129,0.11) 0%, transparent 60%), radial-gradient(ellipse 30% 40% at 5% 90%, rgba(16,185,129,0.05) 0%, transparent 50%)",
           }}
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-0">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 mb-8 animate-fade-in">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              {platformConfig.heroBadge}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Split: text left, images right */}
+          <div className="grid lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_480px] gap-8 xl:gap-14 items-center">
+
+            {/* ── Left: text ── */}
+            <div className="py-16 lg:py-24">
+              <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 mb-10 animate-fade-in">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                {platformConfig.heroBadge}
+              </div>
+
+              {/* Stacked headline */}
+              <div className="mb-8 animate-fade-in delay-100">
+                {["COMPETE.", "RISE.", "DOMINATE."].map((word, i) => (
+                  <p
+                    key={word}
+                    className={`font-heading font-black leading-[0.88] tracking-tight block ${
+                      i === 1 ? "text-emerald-400" : "text-white"
+                    }`}
+                    style={{ fontSize: "clamp(3rem, 7.5vw, 5.75rem)" }}
+                  >
+                    {word}
+                  </p>
+                ))}
+              </div>
+
+              <p className="text-gray-400 text-base lg:text-lg leading-relaxed max-w-md mb-10 animate-fade-in delay-200">
+                {platformConfig.heroSubtitle}
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-10 animate-fade-in delay-300">
+                <button
+                  onClick={() => navigate("/leagues")}
+                  className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-md transition-colors text-base cursor-pointer"
+                  data-testid="hero-browse-btn"
+                >
+                  Find My League
+                </button>
+                <button
+                  onClick={() => navigate("/auth?mode=register")}
+                  className="px-8 py-4 border border-white/20 hover:border-white/40 text-white font-semibold rounded-md transition-colors text-base cursor-pointer"
+                  data-testid="hero-signup-btn"
+                >
+                  Join Free
+                </button>
+              </div>
+
+              {/* Sport pills */}
+              <div className="flex gap-3 flex-wrap animate-fade-in delay-400">
+                {sportEntries.map(([sport, config]) => {
+                  const Icon = SPORT_ICONS[sport] || Activity;
+                  return (
+                    <button
+                      key={sport}
+                      onClick={() => navigate(`/sport/${sport}`)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition cursor-pointer"
+                      data-testid={`hero-sport-pill-${sport}`}
+                    >
+                      <Icon className="w-4 h-4" style={{ color: config.accent }} />
+                      {config.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <h1
-              className="font-heading font-black text-white leading-[0.9] tracking-tight mb-6 animate-fade-in delay-100"
-              style={{ fontSize: "clamp(3.5rem, 9vw, 7.5rem)" }}
-            >
-              Compete. Rise.<br />
-              <span className="text-emerald-400">Dominate.</span>
-            </h1>
-
-            <p className="text-gray-400 text-lg mb-10 leading-relaxed max-w-xl mx-auto animate-fade-in delay-200">
-              {platformConfig.heroSubtitle}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-in delay-300">
-              <button
-                onClick={() => navigate("/leagues")}
-                className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-md transition-colors text-base cursor-pointer"
-                data-testid="hero-browse-btn"
-              >
-                Find My League
-              </button>
-              <button
-                onClick={() => navigate("/auth?mode=register")}
-                className="px-8 py-4 border border-white/20 hover:border-white/40 text-white font-semibold rounded-md transition-colors text-base cursor-pointer"
-                data-testid="hero-signup-btn"
-              >
-                Join Free
-              </button>
-            </div>
-
-            {/* Sport pills */}
-            <div className="flex justify-center gap-3 flex-wrap animate-fade-in delay-400">
-              {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
+            {/* ── Right: image stack ── */}
+            <div className="py-10 lg:py-20 flex flex-col gap-3">
+              {sportEntries.map(([sport, config], idx) => {
                 const Icon = SPORT_ICONS[sport] || Activity;
+                const isFirst = idx === 0;
                 return (
-                  <button
+                  <div
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition cursor-pointer"
-                    data-testid={`hero-sport-pill-${sport}`}
+                    className={`relative rounded-2xl overflow-hidden cursor-pointer group ${
+                      isFirst ? "h-60 sm:h-72" : "h-40 sm:h-44"
+                    }`}
+                    data-testid={`hero-sport-image-${sport}`}
                   >
-                    <Icon className="w-4 h-4" style={{ color: config.accent }} />
-                    {config.label}
-                  </button>
+                    <img
+                      src={config.image}
+                      alt={config.label}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {/* Faint sport number */}
+                    <div className="absolute top-3 right-4 select-none pointer-events-none">
+                      <span className="font-heading font-black text-white/10 leading-none" style={{ fontSize: "4rem" }}>
+                        {config.num}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: config.accent }}
+                        >
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="font-heading font-bold text-white">{config.label}</span>
+                      </div>
+                      <span className="text-gray-300 text-xs font-medium opacity-80">{config.tagline}</span>
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          </div>
-        </div>
 
-        {/* Sport image strip */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-0">
-          <div className={`grid gap-3 ${Object.keys(SPORT_CONFIG).length <= 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
-            {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
-              const Icon = SPORT_ICONS[sport] || Activity;
-              return (
-                <div
-                  key={sport}
-                  onClick={() => navigate(`/sport/${sport}`)}
-                  className="relative rounded-2xl overflow-hidden h-52 sm:h-72 cursor-pointer group"
-                  data-testid={`hero-sport-image-${sport}`}
-                >
-                  <img
-                    src={config.image}
-                    alt={config.label}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: config.accent }}
-                      >
-                        <Icon className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="font-heading font-bold text-white">{config.label}</span>
-                    </div>
-                    <span className="text-gray-300 text-xs font-medium opacity-80">{config.tagline}</span>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
 
       {/* ── Stats ───────────────────────────────────────────────────── */}
-      <section className="bg-white py-16 border-b border-gray-100" data-testid="stats-section">
+      <section className="bg-white border-b border-gray-100" data-testid="stats-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
             {STATS.map((s) => (
-              <div key={s.label} className="text-center px-6 py-6 bg-white" data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}>
-                <p className="stat-counter text-4xl sm:text-5xl text-gray-900 mb-2">{s.value}</p>
-                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{s.label}</p>
+              <div
+                key={s.label}
+                className="px-6 lg:px-10 py-10 text-center"
+                data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}
+              >
+                <p
+                  className="stat-counter text-gray-900 mb-1.5"
+                  style={{ fontSize: "clamp(2rem, 4.5vw, 3.25rem)" }}
+                >
+                  {s.value}
+                </p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">{s.label}</p>
               </div>
             ))}
           </div>
@@ -200,48 +239,71 @@ export default function Home() {
       {/* ── Sport Cards ─────────────────────────────────────────────── */}
       <section className="py-20 bg-gray-50" data-testid="sport-cards-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <div className="mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Choose Your Sport</p>
             <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">
               {activeSportIds.length === 1 ? "One Sport, One Platform" : `${activeSportIds.length} Sports, One Platform`}
             </h2>
           </div>
 
-          <div className={`grid gap-6 ${activeSportIds.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
-            {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
+          {/* Full-width horizontal cards, alternating image side */}
+          <div className="flex flex-col gap-5">
+            {sportEntries.map(([sport, config], idx) => {
               const Icon = SPORT_ICONS[sport] || Activity;
+              const imageRight = idx % 2 !== 0;
               return (
                 <div
                   key={sport}
                   onClick={() => navigate(`/sport/${sport}`)}
-                  className={`bg-white rounded-2xl border border-gray-200 overflow-hidden card-glow-${sport} cursor-pointer group`}
+                  className={`bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow card-glow-${sport}`}
                   data-testid={`sport-card-${sport}`}
                 >
-                  <div className="h-48 overflow-hidden relative">
-                    <img
-                      src={config.image}
-                      alt={config.label}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div
-                      className="absolute top-4 left-4 w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: config.accent }}
-                    >
-                      <Icon className="w-4 h-4 text-white" />
+                  <div className={`flex flex-col ${imageRight ? "md:flex-row-reverse" : "md:flex-row"}`}>
+                    {/* Image panel */}
+                    <div className="relative w-full md:w-[42%] h-52 md:h-60 flex-shrink-0 overflow-hidden">
+                      <img
+                        src={config.image}
+                        alt={config.label}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      {/* Large faint number over image */}
+                      <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+                        <span
+                          className="font-heading font-black text-white/[0.08] leading-none"
+                          style={{ fontSize: "clamp(5rem, 10vw, 9rem)" }}
+                        >
+                          {config.num}
+                        </span>
+                      </div>
+                      {/* Sport badge bottom-left */}
+                      <div className="absolute bottom-4 left-4">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center"
+                          style={{ backgroundColor: config.accent }}
+                        >
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className={`font-heading font-bold text-xl ${config.color} mb-1`}>{config.label}</h3>
-                    <p className="text-sm text-gray-500 mb-4">{config.tagline}</p>
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {config.stats.map((stat) => (
-                        <span key={stat} className={`px-2.5 py-1 text-xs font-medium rounded-full ${config.badge}`}>{stat}</span>
-                      ))}
-                    </div>
-                    <div className={`flex items-center gap-1.5 text-sm font-semibold ${config.color} transition-colors`}>
-                      Enter the League <ArrowRight className="w-4 h-4" />
+
+                    {/* Content panel */}
+                    <div className="flex-1 p-7 md:p-10 flex flex-col justify-center">
+                      <h3 className={`font-heading font-black text-2xl sm:text-3xl ${config.color} mb-2`}>
+                        {config.label}
+                      </h3>
+                      <p className="text-gray-500 text-sm mb-6">{config.tagline}</p>
+                      <div className="flex flex-wrap gap-2 mb-7">
+                        {config.stats.map((stat) => (
+                          <span key={stat} className={`px-3 py-1.5 text-xs font-semibold rounded-full ${config.badge}`}>
+                            {stat}
+                          </span>
+                        ))}
+                      </div>
+                      <div className={`inline-flex items-center gap-1.5 text-sm font-bold ${config.color}`}>
+                        Enter the League <ArrowRight className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -254,23 +316,23 @@ export default function Home() {
       {/* ── Featured Leagues ────────────────────────────────────────── */}
       <section className="py-20 bg-white" data-testid="featured-leagues-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">Season Open</p>
               <h2 className="font-heading font-bold text-3xl text-gray-900">Active Leagues</h2>
             </div>
             <Link
               to="/leagues"
-              className="text-sm font-semibold text-gray-900 border border-gray-200 px-4 py-2 rounded-md hover:border-gray-900 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 border border-gray-200 px-4 py-2 rounded-md hover:border-gray-900 transition-colors cursor-pointer"
               data-testid="view-all-leagues"
             >
-              See All Leagues
+              See All Leagues <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           {/* Sport Tabs */}
           <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
-            {Object.entries(SPORT_CONFIG).map(([sport, config]) => {
+            {sportEntries.map(([sport, config]) => {
               const Icon = SPORT_ICONS[sport] || Activity;
               return (
                 <button
@@ -292,13 +354,13 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+                <div key={i} className="h-44 bg-gray-100 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : filteredLeagues.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-5">
               {filteredLeagues.map((league) => (
                 <LeagueCard key={league.id} league={league} />
               ))}
@@ -315,10 +377,12 @@ export default function Home() {
       {/* ── Featured Cities ──────────────────────────────────────────── */}
       <section className="py-20 bg-gray-50" data-testid="cities-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Your City. Your Circuit.</p>
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">{platformConfig.citySectionTitle}</h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm">{platformConfig.citySectionDesc}</p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Your City. Your Circuit.</p>
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">{platformConfig.citySectionTitle}</h2>
+              <p className="text-gray-500 mt-3 max-w-xl text-sm leading-relaxed">{platformConfig.citySectionDesc}</p>
+            </div>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -326,10 +390,10 @@ export default function Home() {
               <div
                 key={city.name}
                 onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
-                className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer flex items-start gap-4"
+                className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer group flex items-start gap-4"
                 data-testid={`city-card-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 transition-colors">
                   <MapPin className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div className="min-w-0">
@@ -337,7 +401,9 @@ export default function Home() {
                   <p className="text-xs text-gray-500 mb-2 leading-relaxed">{city.desc}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {city.sports.map((s) => (
-                      <span key={s} className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s}</span>
+                      <span key={s} className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                        {s}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -345,7 +411,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-10">
             <button
               onClick={() => navigate("/leagues")}
               className="inline-flex items-center gap-2 px-6 py-3 border border-gray-200 text-sm font-semibold rounded-md hover:border-gray-900 hover:text-gray-900 transition-colors cursor-pointer"
@@ -358,13 +424,24 @@ export default function Home() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-emerald-500 relative overflow-hidden text-center" data-testid="cta-section">
-        <div className="absolute inset-0 pointer-events-none cta-pattern" />
+      <section className="py-28 bg-emerald-500 relative overflow-hidden text-center" data-testid="cta-section">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0)",
+            backgroundSize: "24px 24px",
+          }}
+        />
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-400/25 pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-600/20 pointer-events-none" />
         <div className="relative max-w-2xl mx-auto px-4">
           <p className="text-emerald-200 text-xs font-bold uppercase tracking-[0.2em] mb-4">Get Started Today</p>
-          <h2 className="font-heading font-black text-4xl sm:text-5xl text-white mb-5 leading-tight">Your season starts here.</h2>
+          <h2
+            className="font-heading font-black text-white mb-5 leading-tight"
+            style={{ fontSize: "clamp(2.25rem, 5.5vw, 3.75rem)" }}
+          >
+            Your season starts here.
+          </h2>
           <p className="text-emerald-100 mb-10 text-lg leading-relaxed">{platformConfig.footerTagline}</p>
           <button
             onClick={() => navigate("/auth?mode=register")}
@@ -389,15 +466,24 @@ function LeagueCard({ league }) {
   return (
     <div
       onClick={() => navigate(`/leagues/${league.id}`)}
-      className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer"
+      className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer relative overflow-hidden"
       data-testid={`league-card-${league.id}`}
     >
+      {/* Sport accent left border */}
+      <div
+        className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full"
+        style={{ backgroundColor: config.accent }}
+      />
       <div className="flex items-start justify-between mb-3">
         <span className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
           <Icon className="w-3 h-3" />
           {config.label}
         </span>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+        <span
+          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+            league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+          }`}
+        >
           {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
         </span>
       </div>
