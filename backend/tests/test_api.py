@@ -243,15 +243,3 @@ class TestPhase:
         assert data["payment_provider"] == "stripe"
 
 
-class TestGoogleAuth:
-    def test_google_session_invalid(self):
-        r = requests.post(f"{BASE_URL}/api/auth/google/session", json={"session_id": "fake_invalid"})
-        # Endpoint must exist and reject invalid sessions
-        assert r.status_code == 401, f"Expected 401, got {r.status_code}: {r.text}"
-        data = r.json()
-        # Detail should indicate invalid/expired session
-        assert "Invalid" in str(data) or "expired" in str(data).lower()
-
-    def test_google_session_missing_body(self):
-        r = requests.post(f"{BASE_URL}/api/auth/google/session", json={})
-        assert r.status_code in [400, 422]

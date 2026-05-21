@@ -9,7 +9,7 @@ import uuid
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://racquet-cricket-hub.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "http://localhost:8001").rstrip("/")
 ADMIN_EMAIL = "admin@leaguepro.com"
 ADMIN_PASSWORD = "Admin@123"
 
@@ -100,10 +100,6 @@ class TestRegression:
         r = requests.get(f"{BASE_URL}/api/cities?country=India")
         assert r.status_code == 200
         assert r.json() == []
-
-    def test_google_session_rejects_invalid(self):
-        r = requests.post(f"{BASE_URL}/api/auth/google/session", json={"session_id": "invalid-session-xyz"})
-        assert r.status_code in (400, 401, 403)
 
     def test_forgot_password(self):
         r = requests.post(f"{BASE_URL}/api/auth/forgot-password", json={"email": ADMIN_EMAIL})

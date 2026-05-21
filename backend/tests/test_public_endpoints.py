@@ -56,7 +56,7 @@ class TestPublicEndpointsRoutes:
         assert r.status_code == 200
         assert "email" not in r.text
         assert "password" not in r.text
-        assert "google_id" not in r.text
+
 
     def test_league_spectator_invalid_id(self):
         r = requests.get(f"{BASE_URL}/api/public/league/notanobjectid")

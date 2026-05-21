@@ -45,7 +45,6 @@ class User(BaseDocument):
     sport_preferences: List[str] = []
     phone: Optional[str] = None
     avatar: Optional[str] = None
-    google_id: Optional[str] = None
     is_active: bool = True
     tennis_rating: float = 3.0
     cricket_rating: float = 50.0
