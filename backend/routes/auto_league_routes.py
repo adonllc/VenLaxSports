@@ -130,6 +130,17 @@ async def auto_generate_leagues(data: AutoGenerateIn, request: Request):
                 result = await db.leagues.insert_one(doc)
                 created.append({"id": str(result.inserted_id), "name": name, "fee": fee})
 
+                if doc.get("league_type") == "round_robin":
+                    try:
+                        from routes.round_robin_routes import _run_generate_schedule
+                        await _run_generate_schedule(db, str(result.inserted_id))
+                    except Exception as _exc:
+                        import logging as _log
+                        _log.getLogger(__name__).warning(
+                            "Auto-schedule for RR league %s failed: %s",
+                            result.inserted_id, _exc,
+                        )
+
     return {
         "message": f"Auto-generated {len(created)} leagues, skipped {len(skipped)} existing",
         "created": created,

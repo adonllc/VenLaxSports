@@ -692,3 +692,84 @@ async def _run_check_playoffs(db, league_id: str) -> dict:
 async def check_playoffs_endpoint(league_id: str, request: Request):
     db = request.app.state.db
     return await _run_check_playoffs(db, league_id)
+
+
+@router.post("/{league_id}/dropout/{player_id}")
+async def player_dropout(league_id: str, player_id: str, request: Request):
+    """Admin: remove a player from an active RR league.
+
+    All their remaining scheduled RR matches are marked completed with the
+    opponent winning by BYE (walkover_reason='dropout'). Standings are updated
+    and the playoff check is triggered in case this match completes the round.
+    """
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    if user.get("role") not in ("admin", "city_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    _require_rr(league)
+
+    player_record = await db.player_leagues.find_one(
+        {"player_id": player_id, "league_id": league_id}
+    )
+    if not player_record:
+        raise HTTPException(status_code=404, detail="Player not in this league")
+
+    if player_record.get("dropout"):
+        raise HTTPException(status_code=400, detail="Player already marked as dropout")
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    future_matches = await db.matches.find({
+        "league_id": league_id,
+        "is_rr": True,
+        "status": "scheduled",
+        "$or": [{"player1_id": player_id}, {"player2_id": player_id}],
+    }).to_list(100)
+
+    bye_count = 0
+    for match in future_matches:
+        if match["player1_id"] == player_id:
+            winner_id = match["player2_id"]
+            winner_name = match["player2_name"]
+        else:
+            winner_id = match["player1_id"]
+            winner_name = match["player1_name"]
+
+        await db.matches.update_one(
+            {"_id": match["_id"]},
+            {"$set": {
+                "status": "completed",
+                "winner_id": winner_id,
+                "winner_name": winner_name,
+                "walkover_reason": "dropout",
+                "updated_at": now_iso,
+            }},
+        )
+        await db.standings.update_one(
+            {"league_id": league_id, "player_id": winner_id},
+            {"$inc": {"wins": 1, "matches_played": 1}},
+        )
+        bye_count += 1
+
+    await db.player_leagues.update_one(
+        {"player_id": player_id, "league_id": league_id},
+        {"$set": {"dropout": True, "dropout_at": now_iso}},
+    )
+    await db.standings.update_one(
+        {"league_id": league_id, "player_id": player_id},
+        {"$set": {"dropout": True}},
+    )
+
+    await _run_check_playoffs(db, league_id)
+
+    return {
+        "dropout": True,
+        "player_id": player_id,
+        "bye_matches": bye_count,
+        "message": f"Player removed; {bye_count} remaining match(es) awarded as BYE",
+    }

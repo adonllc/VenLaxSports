@@ -155,9 +155,13 @@ async def startup_event():
     await seed_leagues_wrapper()
     await seed_cities_wrapper()
     await normalize_pricing_wrapper()
+    import scheduler as _sched
+    _sched.start(db)
     logger.info("Application startup complete")
 
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    import scheduler as _sched
+    _sched.stop()
     client.close()

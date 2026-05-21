@@ -53,6 +53,33 @@ async def create_match(data: MatchCreate, request: Request):
     if not opponent:
         raise HTTPException(status_code=404, detail="Opponent not found")
 
+    # Conflict detection: block scheduling if either player has a match within ±1 h
+    if data.scheduled_date:
+        try:
+            from datetime import timedelta as _td
+            sched_dt = datetime.fromisoformat(data.scheduled_date.replace("Z", "+00:00"))
+            w_start = (sched_dt - _td(hours=1)).isoformat()
+            w_end = (sched_dt + _td(hours=1)).isoformat()
+            conflict = await db.matches.find_one({
+                "$or": [
+                    {"player1_id": user["_id"]},
+                    {"player2_id": user["_id"]},
+                    {"player1_id": data.player2_id},
+                    {"player2_id": data.player2_id},
+                ],
+                "status": "scheduled",
+                "scheduled_date": {"$gte": w_start, "$lte": w_end},
+            })
+            if conflict:
+                raise HTTPException(
+                    status_code=409,
+                    detail="A player already has a match within 1 hour of this time slot",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass  # don't block scheduling if date parse fails
+
     match = Match(
         league_id=data.league_id,
         sport=league["sport"],
