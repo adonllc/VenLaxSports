@@ -58,6 +58,7 @@ class User(BaseDocument):
     otp_expires_at: Optional[str] = None
     home_court: Optional[str] = None
     profile_complete: bool = False
+    founding_member: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

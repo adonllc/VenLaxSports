@@ -55,6 +55,7 @@ export default function Home() {
   const [leagues, setLeagues] = useState([]);
   const [activeSport, setActiveSport] = useState(platformConfig.defaultSport);
   const [loading, setLoading] = useState(true);
+  const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
 
   useEffect(() => {
     const fetchLeagues = async () => {
@@ -67,7 +68,16 @@ export default function Home() {
         setLoading(false);
       }
     };
+    const fetchFoundingStats = async () => {
+      try {
+        const { data } = await axios.get(`${API}/founding-members`);
+        setFoundingStats(data);
+      } catch {
+        // non-critical
+      }
+    };
     fetchLeagues();
+    fetchFoundingStats();
   }, []);
 
   const filteredLeagues = leagues.filter((l) => l.sport === activeSport).slice(0, 3);
@@ -435,6 +445,15 @@ export default function Home() {
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-400/25 pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-600/20 pointer-events-none" />
         <div className="relative max-w-2xl mx-auto px-4">
+          {/* Founding member counter */}
+          {foundingStats.spots_left > 0 && (
+            <div className="inline-flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 mb-6" data-testid="founding-member-counter">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              <span className="text-white text-xs font-semibold">
+                {foundingStats.count}/{foundingStats.limit} Founding Member spots taken
+              </span>
+            </div>
+          )}
           <p className="text-emerald-200 text-xs font-bold uppercase tracking-[0.2em] mb-4">Get Started Today</p>
           <h2
             className="font-heading font-black text-white mb-5 leading-tight"
@@ -442,7 +461,13 @@ export default function Home() {
           >
             Your season starts here.
           </h2>
-          <p className="text-emerald-100 mb-10 text-lg leading-relaxed">{platformConfig.footerTagline}</p>
+          <p className="text-emerald-100 mb-4 text-lg leading-relaxed">{platformConfig.footerTagline}</p>
+          {foundingStats.spots_left > 0 && (
+            <p className="text-emerald-200 text-sm mb-8">
+              Sign up now — first {foundingStats.limit} members earn the <strong className="text-white">Founding Member</strong> badge forever.
+              Use code <code className="bg-white/20 px-1.5 py-0.5 rounded font-mono font-bold text-white">PLAY1FREE</code> for your first league free.
+            </p>
+          )}
           <button
             onClick={() => navigate("/auth?mode=register")}
             className="px-10 py-4 bg-white text-emerald-700 font-bold rounded-md text-base hover:bg-emerald-50 transition-colors cursor-pointer shadow-xl shadow-emerald-700/20"

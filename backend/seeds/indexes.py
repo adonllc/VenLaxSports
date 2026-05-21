@@ -11,3 +11,6 @@ async def create_indexes(db) -> None:
     await db.rating_history.create_index([("user_id", 1), ("created_at", -1)])
     await db.challenges.create_index([("challenger_id", 1), ("created_at", -1)])
     await db.challenges.create_index([("challenged_id", 1), ("status", 1)])
+    await db.promo_codes.create_index("code", unique=True)
+    await db.promo_uses.create_index([("code", 1), ("user_id", 1)])
+    await db.users.create_index("founding_member")

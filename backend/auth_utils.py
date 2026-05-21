@@ -115,6 +115,7 @@ def serialize_public_user(user: dict) -> dict:
         "cricket_rating": user.get("cricket_rating", 3.0),
         "avatar": user.get("avatar"),
         "profile_public": user.get("profile_public", True),
+        "founding_member": user.get("founding_member", False),
     }
 
 

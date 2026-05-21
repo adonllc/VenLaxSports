@@ -124,7 +124,14 @@ export default function PlayerDashboard() {
               <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="font-heading font-black text-2xl text-gray-900">{user.name}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-heading font-black text-2xl text-gray-900">{user.name}</h1>
+                {user.founding_member && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge">
+                    ★ Founding Member
+                  </span>
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
                 <span className="truncate">{user.email}</span>
                 {user.city && <span className="flex items-center gap-1 flex-shrink-0"><MapPin className="w-3 h-3" />{user.city}</span>}

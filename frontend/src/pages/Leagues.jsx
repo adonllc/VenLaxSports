@@ -214,11 +214,13 @@ function LeagueCard({ league, onClick }) {
   const spotsLeft = league.max_players - (league.current_players || 0);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const isEnded = league.status === "completed" || league.status === "cancelled";
+  const isAlmostFull = league.status === "registration" && spotsLeft <= 3 && spotsLeft > 0;
+  const isFull = league.status === "registration" && spotsLeft <= 0;
 
   return (
     <div
       onClick={onClick}
-      className={`bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer ${isEnded ? "opacity-60" : "league-card-hover"}`}
+      className={`bg-white border rounded-2xl overflow-hidden cursor-pointer ${isEnded ? "opacity-60" : "league-card-hover"} ${isAlmostFull ? "border-orange-300" : "border-gray-200"}`}
       data-testid={`league-card-${league.id}`}
     >
       <div className={`h-1.5 ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`} />
@@ -227,11 +229,19 @@ function LeagueCard({ league, onClick }) {
           <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
             {config.icon} {config.label}
           </span>
-          {isEnded && (
+          {isEnded ? (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">
               Season Ended
             </span>
-          )}
+          ) : isFull ? (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-600" data-testid="badge-full">
+              Full
+            </span>
+          ) : isAlmostFull ? (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-600 animate-pulse" data-testid="badge-almost-full">
+              🔥 {spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} left
+            </span>
+          ) : null}
         </div>
 
         <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">{league.name}</h3>
@@ -248,13 +258,15 @@ function LeagueCard({ league, onClick }) {
 
         {/* Progress bar */}
         <div className="mb-3">
-          <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-            <span>{league.current_players || 0} joined</span>
-            <span>{spotsLeft} spots left</span>
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="text-gray-500">{league.current_players || 0} joined</span>
+            <span className={isAlmostFull ? "text-orange-600 font-semibold" : isFull ? "text-red-600 font-semibold" : "text-gray-500"}>
+              {isFull ? "League full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
+            </span>
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-[width] ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
+              className={`h-full rounded-full transition-[width] ${isFull ? "bg-red-500" : isAlmostFull ? "bg-orange-400" : league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
               style={{ width: `${fillPct}%` }}
             />
           </div>

@@ -33,6 +33,10 @@ async def register(user_data: UserCreate, response: Response, request: Request):
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    FOUNDING_MEMBER_LIMIT = 200
+    founding_count = await db.users.count_documents({"founding_member": True})
+    is_founding = founding_count < FOUNDING_MEMBER_LIMIT
+
     user = User(
         email=user_data.email.lower(),
         name=user_data.name,
@@ -42,6 +46,7 @@ async def register(user_data: UserCreate, response: Response, request: Request):
         phone=user_data.phone,
         skill_level=user_data.skill_level,
         role="player",
+        founding_member=is_founding,
     )
     result = await db.users.insert_one(user.to_mongo())
     user_id = str(result.inserted_id)

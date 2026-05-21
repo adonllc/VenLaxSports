@@ -69,6 +69,14 @@ async def get_cities(country: str = None):
     return cities
 
 
+@api_router.get("/founding-members")
+async def founding_members_count():
+    """Public — returns founding member slot usage for homepage counter."""
+    LIMIT = 200
+    count = await db.users.count_documents({"founding_member": True})
+    return {"count": count, "limit": LIMIT, "spots_left": max(0, LIMIT - count)}
+
+
 @api_router.get("/phase")
 async def get_phase():
     """Expose active phase info so frontend can confirm backend phase."""
@@ -148,6 +156,11 @@ async def normalize_pricing_wrapper():
     await _norm(db)
 
 
+async def seed_promo_codes_wrapper():
+    from seeds.promo_codes import seed_promo_codes as _seed
+    await _seed(db)
+
+
 @app.on_event("startup")
 async def startup_event():
     await seed_admin_wrapper()
@@ -155,6 +168,7 @@ async def startup_event():
     await seed_leagues_wrapper()
     await seed_cities_wrapper()
     await normalize_pricing_wrapper()
+    await seed_promo_codes_wrapper()
     import scheduler as _sched
     _sched.start(db)
     logger.info("Application startup complete")

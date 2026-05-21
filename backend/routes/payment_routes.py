@@ -10,9 +10,97 @@ import os
 router = APIRouter()
 
 
+FOUNDING_MEMBER_LIMIT = 200
+
+
 class CheckoutRequest(BaseModel):
     league_id: str
     origin_url: str
+    promo_code: Optional[str] = None
+
+
+async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | None:
+    """Return promo doc if valid for this user+league, else None."""
+    promo = await db.promo_codes.find_one({"code": code.upper(), "active": True})
+    if not promo:
+        return None
+    now = datetime.now(timezone.utc)
+    if promo.get("expires_at"):
+        try:
+            exp = datetime.fromisoformat(promo["expires_at"].replace("Z", "+00:00"))
+            if now > exp:
+                return None
+        except Exception:
+            pass
+    if promo.get("max_uses") and promo.get("used_count", 0) >= promo["max_uses"]:
+        return None
+    per_user = promo.get("per_user_limit", 1)
+    if per_user and per_user > 0:
+        uses = await db.promo_uses.count_documents({"code": code.upper(), "user_id": user_id})
+        if uses >= per_user:
+            return None
+    sports = promo.get("applicable_sports") or []
+    if sports and league.get("sport") not in sports:
+        return None
+    formats = promo.get("applicable_formats") or []
+    if formats and league.get("format") not in formats:
+        return None
+    return promo
+
+
+async def _record_promo_use(db, code: str, user_id: str, league_id: str) -> None:
+    await db.promo_codes.update_one({"code": code.upper()}, {"$inc": {"used_count": 1}})
+    await db.promo_uses.insert_one({
+        "code": code.upper(),
+        "user_id": user_id,
+        "league_id": league_id,
+        "used_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+
+@router.get("/promo/{code}")
+async def validate_promo_code(code: str, league_id: str, request: Request):
+    """Validate a promo code for a specific league. Returns discount details."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+
+    promo = await _validate_promo(db, code, user["_id"], league)
+    if not promo:
+        raise HTTPException(status_code=400, detail="Invalid or expired promo code")
+
+    entry_fee = float(league.get("entry_fee", 0))
+    discount_type = promo.get("type")
+    discount_value = float(promo.get("value", 0))
+
+    if discount_type == "free_entry" or discount_value >= 100:
+        final_fee = 0.0
+        savings = entry_fee
+    elif discount_type == "percent_off":
+        final_fee = round(entry_fee * (1 - discount_value / 100), 2)
+        savings = round(entry_fee - final_fee, 2)
+    elif discount_type == "amount_off":
+        final_fee = max(0.0, round(entry_fee - discount_value, 2))
+        savings = round(entry_fee - final_fee, 2)
+    else:
+        final_fee = entry_fee
+        savings = 0.0
+
+    return {
+        "valid": True,
+        "code": promo["code"],
+        "description": promo.get("description", ""),
+        "discount_type": discount_type,
+        "discount_value": discount_value,
+        "original_fee": entry_fee,
+        "final_fee": final_fee,
+        "savings": savings,
+    }
 
 
 @router.post("/checkout")
@@ -34,6 +122,28 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": data.league_id})
     if existing and existing.get("payment_status") in ["paid", "free"]:
         raise HTTPException(status_code=400, detail="Already registered")
+
+    # Apply promo code if provided
+    if data.promo_code:
+        promo = await _validate_promo(db, data.promo_code, user["_id"], league)
+        if not promo:
+            raise HTTPException(status_code=400, detail="Invalid or expired promo code")
+
+        discount_type = promo.get("type")
+        discount_value = float(promo.get("value", 0))
+
+        if discount_type == "free_entry" or discount_value >= 100:
+            await _confirm_player_registered(
+                db, league, data.league_id, user,
+                f"promo:{data.promo_code.upper()}", 0.0,
+                {"promo_code": data.promo_code.upper()},
+            )
+            await _record_promo_use(db, data.promo_code, user["_id"], data.league_id)
+            return {"free": True, "message": "Promo applied — you're registered!"}
+        elif discount_type == "percent_off":
+            entry_fee = max(0.01, round(entry_fee * (1 - discount_value / 100), 2))
+        elif discount_type == "amount_off":
+            entry_fee = max(0.01, round(entry_fee - discount_value, 2))
 
     try:
         from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
@@ -68,6 +178,10 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     )
     session = await stripe.create_checkout_session(checkout_req)
 
+    txn_meta = {"league_id": data.league_id, "user_id": user["_id"]}
+    if data.promo_code:
+        txn_meta["promo_code"] = data.promo_code.upper()
+
     txn = PaymentTransaction(
         user_id=user["_id"],
         user_email=user["email"],
@@ -78,7 +192,7 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         currency="USD",
         status="initiated",
         payment_status="unpaid",
-        metadata={"league_id": data.league_id, "user_id": user["_id"]},
+        metadata=txn_meta,
     )
     await db.payment_transactions.insert_one(txn.to_mongo())
     return {"url": session.url, "session_id": session.session_id}
@@ -157,6 +271,11 @@ async def get_payment_status(session_id: str, request: Request):
                         player["email"], player["name"], league["name"], league["sport"],
                         league_id, paid=True, amount=float(txn.get("amount", 0)),
                         currency=txn.get("currency", "USD")))
+
+                # Record promo use if code was applied
+                promo_code = (txn.get("metadata") or {}).get("promo_code")
+                if promo_code:
+                    await _record_promo_use(db, promo_code, user_id, league_id)
 
     return {
         "status": status.status,

@@ -100,7 +100,14 @@ export default function PublicProfile() {
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="font-heading font-black text-2xl text-gray-900">{profile.name}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-heading font-black text-2xl text-gray-900">{profile.name}</h1>
+                {profile.founding_member && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge-public">
+                    ★ Founding Member
+                  </span>
+                )}
+              </div>
               {profile.city && (
                 <p className="flex items-center gap-1 text-sm text-gray-500 mt-1">
                   <MapPin className="w-3.5 h-3.5 shrink-0" />

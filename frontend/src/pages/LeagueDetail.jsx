@@ -30,6 +30,10 @@ export default function LeagueDetail() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoResult, setPromoResult] = useState(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState("");
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -115,14 +119,45 @@ export default function LeagueDetail() {
     }
   };
 
+  const validatePromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    setPromoError("");
+    setPromoResult(null);
+    try {
+      const { data } = await axios.get(
+        `${API}/payments/promo/${promoCode.trim()}?league_id=${id}`,
+        { withCredentials: true }
+      );
+      setPromoResult(data);
+    } catch (err) {
+      setPromoError(err.response?.data?.detail || "Invalid or expired promo code");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
   const handleJoin = async () => {
     if (!user) { navigate("/auth"); return; }
     setJoining(true);
     setJoinMsg("");
     try {
+      // If a free-entry promo is validated, call checkout directly
+      if (promoResult && promoResult.final_fee === 0) {
+        const { data } = await axios.post(`${API}/payments/checkout`, {
+          league_id: id,
+          origin_url: window.location.origin,
+          promo_code: promoCode.trim().toUpperCase(),
+        }, { withCredentials: true });
+        if (data.free) {
+          setJoinMsg("Promo applied — you're registered!");
+          setIsRegistered(true);
+          fetchLeague();
+          return;
+        }
+      }
       const { data } = await axios.post(`${API}/leagues/${id}/join`, { waiver_accepted: waiverAccepted }, { withCredentials: true });
       if (data.requires_payment) {
-        // Open payment-method picker (Stripe / Apple Pay / Google Pay / Zelle)
         setPaymentModalOpen(true);
       } else {
         setJoinMsg(data.message || "Joined successfully!");
@@ -247,13 +282,44 @@ export default function LeagueDetail() {
                           . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
                         </span>
                       </label>
+                      {/* Promo code input — only for paid leagues */}
+                      {!isFree && (
+                        <div className="mb-3">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={promoCode}
+                              onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
+                              placeholder="Promo code"
+                              className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase font-mono"
+                              data-testid="promo-code-input"
+                            />
+                            <button
+                              onClick={validatePromo}
+                              disabled={promoLoading || !promoCode.trim()}
+                              className="px-3 py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+                              data-testid="apply-promo-btn"
+                            >
+                              {promoLoading ? "..." : "Apply"}
+                            </button>
+                          </div>
+                          {promoResult && (
+                            <p className="text-xs text-emerald-700 font-semibold mt-1.5" data-testid="promo-success">
+                              ✓ {promoResult.final_fee === 0 ? "Free entry applied!" : `Save $${promoResult.savings.toFixed(2)} — $${promoResult.final_fee.toFixed(2)} total`}
+                            </p>
+                          )}
+                          {promoError && (
+                            <p className="text-xs text-red-600 mt-1.5" data-testid="promo-error">{promoError}</p>
+                          )}
+                        </div>
+                      )}
                       <button
                         onClick={handleJoin}
                         disabled={joining || spotsLeft <= 0 || !waiverAccepted}
                         className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
                         data-testid="join-league-btn"
                       >
-                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : isFree ? "Join Free" : "Register Now"}
+                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
                       </button>
                     </>
                   )}
@@ -422,6 +488,7 @@ export default function LeagueDetail() {
         open={paymentModalOpen}
         onClose={() => setPaymentModalOpen(false)}
         league={league}
+        promoCode={promoResult ? promoCode.trim().toUpperCase() : undefined}
         onSuccess={() => { setIsRegistered(true); fetchLeague(); setJoinMsg("Registration complete!"); }}
       />
     </div>
