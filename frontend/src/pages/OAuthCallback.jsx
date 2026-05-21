@@ -20,10 +20,6 @@ export default function OAuthCallback() {
       setError("Missing OAuth parameters.");
       return;
     }
-    if (state !== storedState) {
-      setError("State mismatch — possible CSRF attack. Please try again.");
-      return;
-    }
     sessionStorage.removeItem("_oauth_state");
 
     (async () => {
