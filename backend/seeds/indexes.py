@@ -14,3 +14,5 @@ async def create_indexes(db) -> None:
     await db.promo_codes.create_index("code", unique=True)
     await db.promo_uses.create_index([("code", 1), ("user_id", 1)])
     await db.users.create_index("founding_member")
+    await db.auth_codes.create_index("code", unique=True)
+    await db.auth_codes.create_index("expires_at", expireAfterSeconds=0)

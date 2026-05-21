@@ -4,6 +4,19 @@ import axios from "axios";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const AuthContext = createContext(null);
 
+// ── PKCE helpers (Web Crypto API — available on all modern browsers + localhost) ──
+function _base64url(buffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+async function _codeChallenge(verifier) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  return _base64url(buf);
+}
+function _randomBase64url() {
+  return _base64url(crypto.getRandomValues(new Uint8Array(32)));
+}
+
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
@@ -30,9 +43,37 @@ export const AuthProvider = ({ children }) => {
   }, [fetchMe]);
 
   const login = async (email, password) => {
-    const { data } = await axios.post(`${API}/auth/login`, { email, password }, { withCredentials: true });
-    setUser(data);
-    return data;
+    const codeVerifier = _randomBase64url();
+    const codeChallenge = await _codeChallenge(codeVerifier);
+    const state = _randomBase64url();
+
+    sessionStorage.setItem("_pkce_v", codeVerifier);
+    sessionStorage.setItem("_pkce_s", state);
+
+    try {
+      const { data: auth } = await axios.post(`${API}/auth/authorize`, {
+        email,
+        password,
+        code_challenge: codeChallenge,
+        code_challenge_method: "S256",
+        state,
+      });
+
+      if (auth.state !== sessionStorage.getItem("_pkce_s")) {
+        throw new Error("State mismatch — possible CSRF attack");
+      }
+
+      const { data } = await axios.post(`${API}/auth/token`, {
+        code: auth.code,
+        code_verifier: sessionStorage.getItem("_pkce_v"),
+      }, { withCredentials: true });
+
+      setUser(data);
+      return data;
+    } finally {
+      sessionStorage.removeItem("_pkce_v");
+      sessionStorage.removeItem("_pkce_s");
+    }
   };
 
   const register = async (formData) => {

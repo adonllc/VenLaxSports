@@ -14,6 +14,9 @@ import email_service
 import os
 import random
 import string
+import secrets
+import hashlib
+import base64
 
 router = APIRouter()
 
@@ -144,6 +147,97 @@ async def refresh(request: Request, response: Response):
         return {"message": "Token refreshed"}
     except pyjwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+
+# ── PKCE Authorization Code Flow ────────────────────────────────────────
+
+class AuthorizeRequest(BaseModel):
+    email: str
+    password: str
+    code_challenge: str
+    code_challenge_method: str = "S256"
+    state: str
+
+
+class TokenRequest(BaseModel):
+    code: str
+    code_verifier: str
+
+
+def _verify_pkce(code_verifier: str, code_challenge: str) -> bool:
+    digest = hashlib.sha256(code_verifier.encode("ascii")).digest()
+    computed = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+    return secrets.compare_digest(computed, code_challenge)
+
+
+@router.post("/authorize")
+async def authorize(body: AuthorizeRequest, request: Request):
+    """Step 1 — validate credentials, return single-use auth code."""
+    if body.code_challenge_method != "S256":
+        raise HTTPException(status_code=400, detail="Only S256 code_challenge_method is supported")
+    if len(body.state) < 16:
+        raise HTTPException(status_code=400, detail="state too short — minimum 16 characters")
+    if len(body.code_challenge) < 43:
+        raise HTTPException(status_code=400, detail="code_challenge too short — use S256 over 32-byte verifier")
+
+    db = request.app.state.db
+    user = await db.users.find_one({"email": body.email.lower()})
+    if not user or not user.get("password_hash"):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if not verify_password(body.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    code = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+    await db.auth_codes.insert_one({
+        "code": code,
+        "code_challenge": body.code_challenge,
+        "state": body.state,
+        "user_id": str(user["_id"]),
+        "email": user["email"],
+        "role": user.get("role", "player"),
+        "expires_at": expires_at,
+    })
+    return {"code": code, "state": body.state}
+
+
+@router.post("/token")
+async def token(body: TokenRequest, response: Response, request: Request):
+    """Step 2 — exchange code + code_verifier for session cookies."""
+    db = request.app.state.db
+    record = await db.auth_codes.find_one({"code": body.code})
+    if not record:
+        raise HTTPException(status_code=400, detail="Invalid or expired authorization code")
+    if record["expires_at"] < datetime.now(timezone.utc):
+        await db.auth_codes.delete_one({"code": body.code})
+        raise HTTPException(status_code=400, detail="Authorization code expired")
+    if not _verify_pkce(body.code_verifier, record["code_challenge"]):
+        raise HTTPException(status_code=400, detail="code_verifier does not match code_challenge")
+
+    await db.auth_codes.delete_one({"code": body.code})
+
+    user_id = record["user_id"]
+    email = record["email"]
+    role = record["role"]
+    _set_tokens(response, user_id, email, role)
+
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return {
+        "id": user_id,
+        "email": email,
+        "name": user.get("name"),
+        "role": role,
+        "country": user.get("country", "USA"),
+        "city": user.get("city"),
+        "sport_preferences": user.get("sport_preferences", []),
+        "tennis_rating": user.get("tennis_rating", 3.0),
+        "cricket_rating": user.get("cricket_rating", 50.0),
+        "pickleball_rating": user.get("pickleball_rating", 3.0),
+        "email_notifications": user.get("email_notifications", True),
+        "founding_member": user.get("founding_member", False),
+    }
 
 
 # ── OTP Email Verification ──────────────────────────────────────────────
