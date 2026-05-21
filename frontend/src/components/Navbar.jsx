@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, ChevronDown, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { Trophy, ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
 
@@ -20,15 +20,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sportsOpen, setSportsOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const sportsRef = useRef(null);
   const userRef = useRef(null);
   const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
     const handler = (e) => {
-      if (sportsRef.current && !sportsRef.current.contains(e.target)) setSportsOpen(false);
       if (userRef.current && !userRef.current.contains(e.target)) setUserOpen(false);
     };
     document.addEventListener("mousedown", handler);
@@ -58,30 +55,17 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            {/* Sports Dropdown */}
-            <div className="relative" ref={sportsRef}>
-              <button
-                onClick={() => setSportsOpen(!sportsOpen)}
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                data-testid="nav-sports-dropdown"
+            {/* Sport Pills */}
+            {SPORTS.map((s) => (
+              <Link
+                key={s.id}
+                to={`/sport/${s.id}`}
+                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${s.color} ${s.bg}`}
+                data-testid={`nav-sport-${s.id}`}
               >
-                Sports <ChevronDown className={`w-4 h-4 transition-transform ${sportsOpen ? "rotate-180" : ""}`} />
-              </button>
-              {sportsOpen && (
-                <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg p-2 z-50">
-                  {SPORTS.map((s) => (
-                    <Link
-                      key={s.id}
-                      to={`/sport/${s.id}`}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${s.color} ${s.bg} transition-colors`}
-                      data-testid={`nav-sport-${s.id}`}
-                    >
-                      <span>{s.icon}</span> {s.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                <span>{s.icon}</span> {s.label}
+              </Link>
+            ))}
 
             <Link
               to="/join"
@@ -179,12 +163,12 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 px-4 py-4 space-y-2">
+          <Link to="/join" className="block px-3 py-2 text-sm font-semibold text-emerald-600 rounded-lg hover:bg-emerald-50" data-testid="nav-join-mobile">Find a League</Link>
           {SPORTS.map((s) => (
             <Link key={s.id} to={`/sport/${s.id}`} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${s.color}`} data-testid={`mobile-sport-${s.id}`}>
               <span>{s.icon}</span> {s.label}
             </Link>
           ))}
-          <Link to="/join" className="block px-3 py-2 text-sm font-semibold text-emerald-600 rounded-lg hover:bg-emerald-50" data-testid="nav-join-mobile">Find a League</Link>
           <Link to="/rules" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-rules-mobile">Rules</Link>
           {user ? (
             <>
