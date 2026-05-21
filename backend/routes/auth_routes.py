@@ -220,7 +220,8 @@ async def token(body: TokenRequest, response: Response, request: Request):
     record = await db.auth_codes.find_one({"code": body.code})
     if not record:
         raise HTTPException(status_code=400, detail="Invalid or expired authorization code")
-    if record["expires_at"] < datetime.now(timezone.utc):
+    expires_at = record["expires_at"].replace(tzinfo=timezone.utc) if record["expires_at"].tzinfo is None else record["expires_at"]
+    if expires_at < datetime.now(timezone.utc):
         await db.auth_codes.delete_one({"code": body.code})
         raise HTTPException(status_code=400, detail="Authorization code expired")
     if not _verify_pkce(body.code_verifier, record["code_challenge"]):

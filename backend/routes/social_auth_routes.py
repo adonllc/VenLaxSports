@@ -30,8 +30,9 @@ def _redirect_uri() -> str:
 def _set_auth_cookies(response: Response, user_id: str, email: str, role: str):
     access = create_access_token(user_id, email, role)
     refresh = create_refresh_token(user_id)
-    response.set_cookie("access_token", access, httponly=True, secure=False, samesite="lax", max_age=86400, path="/")
-    response.set_cookie("refresh_token", refresh, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    is_secure = os.environ.get("FRONTEND_URL", "").startswith("https")
+    response.set_cookie("access_token", access, httponly=True, secure=is_secure, samesite="lax", max_age=86400, path="/")
+    response.set_cookie("refresh_token", refresh, httponly=True, secure=is_secure, samesite="lax", max_age=604800, path="/")
 
 
 @router.get("/google/url")
@@ -72,7 +73,8 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
     record = await db.oauth_states.find_one({"state": body.state, "provider": "google"})
     if not record:
         raise HTTPException(status_code=400, detail="Invalid or expired OAuth state")
-    if record["expires_at"] < datetime.now(timezone.utc):
+    expires_at = record["expires_at"].replace(tzinfo=timezone.utc) if record["expires_at"].tzinfo is None else record["expires_at"]
+    if expires_at < datetime.now(timezone.utc):
         await db.oauth_states.delete_one({"state": body.state})
         raise HTTPException(status_code=400, detail="OAuth state expired — restart login")
     await db.oauth_states.delete_one({"state": body.state})
