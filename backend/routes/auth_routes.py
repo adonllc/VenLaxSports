@@ -29,6 +29,18 @@ def _set_tokens(response: Response, user_id: str, email: str, role: str):
     return access, refresh
 
 
+class CheckEmailIn(BaseModel):
+    email: str
+
+
+@router.post("/check-email")
+async def check_email(body: CheckEmailIn, request: Request):
+    """Return whether an email is already registered. Consistent with register error disclosure."""
+    db = request.app.state.db
+    exists = await db.users.find_one({"email": body.email.lower().strip()}, {"_id": 1}) is not None
+    return {"exists": exists}
+
+
 @router.post("/register")
 async def register(user_data: UserCreate, response: Response, request: Request):
     db = request.app.state.db

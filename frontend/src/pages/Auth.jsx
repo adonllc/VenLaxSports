@@ -6,6 +6,9 @@ import platformConfig, { activeSports, activeCountry } from "../config/platformC
 import BRAND from "../config/brandConfig";
 import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
+import axios from "axios";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // PHASE-DRIVEN: only the active country is offered during registration.
 // PHASE 3 introduces "India" via REACT_APP_PHASE=3.
@@ -19,12 +22,30 @@ export default function Auth() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [emailExists, setEmailExists] = useState(null);
   const { login, register, user, formatError } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
+
+  // Debounced duplicate-email check (register mode only)
+  useEffect(() => {
+    if (mode !== "register" || !form.email.includes("@")) {
+      setEmailExists(null);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const { data } = await axios.post(`${API}/auth/check-email`, { email: form.email });
+        setEmailExists(data.exists);
+      } catch {
+        setEmailExists(null);
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [form.email, mode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,14 +99,14 @@ export default function Auth() {
           {/* Mode Toggle */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
             <button
-              onClick={() => { setMode("login"); setError(""); }}
+              onClick={() => { setMode("login"); setError(""); setEmailExists(null); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "login" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
               data-testid="login-tab"
             >
               Log In
             </button>
             <button
-              onClick={() => { setMode("register"); setError(""); }}
+              onClick={() => { setMode("register"); setError(""); setEmailExists(null); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "register" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
               data-testid="register-tab"
             >
@@ -128,13 +149,26 @@ export default function Auth() {
               <input
                 type="email"
                 value={form.email}
-                onChange={update("email")}
+                onChange={(e) => { update("email")(e); setEmailExists(null); }}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${mode === "register" && emailExists ? "border-amber-400 bg-amber-50" : "border-gray-300"}`}
                 data-testid="input-email"
                 autoComplete="email"
                 required
               />
+              {mode === "register" && emailExists === true && (
+                <div className="mt-2 flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2" data-testid="email-exists-warning">
+                  <p className="text-xs text-amber-800 font-medium">Account already exists with this email.</p>
+                  <button
+                    type="button"
+                    onClick={() => { setMode("login"); setError(""); setEmailExists(null); }}
+                    className="text-xs font-semibold text-black underline ml-3 whitespace-nowrap"
+                    data-testid="email-exists-login-btn"
+                  >
+                    Log in instead →
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -228,7 +262,7 @@ export default function Auth() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (mode === "register" && emailExists === true)}
               className="w-full py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm mt-2"
               data-testid="auth-submit-btn"
             >
