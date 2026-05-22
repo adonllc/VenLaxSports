@@ -1,14 +1,15 @@
 from fastapi import APIRouter, HTTPException, Request
 from typing import Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from pydantic import BaseModel
 from models import League, LeagueCreate, PlayerLeague, Standing
-from auth_utils import get_current_user, require_admin
+from auth_utils import get_current_user, require_admin, get_optional_user
 from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
 import email_service
 import asyncio
 import notification_dispatch
+import secrets
 
 router = APIRouter(redirect_slashes=False)
 
@@ -120,6 +121,7 @@ async def create_league(data: LeagueCreate, request: Request):
 
 class JoinLeagueRequest(BaseModel):
     waiver_accepted: bool = False
+    partner_email: Optional[str] = None
 
 
 @router.post("/{league_id}/join")
@@ -140,6 +142,70 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         raise HTTPException(status_code=400, detail="League registration is closed")
     if league["current_players"] >= league["max_players"]:
         raise HTTPException(status_code=400, detail="League is full")
+
+    # ── Doubles branch ────────────────────────────────────────────────────────
+    if league.get("format") == "doubles":
+        partner_email = getattr(body, "partner_email", None)
+        if not partner_email:
+            raise HTTPException(status_code=400, detail="Partner email required for doubles leagues")
+
+        partner_email = partner_email.lower().strip()
+
+        if partner_email == user["email"].lower():
+            raise HTTPException(status_code=400, detail="Cannot invite yourself as partner")
+
+        available = league.get("max_players", 0) - league.get("current_players", 0)
+        if available < 2:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough spots — only {available} remaining (need 2 for doubles)",
+            )
+
+        already_reg = await db.player_leagues.find_one(
+            {"league_id": league_id, "player_id": user["_id"]}
+        )
+        if already_reg:
+            raise HTTPException(status_code=409, detail="Already registered in this league")
+
+        existing_invite = await db.doubles_invites.find_one(
+            {"initiator_id": user["_id"], "league_id": league_id, "status": "pending"}
+        )
+        if existing_invite:
+            raise HTTPException(status_code=409, detail="You already have a pending invite for this league")
+
+        now = datetime.now(timezone.utc)
+        token = secrets.token_hex(32)
+        invite_doc = {
+            "league_id": league_id,
+            "initiator_id": user["_id"],
+            "initiator_name": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or user.get("name", ""),
+            "partner_email": partner_email,
+            "partner_user_id": None,
+            "token": token,
+            "status": "pending",
+            "waiver_p1_at": now.isoformat(),
+            "created_at": now.isoformat(),
+            "expires_at": (now + timedelta(hours=72)).isoformat(),
+        }
+        await db.doubles_invites.insert_one(invite_doc)
+
+        frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
+        confirm_url = f"{frontend_url}/doubles-invite/confirm?token={token}"
+        league_name = league.get("name", "the league")
+        sport = league.get("sport", "tennis")
+        entry_fee_val = float(league.get("entry_fee", 0))
+        initiator_name = invite_doc["initiator_name"]
+        email_service.schedule(email_service.send_partner_invite(
+            partner_email, initiator_name, league_name, sport, entry_fee_val, confirm_url
+        ))
+
+        return {
+            "pending_partner": True,
+            "invite_token": token,
+            "expires_at": invite_doc["expires_at"],
+            "message": f"Invite sent to {partner_email}. Registration completes when your partner confirms.",
+        }
+    # ── End doubles branch ─────────────────────────────────────────────────────
 
     existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": league_id})
     if existing and existing.get("payment_status") in ["paid", "free"]:

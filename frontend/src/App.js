@@ -24,6 +24,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ProfileSetup from "./pages/ProfileSetup";
 import JoinFlow from "./pages/JoinFlow";
 import OAuthCallback from "./pages/OAuthCallback";
+import DoublesInviteConfirm from "./pages/DoublesInviteConfirm";
 import "./App.css";
 
 function AppRouter() {
@@ -51,6 +52,7 @@ function AppRouter() {
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/join" element={<JoinFlow />} />
       <Route path="/auth/callback" element={<OAuthCallback />} />
+      <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
     </Routes>
   );
 }

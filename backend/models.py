@@ -149,13 +149,27 @@ class RRConfig(BaseModel):
 # ─── Doubles Invite ──────────────────────────────────
 class DoublesInvite(BaseDocument):
     league_id: str
-    inviter_id: str
-    inviter_name: str
+    initiator_id: str
+    initiator_name: str
     partner_email: str
+    partner_user_id: Optional[str] = None
     token: str
-    status: str = "pending"                 # "pending" | "accepted" | "expired"
-    expires_at: str
+    status: str = "pending"                 # "pending" | "accepted" | "declined" | "expired"
+    waiver_p1_at: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    expires_at: str
+    payment_session_id: Optional[str] = None
+
+
+class DoublesJoinRequest(BaseModel):
+    partner_email: str
+    waiver_accepted: bool
+
+
+class DoublesConfirmRequest(BaseModel):
+    token: str
+    action: str   # "accept" | "decline"
+    waiver_accepted: bool = False
 
 
 # ─── Team (Cricket) ──────────────────────────────────
@@ -251,6 +265,9 @@ class PlayerLeague(BaseDocument):
     session_id: Optional[str] = None
     joined_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     waiver_accepted_at: Optional[str] = None  # ISO timestamp of explicit waiver consent
+    partner_id: Optional[str] = None
+    partner_name: Optional[str] = None
+    invite_token: Optional[str] = None
 
 
 # ─── Payment Transaction ──────────────────────────────

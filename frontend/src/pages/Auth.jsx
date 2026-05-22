@@ -30,6 +30,14 @@ export default function Auth() {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
 
+  // Preserve doubles invite token across register/login
+  useEffect(() => {
+    const inviteToken = params.get("invite_token");
+    if (inviteToken) {
+      localStorage.setItem("doubles_invite_token", inviteToken);
+    }
+  }, []);
+
   // Debounced duplicate-email check (register mode only)
   useEffect(() => {
     if (mode !== "register" || !form.email.includes("@")) {
@@ -54,10 +62,22 @@ export default function Auth() {
     try {
       if (mode === "login") {
         await login(form.email, form.password);
+        const pendingToken = localStorage.getItem("doubles_invite_token");
+        if (pendingToken) {
+          localStorage.removeItem("doubles_invite_token");
+          navigate(`/doubles-invite/confirm?token=${pendingToken}`);
+          return;
+        }
         navigate("/dashboard");
       } else {
         if (!form.name.trim()) { setError("Name is required"); setLoading(false); return; }
         await register(form);
+        const pendingToken = localStorage.getItem("doubles_invite_token");
+        if (pendingToken) {
+          localStorage.removeItem("doubles_invite_token");
+          navigate(`/doubles-invite/confirm?token=${pendingToken}`);
+          return;
+        }
         navigate("/verify-email");
       }
     } catch (err) {

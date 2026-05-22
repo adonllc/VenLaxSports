@@ -234,6 +234,49 @@ async def get_payment_status(session_id: str, request: Request):
     if status.payment_status == "paid":
         league_id = txn.get("league_id")
         user_id = txn.get("user_id")
+
+        # ── Doubles paid path ─────────────────────────────────────────────────
+        meta = txn.get("metadata") or {}
+        # Also check Stripe session metadata if available
+        try:
+            session_meta = status.metadata if hasattr(status, "metadata") and status.metadata else {}
+        except Exception:
+            session_meta = {}
+        is_doubles = (
+            meta.get("is_doubles") == "true"
+            or session_meta.get("is_doubles") == "true"
+        )
+        invite_token = meta.get("invite_token") or session_meta.get("invite_token")
+
+        if is_doubles and invite_token:
+            invite = await db.doubles_invites.find_one({"token": invite_token})
+            if invite and invite.get("partner_user_id"):
+                try:
+                    partner_user_doc = await db.users.find_one(
+                        {"_id": ObjectId(invite["partner_user_id"])}
+                    )
+                except Exception:
+                    partner_user_doc = None
+                if partner_user_doc:
+                    partner_user_doc["_id"] = str(partner_user_doc["_id"])
+                    partner_user_dict = {
+                        "_id": partner_user_doc["_id"],
+                        "id": partner_user_doc["_id"],
+                        "email": partner_user_doc.get("email", ""),
+                        "name": partner_user_doc.get("name", ""),
+                        "first_name": partner_user_doc.get("first_name", ""),
+                        "last_name": partner_user_doc.get("last_name", ""),
+                    }
+                    try:
+                        league_doc = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])})
+                    except Exception:
+                        league_doc = None
+                    if league_doc:
+                        from routes.doubles_routes import _create_doubles_pair
+                        await _create_doubles_pair(db, invite, league_doc, partner_user_dict)
+            return {"status": "paid", "is_doubles": True}
+        # ── End doubles paid path ─────────────────────────────────────────────
+
         already_registered = await db.player_leagues.find_one(
             {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}
         )

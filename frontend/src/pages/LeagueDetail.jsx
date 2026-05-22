@@ -39,6 +39,9 @@ export default function LeagueDetail() {
   const [promoResult, setPromoResult] = useState(null);
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState("");
+  const [partnerEmail, setPartnerEmail] = useState("");
+  const [inviteSent, setInviteSent] = useState(false);
+  const [inviteToken, setInviteToken] = useState(null);
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -121,6 +124,33 @@ export default function LeagueDetail() {
       setPromoError(err.response?.data?.detail || "Invalid or expired promo code");
     } finally {
       setPromoLoading(false);
+    }
+  };
+
+  const handleDoublesJoin = async () => {
+    if (!user) { navigate("/auth"); return; }
+    setJoining(true);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leagues/${league.id}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          partner_email: partnerEmail.trim().toLowerCase(),
+          waiver_accepted: waiverAccepted,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.pending_partner) {
+        setInviteSent(true);
+        setInviteToken(data.invite_token || null);
+      } else {
+        alert(data.detail || "Failed to send invite. Please try again.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    } finally {
+      setJoining(false);
     }
   };
 
@@ -259,62 +289,141 @@ export default function LeagueDetail() {
 
                   {!isRegistered && league.status === "registration" && (
                     <>
-                      {/* Waiver checkbox — required for all leagues, free or paid */}
-                      <label className="flex items-start gap-2.5 cursor-pointer mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={waiverAccepted}
-                          onChange={(e) => setWaiverAccepted(e.target.checked)}
-                          className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
-                          data-testid="waiver-checkbox"
-                        />
-                        <span className="text-[11px] text-amber-900 leading-relaxed">
-                          I have read and agree to the{" "}
-                          <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
-                            Liability Waiver & Assumption of Risk
-                          </a>
-                          . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
-                        </span>
-                      </label>
-                      {/* Promo code input — only for paid leagues */}
-                      {!isFree && (
-                        <div className="mb-3">
-                          <div className="flex gap-2">
+                      {league.format === "doubles" ? (
+                        /* Doubles registration flow */
+                        <>
+                          {!inviteSent ? (
+                            <div className="space-y-3">
+                              <p className="text-sm text-gray-600">
+                                Doubles registration requires both partners to confirm.
+                              </p>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                  Partner Email
+                                </label>
+                                <input
+                                  type="email"
+                                  value={partnerEmail}
+                                  onChange={(e) => setPartnerEmail(e.target.value)}
+                                  placeholder="partner@example.com"
+                                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                  data-testid="partner-email-input"
+                                />
+                              </div>
+                              <label className="flex items-start gap-2.5 cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
+                                <input
+                                  type="checkbox"
+                                  checked={waiverAccepted}
+                                  onChange={(e) => setWaiverAccepted(e.target.checked)}
+                                  className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
+                                  data-testid="waiver-checkbox"
+                                />
+                                <span className="text-[11px] text-amber-900 leading-relaxed">
+                                  I accept the{" "}
+                                  <a href="/rules" className="underline font-semibold hover:text-amber-700">
+                                    rules and waiver
+                                  </a>
+                                </span>
+                              </label>
+                              <button
+                                onClick={handleDoublesJoin}
+                                disabled={!partnerEmail || !waiverAccepted || joining}
+                                className="w-full bg-gray-900 text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 hover:bg-gray-700 transition-colors"
+                                data-testid="send-doubles-invite-btn"
+                              >
+                                {joining ? "Sending invite..." : "Send Partner Invite"}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-md p-4 space-y-2">
+                              <p className="text-sm font-medium text-emerald-800">
+                                Invite sent to {partnerEmail}
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                Your registration will complete once your partner confirms. The invite expires in 72 hours.
+                              </p>
+                              {inviteToken && (
+                                <div className="mt-2">
+                                  <p className="text-xs text-gray-500 mb-1">Share confirm link directly:</p>
+                                  <div className="flex gap-2 items-center">
+                                    <input
+                                      readOnly
+                                      value={`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`}
+                                      className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 bg-white"
+                                    />
+                                    <button
+                                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`)}
+                                      className="text-xs text-emerald-600 border border-emerald-200 rounded px-2 py-1 hover:bg-emerald-50"
+                                    >
+                                      Copy
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        /* Singles registration flow */
+                        <>
+                          {/* Waiver checkbox — required for all leagues, free or paid */}
+                          <label className="flex items-start gap-2.5 cursor-pointer mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
                             <input
-                              type="text"
-                              value={promoCode}
-                              onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
-                              placeholder="Promo code"
-                              className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase font-mono"
-                              data-testid="promo-code-input"
+                              type="checkbox"
+                              checked={waiverAccepted}
+                              onChange={(e) => setWaiverAccepted(e.target.checked)}
+                              className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-black flex-shrink-0"
+                              data-testid="waiver-checkbox"
                             />
-                            <button
-                              onClick={validatePromo}
-                              disabled={promoLoading || !promoCode.trim()}
-                              className="px-3 py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
-                              data-testid="apply-promo-btn"
-                            >
-                              {promoLoading ? "..." : "Apply"}
-                            </button>
-                          </div>
-                          {promoResult && (
-                            <p className="text-xs text-emerald-700 font-semibold mt-1.5" data-testid="promo-success">
-                              ✓ {promoResult.final_fee === 0 ? "Free entry applied!" : `Save $${promoResult.savings.toFixed(2)} — $${promoResult.final_fee.toFixed(2)} total`}
-                            </p>
+                            <span className="text-[11px] text-amber-900 leading-relaxed">
+                              I have read and agree to the{" "}
+                              <a href="/terms#waiver" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-amber-700">
+                                Liability Waiver & Assumption of Risk
+                              </a>
+                              . I understand that matches are unsupervised, courts are player-selected, and I participate at my own risk.
+                            </span>
+                          </label>
+                          {/* Promo code input — only for paid leagues */}
+                          {!isFree && (
+                            <div className="mb-3">
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={promoCode}
+                                  onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
+                                  placeholder="Promo code"
+                                  className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase font-mono"
+                                  data-testid="promo-code-input"
+                                />
+                                <button
+                                  onClick={validatePromo}
+                                  disabled={promoLoading || !promoCode.trim()}
+                                  className="px-3 py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+                                  data-testid="apply-promo-btn"
+                                >
+                                  {promoLoading ? "..." : "Apply"}
+                                </button>
+                              </div>
+                              {promoResult && (
+                                <p className="text-xs text-emerald-700 font-semibold mt-1.5" data-testid="promo-success">
+                                  ✓ {promoResult.final_fee === 0 ? "Free entry applied!" : `Save $${promoResult.savings.toFixed(2)} — $${promoResult.final_fee.toFixed(2)} total`}
+                                </p>
+                              )}
+                              {promoError && (
+                                <p className="text-xs text-red-600 mt-1.5" data-testid="promo-error">{promoError}</p>
+                              )}
+                            </div>
                           )}
-                          {promoError && (
-                            <p className="text-xs text-red-600 mt-1.5" data-testid="promo-error">{promoError}</p>
-                          )}
-                        </div>
+                          <button
+                            onClick={handleJoin}
+                            disabled={joining || spotsLeft <= 0 || !waiverAccepted}
+                            className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                            data-testid="join-league-btn"
+                          >
+                            {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
+                          </button>
+                        </>
                       )}
-                      <button
-                        onClick={handleJoin}
-                        disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                        className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
-                        data-testid="join-league-btn"
-                      >
-                        {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
-                      </button>
                     </>
                   )}
 

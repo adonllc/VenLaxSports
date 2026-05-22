@@ -29,6 +29,7 @@ export default function PlayerDashboard() {
   const [togglingPrivacy, setTogglingPrivacy] = useState(false);
   const [interests, setInterests] = useState([]);
   const [removingInterest, setRemovingInterest] = useState(null);
+  const [pendingInvites, setPendingInvites] = useState([]);
 
   useEffect(() => {
     if (loading) return;
@@ -47,6 +48,10 @@ export default function PlayerDashboard() {
     } catch (e) { console.error(e); }
     axios.get(`${API}/notifications/interests`, { withCredentials: true })
       .then(r => setInterests(r.data))
+      .catch(() => {});
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.invites) setPendingInvites(data.invites); })
       .catch(() => {});
   };
 
@@ -229,6 +234,35 @@ export default function PlayerDashboard() {
             Find a League
           </Link>
         </div>
+
+        {/* Pending Doubles Invites */}
+        {pendingInvites.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Pending Doubles Invites</h2>
+            <div className="space-y-2">
+              {pendingInvites.map((invite) => (
+                <div key={invite.token} className="border border-gray-200 rounded-md p-4 bg-white flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{invite.league_name}</p>
+                    <p className="text-xs text-gray-500">
+                      Invited {invite.partner_email} · expires {new Date(invite.expires_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${invite.token}`)}
+                      className="text-xs text-emerald-600 border border-emerald-200 rounded px-2 py-1 hover:bg-emerald-50"
+                      data-testid={`copy-invite-${invite.token}`}
+                    >
+                      Copy link
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}

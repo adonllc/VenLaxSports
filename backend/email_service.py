@@ -288,6 +288,19 @@ async def send_waitlist_open(to: str, player_name: str, city: str, sport: str,
     await send_email(to, subject, _wrap(f"{sport_emoji} You're on the Waitlist", body, "View League", waitlist_url))
 
 
+async def send_partner_declined(initiator_email: str, initiator_name: str, league_name: str) -> None:
+    body = f"""
+      <p>Hi {initiator_name},</p>
+      <p>Your doubles partner has declined the invite to join <strong>{league_name}</strong>.</p>
+      <p>Your registration slot has been released. You can submit a new invite with a different partner by visiting the league page.</p>
+    """
+    await send_email(
+        initiator_email,
+        f"Your doubles partner declined the invite for {league_name}",
+        _wrap("Partner declined", body),
+    )
+
+
 async def send_generic(to: str, subject: str, body: str) -> None:
     html_body = "".join(f"<p>{line}</p>" for line in body.split("\n\n") if line.strip())
     await send_email(to, subject, _wrap(subject, html_body, None, None))
