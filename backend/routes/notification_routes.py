@@ -143,7 +143,7 @@ async def save_push_subscription(body: PushSubscriptionRequest, request: Request
 
 
 @router.delete("/unsubscribe")
-async def unsubscribe(token: str = Query(...), request: Request = None):
+async def unsubscribe(token: str = Query(...), request: Request):
     """One-click unsubscribe from email link. No login required."""
     db = request.app.state.db
     interest_id = _decode_unsub_token(token)
