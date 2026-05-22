@@ -27,6 +27,8 @@ export default function PlayerDashboard() {
   const [leaguePlayers, setLeaguePlayers] = useState([]);
   const [togglingNotif, setTogglingNotif] = useState(false);
   const [togglingPrivacy, setTogglingPrivacy] = useState(false);
+  const [interests, setInterests] = useState([]);
+  const [removingInterest, setRemovingInterest] = useState(null);
 
   useEffect(() => {
     if (loading) return;
@@ -43,6 +45,9 @@ export default function PlayerDashboard() {
       setLeagues(lRes.data);
       setMatches(mRes.data);
     } catch (e) { console.error(e); }
+    axios.get(`${API}/notifications/interests`, { withCredentials: true })
+      .then(r => setInterests(r.data))
+      .catch(() => {});
   };
 
   const fetchLeaguePlayers = async (lid) => {
@@ -104,6 +109,19 @@ export default function PlayerDashboard() {
       console.error(e);
     } finally {
       setTogglingPrivacy(false);
+    }
+  };
+
+  const removeInterest = async (token) => {
+    if (removingInterest) return;
+    setRemovingInterest(token);
+    try {
+      await axios.delete(`${API}/notifications/unsubscribe?token=${encodeURIComponent(token)}`);
+      setInterests(prev => prev.filter(i => i.unsubscribe_token !== token));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRemovingInterest(null);
     }
   };
 
@@ -369,6 +387,41 @@ export default function PlayerDashboard() {
             )}
           </div>
         </div>
+
+        {/* Notification Subscriptions */}
+        {interests.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mt-6">
+            <div className="p-4 border-b border-gray-100">
+              <h2 className="font-heading font-bold text-gray-900 text-sm">Notification Subscriptions</h2>
+              <p className="text-xs text-gray-500 mt-0.5">You'll be notified when these leagues open</p>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {interests.map((interest) => {
+                const sportEmoji = { tennis: "🎾", pickleball: "🏓", cricket: "🏏" }[interest.sport] || "🏆";
+                return (
+                  <div
+                    key={interest.id}
+                    className="flex items-center justify-between px-4 py-3"
+                    data-testid={`interest-row-${interest.id}`}
+                  >
+                    <span className="text-sm text-gray-700">
+                      {sportEmoji} {interest.sport.charAt(0).toUpperCase() + interest.sport.slice(1)}
+                      {interest.city ? ` — ${interest.city}` : ""}
+                    </span>
+                    <button
+                      onClick={() => removeInterest(interest.unsubscribe_token)}
+                      disabled={removingInterest === interest.unsubscribe_token}
+                      className="text-xs text-red-500 font-semibold hover:text-red-700 transition disabled:opacity-50"
+                      data-testid={`remove-interest-${interest.id}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
