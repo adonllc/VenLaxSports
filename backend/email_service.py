@@ -252,6 +252,42 @@ async def send_schedule_released(to: str, player_name: str, league_name: str, le
                      _wrap("Your schedule is ready", body, "View schedule", url))
 
 
+async def send_season_open(to: str, player_name: str, city: str, sport: str,
+                            league_name: str, join_url: str) -> None:
+    sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Great news — <strong>{league_name}</strong> just opened registration in {city}!</p>
+      <p>Spots fill fast. Secure yours now.</p>
+    """
+    subject = f"{city} {sport.title()} is open — grab your spot"
+    await send_email(to, subject, _wrap(f"{sport_emoji} New League Open", body, "Join Now", join_url))
+
+
+async def send_last_spots(to: str, player_name: str, city: str, sport: str,
+                           spots_left: int, join_url: str) -> None:
+    sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Only <strong>{spots_left} spot{'s' if spots_left != 1 else ''}</strong> left in the {city} {sport.title()} league you were interested in.</p>
+      <p>Join now before it fills up.</p>
+    """
+    subject = f"Only {spots_left} spot{'s' if spots_left != 1 else ''} left in {city} {sport.title()}"
+    await send_email(to, subject, _wrap(f"{sport_emoji} Last Spots Remaining", body, "Claim Your Spot", join_url))
+
+
+async def send_waitlist_open(to: str, player_name: str, city: str, sport: str,
+                              waitlist_url: str) -> None:
+    sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>The {city} {sport.title()} league you were interested in is now full.</p>
+      <p>You've been added to the waitlist — we'll notify you the moment a spot opens.</p>
+    """
+    subject = f"{city} {sport.title()} is full — you're on the waitlist"
+    await send_email(to, subject, _wrap(f"{sport_emoji} You're on the Waitlist", body, "View League", waitlist_url))
+
+
 async def send_generic(to: str, subject: str, body: str) -> None:
     html_body = "".join(f"<p>{line}</p>" for line in body.split("\n\n") if line.strip())
     await send_email(to, subject, _wrap(subject, html_body, None, None))
