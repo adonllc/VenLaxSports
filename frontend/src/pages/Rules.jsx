@@ -117,6 +117,92 @@ const TENNIS_PLAYOFFS = [
   },
 ];
 
+// ─── Format Data ───────────────────────────────────────────────────
+const FLEX_LEAGUE_RULES = [
+  {
+    category: "Scheduling",
+    items: [
+      "Each match has a 7-day scheduling window. Contact opponent within 48 hours of window opening.",
+      "Offer at least 3 available time slots. Opponent picks one or proposes alternatives.",
+      "Higher seed (or first-listed player) books the court and provides match balls.",
+      "Confirm venue at least 24 hours before match time.",
+    ],
+  },
+  {
+    category: "Forfeits",
+    items: [
+      "15+ minutes late without notice = forfeit.",
+      "Cancel within 2 hours of match time = forfeit.",
+      "No response to scheduling within 48 hours = walkover awarded to opponent.",
+      "3 unplayed matches in a season = automatic withdrawal from standings.",
+    ],
+  },
+  {
+    category: "Season Structure",
+    items: [
+      "5-7 matches over 6-8 weeks, followed by playoffs.",
+      "Points accumulated across all matches determine playoff seeding.",
+      "Top 4 (≤12 players) or Top 8 (>12 players) advance to playoffs.",
+      "Mid-season withdrawal: completed matches stand; remaining become walkovers for opponents.",
+    ],
+  },
+  {
+    category: "Standings",
+    items: [
+      "Points formula: 3(W) + 1(L) + 0.5(SW-SL) + 0.1(GW-GL) + Bonus.",
+      "Bonus points: +2 all matches played, +1 straight-set win, +0.5 close 3-set loss.",
+      "Tiebreakers in order: set differential, game differential, head-to-head, opponent strength.",
+    ],
+  },
+];
+
+const ROUND_ROBIN_RULES = [
+  {
+    category: "Scheduling",
+    items: [
+      "All matches pre-assigned by the league organizer before the season begins.",
+      "Each round is assigned a specific week. No self-scheduling required.",
+      "Match times and venues communicated in advance by the organizer.",
+      "Confirm attendance only. No slot negotiation between players.",
+    ],
+  },
+  {
+    category: "Match Order",
+    items: [
+      "Every player faces every other player in the group at least once.",
+      "Number of rounds = number of players minus 1 for even groups.",
+      "Bye weeks assigned for odd-player groups. Byes count as a rest, not a win.",
+      "No player faces the same opponent twice during the main group phase.",
+    ],
+  },
+  {
+    category: "Season Structure",
+    items: [
+      "Group phase: everyone plays everyone. No early exits until the group phase is complete.",
+      "Top finishers from each group advance to playoffs (structure depends on group size).",
+      "No mid-season replacements. Spots are fixed at registration close.",
+      "Withdrawal: completed matches stand; remaining matches recorded as opponent walkovers.",
+    ],
+  },
+  {
+    category: "Standings",
+    items: [
+      "Same points formula as Flex League: 3(W) + 1(L) + 0.5(SW-SL) + 0.1(GW-GL) + Bonus.",
+      "Tiebreakers: head-to-head result first, then set differential, game differential, opponent strength.",
+      "Head-to-head carries more weight in Round Robin because all players face each other directly.",
+    ],
+  },
+];
+
+const FORMAT_COMPARISON = [
+  ["Scheduling",    "You arrange with opponent",             "Pre-assigned by organizer"],
+  ["Match order",   "Play in any order within the window",   "Fixed week-by-week matchups"],
+  ["Flexibility",   "High — choose your own times",          "Low — show up to assigned slot"],
+  ["Season length", "6-8 weeks + playoffs",                  "Determined by group size"],
+  ["Playoffs",      "Top 4 or 8 qualify by points",          "Group leaders advance"],
+  ["Best for",      "Flexible or unpredictable schedules",   "Busy players who want zero friction"],
+];
+
 // ─── Pickleball Data (unchanged) ───────────────────────────────────
 const PICKLEBALL_RULES = [
   {
@@ -205,6 +291,7 @@ export default function Rules() {
       {/* Quick nav */}
       <div className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap gap-1 text-xs font-semibold">
+          <a href="#formats"    className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Formats</a>
           <a href="#tennis"     className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">🎾 Tennis</a>
           <a href="#divisions"  className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Divisions</a>
           <a href="#standings"  className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Points</a>
@@ -216,6 +303,91 @@ export default function Rules() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 space-y-16">
+
+        {/* ── Format Comparison ─────────────────────────────────────── */}
+        <section id="formats" className="scroll-mt-20">
+          <div className="flex items-center gap-3 mb-2">
+            <Calendar className="w-6 h-6 text-gray-700" />
+            <h2 className="font-heading font-black text-2xl text-gray-900">League Formats</h2>
+          </div>
+          <p className="text-gray-500 text-sm mb-8 max-w-2xl">
+            VENLAX offers two formats. Same match rules, same scoring, same court conduct.
+            The difference is how matches are scheduled.
+          </p>
+
+          {/* At-a-glance comparison */}
+          <div className="border border-gray-200 rounded-2xl overflow-hidden mb-6" data-testid="format-comparison-table">
+            <div className="grid grid-cols-3">
+              <div className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-gray-400 bg-gray-50 border-b border-gray-200">Feature</div>
+              <div className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700 bg-emerald-50 border-b border-l border-gray-200">Flex League</div>
+              <div className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-blue-700 bg-blue-50 border-b border-l border-gray-200">Round Robin</div>
+            </div>
+            {FORMAT_COMPARISON.map(([feature, flex, rr], i) => (
+              <div key={feature} className={`grid grid-cols-3 border-t border-gray-100 text-sm ${i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}`}>
+                <div className="px-4 py-3 text-gray-500 font-medium">{feature}</div>
+                <div className="px-4 py-3 text-gray-800 border-l border-gray-100">{flex}</div>
+                <div className="px-4 py-3 text-gray-800 border-l border-gray-100">{rr}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Two detailed format cards */}
+          <div className="grid md:grid-cols-2 gap-5">
+
+            {/* Flex League */}
+            <div className="rounded-2xl border border-emerald-200 overflow-hidden" data-testid="format-flex-league">
+              <div className="bg-emerald-500 px-5 py-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-white font-heading font-black text-lg">Flex League</h3>
+                  <span className="ml-auto text-xs font-semibold text-emerald-100 bg-emerald-600/50 px-2.5 py-0.5 rounded-full">Self-scheduled</span>
+                </div>
+                <p className="text-emerald-100 text-xs">You set the schedule. We track the results.</p>
+              </div>
+              <div className="p-5 space-y-5 bg-white">
+                {FLEX_LEAGUE_RULES.map((cat) => (
+                  <div key={cat.category}>
+                    <h4 className="font-heading font-bold text-xs uppercase tracking-[0.1em] text-emerald-700 mb-2">{cat.category}</h4>
+                    <ul className="space-y-1.5">
+                      {cat.items.map((item, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-gray-700 leading-relaxed">
+                          <span className="text-emerald-500 font-bold flex-shrink-0 mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Round Robin */}
+            <div className="rounded-2xl border border-blue-200 overflow-hidden" data-testid="format-round-robin">
+              <div className="bg-blue-600 px-5 py-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-white font-heading font-black text-lg">Round Robin</h3>
+                  <span className="ml-auto text-xs font-semibold text-blue-100 bg-blue-700/50 px-2.5 py-0.5 rounded-full">Auto-scheduled</span>
+                </div>
+                <p className="text-blue-100 text-xs">Show up. The schedule is already set.</p>
+              </div>
+              <div className="p-5 space-y-5 bg-white">
+                {ROUND_ROBIN_RULES.map((cat) => (
+                  <div key={cat.category}>
+                    <h4 className="font-heading font-bold text-xs uppercase tracking-[0.1em] text-blue-700 mb-2">{cat.category}</h4>
+                    <ul className="space-y-1.5">
+                      {cat.items.map((item, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-gray-700 leading-relaxed">
+                          <span className="text-blue-500 font-bold flex-shrink-0 mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </section>
 
         {/* Tennis */}
         <section id="tennis" className="scroll-mt-20">

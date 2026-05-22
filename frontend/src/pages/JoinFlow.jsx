@@ -3,9 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { activeSports } from "../config/platformConfig";
-import { ChevronRight, ChevronLeft, Users, Calendar, MapPin, Trophy } from "lucide-react";
+import { ChevronRight, ChevronLeft, Users, Calendar, MapPin, Trophy, CheckCircle } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+};
 
 const LEAGUE_TYPES = [
   {
@@ -29,15 +35,21 @@ const DIVISIONS = [
 
 const STEPS = ["Sport", "Format", "Division", "Pick League"];
 
+const SPORT_SELECTED_CLS = {
+  tennis:     "border-tennis bg-tennis-bg text-tennis",
+  pickleball: "border-pickleball bg-pickleball-bg text-pickleball",
+  cricket:    "border-cricket bg-cricket-bg text-cricket",
+};
+
 function ProgressBar({ step }) {
   return (
     <div className="flex items-center gap-1 mb-8 justify-center">
       {STEPS.map((s, i) => (
         <div key={s} className="flex items-center gap-1">
-          <div className={`h-1.5 rounded-full transition-[width,background-color] ${i <= step ? "bg-black w-8" : "bg-gray-200 w-5"}`} />
+          <div className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${i < step ? "bg-tennis w-8" : i === step ? "bg-tennis w-8" : "bg-gray-200 w-5"}`} />
         </div>
       ))}
-      <span className="text-xs text-gray-400 ml-2">{STEPS[step]}</span>
+      <span className="text-xs text-emerald-600 font-semibold ml-2">{STEPS[step]}</span>
     </div>
   );
 }
@@ -51,6 +63,7 @@ export default function JoinFlow() {
   const [leagueType, setLeagueType] = useState("");
   const [division, setDivision] = useState("");
   const [leagues, setLeagues] = useState([]);
+  const [registeredIds, setRegisteredIds] = useState(new Set());
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -69,8 +82,12 @@ export default function JoinFlow() {
       const params = new URLSearchParams({ sport, status: "registration", limit: "20" });
       if (division) params.set("format", division);
       const endpoint = leagueType === "round_robin" ? `${API}/round-robin?${params}` : `${API}/leagues?${params}`;
-      const { data } = await axios.get(endpoint);
+      const [{ data }, myRes] = await Promise.all([
+        axios.get(endpoint),
+        axios.get(`${API}/leagues/my`, { withCredentials: true }).catch(() => ({ data: [] })),
+      ]);
       setLeagues(data);
+      setRegisteredIds(new Set(myRes.data.map((l) => l.id)));
     } catch {
       setLeagues([]);
     } finally {
@@ -100,12 +117,12 @@ export default function JoinFlow() {
                   <button
                     key={s.id}
                     onClick={() => { setSport(s.id); setStep(1); }}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left hover:border-gray-400 ${sport === s.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${sport === s.id ? (SPORT_SELECTED_CLS[s.id] || "border-black bg-gray-50") : "border-gray-200 hover:border-gray-400"}`}
                     data-testid={`pick-sport-${s.id}`}
                   >
                     <span className="text-3xl">{s.icon}</span>
-                    <span className="font-semibold text-gray-900">{s.label}</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
+                    <span className={`font-semibold ${sport === s.id ? "" : "text-gray-900"}`}>{s.label}</span>
+                    <ChevronRight className={`w-4 h-4 ml-auto ${sport === s.id ? "opacity-60" : "text-gray-400"}`} />
                   </button>
                 ))}
               </div>
@@ -193,18 +210,26 @@ export default function JoinFlow() {
                   {leagues.map((lg) => {
                     const spotsLeft = (lg.rr_config?.max_players || lg.max_players) - (lg.current_players || 0);
                     const detailPath = leagueType === "round_robin" ? `/round-robin/${lg.id}` : `/leagues/${lg.id}`;
+                    const alreadyIn = registeredIds.has(lg.id);
                     return (
                       <button
                         key={lg.id}
                         onClick={() => navigate(detailPath)}
-                        className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-black hover:-translate-y-0.5 hover:shadow-md transition"
+                        className={`w-full text-left p-4 rounded-xl border transition ${alreadyIn ? "border-emerald-300 bg-emerald-50/60 hover:border-emerald-500" : "border-gray-200 hover:border-black hover:-translate-y-0.5 hover:shadow-md"}`}
                         data-testid={`league-option-${lg.id}`}
                       >
-                        <p className="font-semibold text-gray-900 text-sm mb-1">{lg.name}</p>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-semibold text-gray-900 text-sm">{lg.name}</p>
+                          {alreadyIn && (
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full" data-testid={`registered-badge-${lg.id}`}>
+                              <CheckCircle className="w-3 h-3" /> Registered
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{lg.city}</span>
                           <span className="flex items-center gap-1"><Users className="w-3 h-3" />{spotsLeft} spots left</span>
-                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{lg.start_date}</span>
+                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(lg.start_date)}</span>
                         </div>
                       </button>
                     );

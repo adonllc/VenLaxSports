@@ -6,6 +6,12 @@ import platformConfig, { activeSports } from "../config/platformConfig";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+const fmtDate = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+};
+
 // PHASE-DRIVEN: only active sports appear in the filter dropdown.
 // PHASE 2 unlocks Cricket automatically via REACT_APP_PHASE=2.
 const ALL_SPORT_CONFIG = {
@@ -142,7 +148,7 @@ export default function Leagues() {
             type="text"
             value={filters.city}
             onChange={(e) => updateFilter("city", e.target.value)}
-            placeholder="Any city or 'All Cities'"
+            placeholder="Filter by city"
             list="leagues-city-list"
             className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black w-44"
             data-testid="filter-city"
@@ -161,7 +167,7 @@ export default function Leagues() {
             className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
             data-testid="filter-status"
           >
-            <option value="">All Status</option>
+            <option value="">Any Status</option>
             <option value="registration">Open Registration</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
@@ -201,7 +207,7 @@ export default function Leagues() {
           <div className="text-center py-20">
             <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="font-heading font-bold text-xl text-gray-700 mb-2">No leagues found</h3>
-            <p className="text-gray-500 text-sm">Try adjusting your filters</p>
+            <p className="text-gray-500 text-sm mb-4">No leagues match your current filters. Clear them to see all open leagues.</p>
           </div>
         )}
       </div>
@@ -253,7 +259,7 @@ function LeagueCard({ league, onClick }) {
         <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
           <span className="capitalize">{league.format}</span>
           <span>•</span>
-          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {league.start_date}</span>
+          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
         </div>
 
         {/* Progress bar */}

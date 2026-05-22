@@ -7,6 +7,12 @@ import PaymentMethodModal from "../components/PaymentMethodModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+};
+
 const SPORT_CONFIG = {
   tennis: { badge: "sport-badge-tennis", color: "text-tennis", accent: "#10B981", icon: "🎾", label: "Tennis" },
   cricket: { badge: "sport-badge-cricket", color: "text-cricket", accent: "#2563EB", icon: "🏏", label: "Cricket" },
@@ -19,7 +25,6 @@ export default function LeagueDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [league, setLeague] = useState(null);
-  const [players, setPlayers] = useState([]);
   const [matches, setMatches] = useState([]);
   const [standings, setStandings] = useState([]);
   const [tab, setTab] = useState("overview");
@@ -49,39 +54,21 @@ export default function LeagueDetail() {
   }, [sessionId, user]);
 
   useEffect(() => {
-    if (tab === "players") fetchPlayers();
     if (tab === "matches") fetchMatches();
     if (tab === "standings") fetchStandings();
   }, [tab]);
 
-  // Derive registration status from already-fetched players when user resolves
-  useEffect(() => {
-    if (user && players.length > 0) {
-      const userId = user?.id || user?._id;
-      setIsRegistered(players.some((p) => p.player_id === userId));
-    }
-  }, [user, players]);
 
   const fetchLeague = async () => {
     try {
-      const [leagueRes, playersRes] = await Promise.all([
-        axios.get(`${API}/leagues/${id}`),
-        axios.get(`${API}/leagues/${id}/players`),
-      ]);
-      setLeague(leagueRes.data);
-      setPlayers(playersRes.data);
+      const { data } = await axios.get(`${API}/leagues/${id}`, { withCredentials: true });
+      setLeague(data);
+      if (data.is_registered) setIsRegistered(true);
     } catch {
       navigate("/leagues");
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchPlayers = async () => {
-    try {
-      const { data } = await axios.get(`${API}/leagues/${id}/players`);
-      setPlayers(data);
-    } catch (e) { console.error(e); }
   };
 
   const fetchMatches = async () => {
@@ -186,6 +173,8 @@ export default function LeagueDetail() {
   const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
+  const SPORT_HEADER_BG = { tennis: "bg-tennis-bg", pickleball: "bg-pickleball-bg", cricket: "bg-cricket-bg" };
+  const headerBg = SPORT_HEADER_BG[league.sport] || "bg-white";
 
   const TABS = [
     { id: "overview", label: "Overview" },
@@ -197,7 +186,7 @@ export default function LeagueDetail() {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="league-detail-page">
       {/* Header Banner */}
-      <div className="bg-white border-b border-gray-200">
+      <div className={`${headerBg} border-b border-gray-200`}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-5 transition-colors" data-testid="back-to-leagues">
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
@@ -212,11 +201,16 @@ export default function LeagueDetail() {
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
+                {isRegistered && (
+                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-600 text-white" data-testid="registered-pill">
+                    <CheckCircle className="w-3 h-3" /> Registered
+                  </span>
+                )}
               </div>
               <h1 className="font-heading font-black text-3xl text-gray-900 mb-2">{league.name}</h1>
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}</span>
-                <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {league.start_date} — {league.end_date}</span>
+                <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(league.start_date)} to {formatDate(league.end_date)}</span>
                 <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {league.current_players || 0}/{league.max_players} players</span>
               </div>
             </div>
@@ -325,9 +319,10 @@ export default function LeagueDetail() {
                   )}
 
                   {isRegistered && (
-                    <div className="text-center text-sm font-semibold text-emerald-700">
-                      <CheckCircle className="w-5 h-5 mx-auto mb-1" />
-                      You're registered!
+                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-4 text-center" data-testid="registered-badge">
+                      <CheckCircle className="w-6 h-6 text-emerald-600 mx-auto mb-1.5" />
+                      <p className="font-bold text-emerald-800 text-sm">You're registered</p>
+                      <p className="text-xs text-emerald-600 mt-0.5">Check your email for details.</p>
                     </div>
                   )}
                 </>

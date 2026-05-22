@@ -67,7 +67,7 @@ export default function PlayerDashboard() {
         player2_id: opponent,
         scheduled_date: schedDate,
       }, { withCredentials: true });
-      setSchedMsg("Match scheduled successfully!");
+      setSchedMsg("Match scheduled. Both players will receive a confirmation email.");
       setOpponent(""); setSchedDate(""); setScheduleLeagueId("");
       fetchData();
     } catch (err) {
@@ -163,10 +163,10 @@ export default function PlayerDashboard() {
                     : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
                 } disabled:opacity-60`}
                 data-testid="toggle-email-notifications"
-                title="Toggle email notifications for match scheduling, score results, and league registration"
+                title="Email updates for match scheduling, scores, and league activity"
               >
                 {user.email_notifications ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
-                Email notifications: {user.email_notifications ? "ON" : "OFF"}
+                Match emails: {user.email_notifications ? "on" : "off"}
               </button>
               <button
                 onClick={togglePrivacy}
@@ -177,23 +177,23 @@ export default function PlayerDashboard() {
                     : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
                 } disabled:opacity-60`}
                 data-testid="toggle-profile-public"
-                title="Control who can see your public profile and match history"
+                title="Control who can see your profile and match history"
               >
-                {user.profile_public !== false ? "🌐 Profile: Public" : "🔒 Profile: Private"}
+                {user.profile_public !== false ? "Profile: public" : "Profile: private"}
               </button>
             </div>
-            <div className="flex gap-4 sm:gap-3 flex-wrap sm:flex-nowrap">
-              <div className="text-center">
-                <p className="font-heading font-black text-2xl text-emerald-600">{user.tennis_rating || 3.0}</p>
-                <p className="text-xs text-gray-500">Tennis</p>
+            <div className="flex gap-5 sm:gap-4 flex-wrap sm:flex-nowrap">
+              <div className="text-center min-w-[48px]">
+                <p className="font-heading font-black text-2xl text-tennis">{user.tennis_rating || 3.0}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-tennis mt-0.5">Tennis</p>
               </div>
-              <div className="text-center">
-                <p className="font-heading font-black text-2xl text-blue-600">{user.cricket_rating || 50}</p>
-                <p className="text-xs text-gray-500">Cricket</p>
+              <div className="text-center min-w-[48px]">
+                <p className="font-heading font-black text-2xl text-cricket">{user.cricket_rating || 50}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-cricket mt-0.5">Cricket</p>
               </div>
-              <div className="text-center">
-                <p className="font-heading font-black text-2xl text-orange-600">{user.pickleball_rating || 3.0}</p>
-                <p className="text-xs text-gray-500">Pickleball</p>
+              <div className="text-center min-w-[48px]">
+                <p className="font-heading font-black text-2xl text-pickleball">{user.pickleball_rating || 3.0}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-pickleball mt-0.5">Pickleball</p>
               </div>
             </div>
           </div>
@@ -202,12 +202,12 @@ export default function PlayerDashboard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: "Leagues", value: leagues.length, icon: Trophy, color: "text-black" },
-            { label: "Wins", value: wins, icon: Award, color: "text-emerald-600" },
-            { label: "Losses", value: losses, icon: TrendingUp, color: "text-red-500" },
-            { label: "Total Matches", value: matches.length, icon: Calendar, color: "text-blue-600" },
+            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "text-gray-900",    bg: "bg-white border-gray-200" },
+            { label: "Wins",          value: wins,           icon: Award,    color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+            { label: "Losses",        value: losses,         icon: TrendingUp, color: "text-red-600",   bg: "bg-red-50 border-red-100" },
+            { label: "Total Matches", value: matches.length, icon: Calendar, color: "text-blue-700",    bg: "bg-blue-50 border-blue-100" },
           ].map((s) => (
-            <div key={s.label} className="bg-white border border-gray-200 rounded-2xl p-5" data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
+            <div key={s.label} className={`border rounded-2xl p-5 ${s.bg}`} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
               <s.icon className={`w-5 h-5 ${s.color} mb-3`} />
               <p className={`font-heading font-black text-3xl ${s.color}`}>{s.value}</p>
               <p className="text-xs text-gray-500 mt-1">{s.label}</p>
@@ -218,8 +218,8 @@ export default function PlayerDashboard() {
         {/* Find a League CTA */}
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
           <div>
-            <p className="font-heading font-bold text-gray-900 text-sm">Ready to compete?</p>
-            <p className="text-xs text-gray-500 mt-0.5">Find a league that fits your sport, format, and division.</p>
+            <p className="font-heading font-bold text-gray-900 text-sm">Find your next league.</p>
+            <p className="text-xs text-gray-500 mt-0.5">Browse by sport, city, and format. New seasons open year-round.</p>
           </div>
           <Link
             to="/join"
@@ -240,9 +240,10 @@ export default function PlayerDashboard() {
             {leagues.length === 0 ? (
               <div className="text-center py-10">
                 <Trophy className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 mb-3">Not in any leagues yet</p>
+                <p className="text-sm font-medium text-gray-700 mb-1">No leagues yet</p>
+                <p className="text-xs text-gray-400 mb-3">Join a league to start tracking matches and your rating.</p>
                 <Link to="/leagues" className="text-sm font-semibold text-black border border-black px-4 py-2 rounded-xl" data-testid="browse-leagues-btn">
-                  Browse Leagues
+                  Browse Open Leagues
                 </Link>
               </div>
             ) : (
@@ -256,8 +257,8 @@ export default function PlayerDashboard() {
                         <p className="text-sm font-semibold text-gray-900 truncate">{l.name}</p>
                         <p className="text-xs text-gray-500">{l.city} • {l.format}</p>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
-                        {l.status}
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : l.status === "active" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                        {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
                       </span>
                       <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium text-gray-400 hover:text-black">
                         Standings
@@ -334,7 +335,9 @@ export default function PlayerDashboard() {
               <h2 className="font-heading font-bold text-lg">Upcoming Matches ({upcoming.length})</h2>
             </div>
             {upcoming.length === 0 ? (
-              <div className="text-center py-10 text-gray-500 text-sm">No upcoming matches</div>
+              <div className="text-center py-10">
+                <p className="text-sm text-gray-500">No scheduled matches. Use the form below to schedule one.</p>
+              </div>
             ) : (
               <div className="divide-y divide-gray-100">
                 {upcoming.slice(0, 5).map((m) => (

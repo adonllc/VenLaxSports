@@ -87,66 +87,58 @@ export default function Home() {
     <div className="bg-white" data-testid="home-page">
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="hero-dark relative overflow-hidden" data-testid="hero-section">
-        {/* Subtle dot texture */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-        {/* Ambient glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 65% at 90% 40%, rgba(16,185,129,0.11) 0%, transparent 60%), radial-gradient(ellipse 30% 40% at 5% 90%, rgba(16,185,129,0.05) 0%, transparent 50%)",
-          }}
-        />
+      <section className="relative bg-white overflow-hidden" data-testid="hero-section">
+        {/* Emerald top rail — sport identity, structural not decorative */}
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-emerald-500 pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Split: text left, images right */}
-          <div className="grid lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_480px] gap-8 xl:gap-14 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-[1fr_360px] lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_480px] gap-8 lg:gap-12 xl:gap-14 items-center">
 
             {/* ── Left: text ── */}
-            <div className="py-16 lg:py-24">
-              <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 mb-10 animate-fade-in">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+            <div className="py-12 sm:py-16 lg:py-28">
+
+              {/* Kicker */}
+              <p className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.12em] uppercase text-gray-400 mb-10">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
                 {platformConfig.heroBadge}
+              </p>
+
+              {/* Headline — factual, precision-over-hype */}
+              <div className="mb-8">
+                <h1
+                  className="font-heading font-black text-gray-900 leading-[0.88] tracking-tight"
+                  style={{ fontSize: "clamp(3.25rem, 7.5vw, 6rem)" }}
+                >
+                  <span className="block">Your league</span>
+                  <span className="block">is waiting.</span>
+                </h1>
+                <p
+                  className="font-heading font-semibold text-emerald-600 mt-3 tracking-tight"
+                  style={{ fontSize: "clamp(1.25rem, 3vw, 2rem)" }}
+                >
+                  Earn your rank.
+                </p>
               </div>
 
-              {/* Stacked headline */}
-              <div className="mb-8 animate-fade-in delay-100">
-                {["COMPETE.", "RISE.", "DOMINATE."].map((word, i) => (
-                  <p
-                    key={word}
-                    className={`font-heading font-black leading-[0.88] tracking-tight block ${
-                      i === 1 ? "text-emerald-400" : "text-white"
-                    }`}
-                    style={{ fontSize: "clamp(3rem, 7.5vw, 5.75rem)" }}
-                  >
-                    {word}
-                  </p>
-                ))}
-              </div>
-
-              <p className="text-gray-400 text-base lg:text-lg leading-relaxed max-w-md mb-10 animate-fade-in delay-200">
+              <p
+                className="text-gray-500 leading-relaxed mb-10"
+                style={{ fontSize: "clamp(1rem, 1.5vw, 1.125rem)", maxWidth: "44ch" }}
+              >
                 {platformConfig.heroSubtitle}
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-10 animate-fade-in delay-300">
+              <div className="flex flex-col lg:flex-row gap-3 mb-12">
                 <button
                   onClick={() => navigate("/leagues")}
-                  className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-md transition-colors text-base cursor-pointer"
+                  className="px-8 py-4 bg-gray-900 hover:bg-gray-700 text-white font-bold rounded-md transition-colors text-base cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                   data-testid="hero-browse-btn"
                 >
                   Find My League
                 </button>
                 <button
                   onClick={() => navigate("/auth?mode=register")}
-                  className="px-8 py-4 border border-white/20 hover:border-white/40 text-white font-semibold rounded-md transition-colors text-base cursor-pointer"
+                  className="px-8 py-4 border border-gray-200 hover:border-gray-900 text-gray-700 hover:text-gray-900 font-semibold rounded-md transition-colors text-base cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                   data-testid="hero-signup-btn"
                 >
                   Join Free
@@ -154,26 +146,26 @@ export default function Home() {
               </div>
 
               {/* Sport pills */}
-              <div className="flex gap-3 flex-wrap animate-fade-in delay-400">
-                {sportEntries.map(([sport, config]) => {
-                  const Icon = SPORT_ICONS[sport] || Activity;
-                  return (
-                    <button
-                      key={sport}
-                      onClick={() => navigate(`/sport/${sport}`)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] hover:border-white/30 text-gray-400 hover:text-white text-sm font-medium transition cursor-pointer"
-                      data-testid={`hero-sport-pill-${sport}`}
-                    >
-                      <Icon className="w-4 h-4" style={{ color: config.accent }} />
-                      {config.label}
-                    </button>
-                  );
-                })}
+              <div className="flex gap-2.5 flex-wrap">
+                {sportEntries.map(([sport, config]) => (
+                  <button
+                    key={sport}
+                    onClick={() => navigate(`/sport/${sport}`)}
+                    className="flex items-center gap-2 px-4 py-3 min-h-[44px] rounded-full border border-gray-200 hover:border-gray-400 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                    data-testid={`hero-sport-pill-${sport}`}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: config.accent }}
+                    />
+                    {config.label}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* ── Right: image stack ── */}
-            <div className="py-10 lg:py-20 flex flex-col gap-3">
+            <div className="py-6 md:py-16 lg:py-20 flex flex-col gap-3">
               {sportEntries.map(([sport, config], idx) => {
                 const Icon = SPORT_ICONS[sport] || Activity;
                 const isFirst = idx === 0;
@@ -182,18 +174,17 @@ export default function Home() {
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
                     className={`relative rounded-2xl overflow-hidden cursor-pointer group ${
-                      isFirst ? "h-60 sm:h-72" : "h-40 sm:h-44"
+                      isFirst ? "h-64 sm:h-80" : "h-44 sm:h-48"
                     }`}
                     data-testid={`hero-sport-image-${sport}`}
                   >
                     <img
                       src={config.image}
-                      alt={config.label}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      loading="lazy"
+                      alt={`${config.label} ranked league`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                      loading={isFirst ? "eager" : "lazy"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    {/* Faint sport number */}
                     <div className="absolute top-3 right-4 select-none pointer-events-none">
                       <span className="font-heading font-black text-white/10 leading-none" style={{ fontSize: "4rem" }}>
                         {config.num}
@@ -209,7 +200,7 @@ export default function Home() {
                         </div>
                         <span className="font-heading font-bold text-white">{config.label}</span>
                       </div>
-                      <span className="text-gray-300 text-xs font-medium opacity-80">{config.tagline}</span>
+                      <span className="text-gray-300 text-xs font-medium">{config.tagline}</span>
                     </div>
                   </div>
                 );
@@ -231,7 +222,7 @@ export default function Home() {
                 data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}
               >
                 <p
-                  className="stat-counter text-gray-900 mb-1.5"
+                  className="stat-counter text-tennis mb-1.5"
                   style={{ fontSize: "clamp(2rem, 4.5vw, 3.25rem)" }}
                 >
                   {s.value}
@@ -482,43 +473,54 @@ export default function Home() {
   );
 }
 
+const HOME_CARD_SPORT_BAR = {
+  tennis:     "bg-tennis",
+  pickleball: "bg-pickleball",
+  cricket:    "bg-cricket",
+};
+
+const fmtDate = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+};
+
 function LeagueCard({ league }) {
   const navigate = useNavigate();
   const config = SPORT_CONFIG[league.sport] || {};
   const Icon = SPORT_ICONS[league.sport] || Activity;
   const spotsLeft = league.max_players - (league.current_players || 0);
+  const barClass = HOME_CARD_SPORT_BAR[league.sport] || "bg-gray-300";
 
   return (
     <div
       onClick={() => navigate(`/leagues/${league.id}`)}
-      className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer relative overflow-hidden"
+      className="bg-white border border-gray-200 rounded-2xl overflow-hidden league-card-hover cursor-pointer"
       data-testid={`league-card-${league.id}`}
     >
-      {/* Sport accent left border */}
-      <div
-        className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full"
-        style={{ backgroundColor: config.accent }}
-      />
-      <div className="flex items-start justify-between mb-3">
-        <span className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
-          <Icon className="w-3 h-3" />
-          {config.label}
-        </span>
-        <span
-          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-            league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
-        </span>
-      </div>
-      <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2">{league.name}</h3>
-      <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-        <MapPin className="w-3 h-3" /> {league.city}
-      </div>
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {spotsLeft} spots left</span>
-        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {league.start_date}</span>
+      <div className={`h-1.5 ${barClass}`} />
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-3">
+          <span className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
+            <Icon className="w-3 h-3" />
+            {config.label}
+          </span>
+          <span
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+              league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {league.status === "registration" ? "Open" : league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
+          </span>
+        </div>
+        <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2">{league.name}</h3>
+        <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+          <MapPin className="w-3 h-3" /> {league.city}
+        </div>
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {spotsLeft} spots left</span>
+          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+        </div>
       </div>
     </div>
   );

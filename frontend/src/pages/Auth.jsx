@@ -96,7 +96,7 @@ export default function Auth() {
             </div>
             <Logo size="hero" variant="hero" testId="auth-hero-logo" />
           </div>
-          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Compete.<br />Rise.<br /><span className="text-emerald-400">Dominate.</span></h2>
+          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Your rank.<br />Your record.<br /><span className="text-emerald-400">Your league.</span></h2>
           <p className="text-gray-400 text-base max-w-xs mx-auto">{BRAND.story_short}</p>
           <div className="flex justify-center gap-6 mt-10">
             {activeSports.map((s) => (
@@ -131,7 +131,7 @@ export default function Auth() {
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
           <p className="text-gray-500 text-sm mb-8">
-            {mode === "login" ? `Log in to your ${BRAND.name} account` : "Your season starts now."}
+            {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
 
           {error && (
@@ -214,7 +214,7 @@ export default function Auth() {
                   type={showPwd ? "text" : "password"}
                   value={form.password}
                   onChange={update("password")}
-                  placeholder="Min. 6 characters"
+                  placeholder={mode === "register" ? "At least 6 characters" : "Your password"}
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   data-testid="input-password"
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
@@ -225,10 +225,14 @@ export default function Auth() {
                   type="button"
                   onClick={() => setShowPwd(!showPwd)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPwd ? "Hide password" : "Show password"}
                 >
                   {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {mode === "register" && (
+                <p className="text-xs text-gray-400 mt-1.5">Minimum 6 characters.</p>
+              )}
               {mode === "login" && (
                 <button
                   type="button"
@@ -291,8 +295,8 @@ export default function Auth() {
 
             {mode === "register" && (
               <p className="text-xs text-gray-400 text-center">
-                By registering, your match results will be publicly visible.{" "}
-                <span className="text-gray-500">You can make your profile private anytime in Settings.</span>
+                Match results are public by default.{" "}
+                <span className="text-gray-500">You can set your profile to private from your dashboard.</span>
               </p>
             )}
 
@@ -302,7 +306,7 @@ export default function Auth() {
               className="w-full py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm mt-2"
               data-testid="auth-submit-btn"
             >
-              {loading ? "Please wait..." : mode === "login" ? "Log In" : "Create Account"}
+              {loading ? (mode === "login" ? "Signing in..." : "Creating account...") : mode === "login" ? "Log In" : "Create Account"}
             </button>
           </form>
 

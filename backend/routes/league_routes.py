@@ -80,7 +80,18 @@ async def get_league(league_id: str, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
-    return _serialize(league)
+    serialized = _serialize(league)
+    user = await get_optional_user(request, db)
+    if user:
+        reg = await db.player_leagues.find_one({
+            "league_id": league_id,
+            "player_id": str(user["_id"]),
+            "payment_status": {"$in": ["paid", "free"]},
+        })
+        serialized["is_registered"] = reg is not None
+    else:
+        serialized["is_registered"] = False
+    return serialized
 
 
 @router.post("")

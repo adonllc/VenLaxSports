@@ -58,7 +58,7 @@ const PHASE_1 = {
   paymentProvider: "stripe",      // PHASE 3: change to "razorpay"
 
   // UI copy
-  heroBadge: "Season 1 is live — spots filling fast",
+  heroBadge: "Season 1 is live. Spots filling fast.",
   heroSubtitle: "Ranked leagues for Tennis & Pickleball players across the USA. Enter your city's circuit.",
   footerTagline: "Ranked leagues. Real competition. Every city. Every season.",
   statsRegion: "All US Cities",
