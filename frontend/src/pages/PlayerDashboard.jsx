@@ -257,6 +257,19 @@ export default function PlayerDashboard() {
                     >
                       Copy link
                     </button>
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm("Cancel this invite?")) return;
+                        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/${invite.token}`, {
+                          method: "DELETE", credentials: "include",
+                        });
+                        setPendingInvites(prev => prev.filter(i => i.token !== invite.token));
+                      }}
+                      className="text-xs text-red-500 border border-red-200 rounded px-2 py-1 hover:bg-red-50"
+                      data-testid={`cancel-invite-${invite.token}`}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               ))}

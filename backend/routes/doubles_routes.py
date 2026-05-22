@@ -233,6 +233,28 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
     }
 
 
+# ── DELETE /{token} ───────────────────────────────────────────────────────────
+
+@router.delete("/{token}")
+async def cancel_doubles_invite(token: str, request: Request):
+    """Initiator (P1) cancels a pending outbound invite."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite not found")
+    if invite["initiator_id"] != user["_id"]:
+        raise HTTPException(status_code=403, detail="Only the initiator can cancel this invite")
+    if invite.get("status") != "pending":
+        raise HTTPException(status_code=409, detail=f"Invite is already {invite.get('status')}")
+
+    await db.doubles_invites.update_one(
+        {"token": token}, {"$set": {"status": "cancelled"}}
+    )
+    return {"cancelled": True}
+
+
 # ── GET /my-invites ───────────────────────────────────────────────────────────
 
 @router.get("/my-invites")
