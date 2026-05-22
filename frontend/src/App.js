@@ -25,7 +25,10 @@ import ProfileSetup from "./pages/ProfileSetup";
 import JoinFlow from "./pages/JoinFlow";
 import OAuthCallback from "./pages/OAuthCallback";
 import DoublesInviteConfirm from "./pages/DoublesInviteConfirm";
+import PreLaunch from "./pages/PreLaunch";
 import "./App.css";
+
+const IS_PRELAUNCH = process.env.REACT_APP_PRELAUNCH === "true";
 
 function AppRouter() {
   return (
@@ -58,6 +61,14 @@ function AppRouter() {
 }
 
 function App() {
+  if (IS_PRELAUNCH) {
+    return (
+      <BrowserRouter>
+        <PreLaunch />
+      </BrowserRouter>
+    );
+  }
+
   return (
     <AuthProvider>
       <BrowserRouter>

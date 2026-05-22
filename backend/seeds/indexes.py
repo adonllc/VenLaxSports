@@ -39,3 +39,5 @@ async def create_indexes(db) -> None:
         unique=True,
         name="player_leagues_unique",
     )
+    # Waitlist
+    await db.waitlist.create_index("email", unique=True)
