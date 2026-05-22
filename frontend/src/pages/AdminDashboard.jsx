@@ -162,6 +162,7 @@ export default function AdminDashboard() {
     { id: "seasons", label: "Seasons" },
     { id: "playoffs", label: "Playoffs" },
     { id: "zelle", label: "Zelle Queue" },
+    { id: "waitlist", label: "Waitlist" },
   ];
 
   return (
@@ -412,6 +413,7 @@ export default function AdminDashboard() {
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
         {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
         {tab === "zelle" && <ZelleQueueTab />}
+        {tab === "waitlist" && <WaitlistTab />}
       </div>
 
       {showRRForm && (
@@ -950,6 +952,139 @@ function ZelleQueueTab() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─────────── Waitlist Tab ───────────
+function WaitlistTab() {
+  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(`${API}/waitlist/list`, { withCredentials: true });
+        setData(res.data);
+      } catch {
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const copyCSV = () => {
+    if (!data) return;
+    const rows = [["Email", "City", "Sport", "Signed Up"], ...data.entries.map((e) => [e.email, e.city, e.sport, e.created_at])];
+    navigator.clipboard.writeText(rows.map((r) => r.join(",")).join("\n"));
+  };
+
+  if (loading) return <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>;
+  if (!data) return <div className="text-sm text-red-500 py-8 text-center">Failed to load waitlist.</div>;
+
+  const filtered = data.entries.filter(
+    (e) => !search || e.email.includes(search.toLowerCase()) || e.city.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6" data-testid="waitlist-tab">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold text-gray-900">{data.total}</div>
+          <div className="text-xs text-gray-500 mt-1">Total signups</div>
+        </div>
+        {data.by_sport.tennis !== undefined && (
+          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+            <div className="text-3xl font-bold text-emerald-700">{data.by_sport.tennis || 0}</div>
+            <div className="text-xs text-gray-500 mt-1">Tennis</div>
+          </div>
+        )}
+        {data.by_sport.pickleball !== undefined && (
+          <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
+            <div className="text-3xl font-bold text-orange-600">{data.by_sport.pickleball || 0}</div>
+            <div className="text-xs text-gray-500 mt-1">Pickleball</div>
+          </div>
+        )}
+        {data.by_sport.both !== undefined && (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+            <div className="text-3xl font-bold text-gray-700">{data.by_sport.both || 0}</div>
+            <div className="text-xs text-gray-500 mt-1">Both sports</div>
+          </div>
+        )}
+      </div>
+
+      {data.by_city.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">By City</p>
+          <div className="flex flex-wrap gap-2">
+            {data.by_city.map(([city, count]) => (
+              <span key={city} className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                {city} <span className="font-semibold text-gray-900">{count}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search email or city..."
+            className="text-sm border border-gray-200 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            data-testid="waitlist-search"
+          />
+          <button
+            onClick={copyCSV}
+            className="text-xs bg-gray-900 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            data-testid="waitlist-copy-csv"
+          >
+            Copy CSV
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+              <tr>
+                <th className="px-4 py-3 text-left">#</th>
+                <th className="px-4 py-3 text-left">Email</th>
+                <th className="px-4 py-3 text-left">City</th>
+                <th className="px-4 py-3 text-left">Sport</th>
+                <th className="px-4 py-3 text-left">Signed Up</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filtered.length === 0 ? (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-xs">No entries found.</td></tr>
+              ) : (
+                filtered.map((e, i) => (
+                  <tr key={e.email} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{e.email}</td>
+                    <td className="px-4 py-3 text-gray-600">{e.city}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        e.sport === "tennis" ? "bg-emerald-100 text-emerald-700" :
+                        e.sport === "pickleball" ? "bg-orange-100 text-orange-700" :
+                        "bg-gray-100 text-gray-700"
+                      }`}>
+                        {e.sport}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">
+                      {e.created_at ? new Date(e.created_at).toLocaleDateString() : "—"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
