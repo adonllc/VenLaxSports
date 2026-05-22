@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from auth_utils import get_current_user
@@ -42,10 +42,11 @@ async def waitlist_count(request: Request):
 
 
 @router.get("/list")
-async def list_waitlist(request: Request, current_user=Depends(get_current_user)):
+async def list_waitlist(request: Request):
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
     if current_user.get("role") != "admin":
         raise HTTPException(403, "Admin only")
-    db = request.app.state.db
     entries = await db.waitlist.find({}, {"_id": 0}).sort("created_at", -1).to_list(10000)
     by_city = {}
     by_sport = {}
