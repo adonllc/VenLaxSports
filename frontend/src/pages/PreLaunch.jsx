@@ -58,7 +58,7 @@ export default function PreLaunch() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium px-3 py-1.5 rounded-full mb-8">
             <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse inline-block"></span>
-            Launching in select cities — 2025
+            Launching in select cities — 2026
           </div>
           <h1
             className="text-5xl md:text-6xl font-bold leading-tight mb-6"
@@ -330,7 +330,7 @@ export default function PreLaunch() {
             {[
               { stat: "2 Sports", label: "Tennis + Pickleball" },
               { stat: "City-Based", label: "Local rankings + leagues" },
-              { stat: "2025", label: "First cities launching" },
+              { stat: "2026", label: "First cities launching" },
             ].map((item) => (
               <div key={item.stat}>
                 <div
@@ -444,7 +444,7 @@ export default function PreLaunch() {
             <a href="/rules" className="hover:text-gray-300 transition-colors">
               Rules
             </a>
-            <span>© 2025 VENLAX Sports. All rights reserved.</span>
+            <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </div>
       </footer>
