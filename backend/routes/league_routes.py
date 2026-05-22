@@ -7,6 +7,8 @@ from models import League, LeagueCreate, PlayerLeague, Standing
 from auth_utils import get_current_user, require_admin
 from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
 import email_service
+import asyncio
+import notification_dispatch
 
 router = APIRouter(redirect_slashes=False)
 
@@ -96,7 +98,13 @@ async def create_league(data: LeagueCreate, request: Request):
         admin_id=user["_id"],
     )
     result = await db.leagues.insert_one(league.to_mongo())
-    return {"id": str(result.inserted_id), "message": "League created", **data.model_dump()}
+    league_id = str(result.inserted_id)
+
+    # Trigger 1 — notify interested players that a new season opened
+    league_dict = {"id": league_id, **data.model_dump()}
+    asyncio.create_task(notification_dispatch.dispatch_season_open(db, league_dict))
+
+    return {"id": league_id, "message": "League created", **data.model_dump()}
 
 
 class JoinLeagueRequest(BaseModel):
@@ -155,7 +163,27 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         waiver_accepted_at=waiver_ts,
     )
     await db.player_leagues.insert_one(pl.to_mongo())
+    old_count = league["current_players"]
+    new_count = old_count + 1
+    max_p = league.get("max_players", 0)
+
     await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
+
+    # Capacity milestone dispatch (fire-and-forget)
+    _league_info = {
+        "id": league_id,
+        "name": league["name"],
+        "city": league.get("city", ""),
+        "sport": league.get("sport", ""),
+    }
+    if max_p > 0:
+        if new_count >= max_p:
+            asyncio.create_task(notification_dispatch.dispatch_waitlist_open(db, _league_info))
+        elif old_count < int(max_p * 0.8) and new_count >= int(max_p * 0.8):
+            spots_left = max_p - new_count
+            asyncio.create_task(notification_dispatch.dispatch_last_spots(db, _league_info, spots_left))
+        elif old_count < int(max_p * 0.5) and new_count >= int(max_p * 0.5):
+            asyncio.create_task(notification_dispatch.dispatch_filling_fast(db, _league_info))
 
     # Upsert standing
     await _upsert_standing(db, league_id, user["_id"], user["name"], league["sport"], user.get("country", "USA"))
