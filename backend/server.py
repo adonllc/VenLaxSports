@@ -34,6 +34,7 @@ from routes.round_robin_routes import router as rr_router
 from routes.public_routes import router as public_router
 from routes.whatsapp_routes import router as wa_router
 from routes.social_auth_routes import router as social_auth_router
+from routes.notification_routes import router as notification_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(social_auth_router, prefix="/auth", tags=["social-auth"])
@@ -48,6 +49,7 @@ api_router.include_router(auto_league_router, prefix="/admin/auto", tags=["auto-
 api_router.include_router(rr_router, prefix="/round-robin", tags=["round-robin"])
 api_router.include_router(public_router, prefix="/public", tags=["public"])
 api_router.include_router(wa_router, prefix="/webhook/whatsapp", tags=["whatsapp"])
+api_router.include_router(notification_router, prefix="/notifications", tags=["notifications"])
 
 
 @api_router.get("/")

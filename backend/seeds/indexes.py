@@ -18,3 +18,7 @@ async def create_indexes(db) -> None:
     await db.auth_codes.create_index("expires_at", expireAfterSeconds=0)
     await db.oauth_states.create_index("state", unique=True)
     await db.oauth_states.create_index("expires_at", expireAfterSeconds=0)
+    # Smart notifications (B2)
+    await db.notification_interests.create_index([("city", 1), ("sport", 1)])
+    await db.notification_interests.create_index([("email", 1)])
+    await db.push_subscriptions.create_index([("user_id", 1)])
