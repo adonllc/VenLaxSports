@@ -76,7 +76,7 @@ async def _send_push_to_user(db, user_id: str, payload: dict) -> None:
     except Exception:
         return
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     for sub in subs:
         try:
             await loop.run_in_executor(None, partial(

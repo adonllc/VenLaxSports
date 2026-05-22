@@ -282,7 +282,7 @@ async def send_waitlist_open(to: str, player_name: str, city: str, sport: str,
     body = f"""
       <p>Hi {player_name},</p>
       <p>The {city} {sport.title()} league you were interested in is now full.</p>
-      <p>You've been added to the waitlist — we'll notify you the moment a spot opens.</p>
+      <p>Join the waitlist below — we'll notify you the moment a spot opens.</p>
     """
     subject = f"{city} {sport.title()} is full — you're on the waitlist"
     await send_email(to, subject, _wrap(f"{sport_emoji} You're on the Waitlist", body, "View League", waitlist_url))
