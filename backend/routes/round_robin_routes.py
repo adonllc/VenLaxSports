@@ -386,37 +386,117 @@ async def invite_partner(league_id: str, request: Request):
         raise HTTPException(status_code=400, detail="League already started")
 
     body = await request.json()
+    partner_id = body.get("partner_id", "").strip()
     partner_email = body.get("partner_email", "").strip().lower()
-    if not partner_email:
-        raise HTTPException(status_code=400, detail="partner_email required")
+
+    if not partner_id and not partner_email:
+        raise HTTPException(status_code=400, detail="partner_id or partner_email required")
 
     existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": league_id})
     if existing:
         raise HTTPException(status_code=400, detail="Already registered in this league")
 
+    import email_service
+    now = datetime.now(timezone.utc)
+    inviter_name = user.get("name", "")
     token = str(uuid.uuid4())
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=72)
+    expires_at = now + timedelta(hours=72)
 
+    if partner_id:
+        # ── Direct registration — partner found in system ─────────────────────
+        try:
+            partner = await db.users.find_one({"_id": ObjectId(partner_id)})
+        except Exception:
+            raise HTTPException(status_code=404, detail="Partner not found")
+        if not partner:
+            raise HTTPException(status_code=404, detail="Partner not found")
+        if str(partner["_id"]) == str(user["_id"]):
+            raise HTTPException(status_code=400, detail="Cannot partner with yourself")
+
+        partner_reg = await db.player_leagues.find_one(
+            {"player_id": str(partner["_id"]), "league_id": league_id}
+        )
+        if partner_reg:
+            raise HTTPException(status_code=409, detail="Partner already registered in this league")
+
+        current = league.get("current_players", 0)
+        if current + 1 >= rr.get("max_players", 12):
+            raise HTTPException(status_code=400, detail="League is full")
+
+        p2_name = partner.get("name", "")
+
+        await db.doubles_invites.insert_one({
+            "league_id": league_id,
+            "inviter_id": user["_id"],
+            "inviter_name": inviter_name,
+            "partner_email": partner.get("email", ""),
+            "partner_user_id": str(partner["_id"]),
+            "token": token,
+            "status": "accepted",
+            "expires_at": expires_at.isoformat(),
+            "created_at": now.isoformat(),
+        })
+
+        from models import Standing
+        team_entry = {
+            "player_id": user["_id"], "player_name": inviter_name,
+            "league_id": league_id, "sport": league["sport"],
+            "payment_status": "free", "partner_id": str(partner["_id"]),
+            "partner_name": p2_name, "joined_at": now.isoformat(),
+        }
+        await db.player_leagues.insert_one(team_entry)
+        await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
+        s1 = Standing(league_id=league_id, player_id=user["_id"], player_name=inviter_name,
+                      sport=league["sport"], country="USA")
+        await db.standings.insert_one(s1.to_mongo())
+
+        try:
+            await db.player_leagues.insert_one({
+                "player_id": str(partner["_id"]), "player_name": p2_name,
+                "league_id": league_id, "sport": league["sport"],
+                "payment_status": "free", "partner_id": user["_id"],
+                "partner_name": inviter_name, "joined_at": now.isoformat(),
+            })
+            s2 = Standing(league_id=league_id, player_id=str(partner["_id"]), player_name=p2_name,
+                          sport=league["sport"], country="USA")
+            await db.standings.insert_one(s2.to_mongo())
+        except Exception:
+            pass
+
+        email_service.schedule(email_service.send_registration_confirmed(
+            user["email"], inviter_name, league["name"], league["sport"], league_id, False
+        ))
+        if partner.get("email"):
+            email_service.schedule(email_service.send_registration_confirmed(
+                partner["email"], p2_name, league["name"], league["sport"], league_id, False
+            ))
+
+        new_count = current + 1
+        if new_count >= rr.get("min_players", 6) and not rr.get("schedule_generated"):
+            await _run_generate_schedule(db, league_id)
+
+        return {"registered": True, "message": "Team registered!"}
+
+    # ── Invite by email ───────────────────────────────────────────────────────
     await db.doubles_invites.insert_one({
         "league_id": league_id,
         "inviter_id": user["_id"],
-        "inviter_name": user["name"],
+        "inviter_name": inviter_name,
         "partner_email": partner_email,
         "token": token,
         "status": "pending",
         "expires_at": expires_at.isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now.isoformat(),
     })
 
-    import email_service
     frontend_url = email_service._get_frontend_url()
     accept_url = f"{frontend_url}/round-robin/invite/{token}" if frontend_url else f"/round-robin/invite/{token}"
     email_service.schedule(email_service.send_partner_invite(
-        partner_email, user["name"], league["name"],
+        partner_email, inviter_name, league["name"],
         league["sport"], league.get("entry_fee", 0), accept_url
     ))
 
-    return {"invited": True, "message": "Invite sent to " + partner_email}
+    return {"invited": True, "token": token, "message": "Invite sent to " + partner_email}
 
 
 class AcceptInviteBody(BaseModel):

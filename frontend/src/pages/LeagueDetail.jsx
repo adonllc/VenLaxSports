@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import PaymentMethodModal from "../components/PaymentMethodModal";
+import PartnerSearch from "../components/PartnerSearch";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -39,6 +40,7 @@ export default function LeagueDetail() {
   const [promoResult, setPromoResult] = useState(null);
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState("");
+  const [selectedPartner, setSelectedPartner] = useState(null);
   const [partnerEmail, setPartnerEmail] = useState("");
   const [inviteSent, setInviteSent] = useState(false);
   const [inviteToken, setInviteToken] = useState(null);
@@ -131,23 +133,34 @@ export default function LeagueDetail() {
     if (!user) { navigate("/auth"); return; }
     setJoining(true);
     try {
+      const body = { waiver_accepted: waiverAccepted };
+      if (selectedPartner) {
+        body.partner_id = selectedPartner.id;
+      } else {
+        body.partner_email = partnerEmail.trim().toLowerCase();
+      }
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leagues/${league.id}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          partner_email: partnerEmail.trim().toLowerCase(),
-          waiver_accepted: waiverAccepted,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (res.ok && data.pending_partner) {
+      if (!res.ok) {
+        alert(data.detail || "Failed to register. Please try again.");
+        return;
+      }
+      if (data.redirect && data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else if (data.registered) {
+        setIsRegistered(true);
+        setJoinMsg("Team registered successfully!");
+        fetchLeague();
+      } else if (data.pending_partner) {
         setInviteSent(true);
         setInviteToken(data.invite_token || null);
-      } else {
-        alert(data.detail || "Failed to send invite. Please try again.");
       }
-    } catch (err) {
+    } catch {
       alert("Network error. Please try again.");
     } finally {
       setJoining(false);
@@ -294,22 +307,10 @@ export default function LeagueDetail() {
                         <>
                           {!inviteSent ? (
                             <div className="space-y-3">
-                              <p className="text-sm text-gray-600">
-                                Doubles registration requires both partners to confirm.
-                              </p>
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
-                                  Partner Email
-                                </label>
-                                <input
-                                  type="email"
-                                  value={partnerEmail}
-                                  onChange={(e) => setPartnerEmail(e.target.value)}
-                                  placeholder="partner@example.com"
-                                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                                  data-testid="partner-email-input"
-                                />
-                              </div>
+                              <PartnerSearch
+                                onPartnerSelect={(p) => { setSelectedPartner(p); setPartnerEmail(""); }}
+                                onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
+                              />
                               <label className="flex items-start gap-2.5 cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
                                 <input
                                   type="checkbox"
@@ -327,11 +328,15 @@ export default function LeagueDetail() {
                               </label>
                               <button
                                 onClick={handleDoublesJoin}
-                                disabled={!partnerEmail || !waiverAccepted || joining}
+                                disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
                                 className="w-full bg-gray-900 text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 hover:bg-gray-700 transition-colors"
                                 data-testid="send-doubles-invite-btn"
                               >
-                                {joining ? "Sending invite..." : "Send Partner Invite"}
+                                {joining
+                                  ? "Registering…"
+                                  : selectedPartner
+                                  ? `Register Team with ${selectedPartner.name}`
+                                  : "Send Partner Invite"}
                               </button>
                             </div>
                           ) : (
@@ -340,7 +345,7 @@ export default function LeagueDetail() {
                                 Invite sent to {partnerEmail}
                               </p>
                               <p className="text-xs text-gray-600">
-                                Your registration will complete once your partner confirms. The invite expires in 72 hours.
+                                Registration completes once your partner confirms. Invite expires in 72 hours.
                               </p>
                               {inviteToken && (
                                 <div className="mt-2">

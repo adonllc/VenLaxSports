@@ -5,6 +5,7 @@ import { Users, Calendar } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import RRScheduleView from "../components/RRScheduleView";
 import RRBracketView from "../components/RRBracketView";
+import PartnerSearch from "../components/PartnerSearch";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -23,6 +24,7 @@ export default function RoundRobinDetail() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [selectedRRPartner, setSelectedRRPartner] = useState(null);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteSent, setInviteSent] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -72,16 +74,25 @@ export default function RoundRobinDetail() {
 
   const handleInvitePartner = async () => {
     if (!user) { navigate("/auth"); return; }
-    if (!inviteEmail) return;
+    if (!selectedRRPartner && !inviteEmail) return;
     setInviteLoading(true);
+    setError("");
     try {
-      await axios.post(
+      const body = selectedRRPartner
+        ? { partner_id: selectedRRPartner.id }
+        : { partner_email: inviteEmail };
+      const res = await axios.post(
         `${API}/round-robin/${id}/invite-partner`,
-        { partner_email: inviteEmail },
+        body,
         { withCredentials: true }
       );
+      if (res.data.redirect) {
+        window.location.href = res.data.checkout_url;
+        return;
+      }
       setInviteSent(true);
       setShowInviteModal(false);
+      if (res.data.registered) await fetchAll();
     } catch (e) {
       setError(e.response?.data?.detail || "Failed to send invite.");
     } finally {
@@ -127,7 +138,7 @@ export default function RoundRobinDetail() {
                     >
                       Register as Team
                     </button>
-                    <p className="text-xs text-gray-400 mt-2 text-center">Enter partner email to send invite</p>
+                    <p className="text-xs text-gray-400 mt-2 text-center">Search for partner or send email invite</p>
                   </>
                 ) : (
                   <button
@@ -245,27 +256,29 @@ export default function RoundRobinDetail() {
       {showInviteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <h2 className="font-bold text-gray-900 text-lg mb-4">Invite your partner</h2>
-            <p className="text-sm text-gray-500 mb-4">Enter your partner's email. They'll receive an invite link to join as your fixed doubles partner.</p>
-            <input
-              data-testid="input-partner-email"
-              type="email"
-              value={inviteEmail}
-              onChange={e => setInviteEmail(e.target.value)}
-              placeholder="partner@email.com"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            <h2 className="font-bold text-gray-900 text-lg mb-1">Register as Team</h2>
+            <p className="text-sm text-gray-500 mb-4">Find your partner by name or email. If they're not on VenLax yet, invite them.</p>
+            <div className="mb-4">
+              <PartnerSearch
+                onPartnerSelect={setSelectedRRPartner}
+                onEmailChange={setInviteEmail}
+              />
+            </div>
             <div className="flex gap-3">
               <button
                 data-testid="btn-send-invite"
                 onClick={handleInvitePartner}
-                disabled={inviteLoading || !inviteEmail}
+                disabled={inviteLoading || (!selectedRRPartner && !inviteEmail)}
                 className="flex-1 bg-black text-white rounded-md py-2 text-sm font-bold hover:bg-gray-800 transition disabled:opacity-50"
               >
-                {inviteLoading ? "Sending..." : "Send Invite"}
+                {inviteLoading
+                  ? "Processing..."
+                  : selectedRRPartner
+                    ? `Register with ${selectedRRPartner.name}`
+                    : "Send Partner Invite"}
               </button>
               <button
-                onClick={() => setShowInviteModal(false)}
+                onClick={() => { setShowInviteModal(false); setSelectedRRPartner(null); setInviteEmail(""); }}
                 className="flex-1 border border-gray-300 rounded-md py-2 text-sm font-medium hover:bg-gray-50 transition"
               >
                 Cancel

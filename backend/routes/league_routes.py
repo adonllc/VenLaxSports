@@ -122,6 +122,7 @@ async def create_league(data: LeagueCreate, request: Request):
 class JoinLeagueRequest(BaseModel):
     waiver_accepted: bool = False
     partner_email: Optional[str] = None
+    partner_id: Optional[str] = None
 
 
 @router.post("/{league_id}/join")
@@ -145,21 +146,11 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
 
     # ── Doubles branch ────────────────────────────────────────────────────────
     if league.get("format") == "doubles":
-        partner_email = getattr(body, "partner_email", None)
-        if not partner_email:
-            raise HTTPException(status_code=400, detail="Partner email required for doubles leagues")
+        partner_id = getattr(body, "partner_id", None)
+        partner_email_raw = getattr(body, "partner_email", None)
 
-        partner_email = partner_email.lower().strip()
-
-        if partner_email == user["email"].lower():
-            raise HTTPException(status_code=400, detail="Cannot invite yourself as partner")
-
-        available = league.get("max_players", 0) - league.get("current_players", 0)
-        if available < 2:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Not enough spots — only {available} remaining (need 2 for doubles)",
-            )
+        if not partner_id and not partner_email_raw:
+            raise HTTPException(status_code=400, detail="Select a partner or enter partner email")
 
         already_reg = await db.player_leagues.find_one(
             {"league_id": league_id, "player_id": user["_id"]}
@@ -167,44 +158,173 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         if already_reg:
             raise HTTPException(status_code=409, detail="Already registered in this league")
 
-        existing_invite = await db.doubles_invites.find_one(
-            {"initiator_id": user["_id"], "league_id": league_id, "status": "pending"}
-        )
-        if existing_invite:
-            raise HTTPException(status_code=409, detail="You already have a pending invite for this league")
-
         now = datetime.now(timezone.utc)
-        token = secrets.token_hex(32)
-        invite_doc = {
-            "league_id": league_id,
-            "initiator_id": user["_id"],
-            "initiator_name": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or user.get("name", ""),
-            "partner_email": partner_email,
-            "partner_user_id": None,
-            "token": token,
-            "status": "pending",
-            "waiver_p1_at": now.isoformat(),
-            "created_at": now.isoformat(),
-            "expires_at": (now + timedelta(hours=72)).isoformat(),
-        }
-        await db.doubles_invites.insert_one(invite_doc)
-
-        frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
-        confirm_url = f"{frontend_url}/doubles-invite/confirm?token={token}"
         league_name = league.get("name", "the league")
         sport = league.get("sport", "tennis")
-        entry_fee_val = float(league.get("entry_fee", 0))
-        initiator_name = invite_doc["initiator_name"]
-        email_service.schedule(email_service.send_partner_invite(
-            partner_email, initiator_name, league_name, sport, entry_fee_val, confirm_url
-        ))
+        entry_fee = float(league.get("entry_fee", 0))
+        initiator_name = (
+            f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+            or user.get("name", "")
+        )
 
-        return {
-            "pending_partner": True,
-            "invite_token": token,
-            "expires_at": invite_doc["expires_at"],
-            "message": f"Invite sent to {partner_email}. Registration completes when your partner confirms.",
-        }
+        if partner_id:
+            # ── Direct registration — partner found in system ─────────────────
+            try:
+                partner = await db.users.find_one({"_id": ObjectId(partner_id)})
+            except Exception:
+                raise HTTPException(status_code=404, detail="Partner not found")
+            if not partner:
+                raise HTTPException(status_code=404, detail="Partner not found")
+            if str(partner["_id"]) == str(user["_id"]):
+                raise HTTPException(status_code=400, detail="Cannot partner with yourself")
+
+            partner_reg = await db.player_leagues.find_one(
+                {"league_id": league_id, "player_id": str(partner["_id"])}
+            )
+            if partner_reg:
+                raise HTTPException(status_code=409, detail="Partner already registered in this league")
+
+            p2_name = (
+                f"{partner.get('first_name', '')} {partner.get('last_name', '')}".strip()
+                or partner.get("name", "")
+            )
+
+            # Atomic spot reservation
+            reserved = await db.leagues.find_one_and_update(
+                {
+                    "_id": ObjectId(league_id),
+                    "$expr": {"$lte": [{"$add": ["$current_players", 2]}, "$max_players"]},
+                },
+                {"$inc": {"current_players": 2}},
+            )
+            if not reserved:
+                raise HTTPException(status_code=409, detail="Not enough spots — league is full")
+
+            token = secrets.token_hex(32)
+            invite_doc = {
+                "league_id": league_id,
+                "initiator_id": user["_id"],
+                "initiator_name": initiator_name,
+                "partner_email": partner.get("email", ""),
+                "partner_user_id": str(partner["_id"]),
+                "token": token,
+                "status": "pending",
+                "waiver_p1_at": now.isoformat(),
+                "created_at": now.isoformat(),
+                "expires_at": (now + timedelta(hours=72)).isoformat(),
+            }
+            await db.doubles_invites.insert_one(invite_doc)
+
+            if entry_fee == 0:
+                # Free — register both now
+                await db.player_leagues.insert_one({
+                    "league_id": league_id, "player_id": user["_id"], "player_name": initiator_name,
+                    "sport": sport, "payment_status": "free", "partner_id": str(partner["_id"]),
+                    "partner_name": p2_name, "invite_token": token, "registered_at": now.isoformat(),
+                })
+                try:
+                    await db.player_leagues.insert_one({
+                        "league_id": league_id, "player_id": str(partner["_id"]), "player_name": p2_name,
+                        "sport": sport, "payment_status": "free", "partner_id": user["_id"],
+                        "partner_name": initiator_name, "invite_token": token, "registered_at": now.isoformat(),
+                    })
+                except Exception:
+                    pass
+                await db.doubles_invites.update_one({"token": token}, {"$set": {"status": "accepted"}})
+                email_service.schedule(email_service.send_registration_confirmed(
+                    user["email"], initiator_name, league_name, sport, league_id, False
+                ))
+                if partner.get("email"):
+                    email_service.schedule(email_service.send_registration_confirmed(
+                        partner["email"], p2_name, league_name, sport, league_id, False
+                    ))
+                return {"registered": True, "message": "Team registered successfully!"}
+
+            # Paid — Stripe checkout for P1
+            try:
+                from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+            except ImportError:
+                raise HTTPException(status_code=503, detail="Stripe not configured")
+            import os as _os
+            from models import PaymentTransaction
+            api_key = _os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+            host_url = str(request.base_url)
+            frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
+            stripe_client = StripeCheckout(api_key=api_key, webhook_url=f"{host_url}api/webhook/stripe")
+            checkout_req = CheckoutSessionRequest(
+                amount=float(entry_fee),
+                currency="usd",
+                success_url=f"{frontend_url}/leagues/{league_id}?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{frontend_url}/leagues/{league_id}",
+                metadata={
+                    "league_id": league_id,
+                    "user_id": user["_id"],
+                    "user_email": user["email"],
+                    "invite_token": token,
+                    "is_doubles": "true",
+                },
+            )
+            session = await stripe_client.create_checkout_session(checkout_req)
+            txn = PaymentTransaction(
+                user_id=user["_id"],
+                user_email=user["email"],
+                league_id=league_id,
+                league_name=league_name,
+                session_id=session.session_id,
+                amount=float(entry_fee),
+                currency="USD",
+                status="initiated",
+                payment_status="unpaid",
+                metadata={"league_id": league_id, "user_id": user["_id"], "invite_token": token, "is_doubles": "true"},
+            )
+            await db.payment_transactions.insert_one(txn.to_mongo())
+            return {"redirect": True, "checkout_url": session.url}
+
+        else:
+            # ── Invite by email — partner not yet on VenLax ──────────────────
+            partner_email = partner_email_raw.lower().strip()
+            if partner_email == user["email"].lower():
+                raise HTTPException(status_code=400, detail="Cannot invite yourself as partner")
+
+            available = league.get("max_players", 0) - league.get("current_players", 0)
+            if available < 2:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Not enough spots — only {available} remaining (need 2 for doubles)",
+                )
+
+            existing_invite = await db.doubles_invites.find_one(
+                {"initiator_id": user["_id"], "league_id": league_id, "status": "pending"}
+            )
+            if existing_invite:
+                raise HTTPException(status_code=409, detail="You already have a pending invite for this league")
+
+            token = secrets.token_hex(32)
+            invite_doc = {
+                "league_id": league_id,
+                "initiator_id": user["_id"],
+                "initiator_name": initiator_name,
+                "partner_email": partner_email,
+                "partner_user_id": None,
+                "token": token,
+                "status": "pending",
+                "waiver_p1_at": now.isoformat(),
+                "created_at": now.isoformat(),
+                "expires_at": (now + timedelta(hours=72)).isoformat(),
+            }
+            await db.doubles_invites.insert_one(invite_doc)
+
+            frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
+            confirm_url = f"{frontend_url}/doubles-invite/confirm?token={token}"
+            email_service.schedule(email_service.send_partner_invite(
+                partner_email, initiator_name, league_name, sport, entry_fee, confirm_url
+            ))
+            return {
+                "pending_partner": True,
+                "invite_token": token,
+                "expires_at": invite_doc["expires_at"],
+                "message": f"Invite sent to {partner_email}. Registration completes when your partner confirms.",
+            }
     # ── End doubles branch ─────────────────────────────────────────────────────
 
     existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": league_id})
