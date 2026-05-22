@@ -233,6 +233,38 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
     }
 
 
+# ── GET /my-invites ───────────────────────────────────────────────────────────
+
+@router.get("/my-invites")
+async def my_doubles_invites(request: Request):
+    """Pending outbound invites where the current user is the initiator (P1)."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    invites = await db.doubles_invites.find(
+        {"initiator_id": user["_id"], "status": "pending"}
+    ).sort("created_at", -1).to_list(50)
+
+    result = []
+    for inv in invites:
+        league_name = "Unknown League"
+        try:
+            league = await db.leagues.find_one({"_id": ObjectId(inv["league_id"])})
+            if league:
+                league_name = league["name"]
+        except Exception:
+            pass
+        result.append({
+            "token": inv["token"],
+            "league_name": league_name,
+            "partner_email": inv.get("partner_email", ""),
+            "expires_at": inv.get("expires_at", ""),
+            "status": inv.get("status", "pending"),
+        })
+
+    return {"invites": result}
+
+
 # ── Shared helper ─────────────────────────────────────────────────────────────
 
 async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dict):
