@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Trophy, Users, ChevronRight } from "lucide-react";
+import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
+import NotifyMeBanner from "../components/NotifyMeBanner";
+import NotifyMeModal from "../components/NotifyMeModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -15,6 +17,7 @@ export default function CityLeaderboard() {
   const { city, sport } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [bellOpen, setBellOpen] = useState(false);
 
   useEffect(() => {
     axios
@@ -39,12 +42,25 @@ export default function CityLeaderboard() {
           <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${cfg.color}`}>
             {cfg.emoji} {cfg.label}
           </p>
-          <h1 className="font-heading font-black text-3xl text-gray-900 mb-1">
-            {city} Leaderboard
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Top ranked {cfg.label.toLowerCase()} players in {city}
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="font-heading font-black text-3xl text-gray-900 mb-1">
+                {city} Leaderboard
+              </h1>
+              <p className="text-gray-500 text-sm">
+                Top ranked {cfg.label.toLowerCase()} players in {city}
+              </p>
+            </div>
+            <button
+              onClick={() => setBellOpen(true)}
+              className="shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition"
+              data-testid="city-notify-bell"
+              title={`Notify me when ${city} ${cfg.label} opens`}
+            >
+              <Bell className="w-4 h-4" />
+              <span className="hidden sm:inline">Notify Me</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -117,8 +133,36 @@ export default function CityLeaderboard() {
             </h2>
           </div>
           {!data || (data.active_leagues?.length ?? 0) === 0 ? (
-            <div className="py-8 text-center text-sm text-gray-400">
-              No active leagues — check back soon!
+            <div className="p-4">
+              <NotifyMeBanner city={city} sport={sport} />
+            </div>
+          ) : data.active_leagues.every(l => l.status !== "registration") ? (
+            <div className="p-4">
+              <NotifyMeBanner city={city} sport={sport} />
+              <div className="mt-3 divide-y divide-gray-50">
+                {data.active_leagues.map(league => (
+                  <Link
+                    key={league.id}
+                    to={`/leagues/${league.id}/public`}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition"
+                    data-testid={`city-league-${league.id}`}
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">{league.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {league.current_players}/{league.max_players} players
+                      </p>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize shrink-0 ${
+                      league.status === "active"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}>
+                      {league.status}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-gray-50">
@@ -162,6 +206,12 @@ export default function CityLeaderboard() {
           </Link>
         </div>
       </div>
+      <NotifyMeModal
+        isOpen={bellOpen}
+        onClose={() => setBellOpen(false)}
+        city={city}
+        sport={sport}
+      />
     </div>
   );
 }
