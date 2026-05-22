@@ -81,6 +81,7 @@ pycodestyle==2.14.0
 pycparser==3.0
 pydantic==2.13.3
 pydantic_core==2.46.3
+pywebpush==2.0.0
 pyflakes==3.4.0
 Pygments==2.20.0
 PyJWT==2.12.1
