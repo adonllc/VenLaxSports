@@ -189,31 +189,40 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 or partner.get("name", "")
             )
 
-            # Atomic spot reservation
-            reserved = await db.leagues.find_one_and_update(
-                {
-                    "_id": ObjectId(league_id),
-                    "$expr": {"$lte": [{"$add": ["$current_players", 2]}, "$max_players"]},
-                },
-                {"$inc": {"current_players": 2}},
-            )
-            if not reserved:
-                raise HTTPException(status_code=409, detail="Not enough spots — league is full")
-
-            token = secrets.token_hex(32)
-            invite_doc = {
-                "league_id": league_id,
+            # Reuse existing pending invite on retries (avoids duplicate key + double spot reservation)
+            existing_invite = await db.doubles_invites.find_one({
                 "initiator_id": user["_id"],
-                "initiator_name": initiator_name,
-                "partner_email": partner.get("email", ""),
-                "partner_user_id": str(partner["_id"]),
-                "token": token,
+                "league_id": league_id,
                 "status": "pending",
-                "waiver_p1_at": now.isoformat(),
-                "created_at": now.isoformat(),
-                "expires_at": (now + timedelta(hours=72)).isoformat(),
-            }
-            await db.doubles_invites.insert_one(invite_doc)
+            })
+            if existing_invite:
+                token = existing_invite["token"]
+            else:
+                # Atomic spot reservation
+                reserved = await db.leagues.find_one_and_update(
+                    {
+                        "_id": ObjectId(league_id),
+                        "$expr": {"$lte": [{"$add": ["$current_players", 2]}, "$max_players"]},
+                    },
+                    {"$inc": {"current_players": 2}},
+                )
+                if not reserved:
+                    raise HTTPException(status_code=409, detail="Not enough spots — league is full")
+
+                token = secrets.token_hex(32)
+                invite_doc = {
+                    "league_id": league_id,
+                    "initiator_id": user["_id"],
+                    "initiator_name": initiator_name,
+                    "partner_email": partner.get("email", ""),
+                    "partner_user_id": str(partner["_id"]),
+                    "token": token,
+                    "status": "pending",
+                    "waiver_p1_at": now.isoformat(),
+                    "created_at": now.isoformat(),
+                    "expires_at": (now + timedelta(hours=72)).isoformat(),
+                }
+                await db.doubles_invites.insert_one(invite_doc)
 
             if entry_fee == 0:
                 # Free — register both now
