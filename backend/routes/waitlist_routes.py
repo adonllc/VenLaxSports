@@ -10,6 +10,8 @@ class WaitlistEntry(BaseModel):
     email: str
     city: str
     sport: str = "tennis"
+    skill_level: str = "intermediate"
+    referred_by: str = ""
 
 
 @router.post("")
@@ -23,15 +25,26 @@ async def join_waitlist(entry: WaitlistEntry, request: Request):
 
     existing = await db.waitlist.find_one({"email": email})
     if existing:
-        return {"message": "You're already on the list!", "already_registered": True}
+        return {
+            "message": "You're already on the list!",
+            "already_registered": True,
+            "waitlist_id": str(existing["_id"]),
+        }
 
-    await db.waitlist.insert_one({
+    doc = {
         "email": email,
         "city": city,
         "sport": entry.sport,
+        "skill_level": entry.skill_level,
+        "referred_by": entry.referred_by.strip() if entry.referred_by else "",
         "created_at": datetime.now(timezone.utc).isoformat(),
-    })
-    return {"message": "You're on the list!", "already_registered": False}
+    }
+    result = await db.waitlist.insert_one(doc)
+    return {
+        "message": "You're on the list!",
+        "already_registered": False,
+        "waitlist_id": str(result.inserted_id),
+    }
 
 
 @router.get("/count")
