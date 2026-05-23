@@ -36,6 +36,7 @@ export default function LeagueDetail() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [doublesInviteToken, setDoublesInviteToken] = useState(null);
+  const [doublesEmailInvite, setDoublesEmailInvite] = useState(false);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoResult, setPromoResult] = useState(null);
@@ -100,9 +101,13 @@ export default function LeagueDetail() {
       const { data } = await axios.get(`${API}/payments/status/${sid}`, { withCredentials: true });
       setPaymentStatus(data);
       if (data.payment_status === "paid") {
-        setIsRegistered(true);
-        setJoinMsg("Payment successful! You have joined the league.");
-        fetchLeague();
+        if (data.invite_pending) {
+          setJoinMsg("Payment complete! Invite sent — registration finalizes when your partner confirms.");
+        } else {
+          setIsRegistered(true);
+          setJoinMsg("Payment successful! You have joined the league.");
+          fetchLeague();
+        }
         return;
       }
       if (data.status === "expired") return;
@@ -153,6 +158,12 @@ export default function LeagueDetail() {
       }
       if (data.requires_payment) {
         setDoublesInviteToken(data.invite_token || null);
+        if (data.pending_partner) setDoublesEmailInvite(true);
+        if (data.invite_existed) {
+          setJoinMsg("Resuming your pending team registration — complete payment to confirm your spot.");
+        } else if (data.has_pending_invite) {
+          setJoinMsg(`Pending invite found for ${data.partner_email}. Complete payment to confirm your spot.`);
+        }
         setPaymentModalOpen(true);
       } else if (data.registered) {
         setIsRegistered(true);
@@ -161,6 +172,8 @@ export default function LeagueDetail() {
       } else if (data.pending_partner) {
         setInviteSent(true);
         setInviteToken(data.invite_token || null);
+      } else if (data.has_pending_invite) {
+        setJoinMsg(`Pending invite already sent to ${data.partner_email}. Ask your partner to check their email.`);
       }
     } catch {
       alert("Network error. Please try again.");
@@ -601,7 +614,18 @@ export default function LeagueDetail() {
         league={league}
         promoCode={promoResult ? promoCode.trim().toUpperCase() : undefined}
         inviteToken={doublesInviteToken}
-        onSuccess={() => { setIsRegistered(true); fetchLeague(); setJoinMsg("Registration complete!"); }}
+        onSuccess={() => {
+          if (doublesEmailInvite) {
+            setInviteSent(true);
+            setInviteToken(doublesInviteToken);
+            setDoublesEmailInvite(false);
+          } else {
+            setIsRegistered(true);
+            fetchLeague();
+            setJoinMsg("Registration complete!");
+          }
+          setPaymentModalOpen(false);
+        }}
       />
     </div>
   );

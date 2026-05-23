@@ -193,9 +193,14 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
             existing_invite = await db.doubles_invites.find_one({
                 "initiator_id": user["_id"],
                 "league_id": league_id,
-                "status": "pending",
+                "status": {"$in": ["pending", "initiator_paid"]},
             })
             if existing_invite:
+                if existing_invite.get("partner_user_id") and existing_invite["partner_user_id"] != partner_id:
+                    raise HTTPException(
+                        status_code=409,
+                        detail="You already have a pending invite for another partner. Cancel it first.",
+                    )
                 token = existing_invite["token"]
             else:
                 # Atomic spot reservation
@@ -255,6 +260,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "invite_token": token,
                 "entry_fee": float(entry_fee),
                 "league_name": league_name,
+                "invite_existed": existing_invite is not None,
             }
 
         else:
@@ -271,10 +277,19 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 )
 
             existing_invite = await db.doubles_invites.find_one(
-                {"initiator_id": user["_id"], "league_id": league_id, "status": "pending"}
+                {"initiator_id": user["_id"], "league_id": league_id, "status": {"$in": ["pending", "initiator_paid"]}}
             )
             if existing_invite:
-                raise HTTPException(status_code=409, detail="You already have a pending invite for this league")
+                resp = {
+                    "has_pending_invite": True,
+                    "invite_token": existing_invite["token"],
+                    "partner_email": existing_invite.get("partner_email", ""),
+                    "expires_at": existing_invite.get("expires_at", ""),
+                }
+                if entry_fee > 0 and existing_invite.get("status") in ("pending", "initiator_paid"):
+                    resp["requires_payment"] = True
+                    resp["entry_fee"] = float(entry_fee)
+                return resp
 
             token = secrets.token_hex(32)
             invite_doc = {
@@ -296,6 +311,14 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
             email_service.schedule(email_service.send_partner_invite(
                 partner_email, initiator_name, league_name, sport, entry_fee, confirm_url
             ))
+            if entry_fee > 0:
+                return {
+                    "pending_partner": True,
+                    "requires_payment": True,
+                    "invite_token": token,
+                    "entry_fee": float(entry_fee),
+                    "expires_at": invite_doc["expires_at"],
+                }
             return {
                 "pending_partner": True,
                 "invite_token": token,

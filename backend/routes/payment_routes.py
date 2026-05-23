@@ -284,7 +284,15 @@ async def get_payment_status(session_id: str, request: Request):
                     if league_doc:
                         from routes.doubles_routes import _create_doubles_pair
                         await _create_doubles_pair(db, invite, league_doc, partner_user_dict)
-            return {"status": "paid", "is_doubles": True}
+                return {"status": "paid", "is_doubles": True}
+            else:
+                # Email-invite: P2 hasn't confirmed yet — mark P1 as paid
+                if invite and invite.get("status") != "initiator_paid":
+                    await db.doubles_invites.update_one(
+                        {"token": invite_token},
+                        {"$set": {"status": "initiator_paid"}},
+                    )
+                return {"status": "paid", "is_doubles": True, "invite_pending": True}
         # ── End doubles paid path ─────────────────────────────────────────────
 
         already_registered = await db.player_leagues.find_one(

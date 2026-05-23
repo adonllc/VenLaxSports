@@ -87,8 +87,8 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
     if not invite:
         raise HTTPException(status_code=404, detail="Invite not found")
 
-    # Validate status is still pending
-    if invite.get("status") != "pending":
+    # Validate status is still actionable
+    if invite.get("status") not in ("pending", "initiator_paid"):
         if invite.get("status") == "accepted":
             raise HTTPException(status_code=409, detail="Invite already accepted")
         if invite.get("status") == "declined":
@@ -168,6 +168,7 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
         raise HTTPException(status_code=409, detail="No spots available — league is full")
 
     # Record partner on invite
+    invite_status_before = invite.get("status", "pending")
     await db.doubles_invites.update_one(
         {"token": body.token},
         {"$set": {"partner_user_id": current_user["_id"]}},
@@ -177,15 +178,15 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
 
     entry_fee = float(league.get("entry_fee", 0))
 
-    if entry_fee == 0:
-        # Free league — create both PlayerLeague records now
+    if entry_fee == 0 or invite_status_before == "initiator_paid":
+        # Free league OR initiator already paid — create both PlayerLeague records now
         await _create_doubles_pair(db, invite, league, current_user)
         await db.doubles_invites.update_one(
             {"token": body.token}, {"$set": {"status": "accepted"}}
         )
         return {"accepted": True, "league_id": league_id}
 
-    # Paid league — create Stripe checkout for initiator (P1)
+    # Paid league (initiator hasn't paid) — create Stripe checkout for initiator (P1)
     try:
         from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
     except ImportError:
