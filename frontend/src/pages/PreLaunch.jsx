@@ -9,6 +9,16 @@ export default function PreLaunch() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [skillLevel, setSkillLevel] = useState("intermediate");
+  const [waitlistId, setWaitlistId] = useState("");
+  const [referredBy, setReferredBy] = useState("");
+  const [openFaq, setOpenFaq] = useState(null);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) setReferredBy(ref);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,12 +29,19 @@ export default function PreLaunch() {
       const res = await fetch(`${BACKEND_URL}/api/waitlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), city: city.trim(), sport }),
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          city: city.trim(),
+          sport,
+          skill_level: skillLevel,
+          referred_by: referredBy,
+        }),
       });
+      const data = await res.json();
       if (res.ok) {
+        setWaitlistId(data.waitlist_id || "");
         setSubmitted(true);
       } else {
-        const data = await res.json();
         setError(data.detail || "Something went wrong. Try again.");
       }
     } catch {
@@ -33,6 +50,120 @@ export default function PreLaunch() {
       setSubmitting(false);
     }
   };
+
+  const features = [
+    {
+      icon: "🎯",
+      title: "Smart Matchmaking",
+      body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
+      reverse: false,
+      mockup: (
+        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-3">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Opponent Found</p>
+          {[
+            { name: "Marcus T.", rating: 1847, record: "12W 3L" },
+            { name: "Sarah K.", rating: 1823, record: "9W 4L" },
+            { name: "James R.", rating: 1801, record: "7W 5L" },
+          ].map((player) => (
+            <div key={player.name} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold text-xs">
+                  {player.name[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{player.name}</p>
+                  <p className="text-xs text-gray-400">{player.record}</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">{player.rating}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: "📈",
+      title: "Live City Rankings",
+      body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
+      reverse: true,
+      mockup: (
+        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Austin TX — Tennis Singles</p>
+          <div className="space-y-2">
+            {[
+              { rank: 1, name: "Alex M.", rating: 2103, delta: "+12" },
+              { rank: 2, name: "Jordan P.", rating: 1984, delta: "+5" },
+              { rank: 3, name: "Taylor S.", rating: 1947, delta: "-3" },
+              { rank: 4, name: "Casey R.", rating: 1901, delta: "+8" },
+              { rank: 5, name: "Riley D.", rating: 1876, delta: "+2" },
+            ].map((row) => (
+              <div key={row.rank} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${row.rank === 3 ? "bg-emerald-50 border border-emerald-100" : "bg-white border border-gray-100"}`}>
+                <span className="text-xs font-bold text-gray-400 w-4">{row.rank}</span>
+                <span className="text-sm font-medium text-gray-900 flex-1">{row.name}</span>
+                <span className="text-xs text-gray-500">{row.rating}</span>
+                <span className={`text-xs font-medium ${row.delta.startsWith("+") ? "text-emerald-600" : "text-red-400"}`}>{row.delta}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+    {
+      icon: "📅",
+      title: "Flexible League Formats",
+      body: "Round-robin, singles, doubles. Weekly or bi-weekly. You choose your intensity. We handle the scheduling.",
+      reverse: false,
+      mockup: (
+        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-3">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Schedule</p>
+          {[
+            { round: "Round 1", opponent: "vs Marcus T.", due: "Due May 24", status: "Completed", statusColor: "text-emerald-600 bg-emerald-50" },
+            { round: "Round 2", opponent: "vs Sarah K.", due: "Due May 31", status: "Completed", statusColor: "text-emerald-600 bg-emerald-50" },
+            { round: "Round 3", opponent: "vs James R.", due: "Due Jun 7", status: "Pending", statusColor: "text-orange-600 bg-orange-50" },
+          ].map((match) => (
+            <div key={match.round} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
+              <div>
+                <p className="text-xs text-gray-400">{match.round}</p>
+                <p className="text-sm font-medium text-gray-900">{match.opponent}</p>
+                <p className="text-xs text-gray-400">{match.due}</p>
+              </div>
+              <span className={`text-xs font-medium px-2 py-1 rounded-md ${match.statusColor}`}>{match.status}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: "⚡",
+      title: "Two Sports. One Profile.",
+      body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
+      reverse: true,
+      mockup: (
+        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Profile</p>
+          <div className="bg-white border border-gray-100 rounded-xl p-4 mb-3 flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold">YO</div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">Your Name</p>
+              <p className="text-xs text-gray-400">Austin, TX · Founding Member</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+              <p className="text-xs text-emerald-600 font-medium mb-1">Tennis</p>
+              <p className="text-2xl font-bold text-emerald-700" style={{ fontFamily: "'Outfit', sans-serif" }}>1847</p>
+              <p className="text-xs text-emerald-500">ELO rating</p>
+            </div>
+            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
+              <p className="text-xs text-orange-600 font-medium mb-1">Pickleball</p>
+              <p className="text-2xl font-bold text-orange-700" style={{ fontFamily: "'Outfit', sans-serif" }}>1623</p>
+              <p className="text-xs text-orange-500">ELO rating</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -64,13 +195,13 @@ export default function PreLaunch() {
             className="text-5xl md:text-6xl font-bold leading-tight mb-6"
             style={{ fontFamily: "'Outfit', sans-serif" }}
           >
-            Play Ranked. Rise Fast.
+            Stop Hunting for Good Matches.
             <br />
-            <span className="text-emerald-400">Own Your City's Courts.</span>
+            <span className="text-emerald-400">Play in a Real League.</span>
           </h1>
           <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-            VENLAX Sports brings competitive Tennis and Pickleball leagues to your city — real rankings,
-            smart matchmaking, and players who actually show up.
+            VENLAX runs competitive Tennis and Pickleball leagues in your city — real rankings,
+            skill-matched opponents, and players who actually show up.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -97,10 +228,10 @@ export default function PreLaunch() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm text-gray-600">
             {[
-              "Built for busy adult players",
-              "Skill-matched — no mismatches",
-              "Flexible weekly scheduling",
-              "Real city-wide rankings",
+              "$9.99/season — less than one court rental",
+              "Placed by skill — no sandbaggers, no mismatches",
+              "Flexible scheduling — you set match times with your opponent",
+              "Official VENLAX city ranking after every match",
               "Tennis + Pickleball on one profile",
             ].map((point) => (
               <div key={point} className="flex items-center gap-2">
@@ -198,36 +329,7 @@ export default function PreLaunch() {
             Built for players who want more
           </p>
           <div className="space-y-24">
-            {[
-              {
-                icon: "🎯",
-                title: "Smart Matchmaking",
-                body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
-                sport: "tennis",
-                reverse: false,
-              },
-              {
-                icon: "📈",
-                title: "Live City Rankings",
-                body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
-                sport: "pickleball",
-                reverse: true,
-              },
-              {
-                icon: "📅",
-                title: "Flexible League Formats",
-                body: "Round-robin, singles, doubles. Weekly or bi-weekly. You choose your intensity. We handle the scheduling.",
-                sport: "tennis",
-                reverse: false,
-              },
-              {
-                icon: "⚡",
-                title: "Two Sports. One Profile.",
-                body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
-                sport: "pickleball",
-                reverse: true,
-              },
-            ].map((feat) => (
+            {features.map((feat) => (
               <div
                 key={feat.title}
                 className={`flex flex-col md:flex-row items-center gap-12 ${feat.reverse ? "md:flex-row-reverse" : ""}`}
@@ -242,23 +344,83 @@ export default function PreLaunch() {
                   </h3>
                   <p className="text-gray-600 text-lg leading-relaxed">{feat.body}</p>
                 </div>
-                <div
-                  className={`flex-1 rounded-xl h-56 flex items-center justify-center text-7xl ${
-                    feat.sport === "tennis"
-                      ? "bg-emerald-50 border border-emerald-100"
-                      : "bg-orange-50 border border-orange-100"
-                  }`}
-                >
-                  {feat.sport === "tennis" ? "🎾" : "🏓"}
-                </div>
+                {feat.mockup}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Pricing */}
       <section className="bg-gray-50 py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+            Simple pricing
+          </p>
+          <h2
+            className="text-4xl font-bold text-gray-900 text-center mb-4"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            No club fees. No surprises.
+          </h2>
+          <p className="text-gray-500 text-center mb-12 text-sm">Early access members lock in these prices for life.</p>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            {[
+              { name: "Singles League", price: "$9.99", unit: "per player / season" },
+              { name: "Doubles League", price: "$19.99", unit: "per team / season" },
+            ].map((plan) => (
+              <div key={plan.name} className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+                <p className="text-gray-500 text-sm mb-2">{plan.name}</p>
+                <p
+                  className="text-5xl font-bold text-gray-900 mb-1"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                >
+                  {plan.price}
+                </p>
+                <p className="text-gray-400 text-xs mb-6">{plan.unit}</p>
+                <ul className="text-sm text-gray-600 space-y-2 text-left">
+                  {[
+                    "Full round-robin schedule",
+                    "Official VENLAX city ranking",
+                    "Score tracking + match history",
+                    "Email confirmations for every match",
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <span className="text-emerald-500 font-bold text-xs">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6">
+            <p
+              className="font-semibold text-gray-900 mb-4 text-center"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
+            >
+              Early access — Founding Member Status
+            </p>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                "Founding member badge on your public profile",
+                "Priority placement when your city opens",
+                "Current season pricing locked in forever",
+              ].map((benefit) => (
+                <div key={benefit} className="flex items-start gap-2 text-sm text-gray-600">
+                  <span className="text-emerald-500 font-bold mt-0.5 flex-shrink-0">✓</span>
+                  {benefit}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
             Simple by design
@@ -286,7 +448,7 @@ export default function PreLaunch() {
               {
                 step: "03",
                 title: "Play & Rise",
-                body: "Win matches. Climb the city rankings. Build your VENLAX legacy.",
+                body: "Win matches. Climb the city leaderboard. Your ranking follows you.",
                 color: "emerald",
               },
             ].map((step) => (
@@ -315,22 +477,22 @@ export default function PreLaunch() {
       </section>
 
       {/* Social Proof */}
-      <section className="py-20 px-6">
+      <section className="bg-gray-50 py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-10">
             Why players are joining VENLAX early
           </p>
-          <blockquote className="bg-gray-50 border border-gray-100 rounded-xl p-8 mb-10">
+          <blockquote className="bg-white border border-gray-100 rounded-xl p-8 mb-10">
             <p className="text-gray-700 text-lg italic leading-relaxed mb-4">
-              "I've been playing pickleball for three years and never had a real ranking. Structured city leagues with actual matchmaking? I signed up the moment I saw it."
+              "Finally a league that doesn't require a $2,000 club membership."
             </p>
-            <footer className="text-sm text-gray-400">Early access member, Austin TX</footer>
+            <footer className="text-sm text-gray-400">— Tennis player, 34, Austin TX</footer>
           </blockquote>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { stat: "2 Sports", label: "Tennis + Pickleball" },
-              { stat: "City-Based", label: "Local rankings + leagues" },
-              { stat: "2026", label: "First cities launching" },
+              { stat: "$9.99", label: "entry fee per season" },
+              { stat: "7 days", label: "per match round, you pick the time" },
+              { stat: "ELO-based", label: "ranking system, not vibes" },
             ].map((item) => (
               <div key={item.stat}>
                 <div
@@ -340,6 +502,68 @@ export default function PreLaunch() {
                   {item.stat}
                 </div>
                 <div className="text-xs text-gray-500">{item.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+            Common questions
+          </p>
+          <h2
+            className="text-4xl font-bold text-gray-900 text-center mb-12"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            Everything you need to know.
+          </h2>
+          <div className="space-y-2">
+            {[
+              {
+                q: "How are matches scheduled?",
+                a: "You and your opponent coordinate directly. VENLAX gives you 7 days per match round. No mandatory court times — you pick what works.",
+              },
+              {
+                q: "What skill level is right for me?",
+                a: "We place you by self-reported level, then adjust your ELO ranking after each match. You'll always play people close to your actual level.",
+              },
+              {
+                q: "What if no one is in my city yet?",
+                a: "You're on the list. When enough players sign up in your city for a division, we open it and notify you first.",
+              },
+              {
+                q: "Is there a mobile app?",
+                a: "Web-first for now, fully mobile-optimized. A dedicated mobile app is on the roadmap for late 2026.",
+              },
+              {
+                q: "What does the entry fee cover?",
+                a: "League organization, rankings, scheduling, score tracking, and email coordination for the full season. No hidden fees.",
+              },
+              {
+                q: "Can I play both Tennis and Pickleball?",
+                a: "Yes. One profile, separate rankings per sport. Register for each league individually — your stats stay separate.",
+              },
+            ].map((item, i) => (
+              <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  data-testid={`faq-${i}`}
+                >
+                  <span className="font-medium text-gray-900 text-sm">{item.q}</span>
+                  <span className="text-gray-400 text-lg flex-shrink-0 ml-4">
+                    {openFaq === i ? "−" : "+"}
+                  </span>
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-3">
+                    {item.a}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -360,17 +584,53 @@ export default function PreLaunch() {
           </p>
 
           {submitted ? (
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-10">
-              <div className="text-5xl mb-4">🎾</div>
-              <p
-                className="font-bold text-xl text-emerald-400 mb-2"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
-              >
-                You're on the list.
-              </p>
-              <p className="text-gray-400 text-sm">
-                We'll notify you the moment your city opens. Watch your inbox.
-              </p>
+            <div className="space-y-6">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-8 text-center">
+                <p
+                  className="font-bold text-xl text-emerald-400 mb-2"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                >
+                  You're on the early access list.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  We'll notify you the moment {city || "your city"} opens.
+                </p>
+              </div>
+
+              {waitlistId && (
+                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-4">
+                  <p className="text-white font-semibold text-sm text-center">
+                    Move up the list — invite players from your city
+                  </p>
+                  <p className="text-gray-400 text-xs text-center">
+                    Every friend who joins from your link moves you one spot higher.
+                  </p>
+                  <div className="bg-gray-800 border border-gray-600 rounded-md px-3 py-2.5 text-gray-300 text-xs font-mono truncate">
+                    {`${window.location.origin}/?ref=${waitlistId}`}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/?ref=${waitlistId}`);
+                      }}
+                      className="py-2.5 rounded-md border border-gray-600 text-gray-300 text-sm font-medium hover:border-gray-400 transition-colors"
+                      data-testid="copy-referral-link"
+                    >
+                      Copy Link
+                    </button>
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(`I'm getting early access to VENLAX — competitive Tennis/Pickleball leagues in our city. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 rounded-md bg-green-600 hover:bg-green-500 text-white text-sm font-medium text-center transition-colors block"
+                      data-testid="share-whatsapp"
+                    >
+                      Share on WhatsApp
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -413,6 +673,36 @@ export default function PreLaunch() {
                   </button>
                 ))}
               </div>
+              <div>
+                <p className="text-gray-400 text-xs mb-2">Your level</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { value: "beginner", label: "Beginner" },
+                    { value: "intermediate", label: "Intermediate" },
+                    { value: "advanced", label: "Advanced" },
+                    { value: "competitive", label: "Competitive" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSkillLevel(opt.value)}
+                      className={`py-2.5 rounded-md text-xs font-medium border transition-colors ${
+                        skillLevel === opt.value
+                          ? "bg-gray-600 border-gray-500 text-white"
+                          : "border-gray-700 text-gray-400 hover:border-gray-500"
+                      }`}
+                      data-testid={`skill-${opt.value}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {city && (
+                <p className="text-emerald-400 text-xs text-center">
+                  {city.split(",")[0] || city} is filling fast — be first in line when we open.
+                </p>
+              )}
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button
                 type="submit"
@@ -420,7 +710,7 @@ export default function PreLaunch() {
                 className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-4 rounded-md text-base transition-colors disabled:opacity-50"
                 data-testid="waitlist-submit"
               >
-                {submitting ? "Claiming your spot..." : "Claim My Early Access"}
+                {submitting ? "Securing your spot..." : "Secure My Early Access Spot"}
               </button>
               <p className="text-gray-500 text-xs">
                 Limited early-access spots per city. First come, first placed. No spam, ever.
