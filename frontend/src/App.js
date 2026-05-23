@@ -1,62 +1,77 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Auth from "./pages/Auth";
-import ResetPassword from "./pages/ResetPassword";
-import Rules from "./pages/Rules";
-import Leagues from "./pages/Leagues";
-import LeagueDetail from "./pages/LeagueDetail";
-import RoundRobinLeagues from "./pages/RoundRobinLeagues";
-import RoundRobinDetail from "./pages/RoundRobinDetail";
-import RoundRobinInvite from "./pages/RoundRobinInvite";
-import PlayerDashboard from "./pages/PlayerDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import SportLanding from "./pages/SportLanding";
-import ScoreReport from "./pages/ScoreReport";
-import Standings from "./pages/Standings";
-import Terms from "./pages/Terms";
-import LeagueSpectator from "./pages/LeagueSpectator";
-import CityLeaderboard from "./pages/CityLeaderboard";
-import PublicProfile from "./pages/PublicProfile";
-import VerifyEmail from "./pages/VerifyEmail";
-import ProfileSetup from "./pages/ProfileSetup";
-import JoinFlow from "./pages/JoinFlow";
-import OAuthCallback from "./pages/OAuthCallback";
-import DoublesInviteConfirm from "./pages/DoublesInviteConfirm";
-import PreLaunch from "./pages/PreLaunch";
 import "./App.css";
+
+// Eagerly loaded — always needed on first paint
+import Home from "./pages/Home";
+import PreLaunch from "./pages/PreLaunch";
+
+// Route-split — loaded only when navigated to
+const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Rules = lazy(() => import("./pages/Rules"));
+const Leagues = lazy(() => import("./pages/Leagues"));
+const LeagueDetail = lazy(() => import("./pages/LeagueDetail"));
+const RoundRobinLeagues = lazy(() => import("./pages/RoundRobinLeagues"));
+const RoundRobinDetail = lazy(() => import("./pages/RoundRobinDetail"));
+const RoundRobinInvite = lazy(() => import("./pages/RoundRobinInvite"));
+const PlayerDashboard = lazy(() => import("./pages/PlayerDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const SportLanding = lazy(() => import("./pages/SportLanding"));
+const ScoreReport = lazy(() => import("./pages/ScoreReport"));
+const Standings = lazy(() => import("./pages/Standings"));
+const Terms = lazy(() => import("./pages/Terms"));
+const LeagueSpectator = lazy(() => import("./pages/LeagueSpectator"));
+const CityLeaderboard = lazy(() => import("./pages/CityLeaderboard"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
+const JoinFlow = lazy(() => import("./pages/JoinFlow"));
+const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
+const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
 
 const IS_PRELAUNCH = process.env.REACT_APP_PRELAUNCH === "true";
 
+function PageFallback() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
 function AppRouter() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/sport/:sport" element={<SportLanding />} />
-      <Route path="/leagues" element={<Leagues />} />
-      <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
-      <Route path="/leagues/:id" element={<LeagueDetail />} />
-      <Route path="/rules" element={<Rules />} />
-      <Route path="/dashboard" element={<PlayerDashboard />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/matches/:id/score" element={<ScoreReport />} />
-      <Route path="/leagues/:id/standings" element={<Standings />} />
-      <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
-      <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
-      <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
-      <Route path="/players/:id" element={<PublicProfile />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/profile-setup" element={<ProfileSetup />} />
-      <Route path="/join" element={<JoinFlow />} />
-      <Route path="/auth/callback" element={<OAuthCallback />} />
-      <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
-    </Routes>
+    <Suspense fallback={<PageFallback />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/sport/:sport" element={<SportLanding />} />
+        <Route path="/leagues" element={<Leagues />} />
+        <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
+        <Route path="/leagues/:id" element={<LeagueDetail />} />
+        <Route path="/rules" element={<Rules />} />
+        <Route path="/dashboard" element={<PlayerDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/matches/:id/score" element={<ScoreReport />} />
+        <Route path="/leagues/:id/standings" element={<Standings />} />
+        <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
+        <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
+        <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
+        <Route path="/players/:id" element={<PublicProfile />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="/join" element={<JoinFlow />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
+        <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
+      </Routes>
+    </Suspense>
   );
 }
 
