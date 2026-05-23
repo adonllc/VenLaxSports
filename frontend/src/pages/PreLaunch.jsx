@@ -111,23 +111,26 @@ export default function PreLaunch() {
     {
       icon: "📅",
       title: "Flexible League Formats",
-      body: "Round-robin, singles, doubles. Weekly or bi-weekly. You choose your intensity. We handle the scheduling.",
+      body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. Round-robin or bracket. You choose the intensity, we handle the rest.",
       reverse: false,
       mockup: (
         <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Schedule</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Choose Your Format</p>
           {[
-            { round: "Round 1", opponent: "vs Marcus T.", due: "Due May 24", status: "Completed", statusColor: "text-emerald-600 bg-emerald-50" },
-            { round: "Round 2", opponent: "vs Sarah K.", due: "Due May 31", status: "Completed", statusColor: "text-emerald-600 bg-emerald-50" },
-            { round: "Round 3", opponent: "vs James R.", due: "Due Jun 7", status: "Pending", statusColor: "text-orange-600 bg-orange-50" },
-          ].map((match) => (
-            <div key={match.round} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-400">{match.round}</p>
-                <p className="text-sm font-medium text-gray-900">{match.opponent}</p>
-                <p className="text-xs text-gray-400">{match.due}</p>
+            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeColor: "text-emerald-700 bg-emerald-50 border border-emerald-200", icon: "🎾" },
+            { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeColor: "text-blue-700 bg-blue-50 border border-blue-200", icon: "🤝" },
+            { name: "Mixed Doubles", sub: "Bracket · 4 rounds", badge: "Co-ed", badgeColor: "text-purple-700 bg-purple-50 border border-purple-200", icon: "🏆" },
+            { name: "Casual Division", sub: "Flexible · self-paced", badge: "Beginner Friendly", badgeColor: "text-orange-700 bg-orange-50 border border-orange-200", icon: "⚡" },
+          ].map((fmt) => (
+            <div key={fmt.name} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">{fmt.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{fmt.name}</p>
+                  <p className="text-xs text-gray-400">{fmt.sub}</p>
+                </div>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-md ${match.statusColor}`}>{match.status}</span>
+              <span className={`text-xs font-medium px-2 py-1 rounded-md ${fmt.badgeColor}`}>{fmt.badge}</span>
             </div>
           ))}
         </div>
