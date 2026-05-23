@@ -35,6 +35,7 @@ export default function LeagueDetail() {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [doublesInviteToken, setDoublesInviteToken] = useState(null);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoResult, setPromoResult] = useState(null);
@@ -150,8 +151,9 @@ export default function LeagueDetail() {
         alert(data.detail || "Failed to register. Please try again.");
         return;
       }
-      if (data.redirect && data.checkout_url) {
-        window.location.href = data.checkout_url;
+      if (data.requires_payment) {
+        setDoublesInviteToken(data.invite_token || null);
+        setPaymentModalOpen(true);
       } else if (data.registered) {
         setIsRegistered(true);
         setJoinMsg("Team registered successfully!");
@@ -598,6 +600,7 @@ export default function LeagueDetail() {
         onClose={() => setPaymentModalOpen(false)}
         league={league}
         promoCode={promoResult ? promoCode.trim().toUpperCase() : undefined}
+        inviteToken={doublesInviteToken}
         onSuccess={() => { setIsRegistered(true); fetchLeague(); setJoinMsg("Registration complete!"); }}
       />
     </div>

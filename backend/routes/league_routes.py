@@ -240,45 +240,13 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     ))
                 return {"registered": True, "message": "Team registered successfully!"}
 
-            # Paid — Stripe checkout for P1
-            try:
-                from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
-            except ImportError:
-                raise HTTPException(status_code=503, detail="Stripe not configured")
-            import os as _os
-            from models import PaymentTransaction
-            api_key = _os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
-            host_url = str(request.base_url)
-            frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
-            stripe_client = StripeCheckout(api_key=api_key, webhook_url=f"{host_url}api/webhook/stripe")
-            checkout_req = CheckoutSessionRequest(
-                amount=float(entry_fee),
-                currency="usd",
-                success_url=f"{frontend_url}/leagues/{league_id}?session_id={{CHECKOUT_SESSION_ID}}",
-                cancel_url=f"{frontend_url}/leagues/{league_id}",
-                metadata={
-                    "league_id": league_id,
-                    "user_id": user["_id"],
-                    "user_email": user["email"],
-                    "invite_token": token,
-                    "is_doubles": "true",
-                },
-            )
-            session = await stripe_client.create_checkout_session(checkout_req)
-            txn = PaymentTransaction(
-                user_id=user["_id"],
-                user_email=user["email"],
-                league_id=league_id,
-                league_name=league_name,
-                session_id=session.session_id,
-                amount=float(entry_fee),
-                currency="USD",
-                status="initiated",
-                payment_status="unpaid",
-                metadata={"league_id": league_id, "user_id": user["_id"], "invite_token": token, "is_doubles": "true"},
-            )
-            await db.payment_transactions.insert_one(txn.to_mongo())
-            return {"redirect": True, "checkout_url": session.url}
+            # Paid — let frontend show PaymentMethodModal (same as singles)
+            return {
+                "requires_payment": True,
+                "invite_token": token,
+                "entry_fee": float(entry_fee),
+                "league_name": league_name,
+            }
 
         else:
             # ── Invite by email — partner not yet on VenLax ──────────────────

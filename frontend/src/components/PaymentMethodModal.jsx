@@ -15,7 +15,7 @@ const METHOD_VISUALS = {
  * Payment-method picker for league registration.
  * Stripe → existing checkout flow. Apple/Google Pay → wallet POST. Zelle → 2-step (intent + reference).
  */
-export default function PaymentMethodModal({ open, onClose, league, promoCode, onSuccess }) {
+export default function PaymentMethodModal({ open, onClose, league, promoCode, inviteToken, onSuccess }) {
   const [methods, setMethods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeMethod, setActiveMethod] = useState(null);
@@ -40,6 +40,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, o
       const origin = window.location.origin;
       const payload = { league_id: league.id, origin_url: origin };
       if (promoCode) payload.promo_code = promoCode;
+      if (inviteToken) { payload.invite_token = inviteToken; payload.is_doubles = true; }
       const { data } = await axios.post(`${API}/payments/checkout`, payload, { withCredentials: true });
       if (data.free) {
         onSuccess?.();

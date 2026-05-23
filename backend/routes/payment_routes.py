@@ -18,6 +18,8 @@ class CheckoutRequest(BaseModel):
     league_id: str
     origin_url: str
     promo_code: Optional[str] = None
+    invite_token: Optional[str] = None
+    is_doubles: Optional[bool] = False
 
 
 async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | None:
@@ -166,22 +168,30 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     success_url = f"{data.origin_url}/leagues/{data.league_id}?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{data.origin_url}/leagues/{data.league_id}"
 
+    stripe_meta = {
+        "league_id": data.league_id,
+        "user_id": user["_id"],
+        "user_email": user["email"],
+    }
+    if data.invite_token:
+        stripe_meta["invite_token"] = data.invite_token
+        stripe_meta["is_doubles"] = "true"
+
     checkout_req = CheckoutSessionRequest(
         amount=stripe_amount,
         currency=stripe_currency,
         success_url=success_url,
         cancel_url=cancel_url,
-        metadata={
-            "league_id": data.league_id,
-            "user_id": user["_id"],
-            "user_email": user["email"],
-        },
+        metadata=stripe_meta,
     )
     session = await stripe.create_checkout_session(checkout_req)
 
     txn_meta = {"league_id": data.league_id, "user_id": user["_id"]}
     if data.promo_code:
         txn_meta["promo_code"] = data.promo_code.upper()
+    if data.invite_token:
+        txn_meta["invite_token"] = data.invite_token
+        txn_meta["is_doubles"] = "true"
 
     txn = PaymentTransaction(
         user_id=user["_id"],
