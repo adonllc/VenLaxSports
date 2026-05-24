@@ -265,7 +265,20 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <h1 className="font-heading font-black text-3xl text-gray-900 mb-2">{league.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <h1 className="font-heading font-black text-3xl text-gray-900">{league.name}</h1>
+                {league.division_label && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-50 text-indigo-700 border border-indigo-100" data-testid="league-division-badge">
+                    {league.division_label}
+                    {league.division_ntrp_min && (
+                      <span className="ml-1 text-indigo-400 font-normal">
+                        {league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
+                        {league.sport === "pickleball" ? "DUPR" : "NTRP"}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}</span>
                 <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(league.start_date)} to {formatDate(league.end_date)}</span>
