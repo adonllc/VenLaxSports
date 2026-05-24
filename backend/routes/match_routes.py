@@ -185,6 +185,65 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
     except Exception:
         pass
 
+    # ── Ladder rank swap (if this is a ladder challenge match) ──
+    if match.get("source") == "ladder" and match.get("ladder_challenge_id"):
+        try:
+            from bson import ObjectId as _ObjId
+            challenge = await db.ladder_challenges.find_one(
+                {"_id": _ObjId(match["ladder_challenge_id"])}
+            )
+            if challenge and challenge.get("status") == "accepted":
+                ladder = await db.ladders.find_one(
+                    {"_id": _ObjId(challenge["ladder_id"])}
+                )
+                if ladder:
+                    entries = ladder.get("entries", [])
+                    challenger_id = challenge["challenger_id"]
+                    challenged_id = challenge["challenged_id"]
+                    winner_id = score_data.winner_id
+
+                    sport = ladder.get("sport", "tennis")
+                    elo_field = f"{sport}_rating"
+
+                    # Refresh ELO from users collection into ladder entries
+                    for entry in entries:
+                        if entry["player_id"] in (challenger_id, challenged_id):
+                            u = await db.users.find_one(
+                                {"_id": _ObjId(entry["player_id"])}, {elo_field: 1}
+                            )
+                            if u:
+                                entry["elo"] = u.get(elo_field, entry["elo"])
+
+                    # If challenger won: swap their positions in the list
+                    if winner_id == challenger_id:
+                        c_idx = next((i for i, e in enumerate(entries) if e["player_id"] == challenger_id), None)
+                        d_idx = next((i for i, e in enumerate(entries) if e["player_id"] == challenged_id), None)
+                        if c_idx is not None and d_idx is not None:
+                            entries[c_idx], entries[d_idx] = entries[d_idx], entries[c_idx]
+
+                    # Apply 48h cooldown to challenger
+                    from datetime import timedelta as _td
+                    cooldown_until = (datetime.now(timezone.utc) + _td(hours=48)).isoformat()
+                    for entry in entries:
+                        if entry["player_id"] == challenger_id:
+                            entry["challenge_cooldown_until"] = cooldown_until
+
+                    # Re-number ranks sequentially
+                    for i, e in enumerate(entries):
+                        e["rank"] = i + 1
+
+                    await db.ladders.update_one(
+                        {"_id": _ObjId(challenge["ladder_id"])},
+                        {"$set": {"entries": entries}},
+                    )
+                    await db.ladder_challenges.update_one(
+                        {"_id": _ObjId(match["ladder_challenge_id"])},
+                        {"$set": {"status": "completed"}},
+                    )
+        except Exception as _ladder_err:
+            import logging
+            logging.getLogger(__name__).warning(f"Ladder rank swap failed: {_ladder_err}")
+
     # Notify both players with the result
     try:
         league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
