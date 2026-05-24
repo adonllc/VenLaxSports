@@ -322,3 +322,40 @@ class Season(BaseDocument):
     updated_at: Optional[str] = None
     box_assignments: Optional[List[Dict]] = None
     # Structure: [{"box_id": "A", "player_ids": ["uid1", ...]}, ...]
+
+
+# ─── Ladder ──────────────────────────────────────────
+class Ladder(BaseDocument):
+    city: str
+    sport: str                          # "tennis" | "pickleball"
+    division_label: str                 # "Beginner" | "Intermediate" | "Advanced" | "Competitive"
+    format: str = "singles"             # "singles" (doubles v2)
+    entries: list = []
+    # entry shape: {player_id, rank, elo, name, joined_at, challenge_cooldown_until}
+    is_active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class LadderCreate(BaseModel):
+    city: str
+    sport: str
+    division_label: str
+    format: str = "singles"
+
+
+# ─── LadderChallenge ─────────────────────────────────
+class LadderChallenge(BaseDocument):
+    ladder_id: str
+    challenger_id: str
+    challenged_id: str
+    challenger_rank: int
+    challenged_rank: int
+    status: str = "pending"             # "pending"|"accepted"|"declined"|"completed"|"expired"
+    match_id: Optional[str] = None
+    expires_at: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class LadderChallengeCreate(BaseModel):
+    ladder_id: str
+    challenged_player_id: str
