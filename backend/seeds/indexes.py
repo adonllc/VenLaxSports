@@ -41,3 +41,7 @@ async def create_indexes(db) -> None:
     )
     # Waitlist
     await db.waitlist.create_index("email", unique=True)
+    # Challenge Ladder
+    await db.ladders.create_index([("city", 1), ("sport", 1), ("division_label", 1), ("format", 1)])
+    await db.ladder_challenges.create_index([("ladder_id", 1), ("status", 1)])
+    await db.ladder_challenges.create_index([("challenger_id", 1), ("status", 1)])
