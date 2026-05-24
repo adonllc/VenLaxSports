@@ -130,6 +130,15 @@ export default function PlayerDashboard() {
     }
   };
 
+  const handleProfileUpdate = async (fields) => {
+    try {
+      const { data } = await axios.patch(`${API}/users/me`, fields, { withCredentials: true });
+      await fetchMe();
+    } catch (err) {
+      console.error("Profile update failed", err);
+    }
+  };
+
   if (!user) return null;
 
   const wins = matches.filter((m) => m.status === "completed" && (m.winner_id === user.id || m.winner_id === user._id)).length;
@@ -203,6 +212,46 @@ export default function PlayerDashboard() {
             </div>
           </div>
         </div>
+
+        {/* DUPR Rating */}
+        {(user?.sport_preferences?.includes("pickleball") || true) && (
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pickleball Rating (DUPR)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {["2.0-3.0", "3.0-3.5", "3.5-4.5", "4.5+"].map((bracket) => (
+                  <button
+                    key={bracket}
+                    data-testid={`dupr-bracket-${bracket}`}
+                    onClick={() => handleProfileUpdate({ dupr_rating: bracket })}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
+                      user?.dupr_rating === bracket
+                        ? "bg-orange-500 text-white border-orange-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
+                    }`}
+                  >
+                    {bracket}
+                  </button>
+                ))}
+                <button
+                  data-testid="dupr-bracket-unknown"
+                  onClick={() => handleProfileUpdate({ dupr_rating: null })}
+                  className="px-3 py-1.5 rounded-md text-sm font-medium border border-gray-200 text-gray-400 hover:border-gray-400"
+                >
+                  I don't know
+                </button>
+              </div>
+              <p className="mt-1.5 text-xs text-gray-400">
+                Don't know your DUPR?{" "}
+                <a href="https://www.dupr.com" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">
+                  Find it at dupr.com →
+                </a>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -301,7 +350,15 @@ export default function PlayerDashboard() {
                     <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
                       <span className="text-lg">{sc.icon || "🏆"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{l.name}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {l.name}
+                          {l.division_label && (
+                            <span className="ml-2 text-xs text-indigo-600 font-medium">
+                              {l.division_label}
+                              {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
+                            </span>
+                          )}
+                        </p>
                         <p className="text-xs text-gray-500">{l.city} • {l.format}</p>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : l.status === "active" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
