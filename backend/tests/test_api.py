@@ -343,6 +343,21 @@ class TestLadders:
         data = r.json()
         assert isinstance(data, list)
 
+    def test_join_ladder(self):
+        r = requests.get(f"{BASE_URL}/api/ladders")
+        assert r.status_code == 200
+        ladders = r.json()
+        if not ladders:
+            return  # no ladders seeded, skip
+        lid = ladders[0]["id"]
+        s = get_admin_session()
+        r = s.post(f"{BASE_URL}/api/ladders/{lid}/join")
+        assert r.status_code in [200, 201, 400]  # 400 = already joined
+        if r.status_code in [200, 201]:
+            data = r.json()
+            assert "rank" in data
+            assert data["rank"] >= 1
+
 
 class TestPhase:
     def test_phase_endpoint(self):

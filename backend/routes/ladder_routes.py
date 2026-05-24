@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime, timezone
 from bson import ObjectId
 from models import LadderCreate, LadderChallengeCreate
-from auth_utils import get_optional_user, require_admin
+from auth_utils import get_current_user, get_optional_user, require_admin
 
 router = APIRouter(redirect_slashes=False)
 
@@ -56,6 +56,56 @@ async def create_ladder(data: LadderCreate, request: Request):
     doc["id"] = str(result.inserted_id)
     doc.pop("_id", None)
     return doc
+
+
+@router.post("/{ladder_id}/join")
+async def join_ladder(ladder_id: str, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    uid = str(user["_id"])
+
+    try:
+        ladder = await db.ladders.find_one({"_id": ObjectId(ladder_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="Ladder not found")
+    if not ladder:
+        raise HTTPException(status_code=404, detail="Ladder not found")
+
+    entries = ladder.get("entries", [])
+    if any(e["player_id"] == uid for e in entries):
+        raise HTTPException(status_code=400, detail="Already in this ladder")
+
+    sport = ladder.get("sport", "tennis")
+    elo_field = f"{sport}_rating"
+    my_elo = user.get(elo_field, 1500)
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    new_entry = {
+        "player_id": uid,
+        "name": user.get("name", ""),
+        "elo": my_elo,
+        "joined_at": now_iso,
+        "challenge_cooldown_until": None,
+    }
+
+    insert_pos = len(entries)
+    for i, e in enumerate(entries):
+        if my_elo > e.get("elo", 0):
+            insert_pos = i
+            break
+
+    entries.insert(insert_pos, new_entry)
+
+    for i, e in enumerate(entries):
+        e["rank"] = i + 1
+
+    await db.ladders.update_one(
+        {"_id": ObjectId(ladder_id)},
+        {"$set": {"entries": entries}},
+    )
+
+    new_entry["rank"] = insert_pos + 1
+    return new_entry
 
 
 @router.get("/{ladder_id}")
