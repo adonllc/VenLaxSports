@@ -207,3 +207,73 @@ def _parse_games(score: str, p1_id: str, p2_id: str) -> dict:
     except Exception:
         pass
     return result
+
+
+@router.post("/{league_id}/finalize")
+async def finalize_box_league(league_id: str, request: Request):
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league or league.get("league_type") != "box_league":
+        raise HTTPException(status_code=400, detail="Not a box league")
+
+    promote_n = league.get("box_promote", 2)
+    relegate_n = league.get("box_relegate", 2)
+
+    standings_resp = await box_standings(league_id, request)
+    boxes = standings_resp["boxes"]
+
+    promoted, relegated, mid_table = [], [], []
+
+    for box in boxes:
+        players = box["players"]
+        n = len(players)
+        for i, p in enumerate(players):
+            pid = p["player_id"]
+            rank = i + 1
+            if rank <= promote_n:
+                status = "promoted"
+                promoted.append({"player_id": pid, "name": p["name"], "box": box["box_id"], "rank": rank})
+            elif rank > n - relegate_n:
+                status = "relegated"
+                relegated.append({"player_id": pid, "name": p["name"], "box": box["box_id"], "rank": rank})
+            else:
+                status = None
+                mid_table.append({"player_id": pid, "name": p["name"], "box": box["box_id"], "rank": rank})
+
+            await db.player_leagues.update_one(
+                {"league_id": league_id, "player_id": pid},
+                {"$set": {"promotion_status": status}},
+            )
+
+    await db.leagues.update_one(
+        {"_id": ObjectId(league_id)},
+        {"$set": {"status": "completed"}},
+    )
+
+    league_name = league.get("name", "Box League")
+    city = league.get("city", "")
+    for p in promoted:
+        user = await db.users.find_one({"_id": ObjectId(p["player_id"])}, {"email": 1, "email_notifications": 1})
+        if user and user.get("email") and user.get("email_notifications", True):
+            await email_service.send_email(
+                to=user["email"],
+                subject="You've been promoted on VENLAX!",
+                body=f"You finished #{p['rank']} in Box {p['box']} of the {city} {league_name}. "
+                     f"You're promoted to the next division next season!",
+            )
+    for p in relegated:
+        user = await db.users.find_one({"_id": ObjectId(p["player_id"])}, {"email": 1, "email_notifications": 1})
+        if user and user.get("email") and user.get("email_notifications", True):
+            await email_service.send_email(
+                to=user["email"],
+                subject=f"Season results — VENLAX {city}",
+                body=f"You finished #{p['rank']} in Box {p['box']} of the {city} {league_name}. "
+                     f"You've been moved to the lower division for next season.",
+            )
+
+    return {"promoted": promoted, "relegated": relegated, "mid": mid_table}
