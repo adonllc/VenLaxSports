@@ -31,6 +31,7 @@ const DEFAULT_FORM = {
   entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16,
   start_date: "", end_date: "", description: "", venue: "", season: "Season 1", season_id: "",
   division_label: "", division_ntrp_min: null, division_ntrp_max: null,
+  league_type: "flex",
 };
 
 export default function AdminDashboard() {
@@ -150,6 +151,27 @@ export default function AdminDashboard() {
     } catch (e) {
       const d = e.response?.data?.detail;
       alert(typeof d === "string" ? d : "Failed to close league");
+    }
+  };
+
+  const handleAssignBoxes = async (leagueId) => {
+    try {
+      const { data } = await axios.post(`${API}/box-leagues/${leagueId}/assign-boxes`, {}, { withCredentials: true });
+      setMsg(`Boxes assigned: ${data.boxes.map(b => `Box ${b.box_id} (${b.player_count} players)`).join(", ")}`);
+      fetchLeagues();
+    } catch (err) {
+      setMsg(err.response?.data?.detail || "Failed to assign boxes");
+    }
+  };
+
+  const handleFinalizeSeason = async (leagueId) => {
+    if (!window.confirm("Finalize this season? This will set promotion/relegation for all players and send emails.")) return;
+    try {
+      const { data } = await axios.post(`${API}/box-leagues/${leagueId}/finalize`, {}, { withCredentials: true });
+      setMsg(`Season finalized. Promoted: ${data.promoted.length}, Relegated: ${data.relegated.length}`);
+      fetchLeagues();
+    } catch (err) {
+      setMsg(err.response?.data?.detail || "Failed to finalize");
     }
   };
 
@@ -297,6 +319,19 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">League Type</label>
+                    <select
+                      data-testid="admin-league-type-select"
+                      value={form.league_type || "flex"}
+                      onChange={(e) => setForm((f) => ({ ...f, league_type: e.target.value }))}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    >
+                      <option value="flex">Flex (self-scheduled)</option>
+                      <option value="round_robin">Round Robin</option>
+                      <option value="box_league">Box League (promotion/relegation)</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Country *</label>
                     <select value={form.country} onChange={update("country")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black" data-testid="create-league-country">
                       {activeCountry === "USA" && <option value="USA">🇺🇸 USA</option>}
@@ -414,7 +449,7 @@ export default function AdminDashboard() {
                         </select>
                       </td>
                       <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Link to={`/leagues/${l.id}`} className="text-xs text-blue-600 hover:underline">View</Link>
                           {l.status !== "completed" && (
                             <button
@@ -430,6 +465,24 @@ export default function AdminDashboard() {
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
+                        {l.league_type === "box_league" && (
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              data-testid={`assign-boxes-${l.id}`}
+                              onClick={() => handleAssignBoxes(l.id)}
+                              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                            >
+                              Assign Boxes
+                            </button>
+                            <button
+                              data-testid={`finalize-season-${l.id}`}
+                              onClick={() => handleFinalizeSeason(l.id)}
+                              className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-md hover:bg-gray-700"
+                            >
+                              Finalize Season
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
