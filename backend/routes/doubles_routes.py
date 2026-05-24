@@ -178,13 +178,23 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
 
     entry_fee = float(league.get("entry_fee", 0))
 
+    # Soft gender check for mixed_doubles
+    gender_warning = None
+    if league.get("format") == "mixed_doubles":
+        p1 = await db.users.find_one({"_id": ObjectId(invite["initiator_id"])}, {"gender": 1})
+        p2 = await db.users.find_one({"_id": ObjectId(current_user["_id"])}, {"gender": 1})
+        p1_gender = p1.get("gender") if p1 else None
+        p2_gender = p2.get("gender") if p2 else None
+        if p1_gender and p2_gender and p1_gender == p2_gender:
+            gender_warning = "Mixed doubles requires one male and one female player. Please verify your team composition."
+
     if entry_fee == 0 or invite_status_before == "initiator_paid":
         # Free league OR initiator already paid — create both PlayerLeague records now
         await _create_doubles_pair(db, invite, league, current_user)
         await db.doubles_invites.update_one(
             {"token": body.token}, {"$set": {"status": "accepted"}}
         )
-        return {"accepted": True, "league_id": league_id}
+        return {"accepted": True, "league_id": league_id, "gender_warning": gender_warning}
 
     # Paid league (initiator hasn't paid) — create Stripe checkout for initiator (P1)
     try:
@@ -231,6 +241,7 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
         "accepted": True,
         "requires_payment": True,
         "checkout_url": session.url,
+        "gender_warning": gender_warning,
     }
 
 

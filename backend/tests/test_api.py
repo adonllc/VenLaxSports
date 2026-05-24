@@ -377,6 +377,25 @@ class TestPricing:
         assert fee_for_format("singles") == 9.99
 
 
+class TestMixedDoubles:
+    def test_mixed_doubles_league_creation(self):
+        s = get_admin_session()
+        r = s.post(f"{BASE_URL}/api/leagues", json={
+            "name": "Mixed Doubles Test",
+            "sport": "tennis",
+            "country": "USA",
+            "city": "Austin",
+            "format": "mixed_doubles",
+            "entry_fee": 19.99,
+            "start_date": "2026-06-01",
+            "end_date": "2026-07-15",
+        })
+        assert r.status_code in [200, 201]
+        data = r.json()
+        assert data.get("format") == "mixed_doubles"
+        assert data.get("entry_fee") == 19.99
+
+
 class TestPhase:
     def test_phase_endpoint(self):
         r = requests.get(f"{BASE_URL}/api/phase")
