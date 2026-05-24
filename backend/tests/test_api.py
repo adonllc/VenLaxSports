@@ -322,6 +322,28 @@ class TestBoxLeagues:
         assert r.status_code in [401, 403]
 
 
+class TestLadders:
+    def test_create_ladder(self):
+        s = get_admin_session()
+        r = s.post(f"{BASE_URL}/api/ladders", json={
+            "city": "Austin",
+            "sport": "tennis",
+            "division_label": "Intermediate",
+            "format": "singles",
+        })
+        assert r.status_code in [200, 201]
+        data = r.json()
+        assert data["city"] == "Austin"
+        assert data["sport"] == "tennis"
+        assert data["entries"] == []
+
+    def test_list_ladders(self):
+        r = requests.get(f"{BASE_URL}/api/ladders")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+
+
 class TestPhase:
     def test_phase_endpoint(self):
         r = requests.get(f"{BASE_URL}/api/phase")
