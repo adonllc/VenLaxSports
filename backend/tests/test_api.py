@@ -366,6 +366,17 @@ class TestLadders:
         assert r.status_code in [401, 403, 422]
 
 
+class TestPricing:
+    def test_mixed_doubles_fee_same_as_doubles(self):
+        """pricing_config.fee_for_format returns 19.99 for mixed_doubles"""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+        from pricing_config import fee_for_format
+        assert fee_for_format("mixed_doubles") == 19.99
+        assert fee_for_format("doubles") == 19.99
+        assert fee_for_format("singles") == 9.99
+
+
 class TestPhase:
     def test_phase_endpoint(self):
         r = requests.get(f"{BASE_URL}/api/phase")

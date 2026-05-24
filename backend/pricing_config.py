@@ -9,6 +9,7 @@ ENTRY_FEE_USD: dict[str, float] = {
     "singles": 9.99,
     "doubles": 19.99,
     "mixed": 19.99,
+    "mixed_doubles": 19.99,
 }
 
 DEFAULT_ENTRY_FEE = 9.99
