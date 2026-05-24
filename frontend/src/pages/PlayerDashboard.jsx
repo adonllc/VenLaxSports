@@ -31,6 +31,7 @@ export default function PlayerDashboard() {
   const [removingInterest, setRemovingInterest] = useState(null);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [boxStatuses, setBoxStatuses] = useState({});
+  const [ladderEntries, setLadderEntries] = useState([]);
 
   useEffect(() => {
     if (loading) return;
@@ -72,6 +73,26 @@ export default function PlayerDashboard() {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data?.invites) setPendingInvites(data.invites); })
+      .catch(() => {});
+    axios.get(`${API}/ladders`, { withCredentials: true })
+      .then(r => {
+        const uid = user?.id || user?._id;
+        const myEntries = [];
+        for (const ladder of r.data) {
+          const myEntry = (ladder.entries || []).find(e => e.player_id === uid);
+          if (myEntry) {
+            myEntries.push({
+              ladder_id: ladder.id,
+              city: ladder.city,
+              sport: ladder.sport,
+              division_label: ladder.division_label,
+              rank: myEntry.rank,
+              total: ladder.entry_count,
+            });
+          }
+        }
+        setLadderEntries(myEntries);
+      })
       .catch(() => {});
   };
 
@@ -404,6 +425,33 @@ export default function PlayerDashboard() {
               </div>
             )}
           </div>
+
+          {/* Ladder Rankings */}
+          {ladderEntries.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="font-heading font-bold text-lg">Ladder Rankings</h2>
+              </div>
+              <div className="p-5 space-y-3">
+                {ladderEntries.map((entry) => (
+                  <div
+                    key={entry.ladder_id}
+                    data-testid={`ladder-rank-card-${entry.ladder_id}`}
+                    className="flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl hover:shadow-sm transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/ladders/${entry.ladder_id}`)}
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {entry.city} · {entry.division_label} {entry.sport.charAt(0).toUpperCase() + entry.sport.slice(1)}
+                      </p>
+                      <p className="text-sm text-gray-500">Rank #{entry.rank} of {entry.total}</p>
+                    </div>
+                    <span className="text-2xl font-bold text-indigo-700">#{entry.rank}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Rating History */}
           <RatingHistoryChart user={user} />
