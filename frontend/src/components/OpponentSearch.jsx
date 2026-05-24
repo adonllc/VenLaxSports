@@ -117,7 +117,12 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
                 <User className="w-3 h-3 text-gray-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">{u.name}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {u.name}
+                  <span className="text-xs text-gray-400 ml-1.5">
+                    {u.gender === "male" ? "(M)" : u.gender === "female" ? "(F)" : ""}
+                  </span>
+                </p>
                 <p className="text-xs text-gray-500 truncate">{u.email}</p>
               </div>
             </button>

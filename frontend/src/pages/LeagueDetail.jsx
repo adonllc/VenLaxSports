@@ -269,6 +269,11 @@ export default function LeagueDetail() {
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
+                {league.format === "mixed_doubles" && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                    Mixed Doubles
+                  </span>
+                )}
                 {isRegistered && (
                   <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-600 text-white" data-testid="registered-pill">
                     <CheckCircle className="w-3 h-3" /> Registered
@@ -349,6 +354,11 @@ export default function LeagueDetail() {
                                 onPartnerSelect={(p) => { setSelectedPartner(p); setPartnerEmail(""); }}
                                 onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
                               />
+                              {league.format === "mixed_doubles" && (
+                                <p className="text-xs text-gray-400 mt-2">
+                                  Mixed Doubles requires one male and one female player. Gender shown as (M) or (F) in search results.
+                                </p>
+                              )}
                               <label className="flex items-start gap-2.5 cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-3 py-3" data-testid="waiver-checkbox-label">
                                 <input
                                   type="checkbox"
