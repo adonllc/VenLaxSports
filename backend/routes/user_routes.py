@@ -121,6 +121,8 @@ async def update_profile(data: UserProfileUpdate, request: Request):
         raise HTTPException(status_code=400, detail="No fields to update")
     await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
     updated = await db.users.find_one({"_id": ObjectId(user["_id"])}, {"password_hash": 0})
+    if not updated:
+        raise HTTPException(status_code=404, detail="User not found")
     updated["id"] = str(updated.pop("_id"))
     return updated
 
