@@ -28,6 +28,7 @@ async def get_leagues(
     city: Optional[str] = None,
     status: Optional[str] = None,
     season_id: Optional[str] = None,
+    division: Optional[str] = None,
     limit: int = 24,
     skip: int = 0,
 ):
@@ -52,6 +53,8 @@ async def get_leagues(
         query["status"] = status
     if season_id:
         query["season_id"] = season_id
+    if division:
+        query["division_label"] = division
 
     leagues = await db.leagues.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     return [_serialize(l) for l in leagues]

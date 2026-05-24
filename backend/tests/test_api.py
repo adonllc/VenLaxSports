@@ -190,6 +190,14 @@ class TestLeagues:
         assert data.get("division_ntrp_min") == 3.5
         assert data.get("division_ntrp_max") == 4.0
 
+    def test_division_filter(self):
+        r = requests.get(f"{BASE_URL}/api/leagues?division=Intermediate")
+        assert r.status_code == 200
+        data = r.json()
+        # All returned leagues must have division_label == "Intermediate"
+        for league in data:
+            assert league.get("division_label") == "Intermediate"
+
 
 class TestAdmin:
     @pytest.fixture(autouse=True)
