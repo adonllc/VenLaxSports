@@ -46,6 +46,8 @@ export default function LeagueDetail() {
   const [partnerEmail, setPartnerEmail] = useState("");
   const [inviteSent, setInviteSent] = useState(false);
   const [inviteToken, setInviteToken] = useState(null);
+  const [boxStandings, setBoxStandings] = useState(null);
+  const [activeBox, setActiveBox] = useState("A");
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -71,6 +73,14 @@ export default function LeagueDetail() {
       const { data } = await axios.get(`${API}/leagues/${id}`, { withCredentials: true });
       setLeague(data);
       if (data.is_registered) setIsRegistered(true);
+      if (data.league_type === "box_league") {
+        axios.get(`${API}/box-leagues/${id}/standings`, { withCredentials: true })
+          .then(({ data: boxData }) => {
+            setBoxStandings(boxData);
+            if (boxData.boxes?.length > 0) setActiveBox(boxData.boxes[0].box_id);
+          })
+          .catch(() => {});
+      }
     } catch {
       navigate("/leagues");
     } finally {
@@ -617,6 +627,64 @@ export default function LeagueDetail() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {league?.league_type === "box_league" && boxStandings && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Box Standings</h3>
+            {/* Box tab pills */}
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {boxStandings.boxes.map((box) => (
+                <button
+                  key={box.box_id}
+                  data-testid={`box-tab-${box.box_id}`}
+                  onClick={() => setActiveBox(box.box_id)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    activeBox === box.box_id
+                      ? "bg-gray-900 text-white border-gray-900"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  Box {box.box_id}
+                </button>
+              ))}
+            </div>
+
+            {/* Active box standings table */}
+            {boxStandings.boxes.filter((b) => b.box_id === activeBox).map((box) => (
+              <div key={box.box_id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Rank</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Player</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">W</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">L</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {box.players.map((p, idx) => {
+                      const isPromote = idx < boxStandings.box_promote;
+                      const isRelegate = idx >= box.players.length - boxStandings.box_relegate;
+                      return (
+                        <tr key={p.player_id} className={isPromote ? "bg-emerald-50" : isRelegate ? "bg-red-50" : ""}>
+                          <td className="px-4 py-3 font-semibold text-gray-500">#{p.rank}</td>
+                          <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
+                          <td className="px-4 py-3 text-center text-gray-700">{p.wins}</td>
+                          <td className="px-4 py-3 text-center text-gray-700">{p.losses}</td>
+                          <td className="px-4 py-3 text-right">
+                            {isPromote && <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">Promoting ↑</span>}
+                            {isRelegate && <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-md">Relegating ↓</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
         )}
       </div>
