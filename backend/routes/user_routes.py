@@ -59,6 +59,17 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
     return results
 
 
+class UserProfileUpdate(BaseModel):
+    city: Optional[str] = None
+    phone: Optional[str] = None
+    home_court: Optional[str] = None
+    email_notifications: Optional[bool] = None
+    profile_public: Optional[bool] = None
+    dupr_rating: Optional[str] = None
+    gender: Optional[str] = None
+    sport_preferences: Optional[List[str]] = None
+
+
 class ProfileSetupIn(BaseModel):
     sport_preferences: Optional[List[str]] = None
     skill_level: Optional[str] = None
@@ -98,6 +109,20 @@ async def my_rating_history(request: Request, sport: Optional[str] = None, limit
         query["sport"] = sport
     cursor = db.rating_history.find(query, {"_id": 0}).sort("created_at", 1).limit(limit)
     return await cursor.to_list(limit)
+
+
+@router.patch("/me")
+async def update_profile(data: UserProfileUpdate, request: Request):
+    """Update the current user's profile fields."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    update = {k: v for k, v in data.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
+    updated = await db.users.find_one({"_id": ObjectId(user["_id"])}, {"password_hash": 0})
+    updated["id"] = str(updated.pop("_id"))
+    return updated
 
 
 @router.get("/{user_id}")

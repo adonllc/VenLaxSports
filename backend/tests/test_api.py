@@ -260,6 +260,15 @@ class TestCities:
             assert c["country"] == "USA"
 
 
+class TestUsers:
+    def test_patch_user_dupr_rating(self):
+        s = get_admin_session()
+        r = s.patch(f"{BASE_URL}/api/users/me", json={"dupr_rating": "3.0-3.5"})
+        assert r.status_code == 200
+        data = r.json()
+        assert data.get("dupr_rating") == "3.0-3.5"
+
+
 class TestPhase:
     def test_phase_endpoint(self):
         r = requests.get(f"{BASE_URL}/api/phase")
