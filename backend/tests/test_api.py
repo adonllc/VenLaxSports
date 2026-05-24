@@ -358,6 +358,13 @@ class TestLadders:
             assert "rank" in data
             assert data["rank"] >= 1
 
+    def test_challenge_requires_auth(self):
+        r = requests.post(f"{BASE_URL}/api/ladders/challenges", json={
+            "ladder_id": "fakeid",
+            "challenged_player_id": "fakeid2",
+        })
+        assert r.status_code in [401, 403, 422]
+
 
 class TestPhase:
     def test_phase_endpoint(self):
