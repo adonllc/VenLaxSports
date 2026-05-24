@@ -290,6 +290,18 @@ class TestUsers:
         assert data.get("dupr_rating") == "3.0-3.5"
 
 
+class TestBoxLeagues:
+    def test_assign_boxes(self):
+        s = get_admin_session()
+        leagues = requests.get(f"{BASE_URL}/api/leagues?status=registration").json()
+        box_leagues = [l for l in leagues if l.get("league_type") == "box_league"]
+        if not box_leagues:
+            pytest.skip("No box league available")
+        lid = box_leagues[0]["id"]
+        r = s.post(f"{BASE_URL}/api/box-leagues/{lid}/assign-boxes")
+        assert r.status_code in [200, 400]  # 400 = not enough players, still means route exists
+
+
 class TestPhase:
     def test_phase_endpoint(self):
         r = requests.get(f"{BASE_URL}/api/phase")

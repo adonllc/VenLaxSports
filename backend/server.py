@@ -37,6 +37,7 @@ from routes.social_auth_routes import router as social_auth_router
 from routes.notification_routes import router as notification_router
 from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
+from routes.box_league_routes import router as box_league_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(social_auth_router, prefix="/auth", tags=["social-auth"])
@@ -54,6 +55,7 @@ api_router.include_router(wa_router, prefix="/webhook/whatsapp", tags=["whatsapp
 api_router.include_router(notification_router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(doubles_router, prefix="/doubles-invite", tags=["doubles"])
 api_router.include_router(waitlist_router, prefix="/waitlist", tags=["waitlist"])
+api_router.include_router(box_league_router, prefix="/box-leagues", tags=["box-leagues"])
 
 
 @api_router.get("/")
