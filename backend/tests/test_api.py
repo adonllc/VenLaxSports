@@ -198,6 +198,27 @@ class TestLeagues:
         for league in data:
             assert league.get("division_label") == "Intermediate"
 
+    def test_box_league_creation(self):
+        s = get_admin_session()
+        r = s.post(f"{BASE_URL}/api/leagues", json={
+            "name": "Box Test League",
+            "sport": "tennis",
+            "country": "USA",
+            "city": "Austin",
+            "format": "singles",
+            "entry_fee": 9.99,
+            "start_date": "2026-06-01",
+            "end_date": "2026-07-15",
+            "league_type": "box_league",
+            "division_label": "Intermediate",
+            "division_ntrp_min": 3.5,
+            "division_ntrp_max": 4.0,
+        })
+        assert r.status_code in [200, 201]
+        data = r.json()
+        assert data.get("league_type") == "box_league"
+        assert data.get("box_group_size") == 6
+
 
 class TestAdmin:
     @pytest.fixture(autouse=True)

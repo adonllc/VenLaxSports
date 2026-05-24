@@ -307,3 +307,18 @@ class Challenge(BaseDocument):
     status: str = "pending"          # pending, accepted, expired
     delivery_method: str = "email"   # email | whatsapp
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+# ─── Season ──────────────────────────────────────────
+class Season(BaseDocument):
+    name: str
+    sport: str
+    start_date: str
+    end_date: str
+    description: Optional[str] = None
+    status: str = "upcoming"         # upcoming | active | completed
+    admin_id: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+    box_assignments: Optional[List[Dict]] = None
+    # Structure: [{"box_id": "A", "player_ids": ["uid1", ...]}, ...]
