@@ -804,12 +804,6 @@ export default function PreLaunch() {
             <span className="text-gray-500 font-normal text-sm">SPORTS</span>
           </div>
           <div className="flex gap-6 text-xs text-gray-500">
-            <a href="/terms" className="hover:text-gray-300 transition-colors">
-              Privacy Policy
-            </a>
-            <a href="/rules" className="hover:text-gray-300 transition-colors">
-              Rules
-            </a>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </div>
