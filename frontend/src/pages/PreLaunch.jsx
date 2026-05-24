@@ -354,6 +354,154 @@ export default function PreLaunch() {
       </section>
 
 
+      {/* League Formats Showcase */}
+      <section className="bg-gray-50 py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest text-center mb-4">
+            Choose your format
+          </p>
+          <h2
+            className="text-4xl font-bold text-gray-900 text-center mb-4"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            Four ways to compete.
+          </h2>
+          <p className="text-gray-500 text-center text-base mb-12 max-w-2xl mx-auto">
+            Same match rules and ELO rankings across all formats — different structure, different intensity.
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-4 mb-10">
+            {[
+              {
+                id: "flex",
+                label: "Flex League",
+                tag: "Self-scheduled",
+                tagline: "You set the schedule. We track the results.",
+                header: "bg-emerald-500",
+                border: "border-emerald-200",
+                bullet: "text-emerald-500",
+                pill: "bg-emerald-600/50 text-emerald-100",
+                highlights: [
+                  "5–7 matches over 6–8 weeks",
+                  "You arrange each match with your opponent",
+                  "Top 4 or 8 qualify for playoffs",
+                  "Points formula rewards wins + margin",
+                ],
+              },
+              {
+                id: "rr",
+                label: "Round Robin",
+                tag: "Auto-scheduled",
+                tagline: "Show up. The schedule is already set.",
+                header: "bg-blue-600",
+                border: "border-blue-200",
+                bullet: "text-blue-500",
+                pill: "bg-blue-700/50 text-blue-100",
+                highlights: [
+                  "Every player faces every other player once",
+                  "Rounds pre-assigned — no self-scheduling",
+                  "Group leaders advance to playoffs",
+                  "Head-to-head carries extra tiebreaker weight",
+                ],
+              },
+              {
+                id: "box",
+                label: "Box League",
+                tag: "Promotion / Relegation",
+                tagline: "Finish top, move up. Finish bottom, move down.",
+                header: "bg-violet-600",
+                border: "border-violet-200",
+                bullet: "text-violet-500",
+                pill: "bg-violet-700/50 text-violet-100",
+                highlights: [
+                  "~6 players per box, seeded by ELO",
+                  "Play every player in your box",
+                  "Top 2 promote · Bottom 2 relegate",
+                  "No playoffs — final standings decide",
+                ],
+              },
+              {
+                id: "ladder",
+                label: "Challenge Ladder",
+                tag: "Always-on",
+                tagline: "Climb the ranks one challenge at a time.",
+                header: "bg-amber-500",
+                border: "border-amber-200",
+                bullet: "text-amber-500",
+                pill: "bg-amber-600/50 text-amber-100",
+                highlights: [
+                  "Permanent ranked list per city + division",
+                  "Join anytime — ELO-seeded placement",
+                  "Challenge anyone ranked above you",
+                  "Win = rank swap · 48h cooldown",
+                ],
+              },
+            ].map((f) => (
+              <div key={f.id} className={`rounded-2xl border ${f.border} overflow-hidden`} data-testid={`prelaunch-format-${f.id}`}>
+                <div className={`${f.header} px-5 py-4`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Outfit', sans-serif" }}>{f.label}</h3>
+                    <span className={`ml-auto text-xs font-semibold ${f.pill} px-2.5 py-0.5 rounded-full`}>{f.tag}</span>
+                  </div>
+                  <p className="text-white/75 text-xs">{f.tagline}</p>
+                </div>
+                <div className="p-4 bg-white">
+                  <ul className="space-y-1.5">
+                    {f.highlights.map((h, i) => (
+                      <li key={i} className="flex gap-2 text-sm text-gray-700">
+                        <span className={`${f.bullet} font-bold flex-shrink-0`}>✓</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Compact comparison table */}
+          <div className="overflow-x-auto rounded-2xl border border-gray-200 mb-8">
+            <table className="w-full text-sm min-w-[540px]">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-400 bg-gray-50 border-b border-gray-200 w-28"></th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-emerald-700 bg-emerald-50 border-b border-l border-gray-200">Flex</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 bg-blue-50 border-b border-l border-gray-200">Round Robin</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-violet-700 bg-violet-50 border-b border-l border-gray-200">Box League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-amber-700 bg-amber-50 border-b border-l border-gray-200">Ladder</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[
+                  { label: "Scheduling", flex: "Self-arranged",     rr: "Pre-assigned",        box: "Self-arranged",          ladder: "Challenge-based" },
+                  { label: "End goal",   flex: "Win playoffs",       rr: "Top of group",        box: "Promote to next div",    ladder: "Climb the list" },
+                  { label: "Playoffs",   flex: "Yes — top 4 or 8",  rr: "Yes — group leaders", box: "No — standings decide",  ladder: "No — rank is live" },
+                  { label: "Best for",   flex: "Flexible schedules", rr: "Zero friction",       box: "Competitive progression",ladder: "Frequent play" },
+                ].map((row, i) => (
+                  <tr key={row.label} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
+                    <td className="px-4 py-3 text-gray-500 font-medium text-xs">{row.label}</td>
+                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.flex}</td>
+                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.rr}</td>
+                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.box}</td>
+                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.ladder}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="text-center">
+            <a
+              href="/rules"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+              data-testid="prelaunch-formats-rules-link"
+            >
+              See full rules for all formats →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
