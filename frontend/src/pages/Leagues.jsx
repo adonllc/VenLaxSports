@@ -43,12 +43,13 @@ export default function Leagues() {
     city: searchParams.get("city") || "",
     status: searchParams.get("status") || "",
     season_id: searchParams.get("season_id") || "",
+    division: searchParams.get("division") || "",
     search: "",
   });
 
   useEffect(() => {
     fetchLeagues();
-  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id]);
+  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id, filters.division]);
 
   useEffect(() => {
     // Seasons endpoint requires auth, so degrade gracefully if logged out
@@ -66,6 +67,7 @@ export default function Leagues() {
       if (filters.city) params.set("city", filters.city);
       if (filters.status) params.set("status", filters.status);
       if (filters.season_id) params.set("season_id", filters.season_id);
+      if (filters.division) params.set("division", filters.division);
       params.set("limit", "50");
       const { data } = await axios.get(`${API}/leagues?${params}`);
       setLeagues(data);
@@ -173,14 +175,32 @@ export default function Leagues() {
             <option value="completed">Completed</option>
           </select>
 
-          {(filters.sport || filters.city || filters.status) && (
+          {(filters.sport || filters.city || filters.status || filters.division) && (
             <button
-              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", search: "" }); setSearchParams({}); }}
+              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", search: "" }); setSearchParams({}); }}
               className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border border-gray-200 rounded-xl"
               data-testid="clear-filters"
             >
               Clear Filters
             </button>)}
+
+          {/* Division filter */}
+          <div className="w-full flex flex-wrap gap-2 mt-1">
+            {["", "Beginner", "Intermediate", "Advanced", "Competitive"].map((div) => (
+              <button
+                key={div || "all"}
+                data-testid={`division-filter-${div || "all"}`}
+                onClick={() => setFilters((f) => ({ ...f, division: div }))}
+                className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                  filters.division === div
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                {div || "All Levels"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Results count */}
@@ -256,10 +276,29 @@ function LeagueCard({ league, onClick }) {
           <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
+        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
           <span className="capitalize">{league.format}</span>
           <span>•</span>
           <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+        </div>
+
+        {/* Division badge */}
+        <div className="mb-4">
+          {league.division_label ? (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+              {league.division_label}
+              {league.division_ntrp_min && (
+                <span className="ml-1 text-indigo-400">
+                  ({league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
+                  {league.sport === "pickleball" ? "DUPR" : "NTRP"})
+                </span>
+              )}
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200">
+              Open Division
+            </span>
+          )}
         </div>
 
         {/* Progress bar */}
