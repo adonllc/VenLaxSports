@@ -173,6 +173,11 @@ async def seed_promo_codes_wrapper():
     await _seed(db)
 
 
+async def seed_demo_wrapper():
+    from seeds.demo import seed_demo as _seed
+    await _seed(db)
+
+
 @app.on_event("startup")
 async def startup_event():
     await seed_admin_wrapper()
@@ -181,6 +186,7 @@ async def startup_event():
     await seed_cities_wrapper()
     await normalize_pricing_wrapper()
     await seed_promo_codes_wrapper()
+    await seed_demo_wrapper()
     import scheduler as _sched
     _sched.start(db)
     logger.info("Application startup complete")
