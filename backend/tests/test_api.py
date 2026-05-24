@@ -301,6 +301,17 @@ class TestBoxLeagues:
         r = s.post(f"{BASE_URL}/api/box-leagues/{lid}/assign-boxes")
         assert r.status_code in [200, 400]  # 400 = not enough players, still means route exists
 
+    def test_box_standings(self):
+        leagues = requests.get(f"{BASE_URL}/api/leagues").json()
+        box_leagues = [l for l in leagues if l.get("league_type") == "box_league"]
+        if not box_leagues:
+            pytest.skip("No box league")
+        lid = box_leagues[0]["id"]
+        r = requests.get(f"{BASE_URL}/api/box-leagues/{lid}/standings")
+        assert r.status_code == 200
+        data = r.json()
+        assert "boxes" in data
+
 
 class TestPhase:
     def test_phase_endpoint(self):

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from itertools import combinations
 from auth_utils import require_admin
+import email_service
 
 router = APIRouter(redirect_slashes=False)
 
@@ -118,3 +119,91 @@ async def assign_boxes(league_id: str, request: Request):
         ],
         "match_count": len(all_matches),
     }
+
+
+@router.get("/{league_id}/standings")
+async def box_standings(league_id: str, request: Request):
+    db = request.app.state.db
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+
+    box_assignments = league.get("box_assignments") or []
+    sport = league.get("sport", "tennis")
+    elo_field = f"{sport}_rating"
+
+    boxes = []
+    for ba in box_assignments:
+        box_id = ba["box_id"]
+        player_ids = ba["player_ids"]
+
+        # Fetch completed matches in this box
+        matches = await db.matches.find({
+            "league_id": league_id,
+            "box_id": box_id,
+            "status": "completed",
+        }).to_list(500)
+
+        # Build stats per player
+        stats = {pid: {"player_id": pid, "wins": 0, "losses": 0, "games_won": 0, "games_lost": 0, "name": ""} for pid in player_ids}
+
+        for m in matches:
+            p1, p2 = m["player1_id"], m["player2_id"]
+            winner = m.get("winner_id")
+            score = m.get("score", "")
+            games = _parse_games(score, p1, p2)
+            if winner == p1:
+                stats[p1]["wins"] += 1
+                stats[p2]["losses"] += 1
+            elif winner == p2:
+                stats[p2]["wins"] += 1
+                stats[p1]["losses"] += 1
+            stats[p1]["games_won"] += games.get(p1, 0)
+            stats[p1]["games_lost"] += games.get(p2, 0)
+            stats[p2]["games_won"] += games.get(p2, 0)
+            stats[p2]["games_lost"] += games.get(p1, 0)
+
+        # Fetch player names + ELO
+        for pid in player_ids:
+            try:
+                user = await db.users.find_one({"_id": ObjectId(pid)}, {"name": 1, elo_field: 1})
+                if user:
+                    stats[pid]["name"] = user.get("name", "")
+                    stats[pid]["elo"] = user.get(elo_field, 1500)
+            except Exception:
+                pass
+
+            reg = await db.player_leagues.find_one({"league_id": league_id, "player_id": pid})
+            stats[pid]["promotion_status"] = reg.get("promotion_status") if reg else None
+
+        sorted_players = sorted(
+            stats.values(),
+            key=lambda p: (-p["wins"], -p.get("games_won", 0), -p.get("elo", 0))
+        )
+        for rank_idx, player in enumerate(sorted_players):
+            player["rank"] = rank_idx + 1
+
+        boxes.append({"box_id": box_id, "players": sorted_players})
+
+    promote_n = league.get("box_promote", 2)
+    relegate_n = league.get("box_relegate", 2)
+    return {"boxes": boxes, "box_promote": promote_n, "box_relegate": relegate_n}
+
+
+def _parse_games(score: str, p1_id: str, p2_id: str) -> dict:
+    """Parse '6-4 6-3' into {p1_id: 12, p2_id: 7} games totals."""
+    result = {p1_id: 0, p2_id: 0}
+    if not score:
+        return result
+    try:
+        for set_score in score.strip().split():
+            parts = set_score.split("-")
+            if len(parts) == 2:
+                result[p1_id] += int(parts[0])
+                result[p2_id] += int(parts[1])
+    except Exception:
+        pass
+    return result
