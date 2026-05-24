@@ -30,6 +30,7 @@ export default function PlayerDashboard() {
   const [interests, setInterests] = useState([]);
   const [removingInterest, setRemovingInterest] = useState(null);
   const [pendingInvites, setPendingInvites] = useState([]);
+  const [boxStatuses, setBoxStatuses] = useState({});
 
   useEffect(() => {
     if (loading) return;
@@ -45,6 +46,25 @@ export default function PlayerDashboard() {
       ]);
       setLeagues(lRes.data);
       setMatches(mRes.data);
+      const myLeagues = lRes.data;
+      for (const league of myLeagues.filter(l => l.league_type === "box_league")) {
+        try {
+          const { data } = await axios.get(`${API}/box-leagues/${league.id}/standings`, { withCredentials: true });
+          const myBox = data.boxes?.find(b => b.players.some(p => p.player_id === (user?.id || user?._id)));
+          if (myBox) {
+            const myEntry = myBox.players.find(p => p.player_id === (user?.id || user?._id));
+            setBoxStatuses(prev => ({
+              ...prev,
+              [league.id]: {
+                box_id: myBox.box_id,
+                rank: myEntry?.rank,
+                total: myBox.players.length,
+                promotion_status: myEntry?.promotion_status
+              }
+            }));
+          }
+        } catch {}
+      }
     } catch (e) { console.error(e); }
     axios.get(`${API}/notifications/interests`, { withCredentials: true })
       .then(r => setInterests(r.data))
@@ -360,6 +380,17 @@ export default function PlayerDashboard() {
                           )}
                         </p>
                         <p className="text-xs text-gray-500">{l.city} • {l.format}</p>
+                        {boxStatuses[l.id] && (
+                          <div className="mt-1 text-sm text-gray-600">
+                            Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
+                            {boxStatuses[l.id].promotion_status === "promoted" && (
+                              <span className="ml-2 text-xs font-semibold text-emerald-700">Promoted ↑</span>
+                            )}
+                            {boxStatuses[l.id].promotion_status === "relegated" && (
+                              <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : l.status === "active" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
                         {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
