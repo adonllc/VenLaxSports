@@ -49,6 +49,9 @@ export default function AdminDashboard() {
   const [msg, setMsg] = useState("");
   const [cities, setCities] = useState([]);
   const [seasons, setSeasons] = useState([]);
+  const [ladders, setLadders] = useState([]);
+  const [ladderForm, setLadderForm] = useState({ city: "", sport: "tennis", division_label: "Intermediate", format: "singles" });
+  const [ladderMsg, setLadderMsg] = useState("");
   const [showRRForm, setShowRRForm] = useState(false);
   const [rrFormData, setRRFormData] = useState({
     name: "", sport: "tennis", country: "USA", city: "",
@@ -65,6 +68,7 @@ export default function AdminDashboard() {
     fetchLeagues();
     fetchCities();
     fetchSeasons();
+    fetchLadders();
   }, [user, loading]);
 
   const fetchStats = async () => {
@@ -86,6 +90,28 @@ export default function AdminDashboard() {
       const { data } = await axios.get(`${API}/cities`);
       setCities(data);
     } catch (e) { console.error(e); }
+  };
+
+  const fetchLadders = async () => {
+    try {
+      const { data } = await axios.get(`${API}/ladders`, { withCredentials: true });
+      setLadders(data);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleCreateLadder = async () => {
+    if (!ladderForm.city || !ladderForm.sport || !ladderForm.division_label) {
+      setLadderMsg("City, sport, and division required.");
+      return;
+    }
+    try {
+      await axios.post(`${API}/ladders`, ladderForm, { withCredentials: true });
+      setLadderMsg("Ladder created.");
+      setLadderForm({ city: "", sport: "tennis", division_label: "Intermediate", format: "singles" });
+      fetchLadders();
+    } catch (err) {
+      setLadderMsg(err.response?.data?.detail || "Failed to create ladder");
+    }
   };
 
   const fetchSeasons = async () => {
@@ -193,6 +219,7 @@ export default function AdminDashboard() {
     { id: "create", label: "Create League" },
     { id: "auto", label: "Auto-Generate" },
     { id: "leagues", label: "Manage Leagues" },
+    { id: "ladders", label: "Ladders" },
     { id: "seasons", label: "Seasons" },
     { id: "playoffs", label: "Playoffs" },
     { id: "zelle", label: "Zelle Queue" },
@@ -494,6 +521,102 @@ export default function AdminDashboard() {
               </table>
               {leagues.length === 0 && (
                 <div className="text-center py-12 text-gray-500">No leagues yet. Create one!</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {tab === "ladders" && (
+          <div className="space-y-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <h3 className="font-heading font-bold text-lg text-gray-900 mb-4">Create Challenge Ladder</h3>
+              {ladderMsg && (
+                <div className="mb-4 text-sm px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-700" data-testid="ladder-msg">{ladderMsg}</div>
+              )}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <select
+                    data-testid="ladder-city-select"
+                    value={ladderForm.city}
+                    onChange={(e) => setLadderForm((f) => ({ ...f, city: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    <option value="">Select city</option>
+                    {cities.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+                  <select
+                    data-testid="ladder-sport-select"
+                    value={ladderForm.sport}
+                    onChange={(e) => setLadderForm((f) => ({ ...f, sport: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    {SPORTS.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Division</label>
+                  <select
+                    data-testid="ladder-division-select"
+                    value={ladderForm.division_label}
+                    onChange={(e) => setLadderForm((f) => ({ ...f, division_label: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    {["Beginner", "Intermediate", "Advanced", "Competitive"].map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
+                  <select
+                    data-testid="ladder-format-select"
+                    value={ladderForm.format}
+                    onChange={(e) => setLadderForm((f) => ({ ...f, format: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    <option value="singles">Singles</option>
+                    <option value="doubles">Doubles</option>
+                  </select>
+                </div>
+              </div>
+              <button
+                data-testid="create-ladder-btn"
+                onClick={handleCreateLadder}
+                className="flex items-center gap-1.5 text-sm font-semibold bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Create Ladder
+              </button>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="font-heading font-bold text-lg">Existing Ladders</h3>
+                <span className="text-sm text-gray-500">{ladders.length} total</span>
+              </div>
+              {ladders.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 text-sm">No ladders yet — create one above</div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {ladders.map((l) => (
+                    <div key={l.id} className="px-5 py-4 flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{l.city} — {l.division_label} {l.sport.charAt(0).toUpperCase() + l.sport.slice(1)} ({l.format})</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{l.entry_count ?? 0} players</p>
+                      </div>
+                      <a
+                        href={`/ladders/${l.id}`}
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                        data-testid={`admin-ladder-view-${l.id}`}
+                      >
+                        View →
+                      </a>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
