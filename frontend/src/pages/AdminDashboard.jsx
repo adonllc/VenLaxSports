@@ -18,11 +18,19 @@ const ALL_FORMATS = {
 const FORMATS = Object.fromEntries(SPORTS.map((s) => [s, ALL_FORMATS[s]]).filter(([, v]) => v));
 const CURRENCIES = { USA: "USD", India: "INR" };
 
+const DIVISION_RANGES = {
+  Beginner:     { tennis: [2.5, 3.0], pickleball: [2.0, 3.0] },
+  Intermediate: { tennis: [3.5, 4.0], pickleball: [3.0, 3.5] },
+  Advanced:     { tennis: [4.0, 4.5], pickleball: [3.5, 4.5] },
+  Competitive:  { tennis: [4.5, null], pickleball: [4.5, null] },
+};
+
 const DEFAULT_FORM = {
   name: "", sport: SPORTS[0] || "tennis", country: activeCountry, city: "",
   format: (FORMATS[SPORTS[0]] || ["singles"])[0],
   entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16,
   start_date: "", end_date: "", description: "", venue: "", season: "Season 1", season_id: "",
+  division_label: "", division_ntrp_min: null, division_ntrp_max: null,
 };
 
 export default function AdminDashboard() {
@@ -261,6 +269,31 @@ export default function AdminDashboard() {
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Format *</label>
                     <select value={form.format} onChange={update("format")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black" data-testid="create-league-format">
                       {(FORMATS[form.sport] || []).map((f) => <option key={f} value={f}>{f}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Division (optional)</label>
+                    <select
+                      data-testid="admin-division-select"
+                      value={form.division_label}
+                      onChange={(e) => {
+                        const label = e.target.value;
+                        const sport = form.sport;
+                        const ranges = label && DIVISION_RANGES[label] ? DIVISION_RANGES[label][sport] || [] : [];
+                        setForm((f) => ({
+                          ...f,
+                          division_label: label,
+                          division_ntrp_min: ranges[0] ?? null,
+                          division_ntrp_max: ranges[1] ?? null,
+                        }));
+                      }}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+                    >
+                      <option value="">Open Division (no skill gate)</option>
+                      <option value="Beginner">Beginner (2.5–3.0 NTRP / 2.0–3.0 DUPR)</option>
+                      <option value="Intermediate">Intermediate (3.5–4.0 NTRP / 3.0–3.5 DUPR)</option>
+                      <option value="Advanced">Advanced (4.0–4.5 NTRP / 3.5–4.5 DUPR)</option>
+                      <option value="Competitive">Competitive (4.5+ NTRP / 4.5+ DUPR)</option>
                     </select>
                   </div>
                   <div>
