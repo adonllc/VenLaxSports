@@ -169,6 +169,27 @@ class TestLeagues:
         r = requests.get(f"{BASE_URL}/api/leagues/{league_id}/matches")
         assert r.status_code == 200
 
+    def test_league_has_division_fields(self):
+        s = get_admin_session()
+        r = s.post(f"{BASE_URL}/api/leagues", json={
+            "name": "Test Division League",
+            "sport": "tennis",
+            "country": "USA",
+            "city": "Austin",
+            "format": "singles",
+            "entry_fee": 9.99,
+            "start_date": "2026-06-01",
+            "end_date": "2026-07-15",
+            "division_label": "Intermediate",
+            "division_ntrp_min": 3.5,
+            "division_ntrp_max": 4.0,
+        })
+        assert r.status_code in [200, 201]
+        data = r.json()
+        assert data.get("division_label") == "Intermediate"
+        assert data.get("division_ntrp_min") == 3.5
+        assert data.get("division_ntrp_max") == 4.0
+
 
 class TestAdmin:
     @pytest.fixture(autouse=True)

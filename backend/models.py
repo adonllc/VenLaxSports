@@ -58,6 +58,8 @@ class User(BaseDocument):
     home_court: Optional[str] = None
     profile_complete: bool = False
     founding_member: bool = False
+    dupr_rating: Optional[str] = None           # "2.0-3.0"|"3.0-3.5"|"3.5-4.5"|"4.5+"
+    gender: Optional[str] = None                # "male"|"female" — used for mixed doubles
     oauth_providers: List[dict] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -101,6 +103,12 @@ class League(BaseDocument):
     league_type: str = "flex"               # "flex" | "round_robin"
     rr_config: Optional[Dict] = None
     is_public: bool = True
+    division_label: Optional[str] = None        # "Beginner"|"Intermediate"|"Advanced"|"Competitive"
+    division_ntrp_min: Optional[float] = None   # e.g. 3.5
+    division_ntrp_max: Optional[float] = None   # e.g. 4.0
+    box_group_size: int = 6
+    box_promote: int = 2
+    box_relegate: int = 2
 
 
 class LeagueCreate(BaseModel):
@@ -121,6 +129,9 @@ class LeagueCreate(BaseModel):
     rules: Optional[str] = None
     league_type: str = "flex"
     rr_config: Optional[Dict] = None
+    division_label: Optional[str] = None
+    division_ntrp_min: Optional[float] = None
+    division_ntrp_max: Optional[float] = None
 
 
 class LeagueUpdate(BaseModel):
