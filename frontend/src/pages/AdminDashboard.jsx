@@ -11,9 +11,13 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // PHASE 2 unlocks Cricket; PHASE 3 unlocks India.
 const SPORTS = activeSportIds;
 const ALL_FORMATS = {
-  tennis: ["singles", "doubles", "mixed"],
+  tennis: ["singles", "doubles", "mixed", "mixed_doubles"],
   cricket: ["T10", "T20", "8-a-side", "11-a-side"],
-  pickleball: ["singles", "doubles", "mixed"],
+  pickleball: ["singles", "doubles", "mixed", "mixed_doubles"],
+};
+const FORMAT_LABELS = {
+  singles: "Singles", doubles: "Doubles", mixed: "Mixed", mixed_doubles: "Mixed Doubles",
+  T10: "T10", T20: "T20", "8-a-side": "8-a-side", "11-a-side": "11-a-side",
 };
 const FORMATS = Object.fromEntries(SPORTS.map((s) => [s, ALL_FORMATS[s]]).filter(([, v]) => v));
 const CURRENCIES = { USA: "USD", India: "INR" };
@@ -290,7 +294,7 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Format *</label>
                     <select value={form.format} onChange={update("format")} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black" data-testid="create-league-format">
-                      {(FORMATS[form.sport] || []).map((f) => <option key={f} value={f}>{f}</option>)}
+                      {(FORMATS[form.sport] || []).map((f) => <option key={f} value={f}>{FORMAT_LABELS[f] ?? f}</option>)}
                     </select>
                   </div>
                   <div>
