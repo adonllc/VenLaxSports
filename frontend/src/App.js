@@ -32,6 +32,8 @@ const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
 const JoinFlow = lazy(() => import("./pages/JoinFlow"));
 const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
 const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
+const Ladders = lazy(() => import("./pages/Ladders"));
+const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 
 const IS_PRELAUNCH = process.env.REACT_APP_PRELAUNCH === "true";
 
@@ -70,6 +72,8 @@ function AppRouter() {
         <Route path="/join" element={<JoinFlow />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
+        <Route path="/ladders" element={<Ladders />} />
+        <Route path="/ladders/:id" element={<LadderDetail />} />
       </Routes>
     </Suspense>
   );

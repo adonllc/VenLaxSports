@@ -76,6 +76,14 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/ladders"
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/ladders") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
+              data-testid="nav-ladders"
+            >
+              Ladders
+            </Link>
+
+            <Link
               to="/rules"
               className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive("/rules") ? "bg-gray-100 text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
               data-testid="nav-rules"
@@ -169,6 +177,7 @@ export default function Navbar() {
               <span>{s.icon}</span> {s.label}
             </Link>
           ))}
+          <Link to="/ladders" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-ladders-mobile">Ladders</Link>
           <Link to="/rules" className="block px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50" data-testid="nav-rules-mobile">Rules</Link>
           {user ? (
             <>
