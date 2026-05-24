@@ -116,10 +116,17 @@ async def update_profile(data: UserProfileUpdate, request: Request):
     """Update the current user's profile fields."""
     db = request.app.state.db
     user = await get_current_user(request, db)
-    update = {k: v for k, v in data.model_dump().items() if v is not None}
-    if not update:
+    payload = data.model_dump(exclude_unset=True)
+    if not payload:
         raise HTTPException(status_code=400, detail="No fields to update")
-    await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
+    set_fields = {k: v for k, v in payload.items() if v is not None}
+    unset_fields = {k: "" for k, v in payload.items() if v is None}
+    ops: dict = {}
+    if set_fields:
+        ops["$set"] = set_fields
+    if unset_fields:
+        ops["$unset"] = unset_fields
+    await db.users.update_one({"_id": ObjectId(user["_id"])}, ops)
     updated = await db.users.find_one({"_id": ObjectId(user["_id"])}, {"password_hash": 0})
     if not updated:
         raise HTTPException(status_code=404, detail="User not found")
