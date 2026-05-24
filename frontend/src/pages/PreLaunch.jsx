@@ -491,13 +491,7 @@ export default function PreLaunch() {
           </div>
 
           <div className="text-center">
-            <a
-              href="/rules"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-              data-testid="prelaunch-formats-rules-link"
-            >
-              See full rules for all formats →
-            </a>
+            <p className="text-sm text-gray-400">Full rules will be announced shortly.</p>
           </div>
         </div>
       </section>
