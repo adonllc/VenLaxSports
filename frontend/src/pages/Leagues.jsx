@@ -37,6 +37,22 @@ const FORMAT_COLORS = {
   mixed_doubles: "bg-purple-100 text-purple-700",
 };
 
+// DUPR → division mapping for pickleball league join pre-selection.
+// When the join flow gains a division selection step (modal or page),
+// use this to pre-select the matching division based on user.dupr_rating:
+//
+//   const suggestedDivision = league.sport === "pickleball" && user?.dupr_rating
+//     ? DUPR_TO_DIVISION[user.dupr_rating]
+//     : null;
+//
+// Then pass `suggestedDivision` as the default value for the division picker.
+const DUPR_TO_DIVISION = {
+  "2.0-3.0": "Beginner",
+  "3.0-3.5": "Intermediate",
+  "3.5-4.5": "Advanced",
+  "4.5+": "Competitive",
+};
+
 export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
