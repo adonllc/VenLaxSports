@@ -231,7 +231,6 @@ export default function PreLaunch() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm text-gray-600">
             {[
-              "$9.99/season — less than one court rental",
               "Placed by skill — no sandbaggers, no mismatches",
               "Flexible scheduling — you set match times with your opponent",
               "Official VENLAX city ranking after every match",
@@ -354,73 +353,6 @@ export default function PreLaunch() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="bg-gray-50 py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
-            Simple pricing
-          </p>
-          <h2
-            className="text-4xl font-bold text-gray-900 text-center mb-4"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
-          >
-            No club fees. No surprises.
-          </h2>
-          <p className="text-gray-500 text-center mb-12 text-sm">Early access members lock in these prices for life.</p>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            {[
-              { name: "Singles League", price: "$9.99", unit: "per player / season" },
-              { name: "Doubles League", price: "$19.99", unit: "per team / season" },
-            ].map((plan) => (
-              <div key={plan.name} className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
-                <p className="text-gray-500 text-sm mb-2">{plan.name}</p>
-                <p
-                  className="text-5xl font-bold text-gray-900 mb-1"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
-                  {plan.price}
-                </p>
-                <p className="text-gray-400 text-xs mb-6">{plan.unit}</p>
-                <ul className="text-sm text-gray-600 space-y-2 text-left">
-                  {[
-                    "Full round-robin schedule",
-                    "Official VENLAX city ranking",
-                    "Score tracking + match history",
-                    "Email confirmations for every match",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-2">
-                      <span className="text-emerald-500 font-bold text-xs">✓</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <p
-              className="font-semibold text-gray-900 mb-4 text-center"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              Early access — Founding Member Status
-            </p>
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                "Founding member badge on your public profile",
-                "Priority placement when your city opens",
-                "Current season pricing locked in forever",
-              ].map((benefit) => (
-                <div key={benefit} className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-emerald-500 font-bold mt-0.5 flex-shrink-0">✓</span>
-                  {benefit}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* How It Works */}
       <section className="py-20 px-6">
@@ -493,7 +425,6 @@ export default function PreLaunch() {
           </blockquote>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { stat: "$9.99", label: "entry fee per season" },
               { stat: "7 days", label: "per match round, you pick the time" },
               { stat: "ELO-based", label: "ranking system, not vibes" },
             ].map((item) => (
@@ -542,8 +473,8 @@ export default function PreLaunch() {
                 a: "Web-first for now, fully mobile-optimized. A dedicated mobile app is on the roadmap for late 2026.",
               },
               {
-                q: "What does the entry fee cover?",
-                a: "League organization, rankings, scheduling, score tracking, and email coordination for the full season. No hidden fees.",
+                q: "What's included in a league?",
+                a: "League organization, rankings, scheduling, score tracking, and email coordination for the full season.",
               },
               {
                 q: "Can I play both Tennis and Pickleball?",
