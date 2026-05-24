@@ -31,6 +31,12 @@ const STATUS_COLORS = {
   cancelled: "bg-red-100 text-red-600",
 };
 
+const FORMAT_COLORS = {
+  singles: "bg-gray-100 text-gray-700",
+  doubles: "bg-blue-50 text-blue-700",
+  mixed_doubles: "bg-purple-100 text-purple-700",
+};
+
 export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -44,12 +50,13 @@ export default function Leagues() {
     status: searchParams.get("status") || "",
     season_id: searchParams.get("season_id") || "",
     division: searchParams.get("division") || "",
+    format: searchParams.get("format") || "",
     search: "",
   });
 
   useEffect(() => {
     fetchLeagues();
-  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id, filters.division]);
+  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id, filters.division, filters.format]);
 
   useEffect(() => {
     // Seasons endpoint requires auth, so degrade gracefully if logged out
@@ -68,6 +75,7 @@ export default function Leagues() {
       if (filters.status) params.set("status", filters.status);
       if (filters.season_id) params.set("season_id", filters.season_id);
       if (filters.division) params.set("division", filters.division);
+      if (filters.format) params.set("format", filters.format);
       params.set("limit", "50");
       const { data } = await axios.get(`${API}/leagues?${params}`);
       setLeagues(data);
@@ -85,9 +93,11 @@ export default function Leagues() {
     setSearchParams(newParams);
   };
 
-  const filteredLeagues = leagues.filter((l) =>
-    !filters.search || l.name.toLowerCase().includes(filters.search.toLowerCase()) || l.city.toLowerCase().includes(filters.search.toLowerCase())
-  );
+  const filteredLeagues = leagues.filter((l) => {
+    if (filters.search && !l.name.toLowerCase().includes(filters.search.toLowerCase()) && !l.city.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.format && l.format !== filters.format) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50" data-testid="leagues-page">
@@ -175,9 +185,9 @@ export default function Leagues() {
             <option value="completed">Completed</option>
           </select>
 
-          {(filters.sport || filters.city || filters.status || filters.division) && (
+          {(filters.sport || filters.city || filters.status || filters.division || filters.format) && (
             <button
-              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", search: "" }); setSearchParams({}); }}
+              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
               className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border border-gray-200 rounded-xl"
               data-testid="clear-filters"
             >
@@ -200,6 +210,54 @@ export default function Leagues() {
                 {div || "All Levels"}
               </button>
             ))}
+          </div>
+
+          {/* Format filter */}
+          <div className="w-full flex flex-wrap gap-2">
+            <button
+              data-testid="format-filter-all"
+              onClick={() => setFilters((f) => ({ ...f, format: "" }))}
+              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                filters.format === ""
+                  ? "bg-gray-900 text-white border-gray-900"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              All Formats
+            </button>
+            <button
+              data-testid="format-filter-singles"
+              onClick={() => setFilters((f) => ({ ...f, format: f.format === "singles" ? "" : "singles" }))}
+              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                filters.format === "singles"
+                  ? "bg-gray-900 text-white border-gray-900"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              Singles
+            </button>
+            <button
+              data-testid="format-filter-doubles"
+              onClick={() => setFilters((f) => ({ ...f, format: f.format === "doubles" ? "" : "doubles" }))}
+              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                filters.format === "doubles"
+                  ? "bg-gray-900 text-white border-gray-900"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              Doubles
+            </button>
+            <button
+              data-testid="format-filter-mixed-doubles"
+              onClick={() => setFilters((f) => ({ ...f, format: f.format === "mixed_doubles" ? "" : "mixed_doubles" }))}
+              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                filters.format === "mixed_doubles"
+                  ? "bg-purple-700 text-white border-purple-700"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              Mixed Doubles
+            </button>
           </div>
         </div>
 
@@ -276,10 +334,12 @@ function LeagueCard({ league, onClick }) {
           <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
-          <span className="capitalize">{league.format}</span>
-          <span>•</span>
-          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+        <div className="flex items-center gap-3 text-xs mb-3">
+          <span className={`px-2 py-0.5 rounded-full font-medium ${FORMAT_COLORS[league.format] || "bg-gray-100 text-gray-700"}`}>
+            {league.format === "mixed_doubles" ? "Mixed Doubles" : league.format ? league.format.charAt(0).toUpperCase() + league.format.slice(1) : ""}
+          </span>
+          <span className="text-gray-400">•</span>
+          <span className="flex items-center gap-1 text-gray-500"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
         </div>
 
         {/* Division badge */}
