@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
@@ -24,10 +23,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-black" />
-              </div>
+            <div className="mb-3">
               <Logo size="md" variant="light" testId="footer-logo" />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">

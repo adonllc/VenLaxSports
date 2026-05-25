@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "../components/Logo";
@@ -110,10 +110,7 @@ export default function Auth() {
           backgroundImage: "radial-gradient(circle at 30% 50%, #10B981 0%, transparent 60%), radial-gradient(circle at 70% 30%, #2563EB 0%, transparent 60%), radial-gradient(circle at 50% 80%, #F97316 0%, transparent 50%)"
         }} />
         <div className="relative z-10 text-center text-white">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-              <Trophy className="w-7 h-7 text-black" />
-            </div>
+          <div className="flex items-center justify-center mb-8">
             <Logo size="hero" variant="hero" testId="auth-hero-logo" />
           </div>
           <h2 className="font-heading font-black text-4xl leading-tight mb-3">Your rank.<br />Your record.<br /><span className="text-emerald-400">Your league.</span></h2>
