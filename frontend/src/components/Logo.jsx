@@ -1,44 +1,66 @@
 import BRAND from "../config/brandConfig";
 
-/**
- * VENLAX Sports wordmark.
- * Renders as: VEN[LAX in emerald] [SPORTS in lighter weight]
- *
- * Variants:
- *  - "default" — gray VEN + emerald LAX + gray SPORTS (light backgrounds)
- *  - "light"   — white VEN + emerald LAX + light-gray SPORTS (dark backgrounds)
- *  - "hero"    — bigger gap, larger SPORTS suffix (Auth left panel)
- */
-export default function Logo({
-  variant = "default",
-  size = "md",
-  className = "",
-  testId = "brand-logo",
-}) {
-  const sizeMap = {
-    sm: { main: "text-base", sports: "text-[10px] ml-1" },
-    md: { main: "text-xl", sports: "text-[10px] ml-1.5 tracking-widest" },
-    lg: { main: "text-2xl", sports: "text-xs ml-1.5 tracking-widest" },
-    xl: { main: "text-3xl", sports: "text-sm ml-2 tracking-widest" },
-    hero: { main: "text-3xl", sports: "text-base ml-2 tracking-widest" },
-  };
-  const colorMap = {
-    default: { ven: "text-gray-900", lax: "text-emerald-500", sports: "text-gray-400" },
-    light: { ven: "text-white", lax: "text-emerald-400", sports: "text-gray-300" },
-    hero: { ven: "text-white", lax: "text-emerald-400", sports: "text-gray-300" },
-  };
-  const sz = sizeMap[size] || sizeMap.md;
-  const c = colorMap[variant] || colorMap.default;
+const S = { tennis: "#10B981", pickle: "#F97316", cricket: "#2563EB", ball: "#EA580C" };
+
+const HEIGHTS = { sm: 28, md: 36, lg: 44, xl: 52, hero: 64 };
+
+const PALETTES = {
+  default: { text: "#111827", x: "#10B981", sub: "#9CA3AF", rule: "#D1D5DB" },
+  light:   { text: "#FFFFFF", x: "#34D399", sub: "#9CA3AF", rule: "#374151" },
+  hero:    { text: "#FFFFFF", x: "#34D399", sub: "#9CA3AF", rule: "#374151" },
+};
+
+export default function Logo({ variant = "default", size = "md", className = "", testId = "brand-logo" }) {
+  const h = HEIGHTS[size] || HEIGHTS.md;
+  const p = PALETTES[variant] || PALETTES.default;
 
   return (
-    <span
-      className={`font-heading font-black tracking-tight inline-flex items-baseline ${sz.main} ${className}`}
-      data-testid={testId}
+    <svg
+      viewBox="0 0 220 44"
+      height={h}
       aria-label={BRAND.full_name}
+      data-testid={testId}
+      className={className}
+      style={{ display: "block" }}
     >
-      <span className={c.ven}>VEN</span>
-      <span className={c.lax}>LAX</span>
-      <span className={`font-semibold uppercase ${c.sports} ${sz.sports}`}>SPORTS</span>
-    </span>
+      {/* Tennis ball */}
+      <circle cx="13" cy="19" r="11" fill={S.tennis} />
+      <path d="M7,12 Q13,19 7,26" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M19,12 Q13,19 19,26" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+
+      {/* Pickleball */}
+      <circle cx="37" cy="19" r="11" fill={S.pickle} />
+      <circle cx="34" cy="16" r="1.8" fill="white" />
+      <circle cx="40" cy="16" r="1.8" fill="white" />
+      <circle cx="34" cy="22" r="1.8" fill="white" />
+      <circle cx="40" cy="22" r="1.8" fill="white" />
+      <circle cx="37" cy="19" r="1.8" fill="white" />
+
+      {/* Cricket bat + ball */}
+      <rect x="57" y="8" width="5" height="22" rx="2.5" fill={S.cricket} />
+      <circle cx="69" cy="19" r="8" fill={S.ball} />
+
+      {/* Divider */}
+      <line x1="84" y1="6" x2="84" y2="34" stroke={p.rule} strokeWidth="1" />
+
+      {/* VENLA + X wordmark */}
+      <text fontFamily="'Outfit', sans-serif" fontWeight="900" fontStyle="italic" fontSize="24" y="29">
+        <tspan x="92" fill={p.text}>VENLA</tspan>
+        <tspan fill={p.x}>X</tspan>
+      </text>
+
+      {/* SPORTS */}
+      <text
+        x="93"
+        y="41"
+        fontFamily="'Outfit', sans-serif"
+        fontSize="6.5"
+        fontWeight="700"
+        letterSpacing="3"
+        fill={p.sub}
+      >
+        SPORTS
+      </text>
+    </svg>
   );
 }

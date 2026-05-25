@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
 
@@ -46,10 +46,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group" data-testid="nav-logo">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center group-hover:bg-gray-800 transition-colors">
-              <Trophy className="w-5 h-5 text-white" />
-            </div>
+          <Link to="/" data-testid="nav-logo">
             <Logo size="md" variant="default" testId="nav-logo-mark" />
           </Link>
 

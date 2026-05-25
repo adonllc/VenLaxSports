@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Logo from "../components/Logo";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://api.venlaxsports.com";
 
@@ -173,11 +174,7 @@ export default function PreLaunch() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="font-bold text-xl tracking-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
-            <span className="text-gray-900">VEN</span>
-            <span className="text-emerald-500">LAX</span>
-            <span className="text-gray-400 text-sm font-normal ml-1">SPORTS</span>
-          </div>
+          <Logo size="md" variant="default" />
           <a
             href="#early-access"
             className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
