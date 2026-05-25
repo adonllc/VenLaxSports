@@ -44,10 +44,10 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 glass-nav border-b border-gray-200" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" data-testid="nav-logo">
-            <Logo size="md" variant="default" testId="nav-logo-mark" />
+            <Logo size="xl" variant="default" testId="nav-logo-mark" />
           </Link>
 
           {/* Desktop Nav */}

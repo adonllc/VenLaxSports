@@ -2,11 +2,11 @@ import logoImg from "../assets/logo.png";
 import BRAND from "../config/brandConfig";
 
 const SIZES = {
-  sm:   { height: 32 },
-  md:   { height: 44 },
-  lg:   { height: 56 },
-  xl:   { height: 72 },
-  hero: { height: 100 },
+  sm:   { height: 44 },
+  md:   { height: 56 },
+  lg:   { height: 72 },
+  xl:   { height: 96 },
+  hero: { height: 128 },
 };
 
 export default function Logo({
