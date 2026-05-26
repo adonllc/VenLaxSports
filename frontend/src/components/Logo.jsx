@@ -31,7 +31,7 @@ export default function Logo({
   const stripeC    = onDark ? "#60A5FA"  : "#2563EB";
   const stripeLtr  = onDark ? "#06122a"  : "#ffffff";
   const divider    = onDark ? "#0d2040"  : "#C7D9F5";
-  const sportsClr  = onDark ? "#1e3a6e"  : "#90ADCF";
+  const sportsClr  = onDark ? "#4a7fba"  : "#90ADCF";
 
   return (
     <svg
