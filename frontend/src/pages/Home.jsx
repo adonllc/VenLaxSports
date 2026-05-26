@@ -40,14 +40,12 @@ const SPORT_CONFIG = Object.fromEntries(
   activeSportIds.map((id) => [id, ALL_SPORT_CONFIG[id]]).filter(([, v]) => v)
 );
 
-// Dark surface colors
-const DARK = "oklch(9% 0.005 260)";
-const DARK_2 = "oklch(13% 0.005 260)";
-const DARK_BORDER = "oklch(20% 0.005 260)";
-const EMERALD = "oklch(70% 0.18 162)";
-const TEXT_BRIGHT = "oklch(97% 0.003 260)";
-const TEXT_MID = "oklch(72% 0.006 260)";
-const TEXT_DIM = "oklch(48% 0.006 260)";
+const EMERALD = "#10B981";
+const OBSIDIAN = "#0A0A0A";
+const TEXT_PRIMARY = "#0A0A0A";
+const TEXT_SECONDARY = "#374151";
+const TEXT_DIM = "#6B7280";
+const BORDER = "#E5E7EB";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -87,8 +85,7 @@ export default function Home() {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section
-        style={{ background: DARK }}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden bg-white"
         data-testid="hero-section"
       >
         {/* Thin emerald top rail */}
@@ -113,14 +110,14 @@ export default function Home() {
               <div className="mb-8">
                 <h1
                   className="font-heading font-black leading-[0.88] tracking-tight"
-                  style={{ fontSize: "clamp(4.5rem, 11vw, 8.5rem)", color: TEXT_BRIGHT }}
+                  style={{ fontSize: "clamp(4.5rem, 11vw, 8.5rem)", color: TEXT_PRIMARY }}
                 >
                   <span className="block">YOUR</span>
                   <span className="block" style={{ color: EMERALD }}>LEAGUE.</span>
                 </h1>
                 <p
                   className="font-heading font-bold mt-3 tracking-tight"
-                  style={{ fontSize: "clamp(1.25rem, 2.8vw, 1.875rem)", color: TEXT_MID }}
+                  style={{ fontSize: "clamp(1.25rem, 2.8vw, 1.875rem)", color: TEXT_SECONDARY }}
                 >
                   Earn your rank.
                 </p>
@@ -138,7 +135,7 @@ export default function Home() {
                 <button
                   onClick={() => navigate("/leagues")}
                   className="px-8 py-4 font-body font-bold rounded-md text-base transition-opacity hover:opacity-90 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                  style={{ background: EMERALD, color: DARK, focusRingColor: EMERALD }}
+                  style={{ background: OBSIDIAN, color: "#ffffff" }}
                   data-testid="hero-browse-btn"
                 >
                   Find My League
@@ -146,9 +143,9 @@ export default function Home() {
                 <button
                   onClick={() => navigate("/auth?mode=register")}
                   className="px-8 py-4 font-body font-semibold rounded-md text-base transition-colors cursor-pointer focus-visible:outline-none"
-                  style={{ border: `1px solid ${DARK_BORDER}`, color: TEXT_MID }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = TEXT_DIM; e.currentTarget.style.color = TEXT_BRIGHT; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = DARK_BORDER; e.currentTarget.style.color = TEXT_MID; }}
+                  style={{ border: `1px solid ${BORDER}`, color: TEXT_SECONDARY }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = OBSIDIAN; e.currentTarget.style.color = OBSIDIAN; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
                   data-testid="hero-signup-btn"
                 >
                   Join Free
@@ -162,9 +159,9 @@ export default function Home() {
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
                     className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full font-body text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none"
-                    style={{ border: `1px solid ${DARK_BORDER}`, color: TEXT_DIM }}
+                    style={{ border: `1px solid ${BORDER}`, color: TEXT_DIM }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = config.accent; e.currentTarget.style.color = config.accent; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = DARK_BORDER; e.currentTarget.style.color = TEXT_DIM; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_DIM; }}
                     data-testid={`hero-sport-pill-${sport}`}
                   >
                     <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: config.accent }} />
@@ -212,7 +209,7 @@ export default function Home() {
                         </div>
                         <span className="font-heading font-bold text-white">{config.label}</span>
                       </div>
-                      <span className="font-body text-xs font-medium" style={{ color: TEXT_DIM }}>{config.tagline}</span>
+                      <span className="font-body text-xs font-medium text-white/60">{config.tagline}</span>
                     </div>
                   </div>
                 );
@@ -223,7 +220,7 @@ export default function Home() {
         </div>
 
         {/* Stats ticker */}
-        <div style={{ borderTop: `1px solid ${DARK_BORDER}`, background: DARK_2 }}>
+        <div className="border-t border-gray-100 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
               {[
@@ -233,10 +230,10 @@ export default function Home() {
                 { v: `${activeSportIds.length}`, l: "sports" },
               ].map((s, i) => (
                 <span key={i} className="flex items-center gap-2 font-body text-sm">
-                  <span className="font-semibold" style={{ color: TEXT_BRIGHT }}>{s.v}</span>
+                  <span className="font-semibold" style={{ color: TEXT_PRIMARY }}>{s.v}</span>
                   {s.l && <span style={{ color: TEXT_DIM }}>{s.l}</span>}
                   {i < 3 && (
-                    <span className="hidden sm:inline ml-4 sm:ml-6" style={{ color: DARK_BORDER }}>·</span>
+                    <span className="hidden sm:inline ml-4 sm:ml-6 text-gray-300">·</span>
                   )}
                 </span>
               ))}
@@ -268,17 +265,11 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             {sportEntries.map(([sport, config], idx) => {
               const Icon = SPORT_ICONS[sport] || Activity;
-              const isDark = idx % 2 === 0;
               return (
                 <div
                   key={sport}
                   onClick={() => navigate(`/sport/${sport}`)}
-                  className="group cursor-pointer overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5"
-                  style={{
-                    background: isDark ? DARK : "white",
-                    border: isDark ? "none" : "1px solid #E5E7EB",
-                    boxShadow: isDark ? "none" : undefined,
-                  }}
+                  className="group cursor-pointer overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5 bg-white border border-gray-100 hover:border-gray-200 hover:shadow-md"
                   data-testid={`sport-card-${sport}`}
                 >
                   <div className={`flex flex-col ${idx % 2 !== 0 ? "md:flex-row-reverse" : "md:flex-row"}`}>
@@ -318,7 +309,7 @@ export default function Home() {
                         className="font-heading font-black leading-[0.88] tracking-tight mb-3"
                         style={{
                           fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
-                          color: isDark ? TEXT_BRIGHT : "#0A0A0A",
+                          color: TEXT_PRIMARY,
                         }}
                       >
                         {config.label}
@@ -326,7 +317,7 @@ export default function Home() {
 
                       <p
                         className="font-body text-sm mb-6 leading-relaxed"
-                        style={{ color: isDark ? TEXT_DIM : "#6B7280" }}
+                        style={{ color: TEXT_DIM }}
                       >
                         {config.tagline}
                       </p>
@@ -337,8 +328,8 @@ export default function Home() {
                             key={stat}
                             className="px-3 py-1 font-body text-xs font-semibold rounded-full"
                             style={{
-                              background: isDark ? "oklch(17% 0.005 260)" : "#F3F4F6",
-                              color: isDark ? TEXT_MID : "#374151",
+                              background: "#F3F4F6",
+                              color: TEXT_SECONDARY,
                             }}
                           >
                             {stat}
@@ -493,22 +484,17 @@ export default function Home() {
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
       <section
-        style={{ background: DARK }}
-        className="py-28 relative overflow-hidden"
+        className="py-28 relative overflow-hidden bg-gray-50 border-t border-gray-100"
         data-testid="cta-section"
       >
         {/* Subtle emerald top accent */}
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(to right, transparent, ${EMERALD}40, transparent)` }} />
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(to right, transparent, ${EMERALD}, transparent)` }} />
 
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           {foundingStats.spots_left > 0 && (
             <div
-              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8 font-body text-xs font-semibold"
-              style={{
-                background: "oklch(14% 0.006 162)",
-                border: `1px solid oklch(25% 0.06 162)`,
-                color: EMERALD,
-              }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8 font-body text-xs font-semibold bg-emerald-50 border border-emerald-100"
+              style={{ color: "#065F46" }}
               data-testid="founding-member-counter"
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: EMERALD }} />
@@ -518,30 +504,29 @@ export default function Home() {
 
           <h2
             className="font-heading font-black leading-[0.88] tracking-tight mb-6"
-            style={{ fontSize: "clamp(3rem, 8vw, 6.5rem)", color: TEXT_BRIGHT }}
+            style={{ fontSize: "clamp(3rem, 8vw, 6.5rem)", color: TEXT_PRIMARY }}
           >
             YOUR SEASON<br />
             <span style={{ color: EMERALD }}>STARTS HERE.</span>
           </h2>
 
-          <p className="font-body mb-4 leading-relaxed max-w-xl mx-auto" style={{ color: TEXT_DIM, fontSize: "1.0625rem" }}>
+          <p className="font-body mb-4 leading-relaxed max-w-xl mx-auto text-gray-500" style={{ fontSize: "1.0625rem" }}>
             {platformConfig.footerTagline}
           </p>
 
           {foundingStats.spots_left > 0 && (
-            <p className="font-body text-sm mb-10" style={{ color: TEXT_DIM }}>
-              First {foundingStats.limit} members earn the <strong style={{ color: TEXT_MID }}>Founding Member</strong> badge forever.
+            <p className="font-body text-sm mb-10 text-gray-500">
+              First {foundingStats.limit} members earn the <strong className="text-gray-900">Founding Member</strong> badge forever.
               Use code <code
-                className="px-1.5 py-0.5 rounded font-mono font-bold text-xs"
-                style={{ background: "oklch(16% 0.005 260)", color: TEXT_BRIGHT }}
+                className="px-1.5 py-0.5 rounded font-mono font-bold text-xs bg-gray-100 text-gray-900"
               >PLAY1FREE</code> for your first league free.
             </p>
           )}
 
           <button
             onClick={() => navigate("/auth?mode=register")}
-            className="px-12 py-4 font-body font-bold rounded-md text-base transition-opacity hover:opacity-90 cursor-pointer"
-            style={{ background: EMERALD, color: DARK }}
+            className="px-12 py-4 font-body font-bold rounded-md text-base transition-colors hover:bg-emerald-600 cursor-pointer"
+            style={{ background: EMERALD, color: "#ffffff" }}
             data-testid="cta-signup-btn"
           >
             Enter the Season
