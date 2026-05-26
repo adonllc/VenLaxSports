@@ -108,7 +108,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   data-testid="nav-user-menu"
                 >
-                  <div className="w-7 h-7 bg-black rounded-full flex items-center justify-center">
+                  <div className="w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center">
                     <span className="text-xs font-bold text-white">{user.name?.[0]?.toUpperCase()}</span>
                   </div>
                   <span className="max-w-[120px] truncate">{user.name}</span>

@@ -763,16 +763,16 @@ export default function Rules() {
           </div>
 
           {/* Formula callout */}
-          <div className="bg-gray-900 text-white rounded-2xl p-6 mb-6" data-testid="points-formula">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Points Formula</p>
-            <p className="font-mono text-emerald-400 text-base sm:text-lg font-bold mb-5 leading-relaxed break-words">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 mb-6" data-testid="points-formula">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Points Formula</p>
+            <p className="font-mono text-emerald-700 text-base sm:text-lg font-bold mb-5 leading-relaxed break-words">
               {POINTS_FORMULA.formula}
             </p>
             <div className="grid sm:grid-cols-2 gap-2">
               {POINTS_FORMULA.legend.map((l) => (
                 <div key={l.sym} className="flex gap-3 text-sm">
-                  <span className="font-mono text-emerald-400 font-bold w-20 flex-shrink-0">{l.sym}</span>
-                  <span className="text-gray-300">{l.def}</span>
+                  <span className="font-mono text-emerald-700 font-bold w-20 flex-shrink-0">{l.sym}</span>
+                  <span className="text-gray-600">{l.def}</span>
                 </div>
               ))}
             </div>

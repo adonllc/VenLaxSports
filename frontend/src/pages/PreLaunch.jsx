@@ -146,7 +146,7 @@ export default function PreLaunch() {
         <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Profile</p>
           <div className="bg-white border border-gray-100 rounded-xl p-4 mb-3 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold">YO</div>
+            <div className="w-12 h-12 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold">YO</div>
             <div>
               <p className="font-semibold text-gray-900 text-sm">Your Name</p>
               <p className="text-xs text-gray-400">Austin, TX · Founding Member</p>
@@ -177,7 +177,7 @@ export default function PreLaunch() {
           <Logo size="md" variant="default" />
           <a
             href="#early-access"
-            className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+            className="bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-emerald-500 transition-colors"
           >
             Get Early Access
           </a>
@@ -185,7 +185,7 @@ export default function PreLaunch() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-gray-950 text-white py-28 px-6">
+      <section className="bg-emerald-950 text-white py-28 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium px-3 py-1.5 rounded-full mb-8">
             <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse inline-block"></span>
@@ -290,7 +290,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Solution */}
-      <section className="bg-gray-950 text-white py-20 px-6">
+      <section className="bg-emerald-950 text-white py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <p className="text-emerald-400 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
             Enter VENLAX Sports
@@ -309,7 +309,7 @@ export default function PreLaunch() {
               { before: "Playing alone with no community", after: "A city-wide network of players who show up" },
               { before: "Wasted weekends, wasted potential", after: "Scheduled match days you actually look forward to" },
             ].map((item) => (
-              <div key={item.before} className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div key={item.before} className="bg-emerald-900/50 border border-emerald-800/50 rounded-lg p-5">
                 <p className="text-gray-500 text-sm line-through mb-2">{item.before}</p>
                 <p className="text-white font-medium flex items-start gap-2">
                   <span className="text-emerald-400 mt-0.5 flex-shrink-0">→</span>
@@ -644,7 +644,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Final CTA */}
-      <section id="early-access" className="bg-gray-950 text-white py-24 px-6">
+      <section id="early-access" className="bg-emerald-950 text-white py-24 px-6">
         <div className="max-w-xl mx-auto text-center">
           <h2
             className="text-4xl md:text-5xl font-bold mb-4"
@@ -671,7 +671,7 @@ export default function PreLaunch() {
               </div>
 
               {waitlistId && (
-                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-4">
+                <div className="bg-emerald-900 border border-emerald-700 rounded-xl p-6 space-y-4">
                   <p className="text-white font-semibold text-sm text-center">
                     Move up the list — invite players from your city
                   </p>
@@ -713,7 +713,7 @@ export default function PreLaunch() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-500 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-emerald-900 border border-emerald-700 text-white placeholder-emerald-400/60 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-400 transition-colors"
                 data-testid="waitlist-email"
               />
               <input
@@ -722,7 +722,7 @@ export default function PreLaunch() {
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Your city (e.g. Austin, TX)"
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-500 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-emerald-900 border border-emerald-700 text-white placeholder-emerald-400/60 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-400 transition-colors"
                 data-testid="waitlist-city"
               />
               <div className="flex gap-3">
@@ -794,7 +794,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-950 border-t border-gray-800 py-8 px-6">
+      <footer className="bg-emerald-950 border-t border-emerald-800 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="md" variant="light" />
           <div className="flex gap-6 text-xs text-gray-500">

@@ -246,13 +246,13 @@ export default function ScoreReport() {
           </div>
 
           {/* Share card */}
-          <div className="bg-gray-900 rounded-2xl p-6 text-center" data-testid="share-card">
-            <p className="text-gray-400 text-xs uppercase tracking-widest mb-3">Share your result</p>
+          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-center" data-testid="share-card">
+            <p className="text-gray-500 text-xs uppercase tracking-widest mb-3">Share your result</p>
             <div className="text-4xl mb-2">{sportEmoji}</div>
-            <p className="text-white font-heading font-black text-xl mb-1">
+            <p className="text-gray-900 font-heading font-black text-xl mb-1">
               {submittedResult.winnerName} won
             </p>
-            <p className="text-gray-400 text-sm mb-5">
+            <p className="text-gray-500 text-sm mb-5">
               {submittedResult.summary && `${submittedResult.summary} · `}
               {match.sport} · VenLax Sports
             </p>
@@ -270,7 +270,7 @@ export default function ScoreReport() {
                 onClick={() => {
                   navigator.clipboard.writeText(spectatorUrl);
                 }}
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition"
+                className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium transition"
                 data-testid="share-copy-btn"
               >
                 Copy link

@@ -193,7 +193,7 @@ export default function PlayerDashboard() {
         {/* Profile Header */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0">
               <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">

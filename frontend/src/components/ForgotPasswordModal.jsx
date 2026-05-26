@@ -74,7 +74,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
           </div>
         ) : (
           <>
-            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center mb-4">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center mb-4">
               <Mail className="w-5 h-5 text-white" />
             </div>
             <h2 id="forgot-pwd-title" className="font-heading font-black text-xl text-gray-900 mb-2">Reset your password</h2>

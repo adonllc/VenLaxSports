@@ -63,7 +63,7 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
   if (selected) {
     return (
       <div className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50" data-testid={`${testId}-selected`}>
-        <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
+        <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
           {selected.name?.[0]?.toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
