@@ -796,10 +796,7 @@ export default function PreLaunch() {
       {/* Footer */}
       <footer className="bg-gray-950 border-t border-gray-800 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-            VEN<span className="text-emerald-500">LAX</span>{" "}
-            <span className="text-gray-500 font-normal text-sm">SPORTS</span>
-          </div>
+          <Logo size="md" variant="light" />
           <div className="flex gap-6 text-xs text-gray-500">
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
