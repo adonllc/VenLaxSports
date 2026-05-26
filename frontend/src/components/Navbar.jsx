@@ -47,7 +47,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" data-testid="nav-logo">
-            <Logo size="xl" variant="default" testId="nav-logo-mark" />
+            <Logo size="lg" variant="default" testId="nav-logo-mark" />
           </Link>
 
           {/* Desktop Nav */}
