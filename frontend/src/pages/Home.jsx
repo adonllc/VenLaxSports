@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import {
-  MapPin, Users, Calendar, ArrowRight,
-  Target, Zap, Shield, Activity,
-} from "lucide-react";
+import { MapPin, ArrowRight, Target, Zap, Shield, Activity } from "lucide-react";
 import platformConfig, { activeSportIds } from "../config/platformConfig";
 import HowItWorks from "../components/HowItWorks";
 
@@ -43,12 +40,14 @@ const SPORT_CONFIG = Object.fromEntries(
   activeSportIds.map((id) => [id, ALL_SPORT_CONFIG[id]]).filter(([, v]) => v)
 );
 
-const STATS = [
-  { value: "1,200+", label: "Players Ranked" },
-  { value: "80+", label: "Active Leagues" },
-  { value: platformConfig.statsRegion, label: "US Cities" },
-  { value: String(activeSportIds.length), label: "Sports" },
-];
+// Dark surface colors
+const DARK = "oklch(9% 0.005 260)";
+const DARK_2 = "oklch(13% 0.005 260)";
+const DARK_BORDER = "oklch(20% 0.005 260)";
+const EMERALD = "oklch(70% 0.18 162)";
+const TEXT_BRIGHT = "oklch(97% 0.003 260)";
+const TEXT_MID = "oklch(72% 0.006 260)";
+const TEXT_DIM = "oklch(48% 0.006 260)";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -86,121 +85,134 @@ export default function Home() {
   return (
     <div className="bg-white" data-testid="home-page">
 
-      {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="relative bg-white overflow-hidden" data-testid="hero-section">
-        {/* Emerald top rail — sport identity, structural not decorative */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-emerald-500 pointer-events-none" />
+      {/* ── Hero ──────────────────────────────────────────────────── */}
+      <section
+        style={{ background: DARK }}
+        className="relative overflow-hidden"
+        data-testid="hero-section"
+      >
+        {/* Thin emerald top rail */}
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: EMERALD }} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-[1fr_360px] lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_480px] gap-8 lg:gap-12 xl:gap-14 items-center">
+          <div className="grid md:grid-cols-[1fr_380px] lg:grid-cols-[1fr_440px] xl:grid-cols-[1fr_500px] gap-8 lg:gap-14 items-center">
 
-            {/* ── Left: text ── */}
-            <div className="py-12 sm:py-16 lg:py-28">
+            {/* Left: typography */}
+            <div className="py-16 sm:py-20 lg:py-28">
 
               {/* Kicker */}
-              <p className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.12em] uppercase text-gray-400 mb-10">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+              <p
+                className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.14em] uppercase mb-10"
+                style={{ color: EMERALD }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: EMERALD }} />
                 {platformConfig.heroBadge}
               </p>
 
-              {/* Headline — factual, precision-over-hype */}
+              {/* Headline */}
               <div className="mb-8">
                 <h1
-                  className="font-heading font-black text-gray-900 leading-[0.88] tracking-tight"
-                  style={{ fontSize: "clamp(3.25rem, 7.5vw, 6rem)" }}
+                  className="font-heading font-black leading-[0.88] tracking-tight"
+                  style={{ fontSize: "clamp(4.5rem, 11vw, 8.5rem)", color: TEXT_BRIGHT }}
                 >
-                  <span className="block">Your league</span>
-                  <span className="block">is waiting.</span>
+                  <span className="block">YOUR</span>
+                  <span className="block" style={{ color: EMERALD }}>LEAGUE.</span>
                 </h1>
                 <p
-                  className="font-heading font-semibold text-emerald-600 mt-3 tracking-tight"
-                  style={{ fontSize: "clamp(1.25rem, 3vw, 2rem)" }}
+                  className="font-heading font-bold mt-3 tracking-tight"
+                  style={{ fontSize: "clamp(1.25rem, 2.8vw, 1.875rem)", color: TEXT_MID }}
                 >
                   Earn your rank.
                 </p>
               </div>
 
               <p
-                className="text-gray-500 leading-relaxed mb-10"
-                style={{ fontSize: "clamp(1rem, 1.5vw, 1.125rem)", maxWidth: "44ch" }}
+                className="font-body leading-relaxed mb-10"
+                style={{ fontSize: "clamp(1rem, 1.5vw, 1.125rem)", maxWidth: "44ch", color: TEXT_DIM }}
               >
                 {platformConfig.heroSubtitle}
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col lg:flex-row gap-3 mb-12">
+              <div className="flex flex-col sm:flex-row gap-3 mb-12">
                 <button
                   onClick={() => navigate("/leagues")}
-                  className="px-8 py-4 bg-gray-900 hover:bg-gray-700 text-white font-bold rounded-md transition-colors text-base cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+                  className="px-8 py-4 font-body font-bold rounded-md text-base transition-opacity hover:opacity-90 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{ background: EMERALD, color: DARK, focusRingColor: EMERALD }}
                   data-testid="hero-browse-btn"
                 >
                   Find My League
                 </button>
                 <button
                   onClick={() => navigate("/auth?mode=register")}
-                  className="px-8 py-4 border border-gray-200 hover:border-gray-900 text-gray-700 hover:text-gray-900 font-semibold rounded-md transition-colors text-base cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+                  className="px-8 py-4 font-body font-semibold rounded-md text-base transition-colors cursor-pointer focus-visible:outline-none"
+                  style={{ border: `1px solid ${DARK_BORDER}`, color: TEXT_MID }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = TEXT_DIM; e.currentTarget.style.color = TEXT_BRIGHT; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = DARK_BORDER; e.currentTarget.style.color = TEXT_MID; }}
                   data-testid="hero-signup-btn"
                 >
                   Join Free
                 </button>
               </div>
 
-              {/* Sport pills */}
+              {/* Sport chips */}
               <div className="flex gap-2.5 flex-wrap">
                 {sportEntries.map(([sport, config]) => (
                   <button
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
-                    className="flex items-center gap-2 px-4 py-3 min-h-[44px] rounded-full border border-gray-200 hover:border-gray-400 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                    className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full font-body text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none"
+                    style={{ border: `1px solid ${DARK_BORDER}`, color: TEXT_DIM }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = config.accent; e.currentTarget.style.color = config.accent; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = DARK_BORDER; e.currentTarget.style.color = TEXT_DIM; }}
                     data-testid={`hero-sport-pill-${sport}`}
                   >
-                    <span
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: config.accent }}
-                    />
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: config.accent }} />
                     {config.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* ── Right: image stack ── */}
-            <div className="py-6 md:py-16 lg:py-20 flex flex-col gap-3">
+            {/* Right: sport image stack */}
+            <div className="hidden md:flex flex-col gap-3 py-16 lg:py-20">
               {sportEntries.map(([sport, config], idx) => {
                 const Icon = SPORT_ICONS[sport] || Activity;
-                const isFirst = idx === 0;
                 return (
                   <div
                     key={sport}
                     onClick={() => navigate(`/sport/${sport}`)}
                     className={`relative rounded-2xl overflow-hidden cursor-pointer group ${
-                      isFirst ? "h-64 sm:h-80" : "h-44 sm:h-48"
+                      idx === 0 ? "h-72" : "h-44"
                     }`}
                     data-testid={`hero-sport-image-${sport}`}
                   >
                     <img
                       src={config.image}
                       alt={`${config.label} ranked league`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                      loading={isFirst ? "eager" : "lazy"}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 motion-reduce:transition-none"
+                      loading={idx === 0 ? "eager" : "lazy"}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute top-3 right-4 select-none pointer-events-none">
-                      <span className="font-heading font-black text-white/10 leading-none" style={{ fontSize: "4rem" }}>
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)" }} />
+                    <div className="absolute top-4 right-4">
+                      <span
+                        className="font-heading font-black leading-none select-none"
+                        style={{ fontSize: "5rem", color: "rgba(255,255,255,0.06)" }}
+                      >
                         {config.num}
                       </span>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <div
                           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: config.accent }}
+                          style={{ background: config.accent }}
                         >
                           <Icon className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-heading font-bold text-white">{config.label}</span>
                       </div>
-                      <span className="text-gray-300 text-xs font-medium">{config.tagline}</span>
+                      <span className="font-body text-xs font-medium" style={{ color: TEXT_DIM }}>{config.tagline}</span>
                     </div>
                   </div>
                 );
@@ -209,103 +221,139 @@ export default function Home() {
 
           </div>
         </div>
-      </section>
 
-      {/* ── Stats ───────────────────────────────────────────────────── */}
-      <section className="bg-white border-b border-gray-100" data-testid="stats-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
-            {STATS.map((s) => (
-              <div
-                key={s.label}
-                className="px-6 lg:px-10 py-10 text-center"
-                data-testid={`stat-${s.label.replace(/\s+/g, "-").toLowerCase()}`}
-              >
-                <p
-                  className="stat-counter text-tennis mb-1.5"
-                  style={{ fontSize: "clamp(2rem, 4.5vw, 3.25rem)" }}
-                >
-                  {s.value}
-                </p>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">{s.label}</p>
-              </div>
-            ))}
+        {/* Stats ticker */}
+        <div style={{ borderTop: `1px solid ${DARK_BORDER}`, background: DARK_2 }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
+              {[
+                { v: "1,200+", l: "ranked players" },
+                { v: "80+", l: "active leagues" },
+                { v: platformConfig.statsRegion, l: null },
+                { v: `${activeSportIds.length}`, l: "sports" },
+              ].map((s, i) => (
+                <span key={i} className="flex items-center gap-2 font-body text-sm">
+                  <span className="font-semibold" style={{ color: TEXT_BRIGHT }}>{s.v}</span>
+                  {s.l && <span style={{ color: TEXT_DIM }}>{s.l}</span>}
+                  {i < 3 && (
+                    <span className="hidden sm:inline ml-4 sm:ml-6" style={{ color: DARK_BORDER }}>·</span>
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── How It Works ────────────────────────────────────────────── */}
+      {/* ── How It Works ───────────────────────────────────────────── */}
       <HowItWorks />
 
-      {/* ── Sport Cards ─────────────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50" data-testid="sport-cards-section">
+      {/* ── Sport Cards ────────────────────────────────────────────── */}
+      <section className="py-20 bg-white" data-testid="sport-cards-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
           <div className="mb-14">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Choose Your Sport</p>
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">
-              {activeSportIds.length === 1 ? "One Sport, One Platform" : `${activeSportIds.length} Sports, One Platform`}
+            <p className="font-body text-xs font-semibold uppercase tracking-[0.14em] mb-4" style={{ color: EMERALD }}>
+              Choose Your Sport
+            </p>
+            <h2
+              className="font-heading font-black leading-[0.9] tracking-tight text-gray-900"
+              style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+            >
+              {activeSportIds.length === 1 ? "One Sport." : `${activeSportIds.length} Sports.`}
+              <br />One Platform.
             </h2>
           </div>
 
-          {/* Full-width horizontal cards, alternating image side */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {sportEntries.map(([sport, config], idx) => {
               const Icon = SPORT_ICONS[sport] || Activity;
-              const imageRight = idx % 2 !== 0;
+              const isDark = idx % 2 === 0;
               return (
                 <div
                   key={sport}
                   onClick={() => navigate(`/sport/${sport}`)}
-                  className={`bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow card-glow-${sport}`}
+                  className="group cursor-pointer overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5"
+                  style={{
+                    background: isDark ? DARK : "white",
+                    border: isDark ? "none" : "1px solid #E5E7EB",
+                    boxShadow: isDark ? "none" : undefined,
+                  }}
                   data-testid={`sport-card-${sport}`}
                 >
-                  <div className={`flex flex-col ${imageRight ? "md:flex-row-reverse" : "md:flex-row"}`}>
-                    {/* Image panel */}
-                    <div className="relative w-full md:w-[42%] h-52 md:h-60 flex-shrink-0 overflow-hidden">
+                  <div className={`flex flex-col ${idx % 2 !== 0 ? "md:flex-row-reverse" : "md:flex-row"}`}>
+
+                    {/* Image */}
+                    <div className="relative w-full md:w-[44%] h-56 md:h-64 flex-shrink-0 overflow-hidden">
                       <img
                         src={config.image}
                         alt={config.label}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         loading="lazy"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                      {/* Large faint number over image */}
-                      <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
-                        <span
-                          className="font-heading font-black text-white/[0.08] leading-none"
-                          style={{ fontSize: "clamp(5rem, 10vw, 9rem)" }}
-                        >
-                          {config.num}
-                        </span>
-                      </div>
-                      {/* Sport badge bottom-left */}
-                      <div className="absolute bottom-4 left-4">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center"
-                          style={{ backgroundColor: config.accent }}
-                        >
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%)" }}
+                      />
                     </div>
 
-                    {/* Content panel */}
-                    <div className="flex-1 p-7 md:p-10 flex flex-col justify-center">
-                      <h3 className={`font-heading font-black text-2xl sm:text-3xl ${config.color} mb-2`}>
+                    {/* Content */}
+                    <div className="flex-1 p-8 md:p-12 flex flex-col justify-center">
+                      <div className="flex items-center gap-3 mb-5">
+                        <div
+                          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ background: config.accent }}
+                        >
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <span
+                          className="font-body text-xs font-bold uppercase tracking-[0.14em]"
+                          style={{ color: config.accent }}
+                        >
+                          Sport {config.num}
+                        </span>
+                      </div>
+
+                      <h3
+                        className="font-heading font-black leading-[0.88] tracking-tight mb-3"
+                        style={{
+                          fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+                          color: isDark ? TEXT_BRIGHT : "#0A0A0A",
+                        }}
+                      >
                         {config.label}
                       </h3>
-                      <p className="text-gray-500 text-sm mb-6">{config.tagline}</p>
-                      <div className="flex flex-wrap gap-2 mb-7">
+
+                      <p
+                        className="font-body text-sm mb-6 leading-relaxed"
+                        style={{ color: isDark ? TEXT_DIM : "#6B7280" }}
+                      >
+                        {config.tagline}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-8">
                         {config.stats.map((stat) => (
-                          <span key={stat} className={`px-3 py-1.5 text-xs font-semibold rounded-full ${config.badge}`}>
+                          <span
+                            key={stat}
+                            className="px-3 py-1 font-body text-xs font-semibold rounded-full"
+                            style={{
+                              background: isDark ? "oklch(17% 0.005 260)" : "#F3F4F6",
+                              color: isDark ? TEXT_MID : "#374151",
+                            }}
+                          >
                             {stat}
                           </span>
                         ))}
                       </div>
-                      <div className={`inline-flex items-center gap-1.5 text-sm font-bold ${config.color}`}>
+
+                      <div
+                        className="inline-flex items-center gap-2 font-body text-sm font-bold"
+                        style={{ color: config.accent }}
+                      >
                         Enter the League <ArrowRight className="w-4 h-4" />
                       </div>
                     </div>
+
                   </div>
                 </div>
               );
@@ -314,17 +362,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Featured Leagues ────────────────────────────────────────── */}
-      <section className="py-20 bg-white" data-testid="featured-leagues-section">
+      {/* ── Featured Leagues ───────────────────────────────────────── */}
+      <section className="py-20 bg-gray-50" data-testid="featured-leagues-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">Season Open</p>
-              <h2 className="font-heading font-bold text-3xl text-gray-900">Active Leagues</h2>
+              <p className="font-body text-xs font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: EMERALD }}>
+                Season Open
+              </p>
+              <h2
+                className="font-heading font-black text-gray-900 leading-[0.92] tracking-tight"
+                style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+              >
+                Active Leagues
+              </h2>
             </div>
             <Link
               to="/leagues"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 border border-gray-200 px-4 py-2 rounded-md hover:border-gray-900 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 font-body text-sm font-semibold text-gray-900 border border-gray-200 px-4 py-2 rounded-md hover:border-gray-900 transition-colors"
               data-testid="view-all-leagues"
             >
               See All Leagues <ArrowRight className="w-3.5 h-3.5" />
@@ -332,19 +387,19 @@ export default function Home() {
           </div>
 
           {/* Sport Tabs */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
             {sportEntries.map(([sport, config]) => {
               const Icon = SPORT_ICONS[sport] || Activity;
               return (
                 <button
                   key={sport}
                   onClick={() => setActiveSport(sport)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition cursor-pointer ${
+                  className="flex items-center gap-2 px-4 py-2 rounded-full font-body text-sm font-semibold whitespace-nowrap transition cursor-pointer"
+                  style={
                     activeSport === sport
-                      ? "text-white shadow-sm"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                  style={activeSport === sport ? { backgroundColor: config.accent } : {}}
+                      ? { background: config.accent, color: "white" }
+                      : { background: "#F3F4F6", color: "#6B7280" }
+                  }
                   data-testid={`tab-${sport}`}
                 >
                   <Icon className="w-4 h-4" />
@@ -368,21 +423,30 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-16 text-gray-500">
-              <p className="text-lg font-medium">No {SPORT_CONFIG[activeSport]?.label} leagues yet</p>
-              <p className="text-sm mt-1">Check back soon or browse all leagues</p>
+              <p className="font-heading font-bold text-lg text-gray-900">No {SPORT_CONFIG[activeSport]?.label} leagues yet</p>
+              <p className="font-body text-sm mt-1">Check back soon or browse all leagues</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Featured Cities ──────────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50" data-testid="cities-section">
+      {/* ── Featured Cities ────────────────────────────────────────── */}
+      <section className="py-20 bg-white" data-testid="cities-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-3">Your City. Your Circuit.</p>
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl text-gray-900">{platformConfig.citySectionTitle}</h2>
-              <p className="text-gray-500 mt-3 max-w-xl text-sm leading-relaxed">{platformConfig.citySectionDesc}</p>
+              <p className="font-body text-xs font-semibold uppercase tracking-[0.14em] mb-3" style={{ color: EMERALD }}>
+                Your City. Your Circuit.
+              </p>
+              <h2
+                className="font-heading font-black text-gray-900 leading-[0.92] tracking-tight"
+                style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+              >
+                {platformConfig.citySectionTitle}
+              </h2>
+              <p className="font-body text-gray-500 mt-3 max-w-xl text-sm leading-relaxed">
+                {platformConfig.citySectionDesc}
+              </p>
             </div>
           </div>
 
@@ -391,18 +455,21 @@ export default function Home() {
               <div
                 key={city.name}
                 onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
-                className="bg-white border border-gray-200 rounded-2xl p-5 league-card-hover cursor-pointer group flex items-start gap-4"
+                className="bg-white border border-gray-100 rounded-2xl p-5 cursor-pointer group hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-md transition-all duration-200 flex items-start gap-4"
                 data-testid={`city-card-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 transition-colors">
-                  <MapPin className="w-5 h-5 text-emerald-500" />
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: "oklch(70% 0.18 162 / 0.1)" }}
+                >
+                  <MapPin className="w-5 h-5" style={{ color: EMERALD }} />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-heading font-bold text-gray-900 mb-1">{city.name}</h3>
-                  <p className="text-xs text-gray-500 mb-2 leading-relaxed">{city.desc}</p>
+                  <p className="font-body text-xs text-gray-500 mb-2 leading-relaxed">{city.desc}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {city.sports.map((s) => (
-                      <span key={s} className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      <span key={s} className="font-body text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                         {s}
                       </span>
                     ))}
@@ -415,7 +482,7 @@ export default function Home() {
           <div className="text-center mt-10">
             <button
               onClick={() => navigate("/leagues")}
-              className="inline-flex items-center gap-2 px-6 py-3 border border-gray-200 text-sm font-semibold rounded-md hover:border-gray-900 hover:text-gray-900 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-gray-200 font-body text-sm font-semibold rounded-md hover:border-gray-900 hover:text-gray-900 transition-colors cursor-pointer"
               data-testid="all-cities-leagues-btn"
             >
               View All Leagues <ArrowRight className="w-4 h-4" />
@@ -424,44 +491,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <section className="py-28 bg-emerald-500 relative overflow-hidden text-center" data-testid="cta-section">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0)",
-            backgroundSize: "24px 24px",
-          }}
-        />
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-400/25 pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-600/20 pointer-events-none" />
-        <div className="relative max-w-2xl mx-auto px-4">
-          {/* Founding member counter */}
+      {/* ── CTA ──────────────────────────────────────────────────── */}
+      <section
+        style={{ background: DARK }}
+        className="py-28 relative overflow-hidden"
+        data-testid="cta-section"
+      >
+        {/* Subtle emerald top accent */}
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(to right, transparent, ${EMERALD}40, transparent)` }} />
+
+        <div className="relative max-w-3xl mx-auto px-4 text-center">
           {foundingStats.spots_left > 0 && (
-            <div className="inline-flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 mb-6" data-testid="founding-member-counter">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span className="text-white text-xs font-semibold">
-                {foundingStats.count}/{foundingStats.limit} Founding Member spots taken
-              </span>
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8 font-body text-xs font-semibold"
+              style={{
+                background: "oklch(14% 0.006 162)",
+                border: `1px solid oklch(25% 0.06 162)`,
+                color: EMERALD,
+              }}
+              data-testid="founding-member-counter"
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: EMERALD }} />
+              {foundingStats.count}/{foundingStats.limit} Founding Member spots claimed
             </div>
           )}
-          <p className="text-emerald-200 text-xs font-bold uppercase tracking-[0.2em] mb-4">Get Started Today</p>
+
           <h2
-            className="font-heading font-black text-white mb-5 leading-tight"
-            style={{ fontSize: "clamp(2.25rem, 5.5vw, 3.75rem)" }}
+            className="font-heading font-black leading-[0.88] tracking-tight mb-6"
+            style={{ fontSize: "clamp(3rem, 8vw, 6.5rem)", color: TEXT_BRIGHT }}
           >
-            Your season starts here.
+            YOUR SEASON<br />
+            <span style={{ color: EMERALD }}>STARTS HERE.</span>
           </h2>
-          <p className="text-emerald-100 mb-4 text-lg leading-relaxed">{platformConfig.footerTagline}</p>
+
+          <p className="font-body mb-4 leading-relaxed max-w-xl mx-auto" style={{ color: TEXT_DIM, fontSize: "1.0625rem" }}>
+            {platformConfig.footerTagline}
+          </p>
+
           {foundingStats.spots_left > 0 && (
-            <p className="text-emerald-200 text-sm mb-8">
-              Sign up now — first {foundingStats.limit} members earn the <strong className="text-white">Founding Member</strong> badge forever.
-              Use code <code className="bg-white/20 px-1.5 py-0.5 rounded font-mono font-bold text-white">PLAY1FREE</code> for your first league free.
+            <p className="font-body text-sm mb-10" style={{ color: TEXT_DIM }}>
+              First {foundingStats.limit} members earn the <strong style={{ color: TEXT_MID }}>Founding Member</strong> badge forever.
+              Use code <code
+                className="px-1.5 py-0.5 rounded font-mono font-bold text-xs"
+                style={{ background: "oklch(16% 0.005 260)", color: TEXT_BRIGHT }}
+              >PLAY1FREE</code> for your first league free.
             </p>
           )}
+
           <button
             onClick={() => navigate("/auth?mode=register")}
-            className="px-10 py-4 bg-white text-emerald-700 font-bold rounded-md text-base hover:bg-emerald-50 transition-colors cursor-pointer shadow-xl shadow-emerald-700/20"
+            className="px-12 py-4 font-body font-bold rounded-md text-base transition-opacity hover:opacity-90 cursor-pointer"
+            style={{ background: EMERALD, color: DARK }}
             data-testid="cta-signup-btn"
           >
             Enter the Season
@@ -472,6 +552,8 @@ export default function Home() {
     </div>
   );
 }
+
+/* ── LeagueCard ──────────────────────────────────────────────────── */
 
 const HOME_CARD_SPORT_BAR = {
   tennis:     "bg-tennis",
@@ -495,31 +577,35 @@ function LeagueCard({ league }) {
   return (
     <div
       onClick={() => navigate(`/leagues/${league.id}`)}
-      className="bg-white border border-gray-200 rounded-2xl overflow-hidden league-card-hover cursor-pointer"
+      className="bg-white border border-gray-100 rounded-2xl overflow-hidden cursor-pointer hover:-translate-y-0.5 hover:shadow-md hover:border-gray-200 transition-all duration-200"
       data-testid={`league-card-${league.id}`}
     >
-      <div className={`h-1.5 ${barClass}`} />
+      <div className={`h-1 ${barClass}`} />
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
-          <span className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
+          <span className={`flex items-center gap-1.5 px-2.5 py-1 font-body text-xs font-semibold rounded-full ${config.badge}`}>
             <Icon className="w-3 h-3" />
             {config.label}
           </span>
-          <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-              league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
-            }`}
-          >
-            {league.status === "registration" ? "Open" : league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
-          </span>
+          {spotsLeft <= 5 && spotsLeft > 0 && (
+            <span className="font-body text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+              {spotsLeft} spots left
+            </span>
+          )}
         </div>
-        <h3 className="font-heading font-bold text-gray-900 mb-1 line-clamp-2">{league.name}</h3>
-        <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-          <MapPin className="w-3 h-3" /> {league.city}
-        </div>
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {spotsLeft} spots left</span>
-          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+
+        <h3 className="font-heading font-bold text-gray-900 mb-1 leading-tight" style={{ fontSize: "1.125rem" }}>
+          {league.name}
+        </h3>
+        <p className="font-body text-xs text-gray-500 mb-3">{league.city} · {league.format}</p>
+
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+          <div className="flex items-center gap-1 font-body text-xs text-gray-400">
+            <span>{league.current_players || 0}/{league.max_players} joined</span>
+          </div>
+          {league.start_date && (
+            <span className="font-body text-xs text-gray-400">{fmtDate(league.start_date)}</span>
+          )}
         </div>
       </div>
     </div>

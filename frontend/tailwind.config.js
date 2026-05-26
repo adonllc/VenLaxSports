@@ -8,8 +8,8 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                heading: ["Outfit", "sans-serif"],
-                body: ["DM Sans", "sans-serif"],
+                heading: ["Barlow Condensed", "sans-serif"],
+                body: ["Barlow", "sans-serif"],
             },
             colors: {
                 tennis: {
