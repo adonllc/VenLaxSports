@@ -22,9 +22,9 @@ export default function Logo({
 
   const onDark = variant === "light" || variant === "hero";
 
-  const textFill   = onDark ? "#ffffff" : "#064E3B";
-  const dotFill    = onDark ? "#34D399" : "#10B981";
-  const sportsFill = onDark ? "#6EECBB" : "#6B7C76";
+  const textFill   = onDark ? "#ffffff" : "#1A2C24";
+  const dotFill    = onDark ? "#E8795A" : "#C24A1D";
+  const sportsFill = onDark ? "#A0C8B8" : "#4A6158";
 
   return (
     <svg

@@ -3,44 +3,52 @@ import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
 
-const SPORT_HOVER = {
-  tennis: "hover:text-emerald-400",
-  cricket: "hover:text-blue-400",
-  pickleball: "hover:text-orange-400",
-};
+const FOREST = "#1A2C24";
+const FOREST_MID = "#2E4A3A";
+const RUST = "#C24A1D";
+
 const SPORT_DOT = {
-  tennis: "bg-emerald-500",
-  cricket: "bg-blue-500",
-  pickleball: "bg-orange-500",
+  tennis:     "#C24A1D",
+  cricket:    "#1A5C45",
+  pickleball: "#D4831A",
 };
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-100 mt-auto" data-testid="footer">
-      {/* Accent top strip */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
+    <footer style={{ background: FOREST, borderTop: `3px solid ${RUST}` }} data-testid="footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="mb-3">
-              <Logo size="md" variant="default" testId="footer-logo" />
+              <Logo size="md" variant="light" testId="footer-logo" />
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.3)" }}>
               {platformConfig.footerTagline}
             </p>
           </div>
 
           {/* Sports */}
           <div>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Sports</h3>
+            <h3
+              className="font-heading font-bold text-sm uppercase tracking-widest mb-4"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
+              Sports
+            </h3>
             <ul className="space-y-2">
               {activeSports.map((s) => (
                 <li key={s.id}>
-                  <Link to={`/sport/${s.id}`} className={`text-sm text-gray-600 hover:text-gray-900 transition-colors`}>
+                  <Link
+                    to={`/sport/${s.id}`}
+                    className="text-sm transition-colors"
+                    style={{ color: "rgba(255,255,255,0.55)" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#fff"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.55)"}
+                  >
                     {s.label}
                   </Link>
                 </li>
@@ -48,27 +56,54 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Leagues */}
+          {/* Platform */}
           <div>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Platform</h3>
+            <h3
+              className="font-heading font-bold text-sm uppercase tracking-widest mb-4"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
+              Platform
+            </h3>
             <ul className="space-y-2">
-              <li><Link to="/leagues" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Browse Leagues</Link></li>
-              <li><Link to="/rules" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Rules &amp; Conduct</Link></li>
-              <li><Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Terms &amp; Conditions</Link></li>
-              <li><Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">My Dashboard</Link></li>
-              <li><Link to="/auth" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Sign Up</Link></li>
+              {[
+                { to: "/leagues", label: "Browse Leagues" },
+                { to: "/rules",   label: "Rules & Conduct" },
+                { to: "/terms",   label: "Terms & Conditions" },
+                { to: "/dashboard", label: "My Dashboard" },
+                { to: "/auth",    label: "Sign Up" },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="text-sm transition-colors"
+                    style={{ color: "rgba(255,255,255,0.55)" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#fff"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.55)"}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Cities */}
           <div>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Cities</h3>
+            <h3
+              className="font-heading font-bold text-sm uppercase tracking-widest mb-4"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
+              Cities
+            </h3>
             <ul className="space-y-2">
               {platformConfig.featuredCities.slice(0, 4).map((city) => (
                 <li key={city.name}>
                   <Link
                     to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: "rgba(255,255,255,0.55)" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#fff"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.55)"}
                   >
                     {city.icon} {city.name}
                   </Link>
@@ -78,12 +113,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-400">&copy; {new Date().getFullYear()} {BRAND.full_name} ({BRAND.domain}). All rights reserved.</p>
+        <div
+          className="mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+          style={{ borderTop: `1px solid rgba(255,255,255,0.08)` }}
+        >
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
+            &copy; {new Date().getFullYear()} {BRAND.full_name} ({BRAND.domain}). All rights reserved.
+          </p>
           <div className="flex items-center gap-4">
             {activeSports.map((s) => (
-              <span key={s.id} className="inline-flex items-center gap-1 text-xs text-gray-500">
-                <span className={`w-2 h-2 rounded-full ${SPORT_DOT[s.id] || "bg-gray-400"} inline-block`}></span>
+              <span key={s.id} className="inline-flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <span
+                  className="w-2 h-2 rounded-full inline-block"
+                  style={{ background: SPORT_DOT[s.id] || RUST }}
+                />
                 {s.label}
               </span>
             ))}
