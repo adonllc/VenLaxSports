@@ -3,19 +3,19 @@ import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
 
-const FOREST = "#1A2C24";
-const FOREST_MID = "#2E4A3A";
-const RUST = "#C24A1D";
+const NAVY = "#1B2A4A";
+const NAVY_MID = "#2A3D66";
+const LIME = "#C5D600";
 
 const SPORT_DOT = {
-  tennis:     "#C24A1D",
-  cricket:    "#1A5C45",
-  pickleball: "#D4831A",
+  tennis:     "#C5D600",
+  pickleball: "#00B4A4",
+  cricket:    "#E86010",
 };
 
 export default function Footer() {
   return (
-    <footer style={{ background: FOREST, borderTop: `3px solid ${RUST}` }} data-testid="footer">
+    <footer style={{ background: NAVY, borderTop: `3px solid ${LIME}` }} data-testid="footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -125,7 +125,7 @@ export default function Footer() {
               <span key={s.id} className="inline-flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
                 <span
                   className="w-2 h-2 rounded-full inline-block"
-                  style={{ background: SPORT_DOT[s.id] || RUST }}
+                  style={{ background: SPORT_DOT[s.id] || LIME }}
                 />
                 {s.label}
               </span>

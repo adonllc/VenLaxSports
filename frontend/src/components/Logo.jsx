@@ -22,9 +22,8 @@ export default function Logo({
 
   const onDark = variant === "light" || variant === "hero";
 
-  const textFill   = onDark ? "#ffffff" : "#1A2C24";
-  const dotFill    = onDark ? "#E8795A" : "#C24A1D";
-  const sportsFill = onDark ? "#A0C8B8" : "#4A6158";
+  const textFill   = onDark ? "#ffffff" : "#0F1D38";
+  const sportsFill = onDark ? "#C5D600" : "#007B70";
 
   return (
     <svg
@@ -38,8 +37,10 @@ export default function Logo({
       className={className}
       style={{ display: "block", flexShrink: 0 }}
     >
-      {/* Emerald dot — top-right of wordmark */}
-      <circle cx="308" cy="14" r="9" fill={dotFill} />
+      {/* Three sport dots — Tennis (lime) · Pickleball (teal) · Cricket (orange) */}
+      <circle cx="316" cy="13" r="9" fill="#C5D600" />
+      <circle cx="338" cy="13" r="9" fill="#00B4A4" />
+      <circle cx="360" cy="13" r="9" fill="#E86010" />
 
       {/* VENLAX wordmark */}
       <text
@@ -53,14 +54,17 @@ export default function Logo({
         fill={textFill}
       >VENLAX</text>
 
+      {/* Lime accent line */}
+      <rect x="40" y="75" width="300" height="2.5" fill="#C5D600" rx="1" />
+
       {/* SPORTS subtitle */}
       <text
         x="190"
-        y="87"
+        y="88"
         textAnchor="middle"
         fontFamily="Barlow, sans-serif"
         fontSize="11"
-        fontWeight="600"
+        fontWeight="700"
         letterSpacing="5"
         fill={sportsFill}
       >SPORTS</text>

@@ -3,6 +3,13 @@ import Logo from "../components/Logo";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://api.venlaxsports.com";
 
+const NAVY = "#1B2A4A";
+const NAVY_MID = "#2A3D66";
+const LIME = "#C5D600";
+const TEAL = "#00B4A4";
+const BORDER = "#CDD5E4";
+const SECTION_BG = "#EAEEE4";
+
 export default function PreLaunch() {
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
@@ -59,24 +66,24 @@ export default function PreLaunch() {
       body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
       reverse: false,
       mockup: (
-        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Opponent Found</p>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#F5F6F0", border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Opponent Found</p>
           {[
             { name: "Marcus T.", rating: 1847, record: "12W 3L" },
             { name: "Sarah K.", rating: 1823, record: "9W 4L" },
             { name: "James R.", rating: 1801, record: "7W 5L" },
           ].map((player) => (
-            <div key={player.name} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
+            <div key={player.name} className="bg-white rounded-xl px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold text-xs">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style={{ background: "#E0F5F3", color: "#007B70" }}>
                   {player.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{player.name}</p>
-                  <p className="text-xs text-gray-400">{player.record}</p>
+                  <p className="text-sm font-medium" style={{ color: NAVY }}>{player.name}</p>
+                  <p className="text-xs" style={{ color: "#6B7A96" }}>{player.record}</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">{player.rating}</span>
+              <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ color: "#007B70", background: "#E0F5F3" }}>{player.rating}</span>
             </div>
           ))}
         </div>
@@ -88,8 +95,8 @@ export default function PreLaunch() {
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       reverse: true,
       mockup: (
-        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Austin TX — Tennis Singles</p>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#F5F6F0", border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Austin TX — Tennis Singles</p>
           <div className="space-y-2">
             {[
               { rank: 1, name: "Alex M.", rating: 2103, delta: "+12" },
@@ -98,11 +105,18 @@ export default function PreLaunch() {
               { rank: 4, name: "Casey R.", rating: 1901, delta: "+8" },
               { rank: 5, name: "Riley D.", rating: 1876, delta: "+2" },
             ].map((row) => (
-              <div key={row.rank} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${row.rank === 3 ? "bg-emerald-50 border border-emerald-100" : "bg-white border border-gray-100"}`}>
-                <span className="text-xs font-bold text-gray-400 w-4">{row.rank}</span>
-                <span className="text-sm font-medium text-gray-900 flex-1">{row.name}</span>
-                <span className="text-xs text-gray-500">{row.rating}</span>
-                <span className={`text-xs font-medium ${row.delta.startsWith("+") ? "text-emerald-600" : "text-red-400"}`}>{row.delta}</span>
+              <div
+                key={row.rank}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg"
+                style={row.rank === 3
+                  ? { background: "#E0F5F3", border: `1px solid ${TEAL}20` }
+                  : { background: "white", border: `1px solid ${BORDER}` }
+                }
+              >
+                <span className="text-xs font-bold w-4" style={{ color: "#6B7A96" }}>{row.rank}</span>
+                <span className="text-sm font-medium flex-1" style={{ color: NAVY }}>{row.name}</span>
+                <span className="text-xs" style={{ color: "#6B7A96" }}>{row.rating}</span>
+                <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? "#007B70" : "#C04A00" }}>{row.delta}</span>
               </div>
             ))}
           </div>
@@ -115,23 +129,23 @@ export default function PreLaunch() {
       body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. Round-robin or bracket. You choose the intensity, we handle the rest.",
       reverse: false,
       mockup: (
-        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Choose Your Format</p>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#F5F6F0", border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Choose Your Format</p>
           {[
-            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeColor: "text-emerald-700 bg-emerald-50 border border-emerald-200", icon: "🎾" },
-            { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeColor: "text-blue-700 bg-blue-50 border border-blue-200", icon: "🤝" },
-            { name: "Mixed Doubles", sub: "Bracket · 4 rounds", badge: "Co-ed", badgeColor: "text-purple-700 bg-purple-50 border border-purple-200", icon: "🏆" },
-            { name: "Casual Division", sub: "Flexible · self-paced", badge: "Beginner Friendly", badgeColor: "text-orange-700 bg-orange-50 border border-orange-200", icon: "⚡" },
+            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeStyle: { color: "#007B70", background: "#E0F5F3" }, icon: "🎾" },
+            { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeStyle: { color: "#1E40AF", background: "#DBEAFE" }, icon: "🤝" },
+            { name: "Mixed Doubles", sub: "Bracket · 4 rounds", badge: "Co-ed", badgeStyle: { color: "#7C3AED", background: "#EDE9FE" }, icon: "🏆" },
+            { name: "Casual Division", sub: "Flexible · self-paced", badge: "Beginner Friendly", badgeStyle: { color: "#C04A00", background: "#FEE8D5" }, icon: "⚡" },
           ].map((fmt) => (
-            <div key={fmt.name} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
+            <div key={fmt.name} className="bg-white rounded-xl px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }}>
               <div className="flex items-center gap-3">
                 <span className="text-lg">{fmt.icon}</span>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{fmt.name}</p>
-                  <p className="text-xs text-gray-400">{fmt.sub}</p>
+                  <p className="text-sm font-semibold" style={{ color: NAVY }}>{fmt.name}</p>
+                  <p className="text-xs" style={{ color: "#6B7A96" }}>{fmt.sub}</p>
                 </div>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-md ${fmt.badgeColor}`}>{fmt.badge}</span>
+              <span className="text-xs font-medium px-2 py-1 rounded-md" style={fmt.badgeStyle}>{fmt.badge}</span>
             </div>
           ))}
         </div>
@@ -143,25 +157,25 @@ export default function PreLaunch() {
       body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
       reverse: true,
       mockup: (
-        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-6">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Profile</p>
-          <div className="bg-white border border-gray-100 rounded-xl p-4 mb-3 flex items-center gap-3">
-            <div className="w-12 h-12 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold">YO</div>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#F5F6F0", border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Your Profile</p>
+          <div className="bg-white rounded-xl p-4 mb-3 flex items-center gap-3" style={{ border: `1px solid ${BORDER}` }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ background: NAVY }}>YO</div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">Your Name</p>
-              <p className="text-xs text-gray-400">Austin, TX · Founding Member</p>
+              <p className="font-semibold text-sm" style={{ color: NAVY }}>Your Name</p>
+              <p className="text-xs" style={{ color: "#6B7A96" }}>Austin, TX · Founding Member</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-              <p className="text-xs text-emerald-600 font-medium mb-1">Tennis</p>
-              <p className="text-2xl font-bold text-emerald-700" style={{ fontFamily: "'Outfit', sans-serif" }}>1847</p>
-              <p className="text-xs text-emerald-500">ELO rating</p>
+            <div className="rounded-xl p-4 text-center" style={{ background: "#F3F7D0", border: "1px solid #C5D600" }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "#5A6600" }}>Tennis</p>
+              <p className="text-2xl font-bold" style={{ color: "#5A6600", fontFamily: "'Barlow Condensed', sans-serif" }}>1847</p>
+              <p className="text-xs" style={{ color: "#7A8600" }}>ELO rating</p>
             </div>
-            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
-              <p className="text-xs text-orange-600 font-medium mb-1">Pickleball</p>
-              <p className="text-2xl font-bold text-orange-700" style={{ fontFamily: "'Outfit', sans-serif" }}>1623</p>
-              <p className="text-xs text-orange-500">ELO rating</p>
+            <div className="rounded-xl p-4 text-center" style={{ background: "#E0F5F3", border: `1px solid ${TEAL}` }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "#007B70" }}>Pickleball</p>
+              <p className="text-2xl font-bold" style={{ color: "#007B70", fontFamily: "'Barlow Condensed', sans-serif" }}>1623</p>
+              <p className="text-xs" style={{ color: "#007B70" }}>ELO rating</p>
             </div>
           </div>
         </div>
@@ -170,14 +184,17 @@ export default function PreLaunch() {
   ];
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Barlow', sans-serif" }}>
       {/* Nav */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-100">
+      <nav className="sticky top-0 z-50 border-b" style={{ background: NAVY, borderColor: NAVY_MID }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Logo size="md" variant="default" />
+          <Logo size="md" variant="light" />
           <a
             href="#early-access"
-            className="bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-emerald-500 transition-colors"
+            className="text-sm font-bold px-4 py-2 rounded-md transition-colors"
+            style={{ background: LIME, color: NAVY }}
+            onMouseEnter={e => e.currentTarget.style.background = "#AEBE00"}
+            onMouseLeave={e => e.currentTarget.style.background = LIME}
           >
             Get Early Access
           </a>
@@ -185,48 +202,57 @@ export default function PreLaunch() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-emerald-950 text-white py-28 px-6">
+      <section style={{ background: NAVY, color: "white" }} className="py-28 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium px-3 py-1.5 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse inline-block"></span>
+          <div
+            className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
+            style={{ background: "rgba(197,214,0,0.12)", border: "1px solid rgba(197,214,0,0.25)", color: LIME }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: LIME }}></span>
             Launching in select cities — 2026
           </div>
           <h1
-            className="text-5xl md:text-6xl font-bold leading-tight mb-6"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black leading-tight mb-6"
+            style={{ fontSize: "clamp(2.5rem, 6vw, 3.75rem)", fontFamily: "'Barlow Condensed', sans-serif" }}
           >
             Stop Hunting for Good Matches.
             <br />
-            <span className="text-emerald-400">Play in a Real League.</span>
+            <span style={{ color: LIME }}>Play in a Real League.</span>
           </h1>
-          <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10" style={{ color: "rgba(255,255,255,0.7)" }}>
             VENLAX runs competitive Tennis and Pickleball leagues in your city — real rankings,
             skill-matched opponents, and players who actually show up.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#early-access"
-              className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-8 py-4 rounded-md transition-colors text-base"
+              className="font-semibold px-8 py-4 rounded-md transition-colors text-base"
+              style={{ background: LIME, color: NAVY }}
+              onMouseEnter={e => e.currentTarget.style.background = "#AEBE00"}
+              onMouseLeave={e => e.currentTarget.style.background = LIME}
               data-testid="hero-cta-primary"
             >
               Join the Early Access List
             </a>
             <a
               href="#early-access"
-              className="border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white font-medium px-8 py-4 rounded-md transition-colors text-base"
+              className="font-medium px-8 py-4 rounded-md transition-colors text-base"
+              style={{ border: "1px solid rgba(255,255,255,0.3)", color: "rgba(255,255,255,0.75)" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.7)"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
               data-testid="hero-cta-secondary"
             >
               Notify Me When My City Opens
             </a>
           </div>
-          <p className="text-gray-500 text-sm mt-6">Limited early-access spots per city. No spam, ever.</p>
+          <p className="text-sm mt-6" style={{ color: "rgba(255,255,255,0.35)" }}>Limited early-access spots per city. No spam, ever.</p>
         </div>
       </section>
 
       {/* Trust Bar */}
-      <section className="border-b border-gray-100 py-5 px-6 bg-gray-50">
+      <section className="border-b py-5 px-6" style={{ background: SECTION_BG, borderColor: BORDER }}>
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm text-gray-600">
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm" style={{ color: "#2A3C58" }}>
             {[
               "Placed by skill — no sandbaggers, no mismatches",
               "Flexible scheduling — you set match times with your opponent",
@@ -234,7 +260,7 @@ export default function PreLaunch() {
               "Tennis + Pickleball on one profile",
             ].map((point) => (
               <div key={point} className="flex items-center gap-2">
-                <span className="text-emerald-500 font-bold">✓</span>
+                <span className="font-bold" style={{ color: TEAL }}>✓</span>
                 {point}
               </div>
             ))}
@@ -243,14 +269,14 @@ export default function PreLaunch() {
       </section>
 
       {/* Problem */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Sound familiar?
           </p>
           <h2
-            className="text-4xl font-bold text-gray-900 text-center mb-12"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black text-center mb-12"
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: NAVY, fontFamily: "'Barlow Condensed', sans-serif" }}
           >
             Finding competitive play shouldn't be this hard.
           </h2>
@@ -272,16 +298,13 @@ export default function PreLaunch() {
                 body: "Club memberships cost thousands. Pickup courts are chaos. Organized, affordable, skill-matched leagues simply don't exist.",
               },
             ].map((item) => (
-              <div key={item.title} className="flex gap-5 p-6 border border-gray-100 rounded-lg">
+              <div key={item.title} className="flex gap-5 p-6 rounded-lg" style={{ border: `1px solid ${BORDER}` }}>
                 <div className="text-3xl flex-shrink-0">{item.icon}</div>
                 <div>
-                  <p
-                    className="font-semibold text-gray-900 mb-1"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
-                  >
+                  <p className="font-semibold mb-1" style={{ color: NAVY, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.1rem" }}>
                     {item.title}
                   </p>
-                  <p className="text-gray-600 text-sm leading-relaxed">{item.body}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "#2A3C58" }}>{item.body}</p>
                 </div>
               </div>
             ))}
@@ -290,14 +313,14 @@ export default function PreLaunch() {
       </section>
 
       {/* Solution */}
-      <section className="bg-emerald-950 text-white py-20 px-6">
+      <section className="py-20 px-6" style={{ background: NAVY, color: "white" }}>
         <div className="max-w-4xl mx-auto">
-          <p className="text-emerald-400 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: LIME }}>
             Enter VENLAX Sports
           </p>
           <h2
-            className="text-4xl font-bold text-center mb-14"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black text-center mb-14"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}
           >
             From scattered to unstoppable.
           </h2>
@@ -309,10 +332,10 @@ export default function PreLaunch() {
               { before: "Playing alone with no community", after: "A city-wide network of players who show up" },
               { before: "Wasted weekends, wasted potential", after: "Scheduled match days you actually look forward to" },
             ].map((item) => (
-              <div key={item.before} className="bg-emerald-900/50 border border-emerald-800/50 rounded-lg p-5">
-                <p className="text-gray-500 text-sm line-through mb-2">{item.before}</p>
-                <p className="text-white font-medium flex items-start gap-2">
-                  <span className="text-emerald-400 mt-0.5 flex-shrink-0">→</span>
+              <div key={item.before} className="rounded-lg p-5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <p className="text-sm line-through mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>{item.before}</p>
+                <p className="font-medium flex items-start gap-2" style={{ color: "#fff" }}>
+                  <span className="mt-0.5 flex-shrink-0" style={{ color: LIME }}>→</span>
                   {item.after}
                 </p>
               </div>
@@ -322,9 +345,9 @@ export default function PreLaunch() {
       </section>
 
       {/* Features Zig-Zag */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest text-center mb-16">
+          <p className="font-semibold text-sm uppercase tracking-widest text-center mb-16" style={{ color: TEAL }}>
             Built for players who want more
           </p>
           <div className="space-y-24">
@@ -336,12 +359,12 @@ export default function PreLaunch() {
                 <div className="flex-1">
                   <div className="text-5xl mb-4">{feat.icon}</div>
                   <h3
-                    className="text-3xl font-bold text-gray-900 mb-4"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
+                    className="font-black mb-4"
+                    style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: NAVY, fontFamily: "'Barlow Condensed', sans-serif" }}
                   >
                     {feat.title}
                   </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">{feat.body}</p>
+                  <p className="text-lg leading-relaxed" style={{ color: "#2A3C58" }}>{feat.body}</p>
                 </div>
                 {feat.mockup}
               </div>
@@ -350,20 +373,19 @@ export default function PreLaunch() {
         </div>
       </section>
 
-
       {/* League Formats Showcase */}
-      <section className="bg-gray-50 py-20 px-6">
+      <section className="py-20 px-6" style={{ background: SECTION_BG }}>
         <div className="max-w-5xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest text-center mb-4">
+          <p className="font-semibold text-sm uppercase tracking-widest text-center mb-4" style={{ color: TEAL }}>
             Choose your format
           </p>
           <h2
-            className="text-4xl font-bold text-gray-900 text-center mb-4"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black text-center mb-4"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: NAVY }}
           >
             Four ways to compete.
           </h2>
-          <p className="text-gray-500 text-center text-base mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-base mb-12 max-w-2xl mx-auto" style={{ color: "#6B7A96" }}>
             Same match rules and ELO rankings across all formats — different structure, different intensity.
           </p>
 
@@ -374,10 +396,10 @@ export default function PreLaunch() {
                 label: "Flex League",
                 tag: "Self-scheduled",
                 tagline: "You set the schedule. We track the results.",
-                header: "bg-emerald-500",
-                border: "border-emerald-200",
-                bullet: "text-emerald-500",
-                pill: "bg-emerald-600/50 text-emerald-100",
+                headerStyle: { background: TEAL },
+                borderStyle: { border: `1px solid ${TEAL}40` },
+                bullet: TEAL,
+                pillStyle: { background: "rgba(0,180,164,0.3)", color: "#E0F5F3" },
                 highlights: [
                   "5–7 matches over 6–8 weeks",
                   "You arrange each match with your opponent",
@@ -390,10 +412,10 @@ export default function PreLaunch() {
                 label: "Round Robin",
                 tag: "Auto-scheduled",
                 tagline: "Show up. The schedule is already set.",
-                header: "bg-blue-600",
-                border: "border-blue-200",
-                bullet: "text-blue-500",
-                pill: "bg-blue-700/50 text-blue-100",
+                headerStyle: { background: "#2563EB" },
+                borderStyle: { border: "1px solid #BFDBFE" },
+                bullet: "#2563EB",
+                pillStyle: { background: "rgba(37,99,235,0.3)", color: "#DBEAFE" },
                 highlights: [
                   "Every player faces every other player once",
                   "Rounds pre-assigned — no self-scheduling",
@@ -406,10 +428,10 @@ export default function PreLaunch() {
                 label: "Box League",
                 tag: "Promotion / Relegation",
                 tagline: "Finish top, move up. Finish bottom, move down.",
-                header: "bg-violet-600",
-                border: "border-violet-200",
-                bullet: "text-violet-500",
-                pill: "bg-violet-700/50 text-violet-100",
+                headerStyle: { background: "#7C3AED" },
+                borderStyle: { border: "1px solid #DDD6FE" },
+                bullet: "#7C3AED",
+                pillStyle: { background: "rgba(124,58,237,0.3)", color: "#EDE9FE" },
                 highlights: [
                   "~6 players per box, seeded by ELO",
                   "Play every player in your box",
@@ -422,10 +444,10 @@ export default function PreLaunch() {
                 label: "Challenge Ladder",
                 tag: "Always-on",
                 tagline: "Climb the ranks one challenge at a time.",
-                header: "bg-amber-500",
-                border: "border-amber-200",
-                bullet: "text-amber-500",
-                pill: "bg-amber-600/50 text-amber-100",
+                headerStyle: { background: "#E86010" },
+                borderStyle: { border: "1px solid #FEE8D5" },
+                bullet: "#E86010",
+                pillStyle: { background: "rgba(232,96,16,0.3)", color: "#FEE8D5" },
                 highlights: [
                   "Permanent ranked list per city + division",
                   "Join anytime — ELO-seeded placement",
@@ -434,19 +456,19 @@ export default function PreLaunch() {
                 ],
               },
             ].map((f) => (
-              <div key={f.id} className={`rounded-2xl border ${f.border} overflow-hidden`} data-testid={`prelaunch-format-${f.id}`}>
-                <div className={`${f.header} px-5 py-4`}>
+              <div key={f.id} className="rounded-2xl overflow-hidden" style={f.borderStyle} data-testid={`prelaunch-format-${f.id}`}>
+                <div className="px-5 py-4" style={f.headerStyle}>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Outfit', sans-serif" }}>{f.label}</h3>
-                    <span className={`ml-auto text-xs font-semibold ${f.pill} px-2.5 py-0.5 rounded-full`}>{f.tag}</span>
+                    <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>{f.label}</h3>
+                    <span className="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full" style={f.pillStyle}>{f.tag}</span>
                   </div>
-                  <p className="text-white/75 text-xs">{f.tagline}</p>
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.75)" }}>{f.tagline}</p>
                 </div>
                 <div className="p-4 bg-white">
                   <ul className="space-y-1.5">
                     {f.highlights.map((h, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-gray-700">
-                        <span className={`${f.bullet} font-bold flex-shrink-0`}>✓</span>
+                      <li key={i} className="flex gap-2 text-sm" style={{ color: "#2A3C58" }}>
+                        <span className="font-bold flex-shrink-0" style={{ color: f.bullet }}>✓</span>
                         <span>{h}</span>
                       </li>
                     ))}
@@ -456,31 +478,31 @@ export default function PreLaunch() {
             ))}
           </div>
 
-          {/* Compact comparison table */}
-          <div className="overflow-x-auto rounded-2xl border border-gray-200 mb-8">
+          {/* Comparison table */}
+          <div className="overflow-x-auto rounded-2xl mb-8" style={{ border: `1px solid ${BORDER}` }}>
             <table className="w-full text-sm min-w-[540px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-400 bg-gray-50 border-b border-gray-200 w-28"></th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-emerald-700 bg-emerald-50 border-b border-l border-gray-200">Flex</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 bg-blue-50 border-b border-l border-gray-200">Round Robin</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-violet-700 bg-violet-50 border-b border-l border-gray-200">Box League</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-amber-700 bg-amber-50 border-b border-l border-gray-200">Ladder</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#6B7A96", background: "#F5F6F0", borderBottom: `1px solid ${BORDER}` }}></th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#007B70", background: "#E0F5F3", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Flex</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#1E40AF", background: "#DBEAFE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Round Robin</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#7C3AED", background: "#EDE9FE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Box League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#C04A00", background: "#FEE8D5", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Ladder</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y" style={{ borderColor: BORDER }}>
                 {[
-                  { label: "Scheduling", flex: "Self-arranged",     rr: "Pre-assigned",        box: "Self-arranged",          ladder: "Challenge-based" },
-                  { label: "End goal",   flex: "Win playoffs",       rr: "Top of group",        box: "Promote to next div",    ladder: "Climb the list" },
-                  { label: "Playoffs",   flex: "Yes — top 4 or 8",  rr: "Yes — group leaders", box: "No — standings decide",  ladder: "No — rank is live" },
-                  { label: "Best for",   flex: "Flexible schedules", rr: "Zero friction",       box: "Competitive progression",ladder: "Frequent play" },
+                  { label: "Scheduling", flex: "Self-arranged", rr: "Pre-assigned", box: "Self-arranged", ladder: "Challenge-based" },
+                  { label: "End goal", flex: "Win playoffs", rr: "Top of group", box: "Promote to next div", ladder: "Climb the list" },
+                  { label: "Playoffs", flex: "Yes — top 4 or 8", rr: "Yes — group leaders", box: "No — standings decide", ladder: "No — rank is live" },
+                  { label: "Best for", flex: "Flexible schedules", rr: "Zero friction", box: "Competitive progression", ladder: "Frequent play" },
                 ].map((row, i) => (
-                  <tr key={row.label} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
-                    <td className="px-4 py-3 text-gray-500 font-medium text-xs">{row.label}</td>
-                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.flex}</td>
-                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.rr}</td>
-                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.box}</td>
-                    <td className="px-4 py-3 text-gray-800 text-xs border-l border-gray-100">{row.ladder}</td>
+                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#F5F6F0" }}>
+                    <td className="px-4 py-3 text-xs font-medium" style={{ color: "#6B7A96" }}>{row.label}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.flex}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.rr}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.box}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.ladder}</td>
                   </tr>
                 ))}
               </tbody>
@@ -488,20 +510,20 @@ export default function PreLaunch() {
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-gray-400">Full rules will be announced shortly.</p>
+            <p className="text-sm" style={{ color: "#6B7A96" }}>Full rules will be announced shortly.</p>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Simple by design
           </p>
           <h2
-            className="text-4xl font-bold text-gray-900 text-center mb-16"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black text-center mb-16"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: NAVY }}
           >
             Three steps to your first match.
           </h2>
@@ -511,39 +533,35 @@ export default function PreLaunch() {
                 step: "01",
                 title: "Join",
                 body: "Sign up in 2 minutes. Set your sport, skill level, and city. We handle the rest.",
-                color: "emerald",
+                dotColor: LIME,
               },
               {
                 step: "02",
                 title: "Get Matched",
                 body: "We place you in the right league, at your level, in your city. No guesswork.",
-                color: "orange",
+                dotColor: TEAL,
               },
               {
                 step: "03",
                 title: "Play & Rise",
                 body: "Win matches. Climb the city leaderboard. Your ranking follows you.",
-                color: "emerald",
+                dotColor: LIME,
               },
             ].map((step) => (
               <div key={step.step} className="text-center">
                 <div
-                  className={`inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6 ${
-                    step.color === "emerald"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-orange-100 text-orange-700"
-                  }`}
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                  className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6"
+                  style={{ background: step.dotColor === LIME ? "#F3F7D0" : "#E0F5F3", color: step.dotColor === LIME ? "#5A6600" : "#007B70", fontFamily: "'Barlow Condensed', sans-serif" }}
                 >
                   {step.step}
                 </div>
                 <h3
-                  className="text-xl font-bold text-gray-900 mb-3"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                  className="font-bold mb-3"
+                  style={{ fontSize: "1.25rem", color: NAVY, fontFamily: "'Barlow Condensed', sans-serif" }}
                 >
                   {step.title}
                 </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{step.body}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "#2A3C58" }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -551,16 +569,16 @@ export default function PreLaunch() {
       </section>
 
       {/* Social Proof */}
-      <section className="bg-gray-50 py-20 px-6">
+      <section className="py-20 px-6" style={{ background: SECTION_BG }}>
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-10">
+          <p className="font-semibold text-sm uppercase tracking-widest mb-10" style={{ color: TEAL }}>
             Why players are joining VENLAX early
           </p>
-          <blockquote className="bg-white border border-gray-100 rounded-xl p-8 mb-10">
-            <p className="text-gray-700 text-lg italic leading-relaxed mb-4">
+          <blockquote className="bg-white rounded-xl p-8 mb-10" style={{ border: `1px solid ${BORDER}` }}>
+            <p className="text-lg italic leading-relaxed mb-4" style={{ color: "#2A3C58" }}>
               "Finally a league that doesn't require a $2,000 club membership."
             </p>
-            <footer className="text-sm text-gray-400">— Tennis player, 34, Austin TX</footer>
+            <footer className="text-sm" style={{ color: "#6B7A96" }}>— Tennis player, 34, Austin TX</footer>
           </blockquote>
           <div className="grid grid-cols-3 gap-6">
             {[
@@ -569,12 +587,12 @@ export default function PreLaunch() {
             ].map((item) => (
               <div key={item.stat}>
                 <div
-                  className="text-2xl font-bold text-emerald-500 mb-1"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                  className="text-2xl font-bold mb-1"
+                  style={{ color: LIME, fontFamily: "'Barlow Condensed', sans-serif" }}
                 >
                   {item.stat}
                 </div>
-                <div className="text-xs text-gray-500">{item.label}</div>
+                <div className="text-xs" style={{ color: "#6B7A96" }}>{item.label}</div>
               </div>
             ))}
           </div>
@@ -584,56 +602,41 @@ export default function PreLaunch() {
       {/* FAQ */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-2xl mx-auto">
-          <p className="text-emerald-500 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
+          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Common questions
           </p>
           <h2
-            className="text-4xl font-bold text-gray-900 text-center mb-12"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black text-center mb-12"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: NAVY }}
           >
             Everything you need to know.
           </h2>
           <div className="space-y-2">
             {[
-              {
-                q: "How are matches scheduled?",
-                a: "You and your opponent coordinate directly. VENLAX gives you 7 days per match round. No mandatory court times — you pick what works.",
-              },
-              {
-                q: "What skill level is right for me?",
-                a: "We place you by self-reported level, then adjust your ELO ranking after each match. You'll always play people close to your actual level.",
-              },
-              {
-                q: "What if no one is in my city yet?",
-                a: "You're on the list. When enough players sign up in your city for a division, we open it and notify you first.",
-              },
-              {
-                q: "Is there a mobile app?",
-                a: "Web-first for now, fully mobile-optimized. A dedicated mobile app is on the roadmap for late 2026.",
-              },
-              {
-                q: "What's included in a league?",
-                a: "League organization, rankings, scheduling, score tracking, and email coordination for the full season.",
-              },
-              {
-                q: "Can I play both Tennis and Pickleball?",
-                a: "Yes. One profile, separate rankings per sport. Register for each league individually — your stats stay separate.",
-              },
+              { q: "How are matches scheduled?", a: "You and your opponent coordinate directly. VENLAX gives you 7 days per match round. No mandatory court times — you pick what works." },
+              { q: "What skill level is right for me?", a: "We place you by self-reported level, then adjust your ELO ranking after each match. You'll always play people close to your actual level." },
+              { q: "What if no one is in my city yet?", a: "You're on the list. When enough players sign up in your city for a division, we open it and notify you first." },
+              { q: "Is there a mobile app?", a: "Web-first for now, fully mobile-optimized. A dedicated mobile app is on the roadmap for late 2026." },
+              { q: "What's included in a league?", a: "League organization, rankings, scheduling, score tracking, and email coordination for the full season." },
+              { q: "Can I play both Tennis and Pickleball?", a: "Yes. One profile, separate rankings per sport. Register for each league individually — your stats stay separate." },
             ].map((item, i) => (
-              <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
+              <div key={i} className="rounded-xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
                 <button
                   type="button"
-                  className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                  className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
+                  style={{ background: openFaq === i ? "#F5F6F0" : "white" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#F5F6F0"}
+                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#F5F6F0" : "white"}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   data-testid={`faq-${i}`}
                 >
-                  <span className="font-medium text-gray-900 text-sm">{item.q}</span>
-                  <span className="text-gray-400 text-lg flex-shrink-0 ml-4">
+                  <span className="font-medium text-sm" style={{ color: NAVY }}>{item.q}</span>
+                  <span className="text-lg flex-shrink-0 ml-4" style={{ color: "#6B7A96" }}>
                     {openFaq === i ? "−" : "+"}
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-3">
+                  <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#2A3C58" }}>
                     {item.a}
                   </div>
                 )}
@@ -644,50 +647,46 @@ export default function PreLaunch() {
       </section>
 
       {/* Final CTA */}
-      <section id="early-access" className="bg-emerald-950 text-white py-24 px-6">
+      <section id="early-access" className="py-24 px-6" style={{ background: NAVY, color: "white" }}>
         <div className="max-w-xl mx-auto text-center">
           <h2
-            className="text-4xl md:text-5xl font-bold mb-4"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
+            className="font-black mb-4"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)" }}
           >
             Your city is opening soon.
           </h2>
-          <p className="text-gray-300 text-lg mb-10">
+          <p className="text-lg mb-10" style={{ color: "rgba(255,255,255,0.65)" }}>
             Early access members get priority city placement and founding member status. Don't wait.
           </p>
 
           {submitted ? (
             <div className="space-y-6">
-              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-8 text-center">
-                <p
-                  className="font-bold text-xl text-emerald-400 mb-2"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
-                >
+              <div className="rounded-xl p-8 text-center" style={{ background: "rgba(197,214,0,0.1)", border: "1px solid rgba(197,214,0,0.3)" }}>
+                <p className="font-bold text-xl mb-2" style={{ color: LIME, fontFamily: "'Barlow Condensed', sans-serif" }}>
                   You're on the early access list.
                 </p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
                   We'll notify you the moment {city || "your city"} opens.
                 </p>
               </div>
 
               {waitlistId && (
-                <div className="bg-emerald-900 border border-emerald-700 rounded-xl p-6 space-y-4">
+                <div className="rounded-xl p-6 space-y-4" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
                   <p className="text-white font-semibold text-sm text-center">
                     Move up the list — invite players from your city
                   </p>
-                  <p className="text-gray-400 text-xs text-center">
+                  <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.45)" }}>
                     Every friend who joins from your link moves you one spot higher.
                   </p>
-                  <div className="bg-gray-800 border border-gray-600 rounded-md px-3 py-2.5 text-gray-300 text-xs font-mono truncate">
+                  <div className="rounded-md px-3 py-2.5 text-xs font-mono truncate" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
                     {`${window.location.origin}/?ref=${waitlistId}`}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin}/?ref=${waitlistId}`);
-                      }}
-                      className="py-2.5 rounded-md border border-gray-600 text-gray-300 text-sm font-medium hover:border-gray-400 transition-colors"
+                      onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/?ref=${waitlistId}`); }}
+                      className="py-2.5 rounded-md text-sm font-medium transition-colors"
+                      style={{ border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.75)" }}
                       data-testid="copy-referral-link"
                     >
                       Copy Link
@@ -696,7 +695,8 @@ export default function PreLaunch() {
                       href={`https://wa.me/?text=${encodeURIComponent(`I'm getting early access to VENLAX — competitive Tennis/Pickleball leagues in our city. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2.5 rounded-md bg-green-600 hover:bg-green-500 text-white text-sm font-medium text-center transition-colors block"
+                      className="py-2.5 rounded-md text-sm font-medium text-center transition-colors block"
+                      style={{ background: "#25D366", color: "white" }}
                       data-testid="share-whatsapp"
                     >
                       Share on WhatsApp
@@ -713,7 +713,10 @@ export default function PreLaunch() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
                 required
-                className="w-full bg-emerald-900 border border-emerald-700 text-white placeholder-emerald-400/60 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-400 transition-colors"
+                className="w-full rounded-md px-4 py-4 text-base focus:outline-none transition-colors"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white" }}
+                onFocus={e => e.currentTarget.style.borderColor = LIME}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"}
                 data-testid="waitlist-email"
               />
               <input
@@ -722,24 +725,24 @@ export default function PreLaunch() {
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Your city (e.g. Austin, TX)"
                 required
-                className="w-full bg-emerald-900 border border-emerald-700 text-white placeholder-emerald-400/60 rounded-md px-4 py-4 text-base focus:outline-none focus:border-emerald-400 transition-colors"
+                className="w-full rounded-md px-4 py-4 text-base focus:outline-none transition-colors"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white" }}
+                onFocus={e => e.currentTarget.style.borderColor = LIME}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"}
                 data-testid="waitlist-city"
               />
               <div className="flex gap-3">
                 {[
-                  { value: "tennis", label: "🎾 Tennis", active: "bg-emerald-500 border-emerald-500 text-white" },
-                  { value: "pickleball", label: "🏓 Pickleball", active: "bg-orange-500 border-orange-500 text-white" },
-                  { value: "both", label: "Both", active: "bg-gray-600 border-gray-500 text-white" },
+                  { value: "tennis", label: "🎾 Tennis", activeStyle: { background: LIME, border: `1px solid ${LIME}`, color: NAVY } },
+                  { value: "pickleball", label: "🏓 Pickleball", activeStyle: { background: TEAL, border: `1px solid ${TEAL}`, color: "white" } },
+                  { value: "both", label: "Both", activeStyle: { background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.4)", color: "white" } },
                 ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() => setSport(opt.value)}
-                    className={`flex-1 py-3 rounded-md text-sm font-medium border transition-colors ${
-                      sport === opt.value
-                        ? opt.active
-                        : "border-gray-700 text-gray-400 hover:border-gray-500"
-                    }`}
+                    className="flex-1 py-3 rounded-md text-sm font-medium transition-colors"
+                    style={sport === opt.value ? opt.activeStyle : { border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.55)" }}
                     data-testid={`sport-${opt.value}`}
                   >
                     {opt.label}
@@ -747,7 +750,7 @@ export default function PreLaunch() {
                 ))}
               </div>
               <div>
-                <p className="text-gray-400 text-xs mb-2">Your level</p>
+                <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>Your level</p>
                 <div className="grid grid-cols-4 gap-2">
                   {[
                     { value: "beginner", label: "Beginner" },
@@ -759,11 +762,11 @@ export default function PreLaunch() {
                       key={opt.value}
                       type="button"
                       onClick={() => setSkillLevel(opt.value)}
-                      className={`py-2.5 rounded-md text-xs font-medium border transition-colors ${
-                        skillLevel === opt.value
-                          ? "bg-gray-600 border-gray-500 text-white"
-                          : "border-gray-700 text-gray-400 hover:border-gray-500"
-                      }`}
+                      className="py-2.5 rounded-md text-xs font-medium transition-colors"
+                      style={skillLevel === opt.value
+                        ? { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.35)", color: "white" }
+                        : { border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }
+                      }
                       data-testid={`skill-${opt.value}`}
                     >
                       {opt.label}
@@ -772,20 +775,23 @@ export default function PreLaunch() {
                 </div>
               </div>
               {city && (
-                <p className="text-emerald-400 text-xs text-center">
+                <p className="text-xs text-center" style={{ color: LIME }}>
                   {city.split(",")[0] || city} is filling fast — be first in line when we open.
                 </p>
               )}
-              {error && <p className="text-red-400 text-sm">{error}</p>}
+              {error && <p className="text-sm" style={{ color: "#FDA4AF" }}>{error}</p>}
               <button
                 type="submit"
                 disabled={submitting || !email || !city}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-4 rounded-md text-base transition-colors disabled:opacity-50"
+                className="w-full font-bold py-4 rounded-md text-base transition-colors disabled:opacity-50"
+                style={{ background: LIME, color: NAVY }}
+                onMouseEnter={e => { if (!submitting && email && city) e.currentTarget.style.background = "#AEBE00"; }}
+                onMouseLeave={e => e.currentTarget.style.background = LIME}
                 data-testid="waitlist-submit"
               >
                 {submitting ? "Securing your spot..." : "Secure My Early Access Spot"}
               </button>
-              <p className="text-gray-500 text-xs">
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
                 Limited early-access spots per city. First come, first placed. No spam, ever.
               </p>
             </form>
@@ -794,10 +800,10 @@ export default function PreLaunch() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-emerald-950 border-t border-emerald-800 py-8 px-6">
+      <footer className="py-8 px-6" style={{ background: NAVY, borderTop: `3px solid ${LIME}` }}>
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="md" variant="light" />
-          <div className="flex gap-6 text-xs text-gray-500">
+          <div className="flex gap-6 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </div>

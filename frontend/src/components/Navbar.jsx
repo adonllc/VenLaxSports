@@ -13,10 +13,10 @@ const SPORTS = activeSports.map((s) => ({
   icon: s.icon,
 }));
 
-const FOREST = "#1A2C24";
-const FOREST_MID = "#2E4A3A";
-const RUST = "#C24A1D";
-const RUST_HOVER = "#A83A12";
+const NAVY = "#1B2A4A";
+const NAVY_MID = "#2A3D66";
+const LIME = "#C5D600";
+const LIME_HOVER = "#AEBE00";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -47,7 +47,7 @@ export default function Navbar() {
   return (
     <nav
       className="sticky top-0 z-50 border-b"
-      style={{ background: FOREST, borderColor: FOREST_MID }}
+      style={{ background: NAVY, borderColor: NAVY_MID }}
       data-testid="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +65,7 @@ export default function Navbar() {
                 to={`/sport/${s.id}`}
                 className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors"
                 style={{ color: "rgba(255,255,255,0.65)" }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = FOREST_MID; }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = NAVY_MID; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.65)"; e.currentTarget.style.background = "transparent"; }}
                 data-testid={`nav-sport-${s.id}`}
               >
@@ -76,9 +76,9 @@ export default function Navbar() {
             <Link
               to="/join"
               className="px-3 py-2 text-sm font-semibold rounded-md transition-colors"
-              style={{ color: RUST }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#E8795A"; e.currentTarget.style.background = "rgba(194,74,29,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = RUST; e.currentTarget.style.background = "transparent"; }}
+              style={{ color: LIME }}
+              onMouseEnter={e => { e.currentTarget.style.color = LIME_HOVER; e.currentTarget.style.background = "rgba(197,214,0,0.08)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = LIME; e.currentTarget.style.background = "transparent"; }}
               data-testid="nav-join"
             >
               Find a League
@@ -87,8 +87,8 @@ export default function Navbar() {
             <Link
               to="/ladders"
               className="px-3 py-2 text-sm font-medium rounded-md transition-colors"
-              style={isActive("/ladders") ? { background: FOREST_MID, color: "#fff", fontWeight: 600 } : { color: "rgba(255,255,255,0.55)" }}
-              onMouseEnter={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = FOREST_MID; } }}
+              style={isActive("/ladders") ? { background: NAVY_MID, color: "#fff", fontWeight: 600 } : { color: "rgba(255,255,255,0.55)" }}
+              onMouseEnter={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = NAVY_MID; } }}
               onMouseLeave={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = "rgba(255,255,255,0.55)"; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-ladders"
             >
@@ -98,8 +98,8 @@ export default function Navbar() {
             <Link
               to="/rules"
               className="px-3 py-2 text-sm font-medium rounded-md transition-colors"
-              style={isActive("/rules") ? { background: FOREST_MID, color: "#fff", fontWeight: 600 } : { color: "rgba(255,255,255,0.55)" }}
-              onMouseEnter={e => { if (!isActive("/rules")) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = FOREST_MID; } }}
+              style={isActive("/rules") ? { background: NAVY_MID, color: "#fff", fontWeight: 600 } : { color: "rgba(255,255,255,0.55)" }}
+              onMouseEnter={e => { if (!isActive("/rules")) { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = NAVY_MID; } }}
               onMouseLeave={e => { if (!isActive("/rules")) { e.currentTarget.style.color = "rgba(255,255,255,0.55)"; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-rules"
             >
@@ -111,7 +111,7 @@ export default function Navbar() {
                 to="/admin"
                 className="px-3 py-2 text-sm font-medium rounded-md transition-colors"
                 style={{ color: "rgba(255,255,255,0.55)" }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = FOREST_MID; }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = NAVY_MID; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.55)"; e.currentTarget.style.background = "transparent"; }}
                 data-testid="nav-admin"
               >
@@ -128,27 +128,27 @@ export default function Navbar() {
                   onClick={() => setUserOpen(!userOpen)}
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
                   style={{ color: "rgba(255,255,255,0.8)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = FOREST_MID; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = NAVY_MID; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                   data-testid="nav-user-menu"
                 >
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: RUST }}>
-                    <span className="text-xs font-bold text-white">{user.name?.[0]?.toUpperCase()}</span>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: LIME }}>
+                    <span className="text-xs font-bold" style={{ color: NAVY }}>{user.name?.[0]?.toUpperCase()}</span>
                   </div>
                   <span className="max-w-[120px] truncate">{user.name}</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {userOpen && (
-                  <div className="absolute top-full right-0 mt-1 w-52 bg-white border border-[#D4E8DF] rounded-xl shadow-lg p-2 z-50">
-                    <div className="px-3 py-2 border-b border-[#D4E8DF] mb-1">
-                      <p className="text-xs text-[#7A9488]">Signed in as</p>
-                      <p className="text-sm font-semibold text-[#1A2C24] truncate">{user.email}</p>
+                  <div className="absolute top-full right-0 mt-1 w-52 bg-white border border-[#CDD5E4] rounded-xl shadow-lg p-2 z-50">
+                    <div className="px-3 py-2 border-b border-[#CDD5E4] mb-1">
+                      <p className="text-xs text-[#6B7A96]">Signed in as</p>
+                      <p className="text-sm font-semibold text-[#0F1D38] truncate">{user.email}</p>
                     </div>
-                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm text-[#4A6158] hover:bg-[#EDF2EE] rounded-lg" data-testid="nav-dashboard">
+                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm text-[#2A3C58] hover:bg-[#EEF1F8] rounded-lg" data-testid="nav-dashboard">
                       <LayoutDashboard className="w-4 h-4" /> My Dashboard
                     </Link>
                     {user.role === "admin" && (
-                      <Link to="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-[#4A6158] hover:bg-[#EDF2EE] rounded-lg" data-testid="nav-admin-panel">
+                      <Link to="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-[#2A3C58] hover:bg-[#EEF1F8] rounded-lg" data-testid="nav-admin-panel">
                         <Shield className="w-4 h-4" /> Admin Panel
                       </Link>
                     )}
@@ -176,10 +176,10 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/auth?mode=register"
-                  className="px-4 py-2 text-sm font-semibold rounded-lg transition-colors text-white"
-                  style={{ background: RUST }}
-                  onMouseEnter={e => e.currentTarget.style.background = RUST_HOVER}
-                  onMouseLeave={e => e.currentTarget.style.background = RUST}
+                  className="px-4 py-2 text-sm font-bold rounded-lg transition-colors"
+                  style={{ background: LIME, color: NAVY }}
+                  onMouseEnter={e => e.currentTarget.style.background = LIME_HOVER}
+                  onMouseLeave={e => e.currentTarget.style.background = LIME}
                   data-testid="nav-register"
                 >
                   Sign Up Free
@@ -192,7 +192,7 @@ export default function Navbar() {
           <button
             className="md:hidden p-2 rounded-lg transition-colors"
             style={{ color: "rgba(255,255,255,0.8)" }}
-            onMouseEnter={e => e.currentTarget.style.background = FOREST_MID}
+            onMouseEnter={e => e.currentTarget.style.background = NAVY_MID}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             onClick={() => setMobileOpen(!mobileOpen)}
             data-testid="nav-mobile-toggle"
@@ -204,8 +204,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t px-4 py-4 space-y-2" style={{ background: FOREST_MID, borderColor: FOREST }}>
-          <Link to="/join" className="block px-3 py-2 text-sm font-semibold rounded-lg" style={{ color: RUST }} data-testid="nav-join-mobile">
+        <div className="md:hidden border-t px-4 py-4 space-y-2" style={{ background: NAVY_MID, borderColor: NAVY }}>
+          <Link to="/join" className="block px-3 py-2 text-sm font-semibold rounded-lg" style={{ color: LIME }} data-testid="nav-join-mobile">
             Find a League
           </Link>
           {SPORTS.map((s) => (
@@ -232,8 +232,8 @@ export default function Navbar() {
               <Link to="/auth" className="block px-3 py-2 text-sm font-medium rounded-lg" style={{ color: "rgba(255,255,255,0.65)" }}>Log In</Link>
               <Link
                 to="/auth?mode=register"
-                className="block px-3 py-2 text-sm font-semibold rounded-lg text-center text-white"
-                style={{ background: RUST }}
+                className="block px-3 py-2 text-sm font-bold rounded-lg text-center"
+                style={{ background: LIME, color: NAVY }}
                 data-testid="nav-register-mobile"
               >
                 Sign Up Free
