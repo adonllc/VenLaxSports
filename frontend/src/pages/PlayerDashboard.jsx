@@ -188,35 +188,34 @@ export default function PlayerDashboard() {
   const recent = matches.filter((m) => m.status === "completed").slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="player-dashboard">
+    <div className="min-h-screen" style={{ background: "#FDF6EE" }} data-testid="player-dashboard">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+        <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: "1px solid #D4B896" }}>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: "#C24A1D" }}>
               <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-heading font-black text-2xl text-gray-900">{user.name}</h1>
+                <h1 className="font-heading font-black text-2xl" style={{ color: "#2C1206" }}>{user.name}</h1>
                 {user.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge">
                     ★ Founding Member
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-3 mt-1 text-sm" style={{ color: "#8B5E3C" }}>
                 <span className="truncate">{user.email}</span>
                 {user.city && <span className="flex items-center gap-1 flex-shrink-0"><MapPin className="w-3 h-3" />{user.city}</span>}
               </div>
               <button
                 onClick={toggleNotifications}
                 disabled={togglingNotif}
-                className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                  user.email_notifications
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                    : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
-                } disabled:opacity-60`}
+                className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-60"
+                style={user.email_notifications
+                  ? { background: "#F5E8D0", color: "#C24A1D", border: "1px solid #D4B896" }
+                  : { background: "#FDF6EE", color: "#8B5E3C", border: "1px solid #D4B896" }}
                 data-testid="toggle-email-notifications"
                 title="Email updates for match scheduling, scores, and league activity"
               >
@@ -226,11 +225,10 @@ export default function PlayerDashboard() {
               <button
                 onClick={togglePrivacy}
                 disabled={togglingPrivacy}
-                className={`mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                  user.profile_public !== false
-                    ? "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
-                    : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
-                } disabled:opacity-60`}
+                className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-60"
+                style={user.profile_public !== false
+                  ? { background: "#F5E8D0", color: "#5C3014", border: "1px solid #D4B896" }
+                  : { background: "#FDF6EE", color: "#8B5E3C", border: "1px solid #D4B896" }}
                 data-testid="toggle-profile-public"
                 title="Control who can see your profile and match history"
               >
@@ -256,9 +254,9 @@ export default function PlayerDashboard() {
 
         {/* DUPR Rating */}
         {(user?.sport_preferences?.includes("pickleball") || true) && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+          <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: "1px solid #D4B896" }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: "#5C3014" }}>
                 Pickleball Rating (DUPR)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -267,11 +265,10 @@ export default function PlayerDashboard() {
                     key={bracket}
                     data-testid={`dupr-bracket-${bracket}`}
                     onClick={() => handleProfileUpdate({ dupr_rating: bracket })}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
-                      user?.dupr_rating === bracket
-                        ? "bg-orange-500 text-white border-orange-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
-                    }`}
+                    className="px-3 py-1.5 rounded-md text-sm font-medium border transition-colors"
+                    style={user?.dupr_rating === bracket
+                      ? { background: "#00B4A4", color: "white", borderColor: "#00B4A4" }
+                      : { background: "white", color: "#5C3014", borderColor: "#D4B896" }}
                   >
                     {bracket}
                   </button>
@@ -279,14 +276,15 @@ export default function PlayerDashboard() {
                 <button
                   data-testid="dupr-bracket-unknown"
                   onClick={() => handleProfileUpdate({ dupr_rating: null })}
-                  className="px-3 py-1.5 rounded-md text-sm font-medium border border-gray-200 text-gray-400 hover:border-gray-400"
+                  className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                  style={{ border: "1px solid #D4B896", color: "#8B5E3C", background: "white" }}
                 >
                   I don't know
                 </button>
               </div>
-              <p className="mt-1.5 text-xs text-gray-400">
+              <p className="mt-1.5 text-xs" style={{ color: "#8B5E3C" }}>
                 Don't know your DUPR?{" "}
-                <a href="https://www.dupr.com" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">
+                <a href="https://www.dupr.com" target="_blank" rel="noopener noreferrer" style={{ color: "#00B4A4" }} className="hover:underline">
                   Find it at dupr.com →
                 </a>
               </p>
@@ -297,28 +295,29 @@ export default function PlayerDashboard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "text-gray-900",    bg: "bg-white border-gray-200" },
-            { label: "Wins",          value: wins,           icon: Award,    color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
-            { label: "Losses",        value: losses,         icon: TrendingUp, color: "text-red-600",   bg: "bg-red-50 border-red-100" },
-            { label: "Total Matches", value: matches.length, icon: Calendar, color: "text-blue-700",    bg: "bg-blue-50 border-blue-100" },
+            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#2C1206", bg: "#FFFFFF",   border: "#D4B896" },
+            { label: "Wins",          value: wins,           icon: Award,    color: "#C24A1D", bg: "#FAE0D5",   border: "#E5A885" },
+            { label: "Losses",        value: losses,         icon: TrendingUp, color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
+            { label: "Total Matches", value: matches.length, icon: Calendar, color: "#5C3014", bg: "#F5E8D0",   border: "#D4B896" },
           ].map((s) => (
-            <div key={s.label} className={`border rounded-2xl p-5 ${s.bg}`} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
-              <s.icon className={`w-5 h-5 ${s.color} mb-3`} />
-              <p className={`font-heading font-black text-3xl ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+            <div key={s.label} className="rounded-2xl p-5" style={{ background: s.bg, border: `1px solid ${s.border}` }} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
+              <s.icon className="w-5 h-5 mb-3" style={{ color: s.color }} />
+              <p className="font-heading font-black text-3xl" style={{ color: s.color }}>{s.value}</p>
+              <p className="text-xs mt-1" style={{ color: "#8B5E3C" }}>{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Find a League CTA */}
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+        <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }}>
           <div>
-            <p className="font-heading font-bold text-gray-900 text-sm">Find your next league.</p>
-            <p className="text-xs text-gray-500 mt-0.5">Browse by sport, city, and format. New seasons open year-round.</p>
+            <p className="font-heading font-bold text-sm" style={{ color: "#2C1206" }}>Find your next league.</p>
+            <p className="text-xs mt-0.5" style={{ color: "#8B5E3C" }}>Browse by sport, city, and format. New seasons open year-round.</p>
           </div>
           <Link
             to="/join"
-            className="flex-shrink-0 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+            className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors"
+            style={{ background: "#C24A1D" }}
             data-testid="dashboard-find-league-btn"
           >
             Find a League
@@ -328,13 +327,13 @@ export default function PlayerDashboard() {
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Pending Doubles Invites</h2>
+            <h2 className="text-lg font-semibold mb-3" style={{ color: "#2C1206" }}>Pending Doubles Invites</h2>
             <div className="space-y-2">
               {pendingInvites.map((invite) => (
-                <div key={invite.token} className="border border-gray-200 rounded-md p-4 bg-white flex items-center justify-between">
+                <div key={invite.token} className="rounded-md p-4 bg-white flex items-center justify-between" style={{ border: "1px solid #D4B896" }}>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{invite.league_name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium" style={{ color: "#2C1206" }}>{invite.league_name}</p>
+                    <p className="text-xs" style={{ color: "#8B5E3C" }}>
                       Invited {invite.partner_email} · expires {new Date(invite.expires_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -342,7 +341,7 @@ export default function PlayerDashboard() {
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
                     <button
                       onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${invite.token}`)}
-                      className="text-xs text-emerald-600 border border-emerald-200 rounded px-2 py-1 hover:bg-emerald-50"
+                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C24A1D", border: "1px solid #E5A885" }}
                       data-testid={`copy-invite-${invite.token}`}
                     >
                       Copy link
@@ -369,43 +368,43 @@ export default function PlayerDashboard() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="font-heading font-bold text-lg">My Leagues</h2>
-              <Link to="/join" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Find a League</Link>
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F5E8D0" }}>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>My Leagues</h2>
+              <Link to="/join" className="text-xs font-semibold" style={{ color: "#C24A1D" }}>Find a League</Link>
             </div>
             {leagues.length === 0 ? (
               <div className="text-center py-10">
-                <Trophy className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm font-medium text-gray-700 mb-1">No leagues yet</p>
-                <p className="text-xs text-gray-400 mb-3">Join a league to start tracking matches and your rating.</p>
-                <Link to="/leagues" className="text-sm font-semibold text-black border border-black px-4 py-2 rounded-xl" data-testid="browse-leagues-btn">
+                <Trophy className="w-8 h-8 mx-auto mb-3" style={{ color: "#D4B896" }} />
+                <p className="text-sm font-medium mb-1" style={{ color: "#5C3014" }}>No leagues yet</p>
+                <p className="text-xs mb-3" style={{ color: "#8B5E3C" }}>Join a league to start tracking matches and your rating.</p>
+                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#2C1206", border: "1px solid #2C1206" }} data-testid="browse-leagues-btn">
                   Browse Open Leagues
                 </Link>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                 {leagues.map((l) => {
                   const sc = SPORT_COLORS[l.sport] || {};
                   return (
                     <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
                       <span className="text-lg">{sc.icon || "🏆"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
+                        <p className="text-sm font-semibold truncate" style={{ color: "#2C1206" }}>
                           {l.name}
                           {l.division_label && (
-                            <span className="ml-2 text-xs text-indigo-600 font-medium">
+                            <span className="ml-2 text-xs font-medium" style={{ color: "#C24A1D" }}>
                               {l.division_label}
                               {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-gray-500">{l.city} • {l.format}</p>
+                        <p className="text-xs" style={{ color: "#8B5E3C" }}>{l.city} • {l.format}</p>
                         {boxStatuses[l.id] && (
-                          <div className="mt-1 text-sm text-gray-600">
+                          <div className="mt-1 text-sm" style={{ color: "#5C3014" }}>
                             Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
                             {boxStatuses[l.id].promotion_status === "promoted" && (
-                              <span className="ml-2 text-xs font-semibold text-emerald-700">Promoted ↑</span>
+                              <span className="ml-2 text-xs font-semibold" style={{ color: "#C24A1D" }}>Promoted ↑</span>
                             )}
                             {boxStatuses[l.id].promotion_status === "relegated" && (
                               <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
@@ -413,10 +412,14 @@ export default function PlayerDashboard() {
                           </div>
                         )}
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "registration" ? "bg-emerald-100 text-emerald-700" : l.status === "active" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={
+                        l.status === "registration" ? { background: "#FAE0D5", color: "#C24A1D" }
+                        : l.status === "active" ? { background: "#E0F5F3", color: "#007B70" }
+                        : { background: "#F5E8D0", color: "#8B5E3C" }
+                      }>
                         {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
                       </span>
-                      <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium text-gray-400 hover:text-black">
+                      <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium" style={{ color: "#8B5E3C" }}>
                         Standings
                       </Link>
                     </div>
@@ -428,25 +431,26 @@ export default function PlayerDashboard() {
 
           {/* Ladder Rankings */}
           {ladderEntries.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-              <div className="p-5 border-b border-gray-100">
-                <h2 className="font-heading font-bold text-lg">Ladder Rankings</h2>
+            <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+              <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>Ladder Rankings</h2>
               </div>
               <div className="p-5 space-y-3">
                 {ladderEntries.map((entry) => (
                   <div
                     key={entry.ladder_id}
                     data-testid={`ladder-rank-card-${entry.ladder_id}`}
-                    className="flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl hover:shadow-sm transition-shadow cursor-pointer"
+                    className="flex items-center justify-between px-4 py-3 rounded-xl hover:shadow-sm transition-shadow cursor-pointer"
+                    style={{ border: "1px solid #D4B896" }}
                     onClick={() => navigate(`/ladders/${entry.ladder_id}`)}
                   >
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold" style={{ color: "#2C1206" }}>
                         {entry.city} · {entry.division_label} {entry.sport.charAt(0).toUpperCase() + entry.sport.slice(1)}
                       </p>
-                      <p className="text-sm text-gray-500">Rank #{entry.rank} of {entry.total}</p>
+                      <p className="text-sm" style={{ color: "#8B5E3C" }}>Rank #{entry.rank} of {entry.total}</p>
                     </div>
-                    <span className="text-2xl font-bold text-indigo-700">#{entry.rank}</span>
+                    <span className="text-2xl font-bold" style={{ color: "#C24A1D" }}>#{entry.rank}</span>
                   </div>
                 ))}
               </div>
@@ -457,21 +461,22 @@ export default function PlayerDashboard() {
           <RatingHistoryChart user={user} />
 
           {/* Schedule a Match */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="font-heading font-bold text-lg">Schedule a Match</h2>
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>Schedule a Match</h2>
             </div>
             <div className="p-5">
               {leagues.length === 0 ? (
-                <p className="text-sm text-gray-500">Join a league first to schedule matches.</p>
+                <p className="text-sm" style={{ color: "#8B5E3C" }}>Join a league first to schedule matches.</p>
               ) : (
                 <form onSubmit={handleSchedule} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Select League</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#5C3014" }}>Select League</label>
                     <select
                       value={scheduleLeagueId}
                       onChange={(e) => { setScheduleLeagueId(e.target.value); fetchLeaguePlayers(e.target.value); }}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none"
+                      style={{ border: "1px solid #D4B896", color: "#2C1206" }}
                       required
                       data-testid="schedule-league-select"
                     >
@@ -480,7 +485,7 @@ export default function PlayerDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Opponent</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#5C3014" }}>Opponent</label>
                     <OpponentSearch
                       leagueId={scheduleLeagueId}
                       value={opponent}
@@ -489,22 +494,23 @@ export default function PlayerDashboard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Match Date & Time</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#5C3014" }}>Match Date & Time</label>
                     <input
                       type="datetime-local"
                       value={schedDate}
                       onChange={(e) => setSchedDate(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none"
+                      style={{ border: "1px solid #D4B896", color: "#2C1206" }}
                       required
                       data-testid="schedule-date-input"
                     />
                   </div>
                   {schedMsg && (
-                    <p className={`text-sm px-3 py-2 rounded-xl ${schedMsg.includes("success") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`} data-testid="schedule-message">
+                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
                       {schedMsg}
                     </p>
                   )}
-                  <button type="submit" disabled={scheduling} className="w-full py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60" data-testid="schedule-submit-btn">
+                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1F0A03" }} data-testid="schedule-submit-btn">
                     {scheduling ? "Scheduling..." : "Schedule Match"}
                   </button>
                 </form>
@@ -513,28 +519,29 @@ export default function PlayerDashboard() {
           </div>
 
           {/* Upcoming Matches */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="font-heading font-bold text-lg">Upcoming Matches ({upcoming.length})</h2>
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>Upcoming Matches ({upcoming.length})</h2>
             </div>
             {upcoming.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-sm text-gray-500">No scheduled matches. Use the form below to schedule one.</p>
+                <p className="text-sm" style={{ color: "#8B5E3C" }}>No scheduled matches. Use the form below to schedule one.</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                 {upcoming.slice(0, 5).map((m) => (
                   <div key={m.id} className="px-5 py-4">
                     <div className="flex justify-between items-start gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
-                        <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                        <p className="text-sm font-semibold truncate" style={{ color: "#2C1206" }}>{m.player1_name} vs {m.player2_name}</p>
+                        <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#8B5E3C" }}>
                           <Clock className="w-3 h-3" /> {new Date(m.scheduled_date).toLocaleString()}
                         </p>
                       </div>
                       <Link
                         to={`/matches/${m.id}/score`}
-                        className="text-xs font-semibold bg-black text-white px-2.5 py-1 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors"
+                        style={{ background: "#1F0A03" }}
                         data-testid={`report-score-btn-${m.id}`}
                       >
                         Report
@@ -547,24 +554,25 @@ export default function PlayerDashboard() {
           </div>
 
           {/* Recent Results */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="font-heading font-bold text-lg">Recent Results ({recent.length})</h2>
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>Recent Results ({recent.length})</h2>
             </div>
             {recent.length === 0 ? (
-              <div className="text-center py-10 text-gray-500 text-sm">No completed matches yet</div>
+              <div className="text-center py-10 text-sm" style={{ color: "#8B5E3C" }}>No completed matches yet</div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                 {recent.map((m) => {
                   const isWin = m.winner_id === user.id || m.winner_id === user._id;
                   return (
                     <div key={m.id} className="flex items-center gap-3 px-5 py-3.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isWin ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"}`}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={isWin ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }}>
                         {isWin ? "W" : "L"}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
-                        {m.winner_name && <p className="text-xs text-gray-500">{m.winner_name} won</p>}
+                        <p className="text-sm font-medium truncate" style={{ color: "#2C1206" }}>{m.player1_name} vs {m.player2_name}</p>
+                        {m.winner_name && <p className="text-xs" style={{ color: "#8B5E3C" }}>{m.winner_name} won</p>}
                       </div>
                     </div>
                   );
@@ -576,12 +584,12 @@ export default function PlayerDashboard() {
 
         {/* Notification Subscriptions */}
         {interests.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mt-6">
-            <div className="p-4 border-b border-gray-100">
-              <h2 className="font-heading font-bold text-gray-900 text-sm">Notification Subscriptions</h2>
-              <p className="text-xs text-gray-500 mt-0.5">You'll be notified when these leagues open</p>
+          <div className="bg-white rounded-2xl overflow-hidden mt-6" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-4" style={{ borderBottom: "1px solid #F5E8D0" }}>
+              <h2 className="font-heading font-bold text-sm" style={{ color: "#2C1206" }}>Notification Subscriptions</h2>
+              <p className="text-xs mt-0.5" style={{ color: "#8B5E3C" }}>You'll be notified when these leagues open</p>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y" style={{ borderColor: "#F5E8D0" }}>
               {interests.map((interest) => {
                 const sportEmoji = { tennis: "🎾", pickleball: "🏓", cricket: "🏏" }[interest.sport] || "🏆";
                 return (
@@ -590,7 +598,7 @@ export default function PlayerDashboard() {
                     className="flex items-center justify-between px-4 py-3"
                     data-testid={`interest-row-${interest.id}`}
                   >
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm" style={{ color: "#5C3014" }}>
                       {sportEmoji} {interest.sport.charAt(0).toUpperCase() + interest.sport.slice(1)}
                       {interest.city ? ` — ${interest.city}` : ""}
                     </span>

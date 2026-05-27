@@ -8,17 +8,17 @@ import NotifyMeModal from "../components/NotifyMeModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const NAVY      = "#1B2A4A";
+const NAVY      = "#1F0A03";
 const LIME      = "#C5D600";
 const LIME_PALE = "#F3F7D0";
 const LIME_TEXT = "#5A6600";
 const TEAL      = "#00B4A4";
 const ORANGE    = "#E86010";
-const PAGE_BG   = "#0A192F";
-const BORDER    = "#CDD5E4";
-const TEXT_PRI  = "#0F1D38";
-const TEXT_BODY = "#2A3C58";
-const TEXT_MUTED= "#6B7A96";
+const PAGE_BG   = "#FDF6EE";
+const BORDER    = "#D4B896";
+const TEXT_PRI  = "#2C1206";
+const TEXT_BODY = "#5C3014";
+const TEXT_MUTED= "#8B5E3C";
 
 const SPORT_META = {
   tennis: {

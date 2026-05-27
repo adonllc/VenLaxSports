@@ -9,8 +9,8 @@ body {
     font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: #0A192F;
-    color: #ffffff;
+    background: #FDF6EE;
+    color: #2C1206;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -19,24 +19,24 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
     :root {
-        --background: 80 13% 96%;
-        --foreground: 220 48% 15%;
+        --background: 33 70% 96%;
+        --foreground: 15 76% 11%;
         --card: 0 0% 100%;
-        --card-foreground: 220 48% 15%;
+        --card-foreground: 15 76% 11%;
         --popover: 0 0% 100%;
-        --popover-foreground: 220 48% 15%;
+        --popover-foreground: 15 76% 11%;
         --primary: 65 100% 42%;
-        --primary-foreground: 220 48% 15%;
-        --secondary: 175 100% 35%;
-        --secondary-foreground: 0 0% 100%;
-        --muted: 80 10% 93%;
-        --muted-foreground: 218 20% 57%;
-        --accent: 175 100% 35%;
-        --accent-foreground: 0 0% 100%;
+        --primary-foreground: 15 76% 11%;
+        --secondary: 36 47% 80%;
+        --secondary-foreground: 15 76% 11%;
+        --muted: 35 35% 93%;
+        --muted-foreground: 24 40% 39%;
+        --accent: 36 47% 80%;
+        --accent-foreground: 15 76% 11%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --border: 218 26% 87%;
-        --input: 218 26% 87%;
+        --border: 32 44% 71%;
+        --input: 32 44% 71%;
         --ring: 65 100% 42%;
         --radius: 0.5rem;
     }

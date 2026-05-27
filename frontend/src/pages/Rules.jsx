@@ -124,12 +124,12 @@ const FORMAT_CARDS = [
     label: "Flex League",
     tag: "Self-scheduled",
     tagline: "You set the schedule. We track the results.",
-    color: "emerald",
-    header: "bg-emerald-500",
-    border: "border-emerald-200",
-    accent: "text-emerald-700",
-    bullet: "text-emerald-500",
-    pill: "bg-emerald-600/50 text-emerald-100",
+    color: "rust",
+    header: "bg-rust-500",
+    border: "border-rust-200",
+    accent: "text-rust-700",
+    bullet: "text-rust-500",
+    pill: "bg-rust-600/50 text-rust-100",
     highlights: [
       "5–7 matches over 6–8 weeks",
       "You arrange each match with your opponent",
@@ -414,42 +414,40 @@ const CODE_OF_CONDUCT = [
 
 export default function Rules() {
   return (
-    <div className="bg-white" data-testid="rules-page">
+    <div style={{ background: "#FDF6EE" }} data-testid="rules-page">
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white py-16 sm:py-20 px-6">
+      <section className="text-white py-16 sm:py-20 px-6" style={{ background: "#1F0A03" }}>
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
+               style={{ background: "rgba(194,74,29,0.15)", border: "1px solid rgba(194,74,29,0.30)", color: "#C5D600" }}>
             <ShieldCheck className="w-3.5 h-3.5" />
             Official League Rulebook v1.0
           </div>
           <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight">
-            The Rules of<br /><span className="text-emerald-400">the Circuit.</span>
+            The Rules of<br /><span style={{ color: "#C5D600" }}>the Circuit.</span>
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(250,240,230,0.65)" }}>
             Every match is governed. Every call is fair. Every result counts.
             Four formats — Flex, Round Robin, Box League, Challenge Ladder.
             Same match rules and scoring across all formats.
           </p>
-          <p className="text-gray-500 text-xs max-w-2xl mt-3">
+          <p className="text-xs max-w-2xl mt-3" style={{ color: "rgba(250,240,230,0.40)" }}>
             VENLAX Sports is an independent platform not affiliated with, licensed by, or endorsed by the USTA, USA Pickleball, Universal Tennis, DUPR, or the ITF.
           </p>
         </div>
       </section>
 
       {/* Quick nav */}
-      <div className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur">
+      <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#D4B896", background: "rgba(253,246,238,0.92)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap gap-1 text-xs font-semibold">
-          <a href="#formats"    className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">All Formats</a>
-          <a href="#box-league" className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Box League</a>
-          <a href="#ladder"     className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Ladder</a>
-          <a href="#tennis"     className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">🎾 Tennis</a>
-          <a href="#divisions"  className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Divisions</a>
-          <a href="#standings"  className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Points</a>
-          <a href="#playoffs"   className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Playoffs</a>
-          <a href="#pickleball" className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">🏓 Pickleball</a>
-          <a href="#ratings"    className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Ratings</a>
-          <a href="#conduct"    className="px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100">Conduct</a>
+          {[["#formats","All Formats"],["#box-league","Box League"],["#ladder","Ladder"],["#tennis","🎾 Tennis"],["#divisions","Divisions"],["#standings","Points"],["#playoffs","Playoffs"],["#pickleball","🏓 Pickleball"],["#ratings","Ratings"],["#conduct","Conduct"]].map(([href, label]) => (
+            <a key={href} href={href} className="px-3 py-1.5 rounded-full transition-colors" style={{ color: "#5C3014" }}
+               onMouseEnter={e => e.currentTarget.style.background="#F5E8D0"}
+               onMouseLeave={e => e.currentTarget.style.background="transparent"}>
+              {label}
+            </a>
+          ))}
         </div>
       </div>
 
@@ -495,16 +493,16 @@ export default function Rules() {
             <table className="w-full text-sm min-w-[640px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-gray-400 bg-gray-50 border-b border-gray-200 w-32">Feature</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-emerald-700 bg-emerald-50 border-b border-l border-gray-200">Flex League</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-blue-700 bg-blue-50 border-b border-l border-gray-200">Round Robin</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-violet-700 bg-violet-50 border-b border-l border-gray-200">Box League</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] text-amber-700 bg-amber-50 border-b border-l border-gray-200">Ladder</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b w-32" style={{ color: "#8B5E3C", background: "#F5E8D0", borderColor: "#D4B896" }}>Feature</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#8B2E0D", background: "#FAE0D5", borderColor: "#D4B896" }}>Flex League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#1E40AF", background: "#DBEAFE", borderColor: "#D4B896" }}>Round Robin</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#7C3AED", background: "#EDE9FE", borderColor: "#D4B896" }}>Box League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#92400E", background: "#FEF3C7", borderColor: "#D4B896" }}>Ladder</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {FORMAT_COMPARISON_ROWS.map((row, i) => (
-                  <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
+                  <tr key={row.feature} style={{ background: i % 2 === 0 ? "white" : "#F5E8D0" }}>
                     <td className="px-4 py-3 text-gray-500 font-medium">{row.feature}</td>
                     <td className="px-4 py-3 text-gray-800 border-l border-gray-100">{row.flex}</td>
                     <td className="px-4 py-3 text-gray-800 border-l border-gray-100">{row.rr}</td>

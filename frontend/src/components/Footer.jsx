@@ -3,8 +3,8 @@ import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
 
-const NAVY = "#1B2A4A";
-const NAVY_MID = "#2A3D66";
+const NAVY = "#1F0A03";
+const NAVY_MID = "#2C1206";
 const LIME = "#C5D600";
 
 const SPORT_DOT = {

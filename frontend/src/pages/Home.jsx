@@ -40,28 +40,28 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 // ── Color tokens ──────────────────────────────────────────────────
-const PAGE_BG    = "#0A192F";
-const SECTION_2  = "#0D1E38";
-const CARD_DARK  = "#112240";
+const PAGE_BG    = "#1F0A03";
+const SECTION_2  = "#2C0E04";
+const CARD_DARK  = "#3D1A09";
 const LIME       = "#C5D600";
 const LIME_HOVER = "#AEBE00";
 const LIME_PALE  = "#F3F7D0";
 const LIME_TEXT  = "#5A6600";
-const NAVY       = "#1B2A4A";
+const NAVY       = "#1F0A03";
 const TEAL       = "#00B4A4";
 const ORANGE     = "#E86010";
-const BORDER_L   = "#CDD5E4";
-const BORDER_D   = "rgba(255,255,255,0.10)";
+const BORDER_L   = "#D4B896";
+const BORDER_D   = "rgba(255,255,255,0.12)";
 
-// Dark-bg text
-const D_HEAD  = "#ffffff";
-const D_BODY  = "rgba(255,255,255,0.70)";
-const D_MUTED = "rgba(255,255,255,0.42)";
+// Dark-bg text (warm linen)
+const D_HEAD  = "#FAF0E6";
+const D_BODY  = "rgba(250,240,230,0.75)";
+const D_MUTED = "rgba(250,240,230,0.45)";
 
-// White-card text
-const C_HEAD  = "#0F1D38";
-const C_BODY  = "#2A3C58";
-const C_MUTED = "#6B7A96";
+// White-card text (earthy)
+const C_HEAD  = "#2C1206";
+const C_BODY  = "#5C3014";
+const C_MUTED = "#8B5E3C";
 
 const fmtDate = (iso) => {
   if (!iso) return "";
@@ -187,7 +187,7 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 motion-reduce:transition-none"
                     loading={idx === 0 ? "eager" : "lazy"}
                   />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,25,47,0.92) 0%, rgba(10,25,47,0.30) 55%, transparent 100%)" }} />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(31,10,3,0.92) 0%, rgba(31,10,3,0.30) 55%, transparent 100%)" }} />
                   {/* Accent bar */}
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: config.accent }} />
                   <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between">
@@ -424,7 +424,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section className="py-28 relative overflow-hidden" style={{ background: NAVY }} data-testid="cta-section">
+      <section className="py-28 relative overflow-hidden" style={{ background: "#C24A1D" }} data-testid="cta-section">
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: LIME }} />
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           {foundingStats.spots_left > 0 && (

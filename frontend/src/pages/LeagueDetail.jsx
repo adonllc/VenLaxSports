@@ -252,11 +252,11 @@ export default function LeagueDetail() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="league-detail-page">
+    <div className="min-h-screen" style={{ background: "#FDF6EE" }} data-testid="league-detail-page">
       {/* Header Banner */}
-      <div className={`${headerBg} border-b border-gray-200`}>
+      <div className={`${headerBg}`} style={{ borderBottom: "1px solid #D4B896" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-5 transition-colors" data-testid="back-to-leagues">
+          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-5 transition-colors" style={{ color: "#8B5E3C" }} data-testid="back-to-leagues">
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
           </button>
 
@@ -266,27 +266,27 @@ export default function LeagueDetail() {
                 <span className={`px-3 py-1 text-sm font-semibold rounded-full ${config.badge}`}>
                   {config.icon} {config.label}
                 </span>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${league.status === "registration" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={league.status === "registration" ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#F5E8D0", color: "#8B5E3C" }}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
                 {league.format === "mixed_doubles" && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium" style={{ background: "#E0F5F3", color: "#007B70", border: "1px solid #00B4A4" }}>
                     Mixed Doubles
                   </span>
                 )}
                 {isRegistered && (
-                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-600 text-white" data-testid="registered-pill">
+                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#C24A1D", color: "white" }} data-testid="registered-pill">
                     <CheckCircle className="w-3 h-3" /> Registered
                   </span>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h1 className="font-heading font-black text-3xl text-gray-900">{league.name}</h1>
+                <h1 className="font-heading font-black text-3xl" style={{ color: "#2C1206" }}>{league.name}</h1>
                 {league.division_label && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-50 text-indigo-700 border border-indigo-100" data-testid="league-division-badge">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium" style={{ background: "#F5E8D0", color: "#C24A1D", border: "1px solid #D4B896" }} data-testid="league-division-badge">
                     {league.division_label}
                     {league.division_ntrp_min && (
-                      <span className="ml-1 text-indigo-400 font-normal">
+                      <span className="ml-1 font-normal" style={{ color: "#8B5E3C" }}>
                         {league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
                         {league.sport === "pickleball" ? "DUPR" : "NTRP"}
                       </span>
@@ -294,7 +294,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: "#8B5E3C" }}>
                 <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}</span>
                 <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(league.start_date)} to {formatDate(league.end_date)}</span>
                 <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {league.current_players || 0}/{league.max_players} players</span>
@@ -302,42 +302,42 @@ export default function LeagueDetail() {
             </div>
 
             {/* Join Card */}
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 w-full lg:w-auto lg:min-w-[240px]">
+            <div className="bg-white rounded-2xl p-5 w-full lg:w-auto lg:min-w-[240px]" style={{ border: "1px solid #D4B896" }}>
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-4">
-                  <Trophy className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                  <p className="font-semibold text-gray-600 text-sm">Season Ended</p>
-                  <p className="text-xs text-gray-400 mt-1">This league is no longer active.</p>
+                  <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: "#D4B896" }} />
+                  <p className="font-semibold text-sm" style={{ color: "#5C3014" }}>Season Ended</p>
+                  <p className="text-xs mt-1" style={{ color: "#8B5E3C" }}>This league is no longer active.</p>
                 </div>
               ) : (
                 <>
                   {/* Spots bar */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <div className="flex justify-between text-xs mb-1" style={{ color: "#8B5E3C" }}>
                       <span>{spotsLeft} spots remaining</span>
                       <span>{fillPct}% filled</span>
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-black transition-[width]" style={{ width: `${fillPct}%` }} />
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F5E8D0" }}>
+                      <div className="h-full rounded-full transition-[width]" style={{ width: `${fillPct}%`, background: "#C24A1D" }} />
                     </div>
                   </div>
 
                   {/* Payment/join status */}
                   {sessionId && !paymentStatus && (
-                    <div className="flex items-center gap-2 text-sm text-blue-600 mb-3 justify-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+                    <div className="flex items-center gap-2 text-sm mb-3 justify-center" style={{ color: "#5C3014" }}>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: "#C24A1D" }} />
                       Checking payment...
                     </div>
                   )}
 
                   {paymentStatus?.payment_status === "paid" && (
-                    <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3">
+                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={{ color: "#C24A1D", background: "#FAE0D5", border: "1px solid #E5A885" }}>
                       <CheckCircle className="w-4 h-4 flex-shrink-0" /> Payment confirmed!
                     </div>
                   )}
 
                   {joinMsg && (
-                    <div className={`flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3 ${joinMsg.includes("success") || joinMsg.includes("joined") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`} data-testid="join-message">
+                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={joinMsg.includes("success") || joinMsg.includes("joined") ? { background: "#FAE0D5", color: "#C24A1D", border: "1px solid #E5A885" } : { background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }} data-testid="join-message">
                       {joinMsg.includes("success") || joinMsg.includes("joined") ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                       {joinMsg}
                     </div>
@@ -377,7 +377,8 @@ export default function LeagueDetail() {
                               <button
                                 onClick={handleDoublesJoin}
                                 disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
-                                className="w-full bg-gray-900 text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 hover:bg-gray-700 transition-colors"
+                                className="w-full text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 transition-colors"
+                                style={{ background: "#1F0A03" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
@@ -388,25 +389,25 @@ export default function LeagueDetail() {
                               </button>
                             </div>
                           ) : (
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-md p-4 space-y-2">
-                              <p className="text-sm font-medium text-emerald-800">
+                            <div className="rounded-md p-4 space-y-2" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }}>
+                              <p className="text-sm font-medium" style={{ color: "#C24A1D" }}>
                                 Invite sent to {partnerEmail}
                               </p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs" style={{ color: "#5C3014" }}>
                                 Registration completes once your partner confirms. Invite expires in 72 hours.
                               </p>
                               {inviteToken && (
                                 <div className="mt-2">
-                                  <p className="text-xs text-gray-500 mb-1">Share confirm link directly:</p>
+                                  <p className="text-xs mb-1" style={{ color: "#8B5E3C" }}>Share confirm link directly:</p>
                                   <div className="flex gap-2 items-center">
                                     <input
                                       readOnly
                                       value={`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`}
-                                      className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 bg-white"
+                                      className="flex-1 text-xs rounded px-2 py-1 bg-white" style={{ border: "1px solid #D4B896" }}
                                     />
                                     <button
                                       onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`)}
-                                      className="text-xs text-emerald-600 border border-emerald-200 rounded px-2 py-1 hover:bg-emerald-50"
+                                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C24A1D", border: "1px solid #E5A885" }}
                                     >
                                       Copy
                                     </button>
@@ -445,20 +446,20 @@ export default function LeagueDetail() {
                                   value={promoCode}
                                   onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
                                   placeholder="Promo code"
-                                  className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase font-mono"
+                                  className="flex-1 px-3 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono bg-white" style={{ border: "1px solid #D4B896", color: "#2C1206" }}
                                   data-testid="promo-code-input"
                                 />
                                 <button
                                   onClick={validatePromo}
                                   disabled={promoLoading || !promoCode.trim()}
-                                  className="px-3 py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+                                  className="px-3 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50" style={{ background: "#1F0A03" }}
                                   data-testid="apply-promo-btn"
                                 >
                                   {promoLoading ? "..." : "Apply"}
                                 </button>
                               </div>
                               {promoResult && (
-                                <p className="text-xs text-emerald-700 font-semibold mt-1.5" data-testid="promo-success">
+                                <p className="text-xs font-semibold mt-1.5" style={{ color: "#C24A1D" }} data-testid="promo-success">
                                   ✓ {promoResult.final_fee === 0 ? "Free entry applied!" : `Save $${promoResult.savings.toFixed(2)} — $${promoResult.final_fee.toFixed(2)} total`}
                                 </p>
                               )}
@@ -470,7 +471,7 @@ export default function LeagueDetail() {
                           <button
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                            className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                            className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#1F0A03" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -481,10 +482,10 @@ export default function LeagueDetail() {
                   )}
 
                   {isRegistered && (
-                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-4 text-center" data-testid="registered-badge">
-                      <CheckCircle className="w-6 h-6 text-emerald-600 mx-auto mb-1.5" />
-                      <p className="font-bold text-emerald-800 text-sm">You're registered</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">Check your email for details.</p>
+                    <div className="rounded-xl px-4 py-4 text-center" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }} data-testid="registered-badge">
+                      <CheckCircle className="w-6 h-6 mx-auto mb-1.5" style={{ color: "#C24A1D" }} />
+                      <p className="font-bold text-sm" style={{ color: "#2C1206" }}>You're registered</p>
+                      <p className="text-xs mt-0.5" style={{ color: "#8B5E3C" }}>Check your email for details.</p>
                     </div>
                   )}
                 </>
@@ -495,14 +496,15 @@ export default function LeagueDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white" style={{ borderBottom: "1px solid #D4B896" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-0 overflow-x-auto">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${tab === t.id ? "border-black text-black" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+                className="px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap"
+                style={tab === t.id ? { borderColor: "#C24A1D", color: "#C24A1D" } : { borderColor: "transparent", color: "#8B5E3C" }}
                 data-testid={`tab-${t.id}`}
               >
                 {t.label}
@@ -516,8 +518,8 @@ export default function LeagueDetail() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {tab === "overview" && (
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6">
-              <h3 className="font-heading font-bold text-lg mb-4">League Details</h3>
+            <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #D4B896" }}>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#2C1206" }}>League Details</h3>
               <dl className="space-y-3">
                 {[
                   ["Sport", `${config.icon} ${config.label}`],
@@ -527,19 +529,19 @@ export default function LeagueDetail() {
                   ["City", league.city],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">
-                    <dt className="text-sm text-gray-500">{k}</dt>
-                    <dd className="text-sm font-medium text-gray-900 text-right">{v}</dd>
+                    <dt className="text-sm" style={{ color: "#8B5E3C" }}>{k}</dt>
+                    <dd className="text-sm font-medium text-right" style={{ color: "#2C1206" }}>{v}</dd>
                   </div>
                 ))}
               </dl>
             </div>
-            <div className="bg-white border border-gray-200 rounded-2xl p-6">
-              <h3 className="font-heading font-bold text-lg mb-4">About This League</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">{league.description || "No description provided."}</p>
+            <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #D4B896" }}>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#2C1206" }}>About This League</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#5C3014" }}>{league.description || "No description provided."}</p>
               {league.rules && (
-                <div className="mt-4 p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Rules</p>
-                  <p className="text-sm text-gray-600">{league.rules}</p>
+                <div className="mt-4 p-3 rounded-xl" style={{ background: "#FDF6EE" }}>
+                  <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: "#5C3014" }}>Rules</p>
+                  <p className="text-sm" style={{ color: "#5C3014" }}>{league.rules}</p>
                 </div>
               )}
             </div>
@@ -547,47 +549,47 @@ export default function LeagueDetail() {
         )}
 
         {tab === "players" && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
               <h3 className="font-heading font-bold text-lg">Registered Players</h3>
             </div>
             <div className="text-center py-16 px-6">
-              <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <p className="font-semibold text-gray-700 mb-1">Player roster is private</p>
-              <p className="text-sm text-gray-500">Roster is not publicly visible.</p>
+              <Users className="w-10 h-10 mx-auto mb-3" style={{ color: "#D4B896" }} />
+              <p className="font-semibold mb-1" style={{ color: "#5C3014" }}>Player roster is private</p>
+              <p className="text-sm" style={{ color: "#8B5E3C" }}>Roster is not publicly visible.</p>
             </div>
           </div>
         )}
 
         {tab === "matches" && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-heading font-bold text-lg">Matches ({matches.length})</h3>
+              <h3 className="font-heading font-bold text-lg" style={{ color: "#2C1206" }}>Matches ({matches.length})</h3>
               {user && (
-                <Link to="/dashboard" className="text-sm font-semibold text-black border border-black px-3 py-1.5 rounded-lg hover:bg-black hover:text-white transition-colors" data-testid="schedule-match-link">
+                <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#2C1206", border: "1px solid #2C1206" }} data-testid="schedule-match-link">
                   Schedule Match
                 </Link>
               )}
             </div>
             {matches.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">No matches scheduled yet</div>
+              <div className="text-center py-12" style={{ color: "#8B5E3C" }}>No matches scheduled yet</div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                 {matches.map((m) => (
                   <div key={m.id} className="flex items-center justify-between px-5 py-4 gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{m.player1_name} vs {m.player2_name}</p>
-                      <p className="text-xs text-gray-500">{m.scheduled_date}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "#2C1206" }}>{m.player1_name} vs {m.player2_name}</p>
+                      <p className="text-xs" style={{ color: "#8B5E3C" }}>{m.scheduled_date}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {m.status === "completed" && m.winner_name && (
-                        <span className="text-xs text-emerald-700 font-medium">{m.winner_name} won</span>
+                        <span className="text-xs font-medium" style={{ color: "#C24A1D" }}>{m.winner_name} won</span>
                       )}
-                      <span className={`text-xs px-2 py-1 rounded-full ${m.status === "completed" ? "bg-gray-100 text-gray-600" : m.status === "scheduled" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}>
+                      <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F5E8D0", color: "#8B5E3C" } : m.status === "scheduled" ? { background: "#E0F5F3", color: "#007B70" } : { background: "#F5E8D0", color: "#8B5E3C" }}>
                         {m.status}
                       </span>
                       {user && m.status === "scheduled" && (user._id === m.player1_id || user.id === m.player1_id || user._id === m.player2_id || user.id === m.player2_id) && (
-                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-black bg-gray-100 hover:bg-gray-200 px-2.5 py-1 rounded-lg transition-colors" data-testid={`report-score-${m.id}`}>
+                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors" style={{ background: "#1F0A03" }} data-testid={`report-score-${m.id}`}>
                           Report Score
                         </Link>
                       )}
@@ -600,37 +602,37 @@ export default function LeagueDetail() {
         )}
 
         {tab === "standings" && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
+            <div className="p-5" style={{ borderBottom: "1px solid #F5E8D0" }}>
               <h3 className="font-heading font-bold text-lg">Standings</h3>
             </div>
             {standings.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">No standings yet — matches haven't been played</div>
+              <div className="text-center py-12" style={{ color: "#8B5E3C" }}>No standings yet — matches haven't been played</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead style={{ background: "#FDF6EE", borderBottom: "1px solid #F5E8D0" }}>
                     <tr>
-                      <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">#</th>
-                      <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Player</th>
-                      <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">W</th>
-                      <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">L</th>
-                      <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">MP</th>
-                      <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Pts</th>
+                      <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>#</th>
+                      <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>Player</th>
+                      <th className="text-center px-3 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>W</th>
+                      <th className="text-center px-3 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>L</th>
+                      <th className="text-center px-3 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>MP</th>
+                      <th className="text-center px-3 py-3 text-xs font-semibold uppercase tracking-wide" style={{ color: "#8B5E3C" }}>Pts</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                     {standings.map((s, i) => (
-                      <tr key={i} className={i === 0 ? "bg-yellow-50" : ""}>
-                        <td className="px-5 py-3 font-heading font-bold text-gray-400">{i + 1}</td>
-                        <td className="px-5 py-3 font-medium text-gray-900">
-                          {i === 0 && <Trophy className="inline w-3.5 h-3.5 text-yellow-500 mr-1" />}
+                      <tr key={i} style={i === 0 ? { background: "#FDF6EE" } : {}}>
+                        <td className="px-5 py-3 font-heading font-bold" style={{ color: "#D4B896" }}>{i + 1}</td>
+                        <td className="px-5 py-3 font-medium" style={{ color: "#2C1206" }}>
+                          {i === 0 && <Trophy className="inline w-3.5 h-3.5 mr-1" style={{ color: "#C24A1D" }} />}
                           {s.player_name}
                         </td>
-                        <td className="px-3 py-3 text-center text-emerald-700 font-semibold">{s.wins}</td>
+                        <td className="px-3 py-3 text-center font-semibold" style={{ color: "#C24A1D" }}>{s.wins}</td>
                         <td className="px-3 py-3 text-center text-red-600">{s.losses}</td>
-                        <td className="px-3 py-3 text-center text-gray-500">{s.matches_played}</td>
-                        <td className="px-3 py-3 text-center font-heading font-bold text-gray-900">{s.points}</td>
+                        <td className="px-3 py-3 text-center" style={{ color: "#8B5E3C" }}>{s.matches_played}</td>
+                        <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#2C1206" }}>{s.points}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -642,7 +644,7 @@ export default function LeagueDetail() {
 
         {league?.league_type === "box_league" && boxStandings && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Box Standings</h3>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: "#2C1206" }}>Box Standings</h3>
             {/* Box tab pills */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {boxStandings.boxes.map((box) => (
@@ -650,11 +652,10 @@ export default function LeagueDetail() {
                   key={box.box_id}
                   data-testid={`box-tab-${box.box_id}`}
                   onClick={() => setActiveBox(box.box_id)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                    activeBox === box.box_id
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                  }`}
+                  className="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors"
+                  style={activeBox === box.box_id
+                    ? { background: "#1F0A03", color: "white", borderColor: "#1F0A03" }
+                    : { background: "white", color: "#5C3014", borderColor: "#D4B896" }}
                 >
                   Box {box.box_id}
                 </button>
@@ -663,29 +664,29 @@ export default function LeagueDetail() {
 
             {/* Active box standings table */}
             {boxStandings.boxes.filter((b) => b.box_id === activeBox).map((box) => (
-              <div key={box.box_id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div key={box.box_id} className="bg-white rounded-xl overflow-hidden" style={{ border: "1px solid #D4B896" }}>
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead style={{ background: "#FDF6EE", borderBottom: "1px solid #F5E8D0" }}>
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Rank</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Player</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">W</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">L</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase" style={{ color: "#8B5E3C" }}>Rank</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase" style={{ color: "#8B5E3C" }}>Player</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase" style={{ color: "#8B5E3C" }}>W</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase" style={{ color: "#8B5E3C" }}>L</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase" style={{ color: "#8B5E3C" }}>Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y" style={{ borderColor: "#F5E8D0" }}>
                     {box.players.map((p, idx) => {
                       const isPromote = idx < boxStandings.box_promote;
                       const isRelegate = idx >= box.players.length - boxStandings.box_relegate;
                       return (
-                        <tr key={p.player_id} className={isPromote ? "bg-emerald-50" : isRelegate ? "bg-red-50" : ""}>
-                          <td className="px-4 py-3 font-semibold text-gray-500">#{p.rank}</td>
-                          <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
-                          <td className="px-4 py-3 text-center text-gray-700">{p.wins}</td>
-                          <td className="px-4 py-3 text-center text-gray-700">{p.losses}</td>
+                        <tr key={p.player_id} style={isPromote ? { background: "#FAE0D5" } : isRelegate ? { background: "#FEF2F2" } : {}}>
+                          <td className="px-4 py-3 font-semibold" style={{ color: "#8B5E3C" }}>#{p.rank}</td>
+                          <td className="px-4 py-3 font-medium" style={{ color: "#2C1206" }}>{p.name}</td>
+                          <td className="px-4 py-3 text-center" style={{ color: "#5C3014" }}>{p.wins}</td>
+                          <td className="px-4 py-3 text-center" style={{ color: "#5C3014" }}>{p.losses}</td>
                           <td className="px-4 py-3 text-right">
-                            {isPromote && <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">Promoting ↑</span>}
+                            {isPromote && <span className="text-xs font-semibold px-2 py-0.5 rounded-md" style={{ color: "#C24A1D", background: "#FAE0D5" }}>Promoting ↑</span>}
                             {isRelegate && <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-md">Relegating ↓</span>}
                           </td>
                         </tr>

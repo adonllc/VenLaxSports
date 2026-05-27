@@ -105,19 +105,19 @@ export default function Auth() {
   return (
     <div className="min-h-[calc(100vh-64px)] flex" data-testid="auth-page">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-900 to-gray-900 items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: "radial-gradient(circle at 30% 50%, #10B981 0%, transparent 60%), radial-gradient(circle at 70% 30%, #2563EB 0%, transparent 60%), radial-gradient(circle at 50% 80%, #F97316 0%, transparent 50%)"
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1F0A03 0%, #3D1A09 100%)" }}>
+        <div className="absolute inset-0 opacity-25" style={{
+          backgroundImage: "radial-gradient(circle at 30% 50%, #C24A1D 0%, transparent 60%), radial-gradient(circle at 70% 30%, #8B2E0D 0%, transparent 60%), radial-gradient(circle at 50% 80%, #E86010 0%, transparent 50%)"
         }} />
         <div className="relative z-10 text-center text-white">
           <div className="flex items-center justify-center mb-8">
             <Logo size="hero" variant="hero" testId="auth-hero-logo" />
           </div>
-          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Your rank.<br />Your record.<br /><span className="text-emerald-400">Your league.</span></h2>
-          <p className="text-gray-400 text-base max-w-xs mx-auto">{BRAND.story_short}</p>
+          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Your rank.<br />Your record.<br /><span style={{ color: "#C5D600" }}>Your league.</span></h2>
+          <p className="text-base max-w-xs mx-auto" style={{ color: "rgba(250,240,230,0.55)" }}>{BRAND.story_short}</p>
           <div className="flex justify-center gap-6 mt-10">
             {activeSports.map((s) => (
-              <div key={s.id} className="text-sm text-gray-300 font-medium">{s.icon} {s.label}</div>
+              <div key={s.id} className="text-sm font-medium" style={{ color: "rgba(250,240,230,0.70)" }}>{s.icon} {s.label}</div>
             ))}
           </div>
         </div>
@@ -127,27 +127,29 @@ export default function Auth() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           {/* Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
+          <div className="flex rounded-xl p-1 mb-8" style={{ background: "#F5E8D0" }}>
             <button
               onClick={() => { setMode("login"); setError(""); setEmailExists(null); }}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "login" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
+              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#2C1206" } : { color: "#8B5E3C" }}
               data-testid="login-tab"
             >
               Log In
             </button>
             <button
               onClick={() => { setMode("register"); setError(""); setEmailExists(null); }}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${mode === "register" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
+              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#2C1206" } : { color: "#8B5E3C" }}
               data-testid="register-tab"
             >
               Sign Up
             </button>
           </div>
 
-          <h1 className="font-heading font-black text-3xl text-gray-900 mb-2">
+          <h1 className="font-heading font-black text-3xl mb-2" style={{ color: "#2C1206" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
-          <p className="text-gray-500 text-sm mb-8">
+          <p className="text-sm mb-8" style={{ color: "#8B5E3C" }}>
             {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
 
@@ -162,7 +164,10 @@ export default function Auth() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl bg-white hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 disabled:opacity-60 mb-5"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-colors text-sm font-medium disabled:opacity-60 mb-5"
+            style={{ border: "1px solid #D4B896", background: "white", color: "#5C3014" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#FDF6EE"}
+            onMouseLeave={e => e.currentTarget.style.background = "white"}
             data-testid="google-login-btn"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -175,21 +180,21 @@ export default function Auth() {
           </button>
 
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px" style={{ background: "#D4B896" }} />
+            <span className="text-xs font-medium" style={{ color: "#8B5E3C" }}>or</span>
+            <div className="flex-1 h-px" style={{ background: "#D4B896" }} />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name *</label>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>Full Name *</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={update("name")}
                   placeholder="John Smith"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #D4B896", color: "#2C1206", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                   data-testid="input-name"
                   autoComplete="name"
                   required
@@ -198,13 +203,16 @@ export default function Auth() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address *</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>Email Address *</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => { update("email")(e); setEmailExists(null); }}
                 placeholder="you@example.com"
-                className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${mode === "register" && emailExists ? "border-amber-400 bg-amber-50" : "border-gray-300"}`}
+                className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{ border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #D4B896", background: mode === "register" && emailExists ? "#FFFBEB" : "white", color: "#2C1206" }}
+                onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                onBlur={e => e.currentTarget.style.boxShadow="none"}
                 data-testid="input-email"
                 autoComplete="email"
                 required
@@ -225,14 +233,17 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password *</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>Password *</label>
               <div className="relative">
                 <input
                   type={showPwd ? "text" : "password"}
                   value={form.password}
                   onChange={update("password")}
                   placeholder={mode === "register" ? "At least 6 characters" : "Your password"}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-4 py-3 pr-12 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                  style={{ border: "1px solid #D4B896", color: "#2C1206", background: "white" }}
+                  onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                  onBlur={e => e.currentTarget.style.boxShadow="none"}
                   data-testid="input-password"
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   required
@@ -241,20 +252,20 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#8B5E3C" }}
                   aria-label={showPwd ? "Hide password" : "Show password"}
                 >
                   {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {mode === "register" && (
-                <p className="text-xs text-gray-400 mt-1.5">Minimum 6 characters.</p>
+                <p className="text-xs mt-1.5" style={{ color: "#8B5E3C" }}>Minimum 6 characters.</p>
               )}
               {mode === "login" && (
                 <button
                   type="button"
                   onClick={() => setForgotOpen(true)}
-                  className="text-xs text-gray-500 hover:text-black font-medium mt-2"
+                  className="text-xs font-medium mt-2" style={{ color: "#8B5E3C" }}
                   data-testid="forgot-password-link"
                 >
                   Forgot password?
@@ -265,34 +276,34 @@ export default function Auth() {
             {mode === "register" && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>Country</label>
                   <select
                     value={form.country}
                     onChange={update("country")}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #D4B896", color: "#2C1206", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-country"
                   >
                     {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">City (optional)</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>City (optional)</label>
                   <input
                     type="text"
                     value={form.city}
                     onChange={update("city")}
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #D4B896", color: "#2C1206", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-city"
                     autoComplete="address-level2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Skill Level (optional)</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#5C3014" }}>Skill Level (optional)</label>
                   <select
                     value={form.skill_level}
                     onChange={update("skill_level")}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #D4B896", color: "#2C1206", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-skill-level"
                   >
                     <option value="">Select your USTA/USAPA level</option>
@@ -311,30 +322,33 @@ export default function Auth() {
             )}
 
             {mode === "register" && (
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-center" style={{ color: "#8B5E3C" }}>
                 Match results are public by default.{" "}
-                <span className="text-gray-500">You can set your profile to private from your dashboard.</span>
+                <span style={{ color: "#8B5E3C" }}>You can set your profile to private from your dashboard.</span>
               </p>
             )}
 
             <button
               type="submit"
               disabled={loading || (mode === "register" && emailExists === true)}
-              className="w-full py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm mt-2"
+              className="w-full py-3.5 font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm mt-2"
+              style={{ background: "#C24A1D", color: "white" }}
+              onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#8B2E0D"; }}
+              onMouseLeave={e => e.currentTarget.style.background = "#C24A1D"}
               data-testid="auth-submit-btn"
             >
               {loading ? (mode === "login" ? "Signing in..." : "Creating account...") : mode === "login" ? "Log In" : "Create Account"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm mt-6" style={{ color: "#8B5E3C" }}>
             {mode === "login" ? (
               <>Don't have an account?{" "}
-                <button onClick={() => setMode("register")} className="font-semibold text-black hover:underline" data-testid="switch-to-register">Sign up free</button>
+                <button onClick={() => setMode("register")} className="font-semibold hover:underline" style={{ color: "#C24A1D" }} data-testid="switch-to-register">Sign up free</button>
               </>
             ) : (
               <>Already have an account?{" "}
-                <button onClick={() => setMode("login")} className="font-semibold text-black hover:underline" data-testid="switch-to-login">Log in</button>
+                <button onClick={() => setMode("login")} className="font-semibold hover:underline" style={{ color: "#C24A1D" }} data-testid="switch-to-login">Log in</button>
               </>
             )}
           </p>

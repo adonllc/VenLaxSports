@@ -3,14 +3,14 @@ import { ArrowRight } from "lucide-react";
 
 const LIME      = "#C5D600";
 const LIME_HOVER= "#AEBE00";
-const NAVY      = "#1B2A4A";
+const NAVY      = "#1F0A03";
 const TEAL      = "#00B4A4";
-const PAGE_BG   = "#0A192F";
+const PAGE_BG   = "#1F0A03";
 const BORDER_D  = "rgba(255,255,255,0.10)";
-const D_HEAD    = "#ffffff";
-const D_BODY    = "rgba(255,255,255,0.70)";
-const D_MUTED   = "rgba(255,255,255,0.42)";
-const NUM_COLOR = "rgba(255,255,255,0.12)";
+const D_HEAD    = "#FAF0E6";
+const D_BODY    = "rgba(250,240,230,0.75)";
+const D_MUTED   = "rgba(250,240,230,0.42)";
+const NUM_COLOR = "rgba(250,240,230,0.12)";
 
 const STEPS = [
   {
