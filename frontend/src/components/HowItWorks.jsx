@@ -44,7 +44,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-24 border-t" style={{ background: "#F5F6F0", borderColor: BORDER }} data-testid="how-it-works">
+    <section className="py-24 border-t" style={{ background: "#C24A1D", borderColor: BORDER }} data-testid="how-it-works">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
 

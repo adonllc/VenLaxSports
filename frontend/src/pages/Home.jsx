@@ -48,7 +48,7 @@ const TEXT_PRIMARY = "#0F1D38";
 const TEXT_BODY = "#2A3C58";
 const TEXT_MUTED = "#6B7A96";
 const BORDER = "#CDD5E4";
-const PAGE_BG = "#F5F6F0";
+const PAGE_BG = "#C24A1D";
 const SECTION_BG = "#EAEEE4";
 const EYEBROW = "#007B70";
 
