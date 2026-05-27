@@ -202,7 +202,7 @@ export default function PreLaunch() {
       </nav>
 
       {/* Hero */}
-      <section style={{ background: NAVY, color: "white" }} className="py-28 px-6">
+      <section style={{ background: "#C24A1D", color: "white" }} className="py-28 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
@@ -313,7 +313,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Solution */}
-      <section className="py-20 px-6" style={{ background: NAVY, color: "white" }}>
+      <section className="py-20 px-6" style={{ background: "#C24A1D", color: "white" }}>
         <div className="max-w-4xl mx-auto">
           <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: LIME }}>
             Enter VENLAX Sports
@@ -483,7 +483,7 @@ export default function PreLaunch() {
             <table className="w-full text-sm min-w-[540px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#6B7A96", background: "#1F0A03", borderBottom: `1px solid ${BORDER}` }}></th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#8B5E3C", background: "#F5E8D0", borderBottom: `1px solid ${BORDER}` }}></th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#007B70", background: "#E0F5F3", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Flex</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#1E40AF", background: "#DBEAFE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Round Robin</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#7C3AED", background: "#EDE9FE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Box League</th>
@@ -497,7 +497,7 @@ export default function PreLaunch() {
                   { label: "Playoffs", flex: "Yes — top 4 or 8", rr: "Yes — group leaders", box: "No — standings decide", ladder: "No — rank is live" },
                   { label: "Best for", flex: "Flexible schedules", rr: "Zero friction", box: "Competitive progression", ladder: "Frequent play" },
                 ].map((row, i) => (
-                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#1F0A03" }}>
+                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#FDF6EE" }}>
                     <td className="px-4 py-3 text-xs font-medium" style={{ color: "#6B7A96" }}>{row.label}</td>
                     <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.flex}</td>
                     <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.rr}</td>
@@ -624,9 +624,9 @@ export default function PreLaunch() {
                 <button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
-                  style={{ background: openFaq === i ? "#1F0A03" : "white" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#1F0A03"}
-                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#1F0A03" : "white"}
+                  style={{ background: openFaq === i ? "#F5E8D0" : "white" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#F5E8D0"}
+                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#F5E8D0" : "white"}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   data-testid={`faq-${i}`}
                 >
@@ -647,7 +647,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Final CTA */}
-      <section id="early-access" className="py-24 px-6" style={{ background: NAVY, color: "white" }}>
+      <section id="early-access" className="py-24 px-6" style={{ background: "#C24A1D", color: "white" }}>
         <div className="max-w-xl mx-auto text-center">
           <h2
             className="font-black mb-4"

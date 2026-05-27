@@ -5,12 +5,12 @@ const LIME      = "#C5D600";
 const LIME_HOVER= "#AEBE00";
 const NAVY      = "#1F0A03";
 const TEAL      = "#00B4A4";
-const PAGE_BG   = "#1F0A03";
-const BORDER_D  = "rgba(255,255,255,0.10)";
-const D_HEAD    = "#FAF0E6";
-const D_BODY    = "rgba(250,240,230,0.75)";
-const D_MUTED   = "rgba(250,240,230,0.42)";
-const NUM_COLOR = "rgba(250,240,230,0.12)";
+const PAGE_BG   = "#F5E8D0";
+const BORDER_D  = "#D4B896";
+const D_HEAD    = "#2C1206";
+const D_BODY    = "#5C3014";
+const D_MUTED   = "#8B5E3C";
+const NUM_COLOR = "rgba(44,18,6,0.06)";
 
 const STEPS = [
   {

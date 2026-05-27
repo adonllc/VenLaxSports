@@ -40,9 +40,9 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 // ── Color tokens ──────────────────────────────────────────────────
-const PAGE_BG    = "#1F0A03";
-const SECTION_2  = "#2C0E04";
-const CARD_DARK  = "#3D1A09";
+const PAGE_BG    = "#FDF6EE";
+const SECTION_2  = "#F5E8D0";
+const CARD_DARK  = "#FFFFFF";
 const LIME       = "#C5D600";
 const LIME_HOVER = "#AEBE00";
 const LIME_PALE  = "#F3F7D0";
@@ -51,14 +51,12 @@ const NAVY       = "#1F0A03";
 const TEAL       = "#00B4A4";
 const ORANGE     = "#E86010";
 const BORDER_L   = "#D4B896";
-const BORDER_D   = "rgba(255,255,255,0.12)";
+const BORDER_D   = "#D4B896";
 
-// Dark-bg text (warm linen)
-const D_HEAD  = "#FAF0E6";
-const D_BODY  = "rgba(250,240,230,0.75)";
-const D_MUTED = "rgba(250,240,230,0.45)";
+const D_HEAD  = "#2C1206";
+const D_BODY  = "#5C3014";
+const D_MUTED = "#8B5E3C";
 
-// White-card text (earthy)
 const C_HEAD  = "#2C1206";
 const C_BODY  = "#5C3014";
 const C_MUTED = "#8B5E3C";
@@ -144,9 +142,9 @@ export default function Home() {
                 <button
                   onClick={() => navigate("/auth?mode=register")}
                   className="px-8 py-4 font-body font-semibold rounded-md text-base transition-colors cursor-pointer focus-visible:outline-none"
-                  style={{ border: "1px solid rgba(255,255,255,0.30)", color: D_HEAD }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.70)"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.30)"; e.currentTarget.style.background = "transparent"; }}
+                  style={{ border: "1px solid #D4B896", color: D_HEAD }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#C24A1D"; e.currentTarget.style.color = "#C24A1D"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#D4B896"; e.currentTarget.style.color = D_HEAD; }}
                   data-testid="hero-signup-btn"
                 >
                   Learn More
@@ -187,7 +185,7 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 motion-reduce:transition-none"
                     loading={idx === 0 ? "eager" : "lazy"}
                   />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(31,10,3,0.92) 0%, rgba(31,10,3,0.30) 55%, transparent 100%)" }} />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(31,10,3,0.88) 0%, rgba(31,10,3,0.25) 55%, transparent 100%)" }} />
                   {/* Accent bar */}
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: config.accent }} />
                   <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between">
@@ -195,7 +193,7 @@ export default function Home() {
                       <span className="text-2xl leading-none">{config.icon}</span>
                       <span className="font-heading font-bold text-white text-lg">{config.label}</span>
                     </div>
-                    <span className="font-body text-xs" style={{ color: D_MUTED }}>{config.tagline}</span>
+                    <span className="font-body text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{config.tagline}</span>
                   </div>
                 </div>
               ))}
@@ -205,7 +203,7 @@ export default function Home() {
         </div>
 
         {/* Stats strip */}
-        <div className="border-t border-b" style={{ borderColor: BORDER_D, background: "rgba(255,255,255,0.03)" }}>
+        <div className="border-t border-b" style={{ borderColor: BORDER_D, background: "#F5E8D0" }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
               {[

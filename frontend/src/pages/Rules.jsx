@@ -417,22 +417,22 @@ export default function Rules() {
     <div style={{ background: "#FDF6EE" }} data-testid="rules-page">
 
       {/* Hero */}
-      <section className="text-white py-16 sm:py-20 px-6" style={{ background: "#1F0A03" }}>
+      <section className="py-16 sm:py-20 px-6" style={{ background: "#C24A1D" }}>
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
-               style={{ background: "rgba(194,74,29,0.15)", border: "1px solid rgba(194,74,29,0.30)", color: "#C5D600" }}>
+               style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
             <ShieldCheck className="w-3.5 h-3.5" />
             Official League Rulebook v1.0
           </div>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight">
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white">
             The Rules of<br /><span style={{ color: "#C5D600" }}>the Circuit.</span>
           </h1>
-          <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(250,240,230,0.65)" }}>
+          <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
             Every match is governed. Every call is fair. Every result counts.
             Four formats — Flex, Round Robin, Box League, Challenge Ladder.
             Same match rules and scoring across all formats.
           </p>
-          <p className="text-xs max-w-2xl mt-3" style={{ color: "rgba(250,240,230,0.40)" }}>
+          <p className="text-xs max-w-2xl mt-3" style={{ color: "rgba(255,255,255,0.55)" }}>
             VENLAX Sports is an independent platform not affiliated with, licensed by, or endorsed by the USTA, USA Pickleball, Universal Tennis, DUPR, or the ITF.
           </p>
         </div>
