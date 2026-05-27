@@ -66,7 +66,7 @@ export default function PreLaunch() {
       body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#C24A1D", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#0A192F", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Opponent Found</p>
           {[
             { name: "Marcus T.", rating: 1847, record: "12W 3L" },
@@ -95,7 +95,7 @@ export default function PreLaunch() {
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#C24A1D", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#0A192F", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Austin TX — Tennis Singles</p>
           <div className="space-y-2">
             {[
@@ -129,7 +129,7 @@ export default function PreLaunch() {
       body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. Round-robin or bracket. You choose the intensity, we handle the rest.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#C24A1D", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#0A192F", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Choose Your Format</p>
           {[
             { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeStyle: { color: "#007B70", background: "#E0F5F3" }, icon: "🎾" },
@@ -157,7 +157,7 @@ export default function PreLaunch() {
       body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#C24A1D", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#0A192F", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Your Profile</p>
           <div className="bg-white rounded-xl p-4 mb-3 flex items-center gap-3" style={{ border: `1px solid ${BORDER}` }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ background: NAVY }}>YO</div>
@@ -483,7 +483,7 @@ export default function PreLaunch() {
             <table className="w-full text-sm min-w-[540px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#6B7A96", background: "#C24A1D", borderBottom: `1px solid ${BORDER}` }}></th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#6B7A96", background: "#0A192F", borderBottom: `1px solid ${BORDER}` }}></th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#007B70", background: "#E0F5F3", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Flex</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#1E40AF", background: "#DBEAFE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Round Robin</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#7C3AED", background: "#EDE9FE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Box League</th>
@@ -497,7 +497,7 @@ export default function PreLaunch() {
                   { label: "Playoffs", flex: "Yes — top 4 or 8", rr: "Yes — group leaders", box: "No — standings decide", ladder: "No — rank is live" },
                   { label: "Best for", flex: "Flexible schedules", rr: "Zero friction", box: "Competitive progression", ladder: "Frequent play" },
                 ].map((row, i) => (
-                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#C24A1D" }}>
+                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#0A192F" }}>
                     <td className="px-4 py-3 text-xs font-medium" style={{ color: "#6B7A96" }}>{row.label}</td>
                     <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.flex}</td>
                     <td className="px-4 py-3 text-xs" style={{ color: "#2A3C58", borderLeft: `1px solid ${BORDER}` }}>{row.rr}</td>
@@ -624,9 +624,9 @@ export default function PreLaunch() {
                 <button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
-                  style={{ background: openFaq === i ? "#C24A1D" : "white" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#C24A1D"}
-                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#C24A1D" : "white"}
+                  style={{ background: openFaq === i ? "#0A192F" : "white" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#0A192F"}
+                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#0A192F" : "white"}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   data-testid={`faq-${i}`}
                 >
