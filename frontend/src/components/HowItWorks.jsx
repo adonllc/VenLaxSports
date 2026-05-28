@@ -1,17 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-const LIME      = "#C5D600";
-const LIME_HOVER= "#AEBE00";
-const NAVY      = "#1F0A03";
-const TEAL      = "#00B4A4";
-const PAGE_BG   = "#F5E8D0";
-const BORDER_D  = "#D4B896";
-const D_HEAD    = "#2C1206";
-const D_BODY    = "#5C3014";
-const D_MUTED   = "#8B5E3C";
-const NUM_COLOR = "rgba(44,18,6,0.06)";
-
 const STEPS = [
   {
     n: "01",
@@ -47,31 +36,34 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-24 border-t" style={{ background: PAGE_BG, borderColor: BORDER_D }} data-testid="how-it-works">
+    <section className="py-24 bg-white border-t border-gray-100" data-testid="how-it-works">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
 
           {/* Left: sticky heading */}
-          <div className="lg:sticky lg:top-28 lg:w-72 flex-shrink-0">
-            <p className="font-body text-xs font-semibold uppercase tracking-[0.18em] mb-4" style={{ color: TEAL }}>
+          <div className="lg:sticky lg:top-24 lg:w-80 flex-shrink-0">
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.18em] mb-4"
+              style={{ color: "#C9572A" }}
+            >
               The Process
             </p>
             <h2
-              className="font-heading font-black leading-[0.9] tracking-tight mb-6 uppercase"
-              style={{ fontSize: "clamp(2.25rem, 5vw, 3.75rem)", color: D_HEAD }}
+              className="font-heading font-black leading-[0.9] tracking-tight mb-6 uppercase text-gray-900"
+              style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)" }}
             >
               Six moves.<br />
-              <span style={{ color: LIME }}>One championship<br />season.</span>
+              <span style={{ color: "#C9572A" }}>One championship<br />season.</span>
             </h2>
-            <p className="font-body text-sm leading-relaxed mb-8 max-w-[28ch]" style={{ color: D_BODY }}>
+            <p className="text-sm leading-relaxed mb-8 max-w-[28ch] text-gray-500">
               No admin chaos. No spreadsheets. Ranked competition, handled.
             </p>
             <Link
               to="/leagues"
-              className="inline-flex items-center gap-2 font-body text-sm font-bold px-6 py-3 rounded-md transition-colors"
-              style={{ background: LIME, color: NAVY }}
-              onMouseEnter={e => e.currentTarget.style.background = "#AEBE00"}
-              onMouseLeave={e => e.currentTarget.style.background = LIME}
+              className="inline-flex items-center gap-2 text-sm font-bold px-6 py-3 rounded-lg text-white transition-colors"
+              style={{ background: "#C9572A" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#B04823"}
+              onMouseLeave={e => e.currentTarget.style.background = "#C9572A"}
               data-testid="how-cta-leagues"
             >
               See open leagues <ArrowRight className="w-4 h-4" />
@@ -79,7 +71,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Right: step list */}
-          <div className="flex-1 divide-y" style={{ borderColor: BORDER_D }}>
+          <div className="flex-1 divide-y divide-gray-100">
             {STEPS.map((s) => (
               <div
                 key={s.n}
@@ -88,17 +80,25 @@ export default function HowItWorks() {
               >
                 <span
                   className="font-heading font-black flex-shrink-0 leading-none mt-0.5 select-none transition-colors duration-200"
-                  style={{ fontSize: "2rem", color: NUM_COLOR, width: "2.5rem", textAlign: "right" }}
-                  onMouseEnter={e => e.currentTarget.style.color = LIME}
-                  onMouseLeave={e => e.currentTarget.style.color = NUM_COLOR}
+                  style={{
+                    fontSize: "2rem",
+                    width: "2.5rem",
+                    textAlign: "right",
+                    color: "#E5E7EB",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#C9572A"}
+                  onMouseLeave={e => e.currentTarget.style.color = "#E5E7EB"}
                 >
                   {s.n}
                 </span>
                 <div>
-                  <h3 className="font-heading font-bold mb-1.5 leading-tight tracking-tight" style={{ fontSize: "1.25rem", color: D_HEAD }}>
+                  <h3
+                    className="font-heading font-bold mb-1.5 leading-tight tracking-tight text-gray-900"
+                    style={{ fontSize: "1.25rem" }}
+                  >
                     {s.title}
                   </h3>
-                  <p className="font-body text-sm leading-relaxed" style={{ color: D_MUTED }}>{s.body}</p>
+                  <p className="text-sm leading-relaxed text-gray-500">{s.body}</p>
                 </div>
               </div>
             ))}

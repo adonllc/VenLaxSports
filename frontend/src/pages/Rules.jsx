@@ -125,11 +125,11 @@ const FORMAT_CARDS = [
     tag: "Self-scheduled",
     tagline: "You set the schedule. We track the results.",
     color: "rust",
-    header: "bg-rust-500",
-    border: "border-rust-200",
-    accent: "text-rust-700",
-    bullet: "text-rust-500",
-    pill: "bg-rust-600/50 text-rust-100",
+    header: "bg-orange-500",
+    border: "border-orange-200",
+    accent: "text-orange-700",
+    bullet: "text-orange-500",
+    pill: "bg-orange-600/50 text-orange-100",
     highlights: [
       "5–7 matches over 6–8 weeks",
       "You arrange each match with your opponent",
@@ -414,7 +414,7 @@ const CODE_OF_CONDUCT = [
 
 export default function Rules() {
   return (
-    <div style={{ background: "#FDF6EE" }} data-testid="rules-page">
+    <div style={{ background: "#FFFFFF" }} data-testid="rules-page">
 
       {/* Hero */}
       <section className="py-16 sm:py-20 px-6" style={{ background: "#C24A1D" }}>
@@ -425,7 +425,7 @@ export default function Rules() {
             Official League Rulebook v1.0
           </div>
           <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white">
-            The Rules of<br /><span style={{ color: "#C5D600" }}>the Circuit.</span>
+            The Rules of<br /><span style={{ color: "#C9572A" }}>the Circuit.</span>
           </h1>
           <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
             Every match is governed. Every call is fair. Every result counts.
@@ -439,11 +439,11 @@ export default function Rules() {
       </section>
 
       {/* Quick nav */}
-      <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#D4B896", background: "rgba(253,246,238,0.92)" }}>
+      <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#E5E7EB", background: "rgba(253,246,238,0.92)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap gap-1 text-xs font-semibold">
           {[["#formats","All Formats"],["#box-league","Box League"],["#ladder","Ladder"],["#tennis","🎾 Tennis"],["#divisions","Divisions"],["#standings","Points"],["#playoffs","Playoffs"],["#pickleball","🏓 Pickleball"],["#ratings","Ratings"],["#conduct","Conduct"]].map(([href, label]) => (
-            <a key={href} href={href} className="px-3 py-1.5 rounded-full transition-colors" style={{ color: "#5C3014" }}
-               onMouseEnter={e => e.currentTarget.style.background="#F5E8D0"}
+            <a key={href} href={href} className="px-3 py-1.5 rounded-full transition-colors" style={{ color: "#374151" }}
+               onMouseEnter={e => e.currentTarget.style.background="#F3F4F6"}
                onMouseLeave={e => e.currentTarget.style.background="transparent"}>
               {label}
             </a>
@@ -493,16 +493,16 @@ export default function Rules() {
             <table className="w-full text-sm min-w-[640px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b w-32" style={{ color: "#8B5E3C", background: "#F5E8D0", borderColor: "#D4B896" }}>Feature</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#8B2E0D", background: "#FAE0D5", borderColor: "#D4B896" }}>Flex League</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#1E40AF", background: "#DBEAFE", borderColor: "#D4B896" }}>Round Robin</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#7C3AED", background: "#EDE9FE", borderColor: "#D4B896" }}>Box League</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#92400E", background: "#FEF3C7", borderColor: "#D4B896" }}>Ladder</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b w-32" style={{ color: "#6B7280", background: "#F3F4F6", borderColor: "#E5E7EB" }}>Feature</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#8B2E0D", background: "#FAE0D5", borderColor: "#E5E7EB" }}>Flex League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#1E40AF", background: "#DBEAFE", borderColor: "#E5E7EB" }}>Round Robin</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#7C3AED", background: "#EDE9FE", borderColor: "#E5E7EB" }}>Box League</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.1em] border-b border-l" style={{ color: "#92400E", background: "#FEF3C7", borderColor: "#E5E7EB" }}>Ladder</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {FORMAT_COMPARISON_ROWS.map((row, i) => (
-                  <tr key={row.feature} style={{ background: i % 2 === 0 ? "white" : "#F5E8D0" }}>
+                  <tr key={row.feature} style={{ background: i % 2 === 0 ? "white" : "#F3F4F6" }}>
                     <td className="px-4 py-3 text-gray-500 font-medium">{row.feature}</td>
                     <td className="px-4 py-3 text-gray-800 border-l border-gray-100">{row.flex}</td>
                     <td className="px-4 py-3 text-gray-800 border-l border-gray-100">{row.rr}</td>

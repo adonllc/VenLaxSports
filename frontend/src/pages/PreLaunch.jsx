@@ -3,12 +3,12 @@ import Logo from "../components/Logo";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://api.venlaxsports.com";
 
-const NAVY = "#1F0A03";
-const NAVY_MID = "#2C1206";
-const LIME = "#C5D600";
-const TEAL = "#00B4A4";
-const BORDER = "#D4B896";
-const SECTION_BG = "#F5E8D0";
+const NAVY = "#111827";
+const NAVY_MID = "#111827";
+const LIME = "#C9572A";
+const TEAL = "#0B6E4F";
+const BORDER = "#E5E7EB";
+const SECTION_BG = "#F3F4F6";
 
 export default function PreLaunch() {
   const [email, setEmail] = useState("");
@@ -66,7 +66,7 @@ export default function PreLaunch() {
       body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#1F0A03", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Opponent Found</p>
           {[
             { name: "Marcus T.", rating: 1847, record: "12W 3L" },
@@ -75,7 +75,7 @@ export default function PreLaunch() {
           ].map((player) => (
             <div key={player.name} className="bg-white rounded-xl px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style={{ background: "#E0F5F3", color: "#007B70" }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style={{ background: "#EDF7F3", color: "#065F46" }}>
                   {player.name[0]}
                 </div>
                 <div>
@@ -83,7 +83,7 @@ export default function PreLaunch() {
                   <p className="text-xs" style={{ color: "#6B7A96" }}>{player.record}</p>
                 </div>
               </div>
-              <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ color: "#007B70", background: "#E0F5F3" }}>{player.rating}</span>
+              <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ color: "#065F46", background: "#EDF7F3" }}>{player.rating}</span>
             </div>
           ))}
         </div>
@@ -95,7 +95,7 @@ export default function PreLaunch() {
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#1F0A03", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Austin TX — Tennis Singles</p>
           <div className="space-y-2">
             {[
@@ -109,14 +109,14 @@ export default function PreLaunch() {
                 key={row.rank}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg"
                 style={row.rank === 3
-                  ? { background: "#E0F5F3", border: `1px solid ${TEAL}20` }
+                  ? { background: "#EDF7F3", border: `1px solid ${TEAL}20` }
                   : { background: "white", border: `1px solid ${BORDER}` }
                 }
               >
                 <span className="text-xs font-bold w-4" style={{ color: "#6B7A96" }}>{row.rank}</span>
                 <span className="text-sm font-medium flex-1" style={{ color: NAVY }}>{row.name}</span>
                 <span className="text-xs" style={{ color: "#6B7A96" }}>{row.rating}</span>
-                <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? "#007B70" : "#C04A00" }}>{row.delta}</span>
+                <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? "#065F46" : "#C04A00" }}>{row.delta}</span>
               </div>
             ))}
           </div>
@@ -129,10 +129,10 @@ export default function PreLaunch() {
       body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. Round-robin or bracket. You choose the intensity, we handle the rest.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#1F0A03", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Choose Your Format</p>
           {[
-            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeStyle: { color: "#007B70", background: "#E0F5F3" }, icon: "🎾" },
+            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeStyle: { color: "#065F46", background: "#EDF7F3" }, icon: "🎾" },
             { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeStyle: { color: "#1E40AF", background: "#DBEAFE" }, icon: "🤝" },
             { name: "Mixed Doubles", sub: "Bracket · 4 rounds", badge: "Co-ed", badgeStyle: { color: "#7C3AED", background: "#EDE9FE" }, icon: "🏆" },
             { name: "Casual Division", sub: "Flexible · self-paced", badge: "Beginner Friendly", badgeStyle: { color: "#C04A00", background: "#FEE8D5" }, icon: "⚡" },
@@ -157,7 +157,7 @@ export default function PreLaunch() {
       body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#1F0A03", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Your Profile</p>
           <div className="bg-white rounded-xl p-4 mb-3 flex items-center gap-3" style={{ border: `1px solid ${BORDER}` }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ background: NAVY }}>YO</div>
@@ -167,15 +167,15 @@ export default function PreLaunch() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl p-4 text-center" style={{ background: "#F3F7D0", border: "1px solid #C5D600" }}>
-              <p className="text-xs font-medium mb-1" style={{ color: "#5A6600" }}>Tennis</p>
-              <p className="text-2xl font-bold" style={{ color: "#5A6600", fontFamily: "'Barlow Condensed', sans-serif" }}>1847</p>
+            <div className="rounded-xl p-4 text-center" style={{ background: "#F0FDF4", border: "1px solid #C9572A" }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "#065F46" }}>Tennis</p>
+              <p className="text-2xl font-bold" style={{ color: "#065F46", fontFamily: "'Barlow Condensed', sans-serif" }}>1847</p>
               <p className="text-xs" style={{ color: "#7A8600" }}>ELO rating</p>
             </div>
-            <div className="rounded-xl p-4 text-center" style={{ background: "#E0F5F3", border: `1px solid ${TEAL}` }}>
-              <p className="text-xs font-medium mb-1" style={{ color: "#007B70" }}>Pickleball</p>
-              <p className="text-2xl font-bold" style={{ color: "#007B70", fontFamily: "'Barlow Condensed', sans-serif" }}>1623</p>
-              <p className="text-xs" style={{ color: "#007B70" }}>ELO rating</p>
+            <div className="rounded-xl p-4 text-center" style={{ background: "#EDF7F3", border: `1px solid ${TEAL}` }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "#065F46" }}>Pickleball</p>
+              <p className="text-2xl font-bold" style={{ color: "#065F46", fontFamily: "'Barlow Condensed', sans-serif" }}>1623</p>
+              <p className="text-xs" style={{ color: "#065F46" }}>ELO rating</p>
             </div>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function PreLaunch() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Barlow', sans-serif", background: "#FDF6EE" }}>
+    <div className="min-h-screen" style={{ fontFamily: "'Barlow', sans-serif", background: "#FFFFFF" }}>
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b" style={{ background: NAVY, borderColor: NAVY_MID }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -206,7 +206,7 @@ export default function PreLaunch() {
         <div className="max-w-4xl mx-auto text-center">
           <div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
-            style={{ background: "rgba(197,214,0,0.12)", border: "1px solid rgba(197,214,0,0.25)", color: LIME }}
+            style={{ background: "rgba(201,87,42,0.10)", border: "1px solid rgba(201,87,42,0.25)", color: LIME }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: LIME }}></span>
             Launching in select cities — 2026
@@ -252,7 +252,7 @@ export default function PreLaunch() {
       {/* Trust Bar */}
       <section className="border-b py-5 px-6" style={{ background: SECTION_BG, borderColor: BORDER }}>
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm" style={{ color: "#5C3014" }}>
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm" style={{ color: "#374151" }}>
             {[
               "Placed by skill — no sandbaggers, no mismatches",
               "Flexible scheduling — you set match times with your opponent",
@@ -269,7 +269,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Problem */}
-      <section className="py-20 px-6" style={{ background: "#FDF6EE" }}>
+      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto">
           <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Sound familiar?
@@ -304,7 +304,7 @@ export default function PreLaunch() {
                   <p className="font-semibold mb-1" style={{ color: NAVY, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.1rem" }}>
                     {item.title}
                   </p>
-                  <p className="text-sm leading-relaxed" style={{ color: "#5C3014" }}>{item.body}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{item.body}</p>
                 </div>
               </div>
             ))}
@@ -364,7 +364,7 @@ export default function PreLaunch() {
                   >
                     {feat.title}
                   </h3>
-                  <p className="text-lg leading-relaxed" style={{ color: "#5C3014" }}>{feat.body}</p>
+                  <p className="text-lg leading-relaxed" style={{ color: "#374151" }}>{feat.body}</p>
                 </div>
                 {feat.mockup}
               </div>
@@ -399,7 +399,7 @@ export default function PreLaunch() {
                 headerStyle: { background: TEAL },
                 borderStyle: { border: `1px solid ${TEAL}40` },
                 bullet: TEAL,
-                pillStyle: { background: "rgba(0,180,164,0.3)", color: "#E0F5F3" },
+                pillStyle: { background: "rgba(0,180,164,0.3)", color: "#EDF7F3" },
                 highlights: [
                   "5–7 matches over 6–8 weeks",
                   "You arrange each match with your opponent",
@@ -444,9 +444,9 @@ export default function PreLaunch() {
                 label: "Challenge Ladder",
                 tag: "Always-on",
                 tagline: "Climb the ranks one challenge at a time.",
-                headerStyle: { background: "#E86010" },
+                headerStyle: { background: "#C9572A" },
                 borderStyle: { border: "1px solid #FEE8D5" },
-                bullet: "#E86010",
+                bullet: "#C9572A",
                 pillStyle: { background: "rgba(232,96,16,0.3)", color: "#FEE8D5" },
                 highlights: [
                   "Permanent ranked list per city + division",
@@ -467,7 +467,7 @@ export default function PreLaunch() {
                 <div className="p-4 bg-white">
                   <ul className="space-y-1.5">
                     {f.highlights.map((h, i) => (
-                      <li key={i} className="flex gap-2 text-sm" style={{ color: "#5C3014" }}>
+                      <li key={i} className="flex gap-2 text-sm" style={{ color: "#374151" }}>
                         <span className="font-bold flex-shrink-0" style={{ color: f.bullet }}>✓</span>
                         <span>{h}</span>
                       </li>
@@ -483,8 +483,8 @@ export default function PreLaunch() {
             <table className="w-full text-sm min-w-[540px]">
               <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#8B5E3C", background: "#F5E8D0", borderBottom: `1px solid ${BORDER}` }}></th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#007B70", background: "#E0F5F3", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Flex</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest w-28" style={{ color: "#6B7280", background: "#F3F4F6", borderBottom: `1px solid ${BORDER}` }}></th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#065F46", background: "#EDF7F3", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Flex</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#1E40AF", background: "#DBEAFE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Round Robin</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#7C3AED", background: "#EDE9FE", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Box League</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "#C04A00", background: "#FEE8D5", borderBottom: `1px solid ${BORDER}`, borderLeft: `1px solid ${BORDER}` }}>Ladder</th>
@@ -497,12 +497,12 @@ export default function PreLaunch() {
                   { label: "Playoffs", flex: "Yes — top 4 or 8", rr: "Yes — group leaders", box: "No — standings decide", ladder: "No — rank is live" },
                   { label: "Best for", flex: "Flexible schedules", rr: "Zero friction", box: "Competitive progression", ladder: "Frequent play" },
                 ].map((row, i) => (
-                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#FDF6EE" }}>
+                  <tr key={row.label} style={{ background: i % 2 === 0 ? "white" : "#FFFFFF" }}>
                     <td className="px-4 py-3 text-xs font-medium" style={{ color: "#6B7A96" }}>{row.label}</td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.flex}</td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.rr}</td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.box}</td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "#5C3014", borderLeft: `1px solid ${BORDER}` }}>{row.ladder}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#374151", borderLeft: `1px solid ${BORDER}` }}>{row.flex}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#374151", borderLeft: `1px solid ${BORDER}` }}>{row.rr}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#374151", borderLeft: `1px solid ${BORDER}` }}>{row.box}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#374151", borderLeft: `1px solid ${BORDER}` }}>{row.ladder}</td>
                   </tr>
                 ))}
               </tbody>
@@ -516,7 +516,7 @@ export default function PreLaunch() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6" style={{ background: "#FDF6EE" }}>
+      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-4xl mx-auto">
           <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Simple by design
@@ -551,7 +551,7 @@ export default function PreLaunch() {
               <div key={step.step} className="text-center">
                 <div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6"
-                  style={{ background: step.dotColor === LIME ? "#F3F7D0" : "#E0F5F3", color: step.dotColor === LIME ? "#5A6600" : "#007B70", fontFamily: "'Barlow Condensed', sans-serif" }}
+                  style={{ background: step.dotColor === LIME ? "#F0FDF4" : "#EDF7F3", color: step.dotColor === LIME ? "#065F46" : "#065F46", fontFamily: "'Barlow Condensed', sans-serif" }}
                 >
                   {step.step}
                 </div>
@@ -561,7 +561,7 @@ export default function PreLaunch() {
                 >
                   {step.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#5C3014" }}>{step.body}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -575,7 +575,7 @@ export default function PreLaunch() {
             Why players are joining VENLAX early
           </p>
           <blockquote className="bg-white rounded-xl p-8 mb-10" style={{ border: `1px solid ${BORDER}` }}>
-            <p className="text-lg italic leading-relaxed mb-4" style={{ color: "#5C3014" }}>
+            <p className="text-lg italic leading-relaxed mb-4" style={{ color: "#374151" }}>
               "Finally a league that doesn't require a $2,000 club membership."
             </p>
             <footer className="text-sm" style={{ color: "#6B7A96" }}>— Tennis player, 34, Austin TX</footer>
@@ -600,7 +600,7 @@ export default function PreLaunch() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-6" style={{ background: "#FDF6EE" }}>
+      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-2xl mx-auto">
           <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: TEAL }}>
             Common questions
@@ -624,9 +624,9 @@ export default function PreLaunch() {
                 <button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
-                  style={{ background: openFaq === i ? "#F5E8D0" : "white" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#F5E8D0"}
-                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#F5E8D0" : "white"}
+                  style={{ background: openFaq === i ? "#F3F4F6" : "white" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#F3F4F6"}
+                  onMouseLeave={e => e.currentTarget.style.background = openFaq === i ? "#F3F4F6" : "white"}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   data-testid={`faq-${i}`}
                 >
@@ -636,7 +636,7 @@ export default function PreLaunch() {
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#5C3014" }}>
+                  <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#374151" }}>
                     {item.a}
                   </div>
                 )}
@@ -661,7 +661,7 @@ export default function PreLaunch() {
 
           {submitted ? (
             <div className="space-y-6">
-              <div className="rounded-xl p-8 text-center" style={{ background: "rgba(197,214,0,0.1)", border: "1px solid rgba(197,214,0,0.3)" }}>
+              <div className="rounded-xl p-8 text-center" style={{ background: "rgba(201,87,42,0.10)", border: "1px solid rgba(201,87,42,0.25)" }}>
                 <p className="font-bold text-xl mb-2" style={{ color: LIME, fontFamily: "'Barlow Condensed', sans-serif" }}>
                   You're on the early access list.
                 </p>

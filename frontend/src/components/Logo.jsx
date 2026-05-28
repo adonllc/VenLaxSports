@@ -22,8 +22,8 @@ export default function Logo({
 
   const onDark = variant === "light" || variant === "hero";
 
-  const textFill   = onDark ? "#ffffff" : "#0F1D38";
-  const sportsFill = onDark ? "#C5D600" : "#007B70";
+  const textFill   = onDark ? "#ffffff" : "#111827";
+  const sportsFill = onDark ? "#C9572A" : "#6B7280";
 
   return (
     <svg
@@ -37,10 +37,27 @@ export default function Logo({
       className={className}
       style={{ display: "block", flexShrink: 0 }}
     >
-      {/* Three sport dots — Tennis (lime) · Pickleball (teal) · Cricket (orange) */}
-      <circle cx="316" cy="13" r="9" fill="#C5D600" />
-      <circle cx="338" cy="13" r="9" fill="#00B4A4" />
-      <circle cx="360" cy="13" r="9" fill="#E86010" />
+      {/* ── Tennis ball ── cx=316 cy=13 r=9 */}
+      <circle cx="316" cy="13" r="9" fill="#C8E600" />
+      {/* Seam: two mirrored curves */}
+      <path d="M309 9 Q312 4 316 13 Q320 22 323 17" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      <path d="M309 17 Q312 22 316 13 Q320 4 323 9" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+
+      {/* ── Pickleball ── cx=338 cy=13 r=9  (bright orange, drilled holes) */}
+      <circle cx="338" cy="13" r="9" fill="#F97316" />
+      <circle cx="338" cy="7.5" r="2" fill="rgba(0,0,0,0.30)" />
+      <circle cx="333" cy="15" r="2" fill="rgba(0,0,0,0.30)" />
+      <circle cx="343" cy="15" r="2" fill="rgba(0,0,0,0.30)" />
+
+      {/* ── Cricket ball ── cx=360 cy=13 r=9  (crimson, white seam) */}
+      <circle cx="360" cy="13" r="9" fill="#CC1100" />
+      {/* Main seam arc */}
+      <path d="M352 13 Q356 8 360 13 Q364 18 368 13" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      {/* Stitch marks */}
+      <line x1="355" y1="10.5" x2="355" y2="12.5" stroke="white" strokeWidth="1"/>
+      <line x1="358" y1="9.2"  x2="358" y2="11.2" stroke="white" strokeWidth="1"/>
+      <line x1="362" y1="14.8" x2="362" y2="16.8" stroke="white" strokeWidth="1"/>
+      <line x1="365" y1="13.5" x2="365" y2="15.5" stroke="white" strokeWidth="1"/>
 
       {/* VENLAX wordmark */}
       <text
@@ -54,8 +71,8 @@ export default function Logo({
         fill={textFill}
       >VENLAX</text>
 
-      {/* Lime accent line */}
-      <rect x="40" y="75" width="300" height="2.5" fill="#C5D600" rx="1" />
+      {/* Brand accent line */}
+      <rect x="40" y="75" width="300" height="2.5" fill="#C9572A" rx="1" />
 
       {/* SPORTS subtitle */}
       <text

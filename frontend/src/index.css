@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,11 +6,11 @@
 
 body {
     margin: 0;
-    font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: #FDF6EE;
-    color: #2C1206;
+    background: #FFFFFF;
+    color: #111827;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -19,26 +19,26 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
     :root {
-        --background: 33 70% 96%;
-        --foreground: 15 76% 11%;
+        --background: 0 0% 100%;
+        --foreground: 222 47% 11%;
         --card: 0 0% 100%;
-        --card-foreground: 15 76% 11%;
+        --card-foreground: 222 47% 11%;
         --popover: 0 0% 100%;
-        --popover-foreground: 15 76% 11%;
-        --primary: 65 100% 42%;
-        --primary-foreground: 15 76% 11%;
-        --secondary: 36 47% 80%;
-        --secondary-foreground: 15 76% 11%;
-        --muted: 35 35% 93%;
-        --muted-foreground: 24 40% 39%;
-        --accent: 36 47% 80%;
-        --accent-foreground: 15 76% 11%;
+        --popover-foreground: 222 47% 11%;
+        --primary: 17 65% 48%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 220 14% 96%;
+        --secondary-foreground: 222 47% 11%;
+        --muted: 220 14% 96%;
+        --muted-foreground: 220 9% 46%;
+        --accent: 220 14% 96%;
+        --accent-foreground: 222 47% 11%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --border: 32 44% 71%;
-        --input: 32 44% 71%;
-        --ring: 65 100% 42%;
-        --radius: 0.5rem;
+        --border: 220 13% 91%;
+        --input: 220 13% 91%;
+        --ring: 17 65% 48%;
+        --radius: 0.625rem;
     }
 }
 
@@ -83,15 +83,15 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* Sport-specific utility classes */
-.sport-tennis     { color: #C5D600; }
-.sport-cricket    { color: #E86010; }
-.sport-pickleball { color: #00B4A4; }
+/* Sport color utility classes — per CLAUDE.md spec */
+.sport-tennis     { color: #10B981; }
+.sport-cricket    { color: #2563EB; }
+.sport-pickleball { color: #F97316; }
 
-.sport-bg-tennis     { background-color: #F8FAE5; }
-.sport-bg-cricket    { background-color: #FEF3EC; }
-.sport-bg-pickleball { background-color: #E8FAF8; }
+.sport-bg-tennis     { background-color: #ECFDF5; }
+.sport-bg-cricket    { background-color: #EFF6FF; }
+.sport-bg-pickleball { background-color: #FFF7ED; }
 
-.sport-badge-tennis     { background-color: #F3F7D0; color: #5A6600; }
-.sport-badge-cricket    { background-color: #FEE8D5; color: #C04A00; }
-.sport-badge-pickleball { background-color: #E0F5F3; color: #007B70; }
+.sport-badge-tennis     { background-color: #D1FAE5; color: #065F46; }
+.sport-badge-cricket    { background-color: #DBEAFE; color: #1E40AF; }
+.sport-badge-pickleball { background-color: #FFEDD5; color: #C2410C; }

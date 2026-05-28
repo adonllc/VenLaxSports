@@ -9,7 +9,8 @@ module.exports = {
         extend: {
             fontFamily: {
                 heading: ["Barlow Condensed", "sans-serif"],
-                body: ["Barlow", "sans-serif"],
+                body: ["Inter", "Barlow", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
             },
             colors: {
                 espresso: {
@@ -58,6 +59,14 @@ module.exports = {
                 coffee: "#2C1206",
                 mocha: "#5C3014",
                 sienna: "#8B5E3C",
+                brand: {
+                    orange: "#C9572A",
+                    "orange-dark": "#B04823",
+                    "orange-pale": "#FEF2EE",
+                    green: "#0B6E4F",
+                    "green-dark": "#095C41",
+                    "green-pale": "#EDF7F3",
+                },
                 navy: {
                     DEFAULT: "#1B2A4A",
                     mid: "#2A3D66",

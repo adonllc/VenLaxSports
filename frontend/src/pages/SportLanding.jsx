@@ -5,26 +5,19 @@ import { ArrowRight, MapPin, CheckCircle, Bell } from "lucide-react";
 import { isSportActive } from "../config/platformConfig";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
+import VenLaxHero from "../components/VenLaxHero";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const NAVY      = "#1F0A03";
-const LIME      = "#C5D600";
-const LIME_PALE = "#F3F7D0";
-const LIME_TEXT = "#5A6600";
-const TEAL      = "#00B4A4";
-const ORANGE    = "#E86010";
-const PAGE_BG   = "#FDF6EE";
-const BORDER    = "#D4B896";
-const TEXT_PRI  = "#2C1206";
-const TEXT_BODY = "#5C3014";
-const TEXT_MUTED= "#8B5E3C";
+const BORDER    = "#E5E7EB";
+const TEXT_PRI  = "#111827";
+const TEXT_MUTED= "#6B7280";
 
 const SPORT_META = {
   tennis: {
     label: "Tennis", icon: "🎾",
-    color: LIME, textOnColor: NAVY,
-    palePill: LIME_PALE, pillText: LIME_TEXT,
+    color: "#10B981", textOnColor: "#ffffff",
+    palePill: "#D1FAE5", pillText: "#065F46",
     tagline: "Competitive singles & doubles leagues for all skill levels",
     description: "Compete in structured tennis leagues with skill-level divisions, best-of-3 set formats, and professional scorekeeping across top courts.",
     formats: ["Singles", "Doubles", "Mixed Doubles"],
@@ -35,8 +28,8 @@ const SPORT_META = {
   },
   cricket: {
     label: "Cricket", icon: "🏏",
-    color: ORANGE, textOnColor: "#ffffff",
-    palePill: "#FEE8D5", pillText: "#C04A00",
+    color: "#2563EB", textOnColor: "#ffffff",
+    palePill: "#DBEAFE", pillText: "#1E40AF",
     tagline: "T10, T20 & competitive cricket leagues",
     description: "Join structured corporate and amateur cricket leagues with professional umpires, NRR tracking, powerplay rules, and top-class facilities.",
     formats: ["T10", "T20", "8-a-side", "11-a-side"],
@@ -47,8 +40,8 @@ const SPORT_META = {
   },
   pickleball: {
     label: "Pickleball", icon: "🏓",
-    color: TEAL, textOnColor: "#ffffff",
-    palePill: "#E0F5F3", pillText: "#007B70",
+    color: "#F97316", textOnColor: "#ffffff",
+    palePill: "#FFEDD5", pillText: "#C2410C",
     tagline: "The fastest-growing racquet sport, now in organized leagues",
     description: "Ride the pickleball wave with organized singles and doubles leagues. Rally scoring, win-by-2 rules, and skill-based ratings across top facilities.",
     formats: ["Singles", "Doubles", "Mixed Doubles"],
@@ -65,12 +58,14 @@ export default function SportLanding() {
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bellOpen, setBellOpen] = useState(false);
+  const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
 
   const meta = SPORT_META[sport];
 
   useEffect(() => {
     if (!meta || !isSportActive(sport)) { navigate("/leagues"); return; }
     fetchLeagues();
+    axios.get(`${API}/founding-members`).then(r => setFoundingStats(r.data)).catch(() => {});
   }, [sport]);
 
   const fetchLeagues = async () => {
@@ -84,78 +79,42 @@ export default function SportLanding() {
   if (!meta || !isSportActive(sport)) return null;
 
   return (
-    <div style={{ background: PAGE_BG, minHeight: "100vh" }} data-testid={`sport-landing-${sport}`}>
+    <div className="bg-white" style={{ minHeight: "100vh" }} data-testid={`sport-landing-${sport}`}>
 
       {/* Hero */}
-      <section className="relative min-h-[55vh] overflow-hidden flex items-center">
-        <img src={meta.image} alt={meta.label} className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(15,29,56,0.90) 0%, rgba(15,29,56,0.55) 50%, rgba(15,29,56,0.25) 100%)" }} />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full py-20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: meta.color }}>
-              <span className="text-xl leading-none">{meta.icon}</span>
-            </div>
-            <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "rgba(255,255,255,0.6)" }}>VENLAX Sports</span>
-          </div>
-          <h1 className="font-heading font-black leading-[0.9] tracking-tight mb-4"
-              style={{ fontSize: "clamp(3rem, 8vw, 4.5rem)", color: "#ffffff" }}>
-            {meta.label}
-          </h1>
-          <p className="text-lg max-w-lg mb-8 leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-            {meta.tagline}
-          </p>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-            <button
-              onClick={() => navigate(`/leagues?sport=${sport}`)}
-              className="px-6 py-3 font-bold rounded-md transition-colors text-sm"
-              style={{ background: LIME, color: NAVY }}
-              onMouseEnter={e => e.currentTarget.style.background = "#AEBE00"}
-              onMouseLeave={e => e.currentTarget.style.background = LIME}
-              data-testid="view-leagues-btn"
-            >
-              View All {meta.label} Leagues
-            </button>
-            <button
-              onClick={() => navigate("/auth?mode=register")}
-              className="px-6 py-3 font-semibold rounded-md transition-colors text-sm"
-              style={{ border: "1px solid rgba(255,255,255,0.35)", color: "#ffffff" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.7)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)"}
-              data-testid="join-now-btn"
-            >
-              Join Now
-            </button>
-          </div>
-        </div>
-      </section>
+      <VenLaxHero
+        sportMeta={{ ...meta, id: sport }}
+        foundingStats={foundingStats}
+        onPrimary={() => navigate(`/leagues?sport=${sport}`)}
+      />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {/* Info Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="rounded-2xl p-6" style={{ background: meta.palePill, border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color === LIME ? LIME_TEXT : meta.color }}>
+            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
               Formats
             </h3>
             <div className="space-y-1.5">
               {meta.formats.map((f) => (
-                <div key={f} className="flex items-center gap-2 text-sm" style={{ color: TEXT_BODY }}>
+                <div key={f} className="flex items-center gap-2 text-sm" style={{ color: TEXT_PRI }}>
                   <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: meta.color }} /> {f}
                 </div>
               ))}
             </div>
           </div>
           <div className="rounded-2xl p-6" style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color === LIME ? LIME_TEXT : meta.color }}>
+            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
               Scoring
             </h3>
-            <p className="text-sm leading-relaxed" style={{ color: TEXT_BODY }}>{meta.scoring}</p>
+            <p className="text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.scoring}</p>
           </div>
           <div className="rounded-2xl p-6" style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color === LIME ? LIME_TEXT : meta.color }}>
+            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
               Rating System
             </h3>
-            <p className="text-sm" style={{ color: TEXT_BODY }}>{meta.rating}</p>
+            <p className="text-sm" style={{ color: TEXT_MUTED }}>{meta.rating}</p>
           </div>
         </div>
 
@@ -164,7 +123,7 @@ export default function SportLanding() {
           <h2 className="font-heading font-bold text-2xl mb-3" style={{ color: TEXT_PRI }}>
             About {meta.label} on VENLAX
           </h2>
-          <p className="leading-relaxed" style={{ color: TEXT_BODY }}>{meta.description}</p>
+          <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
         </div>
 
         {/* Features */}
@@ -195,7 +154,7 @@ export default function SportLanding() {
                 onClick={() => setBellOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
                 style={{ color: TEXT_MUTED, border: `1px solid ${BORDER}`, background: "transparent" }}
-                onMouseEnter={e => { e.currentTarget.style.color = TEAL; e.currentTarget.style.background = "#E0F5F3"; }}
+                onMouseEnter={e => { e.currentTarget.style.color = meta.color; e.currentTarget.style.background = meta.palePill; }}
                 onMouseLeave={e => { e.currentTarget.style.color = TEXT_MUTED; e.currentTarget.style.background = "transparent"; }}
                 data-testid="sport-notify-bell"
                 title={`Notify me when a ${meta?.label} league opens`}
@@ -206,7 +165,7 @@ export default function SportLanding() {
               <Link
                 to={`/leagues?sport=${sport}`}
                 className="text-sm font-semibold flex items-center gap-1 transition-colors"
-                style={{ color: meta.color === LIME ? LIME_TEXT : meta.color }}
+                style={{ color: meta.color }}
                 data-testid="all-leagues-link"
               >
                 View All <ArrowRight className="w-4 h-4" />
@@ -217,7 +176,7 @@ export default function SportLanding() {
           {loading ? (
             <div className="grid md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-40 rounded-2xl animate-pulse" style={{ background: "#E5EAF0" }} />
+                <div key={i} className="h-40 rounded-2xl animate-pulse bg-gray-100" />
               ))}
             </div>
           ) : leagues.length > 0 ? (
@@ -228,7 +187,7 @@ export default function SportLanding() {
                   onClick={() => navigate(`/leagues/${l.id}`)}
                   className="rounded-2xl p-5 cursor-pointer transition-all duration-200"
                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(27,42,74,0.10)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                   data-testid={`sport-league-${l.id}`}
                 >
@@ -239,14 +198,14 @@ export default function SportLanding() {
                     </span>
                     <span className="text-xs font-semibold px-2 py-1 rounded-full"
                           style={l.status === "registration"
-                            ? { background: LIME_PALE, color: LIME_TEXT }
-                            : { background: "#F0F0F0", color: TEXT_MUTED }}>
+                            ? { background: "#D1FAE5", color: "#065F46" }
+                            : { background: "#F3F4F6", color: TEXT_MUTED }}>
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
                   <h3 className="font-semibold text-sm mb-1 line-clamp-2" style={{ color: TEXT_PRI }}>{l.name}</h3>
                   <p className="text-xs flex items-center gap-1" style={{ color: TEXT_MUTED }}>
-                    <MapPin className="w-3 h-3" style={{ color: TEAL }} />{l.city}
+                    <MapPin className="w-3 h-3" style={{ color: meta.color }} />{l.city}
                   </p>
                   <div className="flex justify-between mt-3 text-xs" style={{ color: TEXT_MUTED }}>
                     <span>{l.max_players - (l.current_players || 0)} spots left</span>

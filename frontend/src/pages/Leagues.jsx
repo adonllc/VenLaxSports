@@ -25,16 +25,16 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 const STATUS_COLORS = {
-  registration: "bg-rust-100 text-rust-700",
-  active: "bg-teal-pale text-teal-text",
-  completed: "bg-sand-200 text-mocha",
+  registration: "bg-green-50 text-green-700",
+  active: "bg-blue-50 text-blue-700",
+  completed: "bg-gray-100 text-gray-600",
   cancelled: "bg-red-100 text-red-600",
 };
 
 const FORMAT_COLORS = {
-  singles: "bg-sand-200 text-coffee",
+  singles: "bg-gray-100 text-gray-600",
   doubles: "bg-blue-50 text-blue-700",
-  mixed_doubles: "bg-sand-300 text-mocha",
+  mixed_doubles: "bg-gray-100 text-gray-600",
 };
 
 // DUPR → division mapping for pickleball league join pre-selection.
@@ -116,19 +116,19 @@ export default function Leagues() {
   });
 
   return (
-    <div className="min-h-screen" style={{ background: "#FDF6EE" }} data-testid="leagues-page">
+    <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="leagues-page">
       {/* Header */}
-      <div className="border-b" style={{ background: "white", borderColor: "#D4B896" }}>
+      <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#C24A1D" }}>All Leagues</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#2C1206" }}>Browse Leagues</h1>
-          <p className="max-w-lg" style={{ color: "#8B5E3C" }}>Find and join competitive leagues across all sports and cities</p>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#111827" }}>Browse Leagues</h1>
+          <p className="max-w-lg" style={{ color: "#6B7280" }}>Find and join competitive leagues across all sports and cities</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
-        <div className="rounded-2xl p-4 mb-8 flex flex-wrap gap-3" style={{ background: "white", border: "1px solid #D4B896" }}>
+        <div className="rounded-2xl p-4 mb-8 flex flex-wrap gap-3" style={{ background: "white", border: "1px solid #E5E7EB" }}>
           {/* Search */}
           <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -137,7 +137,7 @@ export default function Leagues() {
               placeholder="Search leagues..."
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-transparent" style={{ border: "1px solid #D4B896", color: "#2C1206" }}
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
               data-testid="filter-search"
             />
           </div>
@@ -146,7 +146,7 @@ export default function Leagues() {
           <select
             value={filters.sport}
             onChange={(e) => updateFilter("sport", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #D4B896", color: "#2C1206" }}
+            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
             data-testid="filter-sport"
           >
             <option value="">All Sports</option>
@@ -159,7 +159,7 @@ export default function Leagues() {
             <select
               value={filters.season_id}
               onChange={(e) => updateFilter("season_id", e.target.value)}
-              className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #D4B896", color: "#2C1206" }}
+              className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
               data-testid="filter-season"
             >
               <option value="">All Seasons</option>
@@ -192,7 +192,7 @@ export default function Leagues() {
           <select
             value={filters.status}
             onChange={(e) => updateFilter("status", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #D4B896", color: "#2C1206" }}
+            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
             data-testid="filter-status"
           >
             <option value="">Any Status</option>
@@ -219,8 +219,8 @@ export default function Leagues() {
                 onClick={() => setFilters((f) => ({ ...f, division: div }))}
                 className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
                 style={filters.division === div
-                  ? { background: "#1F0A03", borderColor: "#1F0A03", color: "white" }
-                  : { background: "white", borderColor: "#D4B896", color: "#5C3014" }}
+                  ? { background: "#111827", borderColor: "#111827", color: "white" }
+                  : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
               >
                 {div || "All Levels"}
               </button>
@@ -242,7 +242,7 @@ export default function Leagues() {
                 className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
                 style={filters.format === value
                   ? { background: "#C24A1D", borderColor: "#C24A1D", color: "white" }
-                  : { background: "white", borderColor: "#D4B896", color: "#5C3014" }}
+                  : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
               >
                 {label}
               </button>
@@ -252,7 +252,7 @@ export default function Leagues() {
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-5">
-          <p className="text-sm" style={{ color: "#8B5E3C" }} data-testid="leagues-count">
+          <p className="text-sm" style={{ color: "#6B7280" }} data-testid="leagues-count">
             {loading ? "Loading..." : `${filteredLeagues.length} league${filteredLeagues.length !== 1 ? "s" : ""} found`}
           </p>
         </div>
@@ -261,7 +261,7 @@ export default function Leagues() {
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-56 bg-white rounded-2xl animate-pulse" style={{ border: "1px solid #D4B896" }} />
+              <div key={i} className="h-56 bg-white rounded-2xl animate-pulse" style={{ border: "1px solid #E5E7EB" }} />
             ))}
           </div>
         ) : filteredLeagues.length > 0 ? (
@@ -272,9 +272,9 @@ export default function Leagues() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <Trophy className="w-12 h-12 mx-auto mb-4" style={{ color: "#D4B896" }} />
-            <h3 className="font-heading font-bold text-xl mb-2" style={{ color: "#2C1206" }}>No leagues found</h3>
-            <p className="text-sm mb-4" style={{ color: "#8B5E3C" }}>No leagues match your current filters. Clear them to see all open leagues.</p>
+            <Trophy className="w-12 h-12 mx-auto mb-4" style={{ color: "#E5E7EB" }} />
+            <h3 className="font-heading font-bold text-xl mb-2" style={{ color: "#111827" }}>No leagues found</h3>
+            <p className="text-sm mb-4" style={{ color: "#6B7280" }}>No leagues match your current filters. Clear them to see all open leagues.</p>
           </div>
         )}
       </div>
@@ -294,7 +294,7 @@ function LeagueCard({ league, onClick }) {
     <div
       onClick={onClick}
       className={`bg-white rounded-2xl overflow-hidden cursor-pointer ${isEnded ? "opacity-60" : "league-card-hover"}`}
-      style={{ border: `1px solid ${isAlmostFull ? "#E86010" : "#D4B896"}` }}
+      style={{ border: `1px solid ${isAlmostFull ? "#C9572A" : "#E5E7EB"}` }}
       data-testid={`league-card-${league.id}`}
     >
       <div className={`h-1.5 ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`} />
@@ -304,7 +304,7 @@ function LeagueCard({ league, onClick }) {
             {config.icon} {config.label}
           </span>
           {isEnded ? (
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#F5E8D0", color: "#8B5E3C" }}>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#F3F4F6", color: "#6B7280" }}>
               Season Ended
             </span>
           ) : isFull ? (
@@ -318,34 +318,34 @@ function LeagueCard({ league, onClick }) {
           ) : null}
         </div>
 
-        <h3 className="font-heading font-bold mb-1 line-clamp-2 leading-tight" style={{ color: "#2C1206" }}>{league.name}</h3>
+        <h3 className="font-heading font-bold mb-1 line-clamp-2 leading-tight" style={{ color: "#111827" }}>{league.name}</h3>
 
-        <div className="flex items-center gap-1 text-xs mb-1" style={{ color: "#8B5E3C" }}>
+        <div className="flex items-center gap-1 text-xs mb-1" style={{ color: "#6B7280" }}>
           <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}
         </div>
 
         <div className="flex items-center gap-3 text-xs mb-3">
-          <span className="px-2 py-0.5 rounded-full font-medium" style={{ background: "#F5E8D0", color: "#5C3014" }}>
+          <span className="px-2 py-0.5 rounded-full font-medium" style={{ background: "#F3F4F6", color: "#374151" }}>
             {league.format === "mixed_doubles" ? "Mixed Doubles" : league.format ? league.format.charAt(0).toUpperCase() + league.format.slice(1) : ""}
           </span>
-          <span style={{ color: "#D4B896" }}>•</span>
-          <span className="flex items-center gap-1" style={{ color: "#8B5E3C" }}><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+          <span style={{ color: "#E5E7EB" }}>•</span>
+          <span className="flex items-center gap-1" style={{ color: "#6B7280" }}><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
         </div>
 
         {/* Division badge */}
         <div className="mb-4">
           {league.division_label ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#F5E8D0", color: "#C24A1D", border: "1px solid #D4B896" }}>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#F3F4F6", color: "#C24A1D", border: "1px solid #E5E7EB" }}>
               {league.division_label}
               {league.division_ntrp_min && (
-                <span className="ml-1" style={{ color: "#8B5E3C" }}>
+                <span className="ml-1" style={{ color: "#6B7280" }}>
                   ({league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
                   {league.sport === "pickleball" ? "DUPR" : "NTRP"})
                 </span>
               )}
             </span>
           ) : (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#FDF6EE", color: "#8B5E3C", border: "1px solid #D4B896" }}>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB" }}>
               Open Division
             </span>
           )}
@@ -354,12 +354,12 @@ function LeagueCard({ league, onClick }) {
         {/* Progress bar */}
         <div className="mb-3">
           <div className="flex justify-between text-xs mb-1.5">
-            <span style={{ color: "#8B5E3C" }}>{league.current_players || 0} joined</span>
-            <span style={{ color: isAlmostFull ? "#E86010" : isFull ? "#DC2626" : "#8B5E3C", fontWeight: (isAlmostFull || isFull) ? 600 : 400 }}>
+            <span style={{ color: "#6B7280" }}>{league.current_players || 0} joined</span>
+            <span style={{ color: isAlmostFull ? "#C9572A" : isFull ? "#DC2626" : "#6B7280", fontWeight: (isAlmostFull || isFull) ? 600 : 400 }}>
               {isFull ? "League full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
             </span>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#F5E8D0" }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
             <div
               className={`h-full rounded-full transition-[width] ${isFull ? "bg-red-500" : isAlmostFull ? "bg-orange-400" : league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
               style={{ width: `${fillPct}%` }}
@@ -368,10 +368,10 @@ function LeagueCard({ league, onClick }) {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${STATUS_COLORS[league.status] || "bg-sand-100 text-mocha"}`}>
+          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${STATUS_COLORS[league.status] || "bg-gray-50 text-gray-500"}`}>
             {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
           </span>
-          <span className="text-xs" style={{ color: "#D4B896" }}>{league.season}</span>
+          <span className="text-xs" style={{ color: "#E5E7EB" }}>{league.season}</span>
         </div>
       </div>
     </div>

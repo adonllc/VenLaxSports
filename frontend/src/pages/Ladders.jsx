@@ -5,22 +5,18 @@ import { useAuth } from "../contexts/AuthContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const ESPRESSO = "#1F0A03";
+const ESPRESSO = "#111827";
 const RUST = "#C24A1D";
-const SAND_PALE = "#FDF6EE";
-const SAND_LIGHT = "#F5E8D0";
-const BORDER = "#D4B896";
-const COFFEE = "#2C1206";
-const MOCHA = "#5C3014";
-const SIENNA = "#8B5E3C";
-const TEAL = "#00B4A4";
-const LIME = "#C5D600";
-const LIME_TEXT = "#5A6600";
-
+const SAND_PALE = "#FFFFFF";
+const SAND_LIGHT = "#F3F4F6";
+const BORDER = "#E5E7EB";
+const COFFEE = "#111827";
+const MOCHA = "#374151";
+const SIENNA = "#6B7280";
 const SPORT_BADGE = {
-  tennis: { bg: "#F3F7D0", color: "#5A6600", border: "#C5D600" },
-  pickleball: { bg: "#E0F5F3", color: "#007B70", border: "#00B4A4" },
-  cricket: { bg: "#FEE8D5", color: "#C04A00", border: "#E86010" },
+  tennis:     { bg: "#D1FAE5", color: "#065F46", border: "#10B981" },
+  pickleball: { bg: "#FFEDD5", color: "#C2410C", border: "#F97316" },
+  cricket:    { bg: "#DBEAFE", color: "#1E40AF", border: "#2563EB" },
 };
 
 export default function Ladders() {
