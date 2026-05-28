@@ -55,7 +55,15 @@ PHASE_CONFIGS = {1: PHASE_1, 2: PHASE_2, 3: PHASE_3}
 PHASE = int(os.environ.get("PHASE", "1"))
 CONFIG = PHASE_CONFIGS.get(PHASE, PHASE_1)
 
-ACTIVE_SPORTS = CONFIG["active_sports"]
+# Independent cricket toggle — set CRICKET_ENABLED=true in env to add
+# cricket to any phase without bumping the phase number.
+_CRICKET_ENABLED = os.environ.get("CRICKET_ENABLED", "false").lower() == "true"
+_base_sports = CONFIG["active_sports"]
+ACTIVE_SPORTS = (
+    _base_sports + ["cricket"]
+    if _CRICKET_ENABLED and "cricket" not in _base_sports
+    else _base_sports
+)
 ACTIVE_COUNTRY = CONFIG["country"]
 CURRENCY = CONFIG["currency"]
 PAYMENT_PROVIDER = CONFIG["payment_provider"]

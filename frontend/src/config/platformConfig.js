@@ -143,11 +143,19 @@ const PHASE_3 = {
 
 // ─────────────────────────────────────────────────────────────────────
 // ACTIVE PHASE — controlled by REACT_APP_PHASE env var
+// CRICKET_ENABLED — independent toggle via REACT_APP_CRICKET_ENABLED
+//   Set REACT_APP_CRICKET_ENABLED=true in Coolify to add cricket to any
+//   phase without bumping the phase number.
 // ─────────────────────────────────────────────────────────────────────
 const PHASE_CONFIGS = { 1: PHASE_1, 2: PHASE_2, 3: PHASE_3 };
 
 export const PHASE = parseInt(process.env.REACT_APP_PHASE || "1");
-export const platformConfig = PHASE_CONFIGS[PHASE] || PHASE_1;
+const baseConfig = PHASE_CONFIGS[PHASE] || PHASE_1;
+
+const CRICKET_ENABLED = process.env.REACT_APP_CRICKET_ENABLED === "true";
+export const platformConfig = (CRICKET_ENABLED && !baseConfig.activeSports.includes("cricket"))
+  ? { ...baseConfig, activeSports: [...baseConfig.activeSports, "cricket"] }
+  : baseConfig;
 
 // Resolved sport objects for the active phase (use this in UI components)
 export const activeSports = platformConfig.activeSports
