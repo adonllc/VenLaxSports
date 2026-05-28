@@ -3,8 +3,8 @@ import Logo from "../components/Logo";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://api.venlaxsports.com";
 
-const NAVY = "#111827";
-const NAVY_MID = "#111827";
+const NAVY = "#1B2B4B";
+const NAVY_MID = "#1B2B4B";
 const LIME = "#C9572A";
 const TEAL = "#0B6E4F";
 const BORDER = "#E5E7EB";
@@ -66,7 +66,7 @@ export default function PreLaunch() {
       body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#1B2B4B", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Opponent Found</p>
           {[
             { name: "Marcus T.", rating: 1847, record: "12W 3L" },
@@ -95,7 +95,7 @@ export default function PreLaunch() {
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#1B2B4B", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Austin TX — Tennis Singles</p>
           <div className="space-y-2">
             {[
@@ -129,7 +129,7 @@ export default function PreLaunch() {
       body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. Round-robin or bracket. You choose the intensity, we handle the rest.",
       reverse: false,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6 space-y-3" style={{ background: "#1B2B4B", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Choose Your Format</p>
           {[
             { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Most Popular", badgeStyle: { color: "#065F46", background: "#EDF7F3" }, icon: "🎾" },
@@ -157,7 +157,7 @@ export default function PreLaunch() {
       body: "Tennis and Pickleball under one account. Switch sports, keep your rankings, build one unified record.",
       reverse: true,
       mockup: (
-        <div className="flex-1 rounded-2xl p-6" style={{ background: "#111827", border: `1px solid ${BORDER}` }}>
+        <div className="flex-1 rounded-2xl p-6" style={{ background: "#1B2B4B", border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Your Profile</p>
           <div className="bg-white rounded-xl p-4 mb-3 flex items-center gap-3" style={{ border: `1px solid ${BORDER}` }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ background: NAVY }}>YO</div>

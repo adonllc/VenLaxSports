@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const ESPRESSO = "#111827";
+const ESPRESSO = "#1B2B4B";
 const RUST = "#C24A1D";
 const SAND_PALE = "#FFFFFF";
 const SAND_LIGHT = "#F3F4F6";

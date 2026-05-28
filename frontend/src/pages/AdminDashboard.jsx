@@ -420,7 +420,7 @@ export default function AdminDashboard() {
                   </div>
                 )}
 
-                <button type="submit" disabled={creating} className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#111827" }} data-testid="create-league-submit">
+                <button type="submit" disabled={creating} className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#1B2B4B" }} data-testid="create-league-submit">
                   {creating ? "Creating..." : "Create League"}
                 </button>
               </form>
@@ -442,7 +442,7 @@ export default function AdminDashboard() {
                 >
                   + Create Round Robin League
                 </button>
-                <button onClick={() => setTab("create")} className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#111827" }} data-testid="add-league-btn">
+                <button onClick={() => setTab("create")} className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#1B2B4B" }} data-testid="add-league-btn">
                   <Plus className="w-4 h-4" /> Add League
                 </button>
               </div>
@@ -513,7 +513,7 @@ export default function AdminDashboard() {
                               data-testid={`finalize-season-${l.id}`}
                               onClick={() => handleFinalizeSeason(l.id)}
                               className="px-3 py-1.5 text-xs font-medium text-white rounded-md"
-                              style={{ background: "#111827" }}
+                              style={{ background: "#1B2B4B" }}
                             >
                               Finalize Season
                             </button>
@@ -592,7 +592,7 @@ export default function AdminDashboard() {
                 data-testid="create-ladder-btn"
                 onClick={handleCreateLadder}
                 className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors"
-                style={{ background: "#111827" }}
+                style={{ background: "#1B2B4B" }}
               >
                 <Plus className="w-4 h-4" /> Create Ladder
               </button>
@@ -638,7 +638,7 @@ export default function AdminDashboard() {
 
       {showRRForm && (
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-labelledby="rr-modal-title"
@@ -730,7 +730,7 @@ export default function AdminDashboard() {
                     alert(e.response?.data?.detail || "Failed to create league");
                   }
                 }}
-                className="flex-1 text-white rounded-md py-2 text-sm font-bold transition" style={{ background: "#111827" }}
+                className="flex-1 text-white rounded-md py-2 text-sm font-bold transition" style={{ background: "#1B2B4B" }}
               >
                 Create League
               </button>
@@ -832,7 +832,7 @@ function SeasonsTab() {
               {msg}
             </div>
           )}
-          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#111827" }} data-testid="season-submit-btn">
+          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="season-submit-btn">
             {busy ? "Creating..." : "Create Season"}
           </button>
         </form>
@@ -942,7 +942,7 @@ function PlayoffsTab({ leagues }) {
               {msg}
             </div>
           )}
-          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#111827" }} data-testid="playoff-submit-btn">
+          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="playoff-submit-btn">
             {busy ? "Generating..." : "Generate Bracket"}
           </button>
           <p className="text-xs text-gray-500">Requires at least N players with recorded match results in the league's standings.</p>
@@ -1025,7 +1025,7 @@ function AutoGenerateTab({ onSuccess }) {
           type="button"
           onClick={handleGenerate}
           disabled={busy}
-          className="w-full py-3 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#111827" }}
+          className="w-full py-3 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }}
           data-testid="auto-generate-btn"
         >
           {busy ? "Generating..." : "Generate Leagues"}
@@ -1260,7 +1260,7 @@ function WaitlistTab() {
           />
           <button
             onClick={copyCSV}
-            className="text-xs bg-gray-900 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            className="text-xs bg-[#1B2B4B] text-white px-3 py-2 rounded-lg hover:bg-[#142040] transition-colors"
             data-testid="waitlist-copy-csv"
           >
             Copy CSV

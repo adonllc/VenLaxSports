@@ -113,7 +113,7 @@ export default function RoundRobinInvite() {
             <Link
               to={`/auth?next=/round-robin/invite/${token}`}
               data-testid="btn-login-to-accept"
-              className="block w-full bg-black text-white rounded-md py-2.5 text-sm font-bold hover:bg-gray-800 transition text-center"
+              className="block w-full bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition text-center"
             >
               Log in to accept
             </Link>
@@ -140,7 +140,7 @@ export default function RoundRobinInvite() {
               data-testid="btn-accept-invite"
               onClick={handleAccept}
               disabled={accepting || !waiverAccepted}
-              className="w-full bg-black text-white rounded-md py-2.5 text-sm font-bold hover:bg-gray-800 transition disabled:opacity-50"
+              className="w-full bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
             >
               {accepting ? "Accepting..." : "Accept & Join as Partner"}
             </button>

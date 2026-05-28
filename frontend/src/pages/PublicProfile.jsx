@@ -157,7 +157,7 @@ export default function PublicProfile() {
             <button
               onClick={handleChallenge}
               disabled={challenging || challengeSent}
-              className="mt-5 w-full flex items-center justify-center gap-2 bg-black text-white rounded-md py-2.5 text-sm font-bold hover:bg-gray-800 transition disabled:opacity-50"
+              className="mt-5 w-full flex items-center justify-center gap-2 bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
               data-testid="challenge-btn"
             >
               <Swords className="w-4 h-4" />
@@ -232,7 +232,7 @@ export default function PublicProfile() {
             <p className="text-gray-500 text-sm mb-3">Play competitively. Track your rating.</p>
             <Link
               to="/auth"
-              className="inline-block bg-black text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-gray-800 transition"
+              className="inline-block bg-[#1B2B4B] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#142040] transition"
               data-testid="profile-join-cta"
             >
               Join VenLax Sports Free

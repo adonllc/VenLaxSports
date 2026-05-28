@@ -219,7 +219,7 @@ export default function Leagues() {
                 onClick={() => setFilters((f) => ({ ...f, division: div }))}
                 className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
                 style={filters.division === div
-                  ? { background: "#111827", borderColor: "#111827", color: "white" }
+                  ? { background: "#1B2B4B", borderColor: "#1B2B4B", color: "white" }
                   : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
               >
                 {div || "All Levels"}

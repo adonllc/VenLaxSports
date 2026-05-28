@@ -378,7 +378,7 @@ export default function PlayerDashboard() {
                 <Trophy className="w-8 h-8 mx-auto mb-3" style={{ color: "#E5E7EB" }} />
                 <p className="text-sm font-medium mb-1" style={{ color: "#374151" }}>No leagues yet</p>
                 <p className="text-xs mb-3" style={{ color: "#6B7280" }}>Join a league to start tracking matches and your rating.</p>
-                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#111827", border: "1px solid #111827" }} data-testid="browse-leagues-btn">
+                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#1B2B4B", border: "1px solid #1B2B4B" }} data-testid="browse-leagues-btn">
                   Browse Open Leagues
                 </Link>
               </div>
@@ -510,7 +510,7 @@ export default function PlayerDashboard() {
                       {schedMsg}
                     </p>
                   )}
-                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#111827" }} data-testid="schedule-submit-btn">
+                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="schedule-submit-btn">
                     {scheduling ? "Scheduling..." : "Schedule Match"}
                   </button>
                 </form>
@@ -541,7 +541,7 @@ export default function PlayerDashboard() {
                       <Link
                         to={`/matches/${m.id}/score`}
                         className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors"
-                        style={{ background: "#111827" }}
+                        style={{ background: "#1B2B4B" }}
                         data-testid={`report-score-btn-${m.id}`}
                       >
                         Report

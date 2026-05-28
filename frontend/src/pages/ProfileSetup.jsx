@@ -62,7 +62,7 @@ export default function ProfileSetup() {
         <div className="flex items-center gap-2 mb-8 justify-center">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${i < step ? "bg-emerald-500 text-white" : i === step ? "bg-black text-white" : "bg-gray-200 text-gray-500"}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${i < step ? "bg-emerald-500 text-white" : i === step ? "bg-[#1B2B4B] text-white" : "bg-gray-200 text-gray-500"}`}>
                 {i < step ? <CheckCircle className="w-4 h-4" /> : i + 1}
               </div>
               <span className={`text-xs font-medium hidden sm:block ${i === step ? "text-gray-900" : "text-gray-400"}`}>{s}</span>
@@ -84,7 +84,7 @@ export default function ProfileSetup() {
                     <button
                       key={s.id}
                       onClick={() => toggleSport(s.id)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${selected ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
+                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${selected ? "border-[#1B2B4B] bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
                       data-testid={`sport-${s.id}`}
                     >
                       <span className="text-2xl">{s.icon}</span>
@@ -98,7 +98,7 @@ export default function ProfileSetup() {
               </div>
               <button
                 onClick={() => setStep(1)}
-                className="w-full py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors text-sm flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors text-sm flex items-center justify-center gap-2"
                 data-testid="next-step-1"
               >
                 Continue <ChevronRight className="w-4 h-4" />
@@ -116,7 +116,7 @@ export default function ProfileSetup() {
                   <button
                     key={sl.value}
                     onClick={() => setForm((f) => ({ ...f, skill_level: sl.value }))}
-                    className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition ${form.skill_level === sl.value ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
+                    className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition ${form.skill_level === sl.value ? "border-[#1B2B4B] bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
                     data-testid={`skill-${sl.value}`}
                   >
                     <span className="font-heading font-black text-lg text-gray-900">{sl.label}</span>
@@ -130,7 +130,7 @@ export default function ProfileSetup() {
                 </button>
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors text-sm flex items-center justify-center gap-2"
+                  className="flex-1 py-3.5 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors text-sm flex items-center justify-center gap-2"
                   data-testid="next-step-2"
                 >
                   Continue <ChevronRight className="w-4 h-4" />
@@ -177,7 +177,7 @@ export default function ProfileSetup() {
                 <button
                   onClick={handleFinish}
                   disabled={saving}
-                  className="flex-1 py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                  className="flex-1 py-3.5 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60 text-sm"
                   data-testid="finish-setup-btn"
                 >
                   {saving ? "Saving..." : "Go to Dashboard"}

@@ -35,7 +35,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={handleClose}
       data-testid="forgot-password-modal"
       role="dialog"
@@ -102,7 +102,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60 text-sm"
                 data-testid="forgot-submit-btn"
               >
                 {loading ? "Sending..." : "Send reset link"}

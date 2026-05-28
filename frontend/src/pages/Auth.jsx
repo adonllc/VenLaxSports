@@ -105,7 +105,7 @@ export default function Auth() {
   return (
     <div className="min-h-[calc(100vh-64px)] flex" data-testid="auth-page">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111827 0%, #3D1A09 100%)" }}>
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1B2B4B 0%, #3D1A09 100%)" }}>
         <div className="absolute inset-0 opacity-25" style={{
           backgroundImage: "radial-gradient(circle at 30% 50%, #C24A1D 0%, transparent 60%), radial-gradient(circle at 70% 30%, #8B2E0D 0%, transparent 60%), radial-gradient(circle at 50% 80%, #C9572A 0%, transparent 50%)"
         }} />

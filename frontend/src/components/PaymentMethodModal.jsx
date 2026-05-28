@@ -89,7 +89,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
       data-testid="payment-method-modal"
       role="dialog"
@@ -212,7 +212,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
               type="button"
               onClick={handleZelleConfirm}
               disabled={loading || zelleRef.length < 4}
-              className="w-full py-3 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60"
+              className="w-full py-3 bg-[#1B2B4B] text-white text-sm font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60"
               data-testid="zelle-confirm-btn"
             >
               {loading ? "Submitting..." : "Confirm payment"}

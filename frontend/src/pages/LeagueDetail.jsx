@@ -378,7 +378,7 @@ export default function LeagueDetail() {
                                 onClick={handleDoublesJoin}
                                 disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
                                 className="w-full text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 transition-colors"
-                                style={{ background: "#111827" }}
+                                style={{ background: "#1B2B4B" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
@@ -452,7 +452,7 @@ export default function LeagueDetail() {
                                 <button
                                   onClick={validatePromo}
                                   disabled={promoLoading || !promoCode.trim()}
-                                  className="px-3 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50" style={{ background: "#111827" }}
+                                  className="px-3 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50" style={{ background: "#1B2B4B" }}
                                   data-testid="apply-promo-btn"
                                 >
                                   {promoLoading ? "..." : "Apply"}
@@ -471,7 +471,7 @@ export default function LeagueDetail() {
                           <button
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                            className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#111827" }}
+                            className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#1B2B4B" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -566,7 +566,7 @@ export default function LeagueDetail() {
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Matches ({matches.length})</h3>
               {user && (
-                <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#111827", border: "1px solid #111827" }} data-testid="schedule-match-link">
+                <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#1B2B4B", border: "1px solid #1B2B4B" }} data-testid="schedule-match-link">
                   Schedule Match
                 </Link>
               )}
@@ -589,7 +589,7 @@ export default function LeagueDetail() {
                         {m.status}
                       </span>
                       {user && m.status === "scheduled" && (user._id === m.player1_id || user.id === m.player1_id || user._id === m.player2_id || user.id === m.player2_id) && (
-                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors" style={{ background: "#111827" }} data-testid={`report-score-${m.id}`}>
+                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors" style={{ background: "#1B2B4B" }} data-testid={`report-score-${m.id}`}>
                           Report Score
                         </Link>
                       )}
@@ -654,7 +654,7 @@ export default function LeagueDetail() {
                   onClick={() => setActiveBox(box.box_id)}
                   className="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors"
                   style={activeBox === box.box_id
-                    ? { background: "#111827", color: "white", borderColor: "#111827" }
+                    ? { background: "#1B2B4B", color: "white", borderColor: "#1B2B4B" }
                     : { background: "white", color: "#374151", borderColor: "#E5E7EB" }}
                 >
                   Box {box.box_id}

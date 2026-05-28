@@ -381,7 +381,7 @@ export default function ScoreReport() {
                       aria-label={`Select ${p.name} as winner`}
                       className={`py-3 px-4 rounded-xl border-2 text-sm font-semibold transition ring-offset-2 ${
                         winnerId === p.id
-                          ? `border-black bg-black text-white ring-2 ${config.ringClass}`
+                          ? `border-[#1B2B4B] bg-[#1B2B4B] text-white ring-2 ${config.ringClass}`
                           : "border-gray-200 text-gray-700 hover:border-gray-400"
                       }`}
                       data-testid={`winner-${p.id}`}
@@ -632,7 +632,7 @@ export default function ScoreReport() {
               <button
                 type="submit"
                 disabled={submitting || !winnerId}
-                className="w-full py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60 text-sm"
                 data-testid="submit-score-btn"
               >
                 {submitting ? "Submitting..." : "Submit Score"}
