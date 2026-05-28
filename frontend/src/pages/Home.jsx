@@ -12,6 +12,7 @@ const SPORT_ICONS = { tennis: Target, pickleball: Zap, cricket: Shield };
 const ALL_SPORT_CONFIG = {
   tennis: {
     accent: "#10B981",
+    badgeText: "#065F46",
     textOnAccent: "#ffffff",
     label: "Tennis",
     icon: "🎾",
@@ -24,6 +25,7 @@ const ALL_SPORT_CONFIG = {
   },
   cricket: {
     accent: "#2563EB",
+    badgeText: "#1E40AF",
     textOnAccent: "#ffffff",
     label: "Cricket",
     icon: "🏏",
@@ -36,6 +38,7 @@ const ALL_SPORT_CONFIG = {
   },
   pickleball: {
     accent: "#F97316",
+    badgeText: "#9A3412",
     textOnAccent: "#ffffff",
     label: "Pickleball",
     icon: "🏓",
@@ -176,7 +179,7 @@ export default function Home() {
                     <span
                       key={s}
                       className="px-3 py-1 text-xs font-semibold rounded-full"
-                      style={{ background: `${config.accent}15`, color: config.accent }}
+                      style={{ background: `${config.accent}15`, color: config.badgeText || config.accent }}
                     >
                       {s}
                     </span>
@@ -323,7 +326,7 @@ export default function Home() {
                       <span
                         key={s}
                         className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ background: `${ORANGE}12`, color: ORANGE }}
+                        style={{ background: `${ORANGE}12`, color: "#7C2D12" }}
                       >
                         {s}
                       </span>
@@ -440,7 +443,7 @@ function LeagueCard({ league }) {
             className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full"
             style={{
               background: `${config.accent || ORANGE}15`,
-              color: config.accent || ORANGE,
+              color: config.badgeText || "#7C2D12",
             }}
           >
             <Icon className="w-3 h-3" />
@@ -449,7 +452,7 @@ function LeagueCard({ league }) {
           {spotsLeft <= 5 && spotsLeft > 0 && (
             <span
               className="text-xs font-semibold rounded-full px-2 py-0.5"
-              style={{ background: `${ORANGE}15`, color: ORANGE }}
+              style={{ background: `${ORANGE}15`, color: "#7C2D12" }}
             >
               {spotsLeft} spots left
             </span>

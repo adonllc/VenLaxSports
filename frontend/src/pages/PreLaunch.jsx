@@ -206,9 +206,9 @@ export default function PreLaunch() {
         <div className="max-w-4xl mx-auto text-center">
           <div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
-            style={{ background: "rgba(201,87,42,0.10)", border: "1px solid rgba(201,87,42,0.25)", color: LIME }}
+            style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)", color: "rgba(255,255,255,0.9)" }}
           >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: LIME }}></span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "rgba(255,255,255,0.9)" }}></span>
             Launching in select cities — 2026
           </div>
           <h1
@@ -217,7 +217,7 @@ export default function PreLaunch() {
           >
             Stop Hunting for Good Matches.
             <br />
-            <span style={{ color: LIME }}>Play in a Real League.</span>
+            <span style={{ color: "rgba(255,255,255,0.95)" }}>Play in a Real League.</span>
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10" style={{ color: "rgba(255,255,255,0.7)" }}>
             VENLAX runs competitive Tennis and Pickleball leagues in your city — real rankings,
@@ -315,7 +315,7 @@ export default function PreLaunch() {
       {/* Solution */}
       <section className="py-20 px-6" style={{ background: "#C24A1D", color: "white" }}>
         <div className="max-w-4xl mx-auto">
-          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: LIME }}>
+          <p className="font-semibold text-sm uppercase tracking-widest mb-4 text-center" style={{ color: "rgba(255,255,255,0.7)" }}>
             Enter VENLAX Sports
           </p>
           <h2
@@ -335,7 +335,7 @@ export default function PreLaunch() {
               <div key={item.before} className="rounded-lg p-5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <p className="text-sm line-through mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>{item.before}</p>
                 <p className="font-medium flex items-start gap-2" style={{ color: "#fff" }}>
-                  <span className="mt-0.5 flex-shrink-0" style={{ color: LIME }}>→</span>
+                  <span className="mt-0.5 flex-shrink-0" style={{ color: "rgba(255,255,255,0.8)" }}>→</span>
                   {item.after}
                 </p>
               </div>
@@ -775,7 +775,7 @@ export default function PreLaunch() {
                 </div>
               </div>
               {city && (
-                <p className="text-xs text-center" style={{ color: LIME }}>
+                <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
                   {city.split(",")[0] || city} is filling fast — be first in line when we open.
                 </p>
               )}

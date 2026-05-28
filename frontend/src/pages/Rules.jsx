@@ -425,7 +425,7 @@ export default function Rules() {
             Official League Rulebook v1.0
           </div>
           <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white">
-            The Rules of<br /><span style={{ color: "#C9572A" }}>the Circuit.</span>
+            The Rules of<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>the Circuit.</span>
           </h1>
           <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
             Every match is governed. Every call is fair. Every result counts.

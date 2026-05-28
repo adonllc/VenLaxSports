@@ -296,7 +296,7 @@ export default function PlayerDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#111827", bg: "#FFFFFF",   border: "#E5E7EB" },
-            { label: "Wins",          value: wins,           icon: Award,    color: "#C24A1D", bg: "#FAE0D5",   border: "#E5A885" },
+            { label: "Wins",          value: wins,           icon: Award,    color: "#7C2D12", bg: "#FAE0D5",   border: "#E5A885" },
             { label: "Losses",        value: losses,         icon: TrendingUp, color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
             { label: "Total Matches", value: matches.length, icon: Calendar, color: "#374151", bg: "#F3F4F6",   border: "#E5E7EB" },
           ].map((s) => (
@@ -413,7 +413,7 @@ export default function PlayerDashboard() {
                         )}
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded-full" style={
-                        l.status === "registration" ? { background: "#FAE0D5", color: "#C24A1D" }
+                        l.status === "registration" ? { background: "#FAE0D5", color: "#7C2D12" }
                         : l.status === "active" ? { background: "#EDF7F3", color: "#065F46" }
                         : { background: "#F3F4F6", color: "#6B7280" }
                       }>
@@ -506,7 +506,7 @@ export default function PlayerDashboard() {
                     />
                   </div>
                   {schedMsg && (
-                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
+                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
                       {schedMsg}
                     </p>
                   )}
@@ -567,7 +567,7 @@ export default function PlayerDashboard() {
                   return (
                     <div key={m.id} className="flex items-center gap-3 px-5 py-3.5">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                        style={isWin ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }}>
+                        style={isWin ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }}>
                         {isWin ? "W" : "L"}
                       </div>
                       <div className="min-w-0 flex-1">
