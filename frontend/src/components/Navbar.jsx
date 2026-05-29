@@ -45,7 +45,7 @@ export default function Navbar() {
       data-testid="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-28">
 
           {/* Logo */}
           <Link to="/" data-testid="nav-logo" className="flex-shrink-0">
