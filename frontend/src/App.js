@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./App.css";
+import ConsentBanner from "./components/ConsentBanner";
 
 // Eagerly loaded — always needed on first paint
 import Home from "./pages/Home";
@@ -24,6 +25,7 @@ const SportLanding = lazy(() => import("./pages/SportLanding"));
 const ScoreReport = lazy(() => import("./pages/ScoreReport"));
 const Standings = lazy(() => import("./pages/Standings"));
 const Terms = lazy(() => import("./pages/Terms"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const LeagueSpectator = lazy(() => import("./pages/LeagueSpectator"));
 const CityLeaderboard = lazy(() => import("./pages/CityLeaderboard"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
@@ -64,6 +66,7 @@ function AppRouter() {
         <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
         <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
         <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
         <Route path="/players/:id" element={<PublicProfile />} />
@@ -91,6 +94,7 @@ function AppShell() {
         <AppRouter />
       </main>
       <Footer />
+      <ConsentBanner />
     </div>
   );
 }

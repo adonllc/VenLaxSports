@@ -50,7 +50,6 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
         results.append({
             "id": str(u["_id"]),
             "name": u.get("name"),
-            "email": u.get("email"),
             "city": u.get("city"),
             "gender": u.get("gender"),
             "tennis_rating": u.get("tennis_rating"),

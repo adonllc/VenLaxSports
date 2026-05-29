@@ -49,6 +49,7 @@ DB_NAME=venlaxsports
 SECRET_KEY=...
 PHASE=1
 STRIPE_SECRET_KEY=...
+ENV=production   # enables secure=True on auth cookies; omit (or set to "development") locally
 # SMTP_* vars optional — console fallback when unset
 ```
 

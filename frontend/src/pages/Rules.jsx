@@ -383,7 +383,7 @@ const PICKLEBALL_RULES = [
     title: "VENLAX League Specifics",
     items: [
       "Each player gets ~5 matches over 6 weeks plus a makeup week.",
-      "DUPR rating updates are applied after every reported match.",
+      "Skill rating updates are applied after every reported match.",
       "Mixed doubles uses the same scoring rules as standard doubles.",
       "Entry fees vary by league — shown at registration.",
     ],
@@ -741,6 +741,12 @@ export default function Rules() {
               </tbody>
             </table>
           </div>
+
+          <p className="text-xs text-gray-400 mt-3 mb-5 px-1">
+            VENLAX skill ratings (1.0–7.0) are proprietary to the VENLAX platform.
+            They are not affiliated with, endorsed by, or equivalent to any external rating system,
+            including the USTA National Tennis Rating Program (NTRP) or DUPR.
+          </p>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-5">
             <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Rating Model</h3>

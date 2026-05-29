@@ -45,7 +45,7 @@ const ALL_SPORT_CONFIG = {
     tagline: "Singles. Doubles. Mixed.",
     desc: "Rally scoring, win-by-2 rules, and skill-based ratings across top facilities.",
     image: "https://images.unsplash.com/photo-1777382141965-68d47862eaf9?w=900&q=80",
-    stats: ["Rally Scoring", "Win-by-2", "DUPR Rating"],
+    stats: ["Rally Scoring", "Win-by-2", "Skill Rating (1.0–7.0)"],
     num: "03",
     badge: "sport-badge-pickleball",
   },

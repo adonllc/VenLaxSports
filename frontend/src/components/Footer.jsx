@@ -60,6 +60,7 @@ export default function Footer() {
                 { to: "/leagues",   label: "Browse Leagues" },
                 { to: "/rules",     label: "Rules & Conduct" },
                 { to: "/terms",     label: "Terms & Conditions" },
+                { to: "/privacy",   label: "Privacy Policy" },
                 { to: "/dashboard", label: "My Dashboard" },
                 { to: "/auth",      label: "Sign Up" },
               ].map(({ to, label }) => (

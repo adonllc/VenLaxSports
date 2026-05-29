@@ -20,12 +20,14 @@ import base64
 
 router = APIRouter()
 
+_SECURE_COOKIES = os.environ.get("ENV", "development").lower() == "production"
+
 
 def _set_tokens(response: Response, user_id: str, email: str, role: str):
     access = create_access_token(user_id, email, role)
     refresh = create_refresh_token(user_id)
-    response.set_cookie("access_token", access, httponly=True, secure=False, samesite="lax", max_age=86400, path="/")
-    response.set_cookie("refresh_token", refresh, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    response.set_cookie("access_token", access, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=86400, path="/")
+    response.set_cookie("refresh_token", refresh, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=604800, path="/")
     return access, refresh
 
 
@@ -155,7 +157,7 @@ async def refresh(request: Request, response: Response):
             raise HTTPException(status_code=401, detail="User not found")
         user_id = str(user["_id"])
         new_access = create_access_token(user_id, user["email"], user.get("role", "player"))
-        response.set_cookie("access_token", new_access, httponly=True, secure=False, samesite="lax", max_age=86400, path="/")
+        response.set_cookie("access_token", new_access, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=86400, path="/")
         return {"message": "Token refreshed"}
     except pyjwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
