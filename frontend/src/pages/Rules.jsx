@@ -199,7 +199,7 @@ const FORMAT_COMPARISON_ROWS = [
   { feature: "End goal",          flex: "Qualify for playoffs",           rr: "Top of group → playoffs",       box: "Promote to next division",         ladder: "Climb the ranked list" },
   { feature: "New season entry",  flex: "Open registration",              rr: "Open registration",             box: "Placed by performance",            ladder: "Join anytime" },
   { feature: "Playoffs",          flex: "Yes — top 4 or 8",              rr: "Yes — group leaders",           box: "No — standings decide",            ladder: "No — rank is live" },
-  { feature: "Best for",          flex: "Flexible schedules",             rr: "Zero scheduling friction",      box: "Competitive progression",          ladder: "Casual frequent play" },
+  { feature: "Best for",          flex: "Flexible schedules",             rr: "Organizer-led competition",     box: "Competitive progression",          ladder: "Casual frequent play" },
 ];
 
 // ─── Format Data ───────────────────────────────────────────────────
@@ -243,12 +243,12 @@ const FLEX_LEAGUE_RULES = [
 
 const ROUND_ROBIN_RULES = [
   {
-    category: "Scheduling",
+    category: "Scheduling — Organizer's Responsibility",
     items: [
-      "All matches pre-assigned by the league organizer before the season begins.",
-      "Each round is assigned a specific week. No self-scheduling required.",
-      "Match times and venues communicated in advance by the organizer.",
-      "Confirm attendance only. No slot negotiation between players.",
+      "VenLax generates match pairings only. All scheduling is the league organizer's responsibility — not VenLax platform admin.",
+      "The organizer assigns match times and venues before each round begins.",
+      "Players confirm attendance. No slot negotiation is needed between players.",
+      "Reschedule requests go to the organizer, not to VenLax support.",
     ],
   },
   {

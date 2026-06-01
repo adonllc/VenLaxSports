@@ -196,15 +196,16 @@ export default function RoundRobinDetail() {
                 <li><strong>Scoring:</strong> {rr.scoring_format || (league.sport === "tennis" ? "Fast-4" : "Games to 11")}</li>
                 <li><strong>Division:</strong> {isDoubles ? "Fixed-Partner Doubles" : "Singles"}</li>
                 <li><strong>Playoff qualifiers:</strong> Top {rr.playoff_threshold || 4}</li>
-                <li><strong>Schedule:</strong> Auto-generated when minimum players ({rr.min_players}) register</li>
+                <li><strong>Fixtures:</strong> Match pairings auto-generated once {rr.min_players}+ players join — your league organizer is notified</li>
               </ul>
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-              <h2 className="font-bold text-amber-900 mb-2 text-sm">Scheduling</h2>
+              <h2 className="font-bold text-amber-900 mb-2 text-sm">Scheduling — Organizer Responsibility</h2>
               <p className="text-amber-800 text-sm leading-relaxed">
-                Players are responsible for coordinating match times within each week window.
-                Offer at least 3 time slots; respond within 48 hours. The league does not assign courts.
-                One reschedule credit per season.
+                <strong>VenLax generates match pairings only.</strong> Your league organizer — not VenLax — is responsible
+                for coordinating all match times and venues. Players: respond to scheduling requests within 48 hours
+                and offer at least 3 available slots. Courts are arranged directly between players and the organizer.
+                One reschedule per season.
               </p>
             </div>
           </div>
