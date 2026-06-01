@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.venlaxsports.com/api/auth/login\" -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')",
+      "Skill(design-review)",
+      "Skill(design-review:*)",
+      "Read(//c/Users/hemkp/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/**)",
+      "Bash(bash \"/c/Users/hemkp/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/start-server.sh\" --project-dir \"c:/Users/hemkp/VENLAX-SPORTS/VenLaxSports\")",
+      "Bash(grep -q \"\\\\.superpowers\" .gitignore)",
+      "Bash(echo \".superpowers/\")",
+      "Bash(ls \"C:\\\\Users\\\\hemkp\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.1.0\\\\skills\\\\subagent-driven-development\")",
+      "Read(//c/Users/hemkp/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/subagent-driven-development/**)",
+      "Read(//c/Users/hemkp/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/requesting-code-review/**)",
+      "Bash(grep -r \"NODE_ENV\" src/ --include=\"*.jsx\" --include=\"*.js\" -l)",
+      "Bash(grep -r \"PUBLIC_URL\\\\|%PUBLIC_URL%\" src/ public/ --include=\"*.html\" --include=\"*.jsx\" --include=\"*.js\" -l)",
+      "Bash(ls public/)",
+      "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(p.get\\('dependencies',{}\\).get\\('react','?'\\), p.get\\('dependencies',{}\\).get\\('react-dom','?'\\)\\)\")",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(xargs sed -i 's/process\\\\.env\\\\.REACT_APP_/import.meta.env.VITE_/g')",
+      "Bash(echo \"exit:$?\")"
+    ]
+  }
+}

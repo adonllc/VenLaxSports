@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENLAX Logo Prompts</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', 'DM Sans', system-ui, sans-serif; background: #F8F9FA; color: #111; padding: 40px 20px; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  h1 span.teal { color: #10B981; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 32px; }
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+  .tool-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; border: 1px solid #E5E7EB; background: white; font-size: 13px; font-weight: 600; text-decoration: none; color: #111; transition: box-shadow .15s; }
+  .tool-link:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); transform: translateY(-1px); }
+  .tool-link .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .card { background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; transition: box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-2px); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #F3F4F6; color: #374151; }
+  .tag { font-size: 12px; font-weight: 600; color: #10B981; }
+  .prompt-text { font-size: 13px; line-height: 1.6; color: #374151; background: #F8F9FA; border-radius: 6px; padding: 12px; font-family: monospace; white-space: pre-wrap; word-break: break-word; }
+  .copy-btn { margin-top: 12px; width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px; background: white; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; transition: background .15s; }
+  .copy-btn:hover { background: #F3F4F6; }
+  .copy-btn.copied { background: #10B981; color: white; border-color: #10B981; }
+  .recommended { border-color: #10B981; }
+  .recommended .badge { background: #D1FAE5; color: #065F46; }
+  footer { margin-top: 40px; text-align: center; font-size: 12px; color: #9CA3AF; }
+</style>
+</head>
+<body>
+
+<h1>VEN<span class="teal">LAX</span> SPORTS</h1>
+<p class="subtitle">10 minimalist flat logo prompts · teal + orange + black palette</p>
+
+<div class="tools">
+  <a class="tool-link" href="https://www.bing.com/images/create" target="_blank">
+    <span class="dot" style="background:#0078D4"></span> Bing Image Creator (free)
+  </a>
+  <a class="tool-link" href="https://labs.google/fx/tools/image-fx" target="_blank">
+    <span class="dot" style="background:#EA4335"></span> Google ImageFX (free)
+  </a>
+  <a class="tool-link" href="https://ideogram.ai" target="_blank">
+    <span class="dot" style="background:#7C3AED"></span> Ideogram.ai (10/day free)
+  </a>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>Tip: try #01, #07, #10 first — strongest for sport brands at small sizes</footer>
+
+<script>
+const prompts = [
+  {
+    num: "01",
+    name: "Arc Wordmark",
+    tag: "⭐ Recommended",
+    recommended: true,
+    text: `Minimalist flat vector logo. Bold black sans-serif wordmark "VENLAX" with "SPORTS" below in small teal caps. A single thin teal arc above the letter X suggesting a ball trajectory. Pure white background. Flat 2D, no shadows, no gradients, no 3D. Professional sports brand.`
+  },
+  {
+    num: "02",
+    name: "Hexagon Icon",
+    tag: "",
+    text: `Flat vector sports brand logo. Bold black wordmark "VENLAX SPORTS". Left of text: small hexagon icon split into 3 color segments — teal, orange, black. Clean minimalist style. White background, no gradients, no effects. Vector-clean.`
+  },
+  {
+    num: "03",
+    name: "Ball-Dot Accent",
+    tag: "",
+    text: `Minimalist sports logo. "VENLAX" in bold black uppercase sans-serif. The letter O replaced by a small orange filled circle suggesting a sports ball. "SPORTS" in small teal tracking-wide caps below. White background. Pure flat 2D design.`
+  },
+  {
+    num: "04",
+    name: "Diagonal Strike",
+    tag: "",
+    text: `Clean flat wordmark logo "VENLAX SPORTS" in black. Single diagonal teal line crossing through the X adding dynamic energy. "SPORTS" in light gray small caps below. Minimal, modern, white background, no shadows.`
+  },
+  {
+    num: "05",
+    name: "VL Monogram",
+    tag: "",
+    text: `Flat minimalist logo. Large bold geometric "VL" monogram in black. Small orange dot accent at top-right corner. "VENLAX SPORTS" in small black sans-serif below the monogram. White background, no gradients, no shadows.`
+  },
+  {
+    num: "06",
+    name: "Racket Icon",
+    tag: "",
+    text: `Vector flat logo. Ultra-simple tennis racket silhouette in solid black — oval head with 3 lines for strings, short handle. "VENLAX" in bold black to the right. "SPORTS" below in teal. White background. Ultra-clean modern brand mark.`
+  },
+  {
+    num: "07",
+    name: "Underline Bar",
+    tag: "⭐ Recommended",
+    recommended: true,
+    text: `Minimalist wordmark logo. "VENLAX" in heavy black uppercase. Thick solid teal underline bar slightly wider than the text. "SPORTS" in small orange uppercase wide-tracking below. White background, flat 2D, no effects.`
+  },
+  {
+    num: "08",
+    name: "V Triangle Icon",
+    tag: "",
+    text: `Flat geometric logo. Stylized V shape made of two triangles — left triangle teal, right triangle orange. "VENLAX SPORTS" in bold black sans-serif to the right of the V mark. White background, no shadows, vector-clean.`
+  },
+  {
+    num: "09",
+    name: "Sport Color Bars",
+    tag: "",
+    text: `Clean minimalist sport logo. "VENLAX SPORTS" in bold black uppercase. Three thin horizontal bars beneath the text: teal, orange, black — equal width matching text. Modern flat 2D design, white background, no effects.`
+  },
+  {
+    num: "10",
+    name: "Split X",
+    tag: "⭐ Recommended",
+    recommended: true,
+    text: `Minimalist flat logo. "VENLAX SPORTS" bold black wordmark. The X in VENLAX is split: top-left stroke in teal, bottom-right stroke in orange, creating a tri-color X. "SPORTS" below in black small caps. White background, flat 2D.`
+  }
+];
+
+const grid = document.getElementById('grid');
+prompts.forEach(p => {
+  const card = document.createElement('div');
+  card.className = 'card' + (p.recommended ? ' recommended' : '');
+  card.innerHTML = `
+    <div class="card-header">
+      <span class="badge">Logo ${p.num} · ${p.name}</span>
+      ${p.tag ? `<span class="tag">${p.tag}</span>` : ''}
+    </div>
+    <div class="prompt-text">${p.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    <button class="copy-btn" onclick="copyPrompt(this, ${JSON.stringify(p.text)})">Copy Prompt</button>
+  `;
+  grid.appendChild(card);
+});
+
+function copyPrompt(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Prompt';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>

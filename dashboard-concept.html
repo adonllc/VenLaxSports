@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VENLAX — League Manager</title>
+  <!-- Inline theme init: runs before paint to prevent flash -->
+  <script>
+    (function() {
+      var saved = localStorage.getItem('venlax-theme');
+      var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = saved || sys;
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* ── Light mode (default) ── */
+    :root {
+      color-scheme: light;
+      --c-base:         oklch(0.980 0.004 248);
+      --c-surface:      oklch(0.963 0.005 248);
+      --c-raised:       oklch(0.942 0.006 248);
+      --c-overlay:      oklch(0.928 0.007 248);
+      --c-border:       oklch(0.868 0.009 248);
+      --c-border-sub:   oklch(0.910 0.007 248);
+      --c-text:         oklch(0.175 0.015 248);
+      --c-muted:        oklch(0.450 0.012 248);
+      --c-faint:        oklch(0.615 0.010 248);
+
+      --c-tennis:       oklch(0.485 0.175 161);
+      --c-tennis-bg:    oklch(0.938 0.045 161);
+      --c-tennis-dim:   oklch(0.720 0.120 161);
+
+      --c-pickle:       oklch(0.530 0.155 50);
+      --c-pickle-bg:    oklch(0.948 0.060 50);
+
+      --c-cricket:      oklch(0.430 0.175 264);
+      --c-cricket-bg:   oklch(0.940 0.055 264);
+
+      --c-live:         oklch(0.490 0.165 145);
+      --c-live-bg:      oklch(0.935 0.050 145);
+      --c-warn:         oklch(0.500 0.155 85);
+      --c-warn-bg:      oklch(0.952 0.060 85);
+      --c-danger:       oklch(0.490 0.200 25);
+      --c-danger-bg:    oklch(0.958 0.050 25);
+      --c-up:           oklch(0.480 0.155 150);
+      --c-down:         oklch(0.490 0.195 25);
+
+      /* Derived tokens */
+      --c-table-hover:  oklch(0.920 0.006 248 / 0.9);
+      --c-row1-bg:      oklch(0.485 0.175 161 / 0.07);
+      --c-row2-bg:      oklch(0.485 0.175 161 / 0.04);
+      --c-row3-bg:      oklch(0.485 0.175 161 / 0.025);
+      --c-live-border:  oklch(0.490 0.165 145 / 0.30);
+      --c-warn-border:  oklch(0.500 0.155 85  / 0.35);
+      --c-rank2:        oklch(0.38 0.012 248);
+    }
+
+    /* ── Dark mode ── */
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --c-base:         oklch(0.113 0.013 248);
+      --c-surface:      oklch(0.153 0.011 248);
+      --c-raised:       oklch(0.185 0.010 248);
+      --c-overlay:      oklch(0.210 0.009 248);
+      --c-border:       oklch(0.240 0.009 248);
+      --c-border-sub:   oklch(0.195 0.008 248);
+      --c-text:         oklch(0.956 0.005 248);
+      --c-muted:        oklch(0.610 0.009 248);
+      --c-faint:        oklch(0.420 0.007 248);
+
+      --c-tennis:       oklch(0.720 0.190 161);
+      --c-tennis-bg:    oklch(0.235 0.070 161);
+      --c-tennis-dim:   oklch(0.320 0.090 161);
+
+      --c-pickle:       oklch(0.750 0.175 50);
+      --c-pickle-bg:    oklch(0.250 0.065 50);
+
+      --c-cricket:      oklch(0.640 0.200 264);
+      --c-cricket-bg:   oklch(0.230 0.075 264);
+
+      --c-live:         oklch(0.795 0.175 145);
+      --c-live-bg:      oklch(0.215 0.060 145);
+      --c-warn:         oklch(0.855 0.175 85);
+      --c-warn-bg:      oklch(0.240 0.065 85);
+      --c-danger:       oklch(0.655 0.215 25);
+      --c-danger-bg:    oklch(0.220 0.060 25);
+      --c-up:           oklch(0.770 0.165 150);
+      --c-down:         oklch(0.640 0.195 25);
+
+      --c-table-hover:  oklch(0.18 0.009 248 / 0.7);
+      --c-row1-bg:      oklch(0.720 0.190 161 / 0.045);
+      --c-row2-bg:      oklch(0.720 0.190 161 / 0.027);
+      --c-row3-bg:      oklch(0.720 0.190 161 / 0.016);
+      --c-live-border:  oklch(0.795 0.175 145 / 0.22);
+      --c-warn-border:  oklch(0.855 0.175 85  / 0.30);
+      --c-rank2:        oklch(0.78 0.008 248);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--c-base);
+      color: var(--c-text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 220ms ease-out, color 180ms ease-out;
+    }
+
+    /* Smooth theme transition on key surfaces */
+    #topbar, #sidebar, #main, #right,
+    .block, .live-card, table.st tbody tr,
+    .nav-item, .upcoming-item, .stat-row, .match-row,
+    .rsection, .ppo-row {
+      transition: background-color 220ms ease-out, border-color 180ms ease-out;
+    }
+
+    #app {
+      display: grid;
+      grid-template-columns: 196px 1fr 288px;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      grid-column: 1 / -1;
+      background: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 14px;
+    }
+    .logo-mark {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      line-height: 1;
+    }
+    .logo-ven  { color: var(--c-text); }
+    .logo-lax  { color: var(--c-tennis); }
+    .logo-sub  {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+      align-self: flex-end;
+      padding-bottom: 2px;
+      margin-left: 5px;
+    }
+    .topbar-div { width: 1px; height: 20px; background: var(--c-border); flex-shrink: 0; }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--c-muted);
+    }
+    .breadcrumb-cur { color: var(--c-text); font-weight: 500; }
+    .bc-sep { color: var(--c-faint); }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--c-raised);
+      border: 1px solid var(--c-border);
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 12.5px;
+      color: var(--c-muted);
+      cursor: text;
+      min-width: 200px;
+    }
+    .search-bar .kb {
+      margin-left: auto;
+      font-size: 10px;
+      background: var(--c-border);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--c-faint);
+    }
+    .city-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--c-raised);
+      border: 1px solid var(--c-border);
+      border-radius: 5px;
+      padding: 5px 10px;
+      color: var(--c-muted);
+      font-size: 12.5px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background-color 120ms ease-out;
+    }
+    .city-btn:hover { background: var(--c-overlay); }
+
+    /* Theme toggle */
+    #theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      border: 1px solid var(--c-border);
+      background: var(--c-raised);
+      color: var(--c-muted);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 120ms ease-out, color 120ms ease-out;
+    }
+    #theme-toggle:hover { background: var(--c-overlay); color: var(--c-text); }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--c-tennis-bg);
+      border: 1px solid var(--c-tennis-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--c-tennis);
+      flex-shrink: 0;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      background: var(--c-surface);
+      border-right: 1px solid var(--c-border);
+      overflow-y: auto;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav-group {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+      padding: 10px 10px 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--c-muted);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--c-raised); color: var(--c-text); }
+    .nav-item.active { background: var(--c-tennis-bg); color: var(--c-tennis); }
+    .nav-icon { width: 15px; height: 15px; opacity: 0.7; flex-shrink: 0; }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-badge {
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: var(--c-raised);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--c-faint);
+    }
+    .nav-badge.alert { background: var(--c-tennis-bg); color: var(--c-tennis); }
+    .nav-div { height: 1px; background: var(--c-border-sub); margin: 6px 4px; }
+
+    .sport-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--c-muted);
+      cursor: pointer;
+    }
+    .sport-pill:hover { color: var(--c-text); }
+    .sport-pill.active-t { background: var(--c-tennis-bg); color: var(--c-tennis); }
+    .sport-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    /* ── Main ── */
+    #main {
+      overflow-y: auto;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .league-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    .league-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--c-text);
+      line-height: 1.1;
+    }
+    .league-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: var(--c-raised);
+      color: var(--c-muted);
+      border: 1px solid var(--c-border-sub);
+    }
+    .chip.sport-t { background: var(--c-tennis-bg); color: var(--c-tennis); border-color: transparent; }
+    .chip.warn { background: var(--c-warn-bg); color: var(--c-warn); border-color: var(--c-warn-border); }
+
+    .prog-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; min-width: 148px; }
+    .prog-label { font-size: 11px; color: var(--c-muted); }
+    .prog-track { width: 148px; height: 4px; background: var(--c-raised); border-radius: 2px; overflow: hidden; }
+    .prog-fill { height: 100%; background: var(--c-tennis); border-radius: 2px; width: 58.3%; }
+    .prog-pct { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--c-tennis); }
+
+    /* ── Data blocks ── */
+    .block {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .block-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+    }
+    .block-action { font-size: 11px; color: var(--c-tennis); cursor: pointer; font-weight: 500; }
+
+    /* ── Standings table ── */
+    table.st { width: 100%; border-collapse: collapse; }
+    table.st thead th {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+      padding: 8px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    table.st thead th.r { text-align: right; }
+    table.st tbody tr {
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    table.st tbody tr:last-child { border-bottom: none; }
+    table.st tbody tr:hover { background: var(--c-table-hover); }
+    table.st tbody tr:nth-child(1) { background: var(--c-row1-bg); }
+    table.st tbody tr:nth-child(2) { background: var(--c-row2-bg); }
+    table.st tbody tr:nth-child(3) { background: var(--c-row3-bg); }
+    table.st tbody td { padding: 10px 16px; font-size: 13px; vertical-align: middle; }
+
+    .rnum { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--c-faint); width: 28px; text-align: right; }
+    .rnum.r1 { color: var(--c-warn); }
+    .rnum.r2 { color: var(--c-rank2); }
+    .rnum.r3 { color: var(--c-pickle); }
+
+    .pname { font-weight: 600; color: var(--c-text); }
+    .ploc  { font-size: 11px; color: var(--c-faint); margin-top: 1px; }
+
+    .rval  { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--c-text); text-align: right; }
+    .rdelta { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; text-align: right; }
+    .rdelta.up   { color: var(--c-up); }
+    .rdelta.dn   { color: var(--c-down); }
+
+    .snum { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--c-muted); text-align: right; }
+
+    .wbar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+    .wpct { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--c-muted); width: 36px; text-align: right; }
+    .wbar { width: 52px; height: 3px; background: var(--c-raised); border-radius: 2px; overflow: hidden; }
+    .wbar-fill { height: 100%; background: var(--c-tennis); border-radius: 2px; opacity: 0.7; }
+
+    /* ── Match entries ── */
+    .match-row {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--c-border-sub);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .match-row:last-child { border-bottom: none; }
+
+    .result-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      background: var(--c-live-bg);
+      color: var(--c-live);
+    }
+
+    .match-info { flex: 1; min-width: 0; }
+    .match-line { display: flex; align-items: baseline; gap: 6px; }
+    .mwinner { font-weight: 600; color: var(--c-text); }
+    .mloser  { color: var(--c-muted); }
+    .mvsep   { color: var(--c-faint); font-size: 10px; }
+    .mscore  { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--c-muted); margin-top: 2px; }
+    .mtime   { font-size: 11px; color: var(--c-faint); flex-shrink: 0; text-align: right; min-width: 68px; }
+
+    /* ── Right panel ── */
+    #right {
+      background: var(--c-surface);
+      border-left: 1px solid var(--c-border);
+      overflow-y: auto;
+    }
+    .rsection {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    .rsection:last-child { border-bottom: none; }
+    .rsec-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+      margin-bottom: 10px;
+    }
+
+    .live-card {
+      background: var(--c-live-bg);
+      border: 1px solid var(--c-live-border);
+      border-radius: 5px;
+      padding: 11px 13px;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--c-live);
+      margin-bottom: 7px;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--c-live);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .live-players { font-weight: 600; font-size: 13px; color: var(--c-text); }
+    .live-score   { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--c-text); margin-top: 5px; letter-spacing: 0.05em; }
+    .live-set     { font-size: 11px; color: var(--c-live); opacity: 0.75; margin-top: 2px; }
+
+    .upcoming-item {
+      padding: 9px 0;
+      border-bottom: 1px solid var(--c-border-sub);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .upcoming-item:last-child { border-bottom: none; }
+    .up-time { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--c-tennis); }
+    .up-players { font-size: 12.5px; font-weight: 500; color: var(--c-text); }
+    .up-venue { font-size: 11px; color: var(--c-faint); }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-lbl { font-size: 12px; color: var(--c-muted); }
+    .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--c-text); }
+
+    .ppo-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--c-border-sub);
+    }
+    .ppo-row:last-child { border-bottom: none; }
+    .ppo-rank { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; width: 16px; }
+    .ppo-name { font-size: 12px; font-weight: 500; }
+    .ppo-badge {
+      margin-left: auto;
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 2px;
+    }
+    .ppo-gap { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--c-faint); margin-left: auto; }
+
+    .cutline-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .cutline-line { flex: 1; height: 1px; background: var(--c-border); }
+    .cutline-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--c-faint);
+    }
+
+    /* Warn-border ppo row */
+    .ppo-row.cutline-above { border-bottom-color: var(--c-warn-border); }
+
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 2px; }
+
+    @media (max-width: 900px) {
+      #app { grid-template-columns: 1fr; }
+      #sidebar, #right { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══ TOP BAR ═══ -->
+  <header id="topbar">
+    <div style="display:flex;align-items:baseline;gap:0;">
+      <div class="logo-mark">
+        <span class="logo-ven">VEN</span><span class="logo-lax">LAX</span>
+      </div>
+      <span class="logo-sub">Sports</span>
+    </div>
+    <div class="topbar-div"></div>
+    <nav class="breadcrumb">
+      <span>Leagues</span>
+      <span class="bc-sep">›</span>
+      <span>New York</span>
+      <span class="bc-sep">›</span>
+      <span class="breadcrumb-cur">Spring 2026 · Singles</span>
+    </nav>
+    <div style="flex:1;"></div>
+    <div class="search-bar">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search players, leagues…
+      <span class="kb">⌘K</span>
+    </div>
+    <button class="city-btn">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      New York
+      <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <!-- Theme toggle -->
+    <button id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <!-- Icon swapped by JS -->
+    </button>
+    <div class="avatar">HP</div>
+  </header>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside id="sidebar">
+    <div class="nav-group">Menu</div>
+
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      Leagues
+      <span class="nav-badge">4</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+      </svg>
+      Players
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4M12 17v4"/>
+      </svg>
+      Matches
+      <span class="nav-badge alert">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      Playoffs
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
+      </svg>
+      Payments
+    </a>
+
+    <div class="nav-div"></div>
+    <div class="nav-group">Sports</div>
+
+    <div class="sport-pill active-t">
+      <span class="sport-dot"></span>
+      Tennis
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;">4</span>
+    </div>
+    <div class="sport-pill">
+      <span class="sport-dot" style="background:var(--c-pickle);color:var(--c-pickle);"></span>
+      <span style="color:var(--c-muted);">Pickleball</span>
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--c-faint);">2</span>
+    </div>
+    <div class="sport-pill">
+      <span class="sport-dot" style="background:var(--c-cricket);color:var(--c-cricket);"></span>
+      <span style="color:var(--c-faint);">Cricket</span>
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--c-faint);">—</span>
+    </div>
+
+    <div style="flex:1;"></div>
+    <div class="nav-div"></div>
+
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+      </svg>
+      Settings
+    </a>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main id="main">
+
+    <div class="league-header">
+      <div>
+        <div class="league-title">NYC Tennis — Spring 2026</div>
+        <div class="league-meta">
+          <span class="chip sport-t">Tennis</span>
+          <span class="chip">Singles</span>
+          <span class="chip">Season 3</span>
+          <span class="chip warn">Week 7 of 12</span>
+        </div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-label">Season progress</div>
+        <div class="prog-track"><div class="prog-fill"></div></div>
+        <div class="prog-pct">7 / 12 weeks</div>
+      </div>
+    </div>
+
+    <!-- Standings -->
+    <div class="block">
+      <div class="block-head">
+        <span class="block-label">Standings</span>
+        <span class="block-action">Export CSV</span>
+      </div>
+      <table class="st">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>Player</th>
+            <th class="r" style="width:96px;">Rating</th>
+            <th class="r" style="width:36px;">W</th>
+            <th class="r" style="width:36px;">L</th>
+            <th class="r" style="width:108px;">Win %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="rnum r1">1</div></td>
+            <td><div class="pname">Alex Morgan</div><div class="ploc">Upper East Side</div></td>
+            <td><div class="rval">1,247</div><div class="rdelta up">+12</div></td>
+            <td><div class="snum">8</div></td><td><div class="snum">2</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.800</span><div class="wbar"><div class="wbar-fill" style="width:80%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum r2">2</div></td>
+            <td><div class="pname">Jordan Chen</div><div class="ploc">Brooklyn Heights</div></td>
+            <td><div class="rval">1,198</div><div class="rdelta dn">−8</div></td>
+            <td><div class="snum">7</div></td><td><div class="snum">3</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.700</span><div class="wbar"><div class="wbar-fill" style="width:70%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum r3">3</div></td>
+            <td><div class="pname">Sam Rivera</div><div class="ploc">Astoria, Queens</div></td>
+            <td><div class="rval">1,165</div><div class="rdelta up">+22</div></td>
+            <td><div class="snum">7</div></td><td><div class="snum">3</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.700</span><div class="wbar"><div class="wbar-fill" style="width:70%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">4</div></td>
+            <td><div class="pname">Taylor Kim</div><div class="ploc">Midtown West</div></td>
+            <td><div class="rval">1,142</div><div class="rdelta up">+5</div></td>
+            <td><div class="snum">6</div></td><td><div class="snum">4</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.600</span><div class="wbar"><div class="wbar-fill" style="width:60%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">5</div></td>
+            <td><div class="pname">Morgan Liu</div><div class="ploc">Flushing, Queens</div></td>
+            <td><div class="rval">1,089</div><div class="rdelta dn">−3</div></td>
+            <td><div class="snum">5</div></td><td><div class="snum">5</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.500</span><div class="wbar"><div class="wbar-fill" style="width:50%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">6</div></td>
+            <td><div class="pname">Casey Park</div><div class="ploc">Hoboken, NJ</div></td>
+            <td><div class="rval">1,067</div><div class="rdelta up">+18</div></td>
+            <td><div class="snum">5</div></td><td><div class="snum">5</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.500</span><div class="wbar"><div class="wbar-fill" style="width:50%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">7</div></td>
+            <td><div class="pname">Riley Johnson</div><div class="ploc">Park Slope, Brooklyn</div></td>
+            <td><div class="rval">1,031</div><div class="rdelta dn">−15</div></td>
+            <td><div class="snum">4</div></td><td><div class="snum">6</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.400</span><div class="wbar"><div class="wbar-fill" style="width:40%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">8</div></td>
+            <td><div class="pname">Drew Martinez</div><div class="ploc">Long Island City</div></td>
+            <td><div class="rval">1,024</div><div class="rdelta up">+7</div></td>
+            <td><div class="snum">4</div></td><td><div class="snum">6</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.400</span><div class="wbar"><div class="wbar-fill" style="width:40%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">9</div></td>
+            <td><div class="pname">Quinn Williams</div><div class="ploc">Jersey City, NJ</div></td>
+            <td><div class="rval">998</div><div class="rdelta dn">−20</div></td>
+            <td><div class="snum">3</div></td><td><div class="snum">7</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.300</span><div class="wbar"><div class="wbar-fill" style="width:30%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">10</div></td>
+            <td><div class="pname">Avery Thompson</div><div class="ploc">Williamsburg, BK</div></td>
+            <td><div class="rval">987</div><div class="rdelta up">+4</div></td>
+            <td><div class="snum">3</div></td><td><div class="snum">7</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.300</span><div class="wbar"><div class="wbar-fill" style="width:30%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">11</div></td>
+            <td><div class="pname">Blake Anderson</div><div class="ploc">Forest Hills, Queens</div></td>
+            <td><div class="rval">943</div><div class="rdelta dn">−9</div></td>
+            <td><div class="snum">2</div></td><td><div class="snum">8</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.200</span><div class="wbar"><div class="wbar-fill" style="width:20%"></div></div></div></td>
+          </tr>
+          <tr>
+            <td><div class="rnum">12</div></td>
+            <td><div class="pname">Sage Davis</div><div class="ploc">Harlem, Manhattan</div></td>
+            <td><div class="rval">912</div><div class="rdelta up">+2</div></td>
+            <td><div class="snum">2</div></td><td><div class="snum">8</div></td>
+            <td><div class="wbar-wrap"><span class="wpct">.200</span><div class="wbar"><div class="wbar-fill" style="width:20%"></div></div></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent matches -->
+    <div class="block">
+      <div class="block-head">
+        <span class="block-label">Recent Matches</span>
+        <span class="block-action">View all 47</span>
+      </div>
+      <div class="match-row">
+        <span class="result-tag">DEF</span>
+        <div class="match-info">
+          <div class="match-line"><span class="mwinner">Alex Morgan</span><span class="mvsep">def.</span><span class="mloser">Riley Johnson</span></div>
+          <div class="mscore">6–2, 6–1</div>
+        </div>
+        <div class="mtime">2h ago</div>
+      </div>
+      <div class="match-row">
+        <span class="result-tag">DEF</span>
+        <div class="match-info">
+          <div class="match-line"><span class="mwinner">Sam Rivera</span><span class="mvsep">def.</span><span class="mloser">Drew Martinez</span></div>
+          <div class="mscore">7–6(4), 6–4</div>
+        </div>
+        <div class="mtime">4h ago</div>
+      </div>
+      <div class="match-row">
+        <span class="result-tag">DEF</span>
+        <div class="match-info">
+          <div class="match-line"><span class="mwinner">Jordan Chen</span><span class="mvsep">def.</span><span class="mloser">Quinn Williams</span></div>
+          <div class="mscore">6–0, 6–2</div>
+        </div>
+        <div class="mtime">Yesterday</div>
+      </div>
+      <div class="match-row">
+        <span class="result-tag">DEF</span>
+        <div class="match-info">
+          <div class="match-line"><span class="mwinner">Casey Park</span><span class="mvsep">def.</span><span class="mloser">Avery Thompson</span></div>
+          <div class="mscore">6–4, 3–6, 6–3</div>
+        </div>
+        <div class="mtime">Yesterday</div>
+      </div>
+      <div class="match-row">
+        <span class="result-tag">DEF</span>
+        <div class="match-info">
+          <div class="match-line"><span class="mwinner">Taylor Kim</span><span class="mvsep">def.</span><span class="mloser">Blake Anderson</span></div>
+          <div class="mscore">6–1, 6–2</div>
+        </div>
+        <div class="mtime">2d ago</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ RIGHT PANEL ═══ -->
+  <aside id="right">
+
+    <div class="rsection">
+      <div class="rsec-label">Live Now</div>
+      <div class="live-card">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          In Progress
+        </div>
+        <div class="live-players">Drew M. vs Morgan L.</div>
+        <div class="live-score">4–3</div>
+        <div class="live-set">Set 2 · Central Park, Court 7</div>
+      </div>
+    </div>
+
+    <div class="rsection">
+      <div class="rsec-label">Upcoming — Next 7 Days</div>
+      <div class="upcoming-item">
+        <div class="up-time">TODAY · 7:30 PM</div>
+        <div class="up-players">Morgan L. vs Sage D.</div>
+        <div class="up-venue">Riverside Park, Court 3</div>
+      </div>
+      <div class="upcoming-item">
+        <div class="up-time">TUE · 6:00 PM</div>
+        <div class="up-players">Alex M. vs Sam R.</div>
+        <div class="up-venue">Hudson River Park, Court 1</div>
+      </div>
+      <div class="upcoming-item">
+        <div class="up-time">WED · 7:00 PM</div>
+        <div class="up-players">Jordan C. vs Casey P.</div>
+        <div class="up-venue">Prospect Park, Court 4</div>
+      </div>
+      <div class="upcoming-item">
+        <div class="up-time">THU · 7:30 PM</div>
+        <div class="up-players">Riley J. vs Taylor K.</div>
+        <div class="up-venue">Carl Schurz Park, Court 2</div>
+      </div>
+    </div>
+
+    <div class="rsection">
+      <div class="rsec-label">Season Summary</div>
+      <div class="stat-row"><span class="stat-lbl">Players enrolled</span><span class="stat-val">12</span></div>
+      <div class="stat-row"><span class="stat-lbl">Matches played</span><span class="stat-val">47</span></div>
+      <div class="stat-row"><span class="stat-lbl">Matches remaining</span><span class="stat-val">19</span></div>
+      <div class="stat-row"><span class="stat-lbl">Weeks to playoffs</span><span class="stat-val">5</span></div>
+      <div class="stat-row"><span class="stat-lbl">Highest rating</span><span class="stat-val" style="color:var(--c-tennis);">1,247</span></div>
+      <div class="stat-row"><span class="stat-lbl">Average rating</span><span class="stat-val">1,076</span></div>
+    </div>
+
+    <div class="rsection">
+      <div class="rsec-label">Playoff Picture</div>
+      <div style="font-size:11px;color:var(--c-muted);margin-bottom:8px;">Top 4 advance. Cutline at position 4.</div>
+
+      <div class="ppo-row">
+        <span class="ppo-rank" style="color:var(--c-live);">1</span>
+        <span class="ppo-name">Alex Morgan</span>
+        <span class="ppo-badge" style="background:var(--c-live-bg);color:var(--c-live);">IN</span>
+      </div>
+      <div class="ppo-row">
+        <span class="ppo-rank" style="color:var(--c-live);">2</span>
+        <span class="ppo-name">Jordan Chen</span>
+        <span class="ppo-badge" style="background:var(--c-live-bg);color:var(--c-live);">IN</span>
+      </div>
+      <div class="ppo-row">
+        <span class="ppo-rank" style="color:var(--c-live);">3</span>
+        <span class="ppo-name">Sam Rivera</span>
+        <span class="ppo-badge" style="background:var(--c-live-bg);color:var(--c-live);">IN</span>
+      </div>
+      <div class="ppo-row cutline-above">
+        <span class="ppo-rank" style="color:var(--c-warn);">4</span>
+        <span class="ppo-name">Taylor Kim</span>
+        <span class="ppo-badge" style="background:var(--c-warn-bg);color:var(--c-warn);">4th</span>
+      </div>
+
+      <div class="cutline-divider">
+        <div class="cutline-line"></div>
+        <span class="cutline-label">Cutline</span>
+        <div class="cutline-line"></div>
+      </div>
+
+      <div class="ppo-row">
+        <span class="ppo-rank" style="color:var(--c-faint);">5</span>
+        <span class="ppo-name" style="color:var(--c-muted);">Morgan Liu</span>
+        <span class="ppo-gap">−22 pts</span>
+      </div>
+      <div class="ppo-row">
+        <span class="ppo-rank" style="color:var(--c-faint);">6</span>
+        <span class="ppo-name" style="color:var(--c-muted);">Casey Park</span>
+        <span class="ppo-gap">−75 pts</span>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<script>
+  // SVG icons
+  var MOON_SVG = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  var SUN_SVG  = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
+  var btn  = document.getElementById('theme-toggle');
+  var html = document.documentElement;
+
+  function applyTheme(t) {
+    html.dataset.theme = t;
+    btn.innerHTML = t === 'dark' ? SUN_SVG : MOON_SVG;
+    btn.title = t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+  }
+
+  // Init icon (theme already applied by inline script above)
+  applyTheme(html.dataset.theme);
+
+  btn.addEventListener('click', function() {
+    var next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('venlax-theme', next);
+    applyTheme(next);
+  });
+</script>
+</body>
+</html>

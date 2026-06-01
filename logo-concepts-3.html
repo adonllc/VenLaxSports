@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>VENLAX — From Source Logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:ital,wght@0,300;0,400;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #080808; font-family: 'Barlow', sans-serif; padding: 48px; }
+  .page-header { margin-bottom: 16px; }
+  .page-header h1 { color: #fff; font-size: 11px; letter-spacing: 5px; text-transform: uppercase; opacity: 0.3; font-weight: 700; }
+  .source-row { display: flex; align-items: center; gap: 32px; margin-bottom: 52px; padding: 24px 32px; background: #111; border-radius: 12px; border: 1px solid #1e1e1e; }
+  .source-label { color: #444; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; }
+  .source-img img { height: 100px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .card { border-radius: 16px; padding: 40px; display: flex; flex-direction: column; gap: 24px; }
+  .dark-card { background: #0f0f0f; border: 1px solid #1a1a1a; }
+  .navy-card { background: #07121f; border: 1px solid #0e1e30; }
+  .card-meta { display: flex; flex-direction: column; gap: 3px; }
+  .num { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; font-weight: 800; color: #9DC527; }
+  .name { font-size: 14px; font-weight: 700; color: #fff; }
+  .desc { font-size: 12px; color: #3a3a3a; line-height: 1.7; margin-top: 2px; }
+  .logo-row { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .on-white { background: #fff; border-radius: 8px; padding: 16px 24px; display: inline-flex; align-items: center; justify-content: center; }
+  .on-light { background: #f0f0f0; border-radius: 8px; padding: 16px 24px; display: inline-flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header"><h1>From Source Logo — VENLAX Sports Variations</h1></div>
+
+<!-- Source reference -->
+<div class="source-row">
+  <div>
+    <div class="source-label">Source</div>
+  </div>
+  <div class="source-img"><img src="docs/venlaxlogo.png" alt="VENLAX Logo"/></div>
+  <div style="color:#2a2a2a; font-size:12px; line-height:1.8; max-width:400px;">
+    Navy shield · Three realistic balls (tennis / pickleball / cricket) · Lime green + white wordmark · "ONE PASSION • THREE SPORTS" tagline · Badge/crest form
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- 17: REFINED SHIELD — same DNA, premium SVG execution -->
+  <div class="card dark-card">
+    <div class="card-meta">
+      <div class="num">17</div>
+      <div class="name">Refined Shield</div>
+      <div class="desc">Same shield crest, cleaner SVG. Flat illustrated balls. Scalable to any size. Keeps "ONE PASSION • THREE SPORTS".</div>
+    </div>
+    <div class="logo-row">
+      <svg width="140" height="160" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#162740"/>
+            <stop offset="100%" stop-color="#0a1520"/>
+          </linearGradient>
+          <linearGradient id="limeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#b5d42a"/>
+            <stop offset="100%" stop-color="#8ab820"/>
+          </linearGradient>
+        </defs>
+        <!-- Shield outline/glow -->
+        <path d="M100 6 L192 32 L192 118 Q192 182 100 222 Q8 182 8 118 L8 32 Z" fill="#9DC527" />
+        <!-- Shield body -->
+        <path d="M100 12 L186 36 L186 118 Q186 178 100 216 Q14 178 14 118 L14 36 Z" fill="url(#shieldGrad)"/>
+        <!-- Inner shield accent -->
+        <path d="M100 20 L178 42 L178 116 Q178 170 100 206 Q22 170 22 116 L22 42 Z" fill="none" stroke="#9DC527" stroke-width="1" opacity="0.3"/>
+
+        <!-- Tennis ball -->
+        <circle cx="68" cy="80" r="28" fill="#c8dc20"/>
+        <path d="M46 70 Q54 55 68 72 Q82 89 90 78" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M46 90 Q54 105 68 88 Q82 71 90 82" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Pickleball -->
+        <circle cx="132" cy="80" r="28" fill="#F97316"/>
+        <circle cx="132" cy="60" r="5" fill="rgba(0,0,0,0.25)"/>
+        <circle cx="118" cy="88" r="5" fill="rgba(0,0,0,0.25)"/>
+        <circle cx="146" cy="88" r="5" fill="rgba(0,0,0,0.25)"/>
+        <circle cx="124" cy="70" r="4" fill="rgba(0,0,0,0.15)"/>
+        <circle cx="140" cy="70" r="4" fill="rgba(0,0,0,0.15)"/>
+
+        <!-- Cricket ball on top -->
+        <circle cx="100" cy="62" r="24" fill="#CC1100"/>
+        <path d="M80 62 Q88 52 100 62 Q112 72 120 62" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <line x1="86" y1="56" x2="86" y2="60" stroke="white" stroke-width="1.5"/>
+        <line x1="92" y1="53" x2="92" y2="57" stroke="white" stroke-width="1.5"/>
+        <line x1="108" y1="67" x2="108" y2="71" stroke="white" stroke-width="1.5"/>
+        <line x1="114" y1="64" x2="114" y2="68" stroke="white" stroke-width="1.5"/>
+
+        <!-- VENLAX banner area -->
+        <rect x="14" y="116" width="172" height="52" fill="#0a1015"/>
+        <rect x="14" y="116" width="172" height="5" fill="#9DC527"/>
+
+        <!-- VENLAX text -->
+        <text x="100" y="148" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="38" font-weight="900" letter-spacing="1" fill="white">VENLAX</text>
+
+        <!-- SPORTS ribbon -->
+        <rect x="30" y="170" width="140" height="24" fill="#0d0d0d"/>
+        <polygon points="14,170 30,170 30,194 14,194" fill="#9DC527"/>
+        <polygon points="186,170 170,170 170,194 186,194" fill="#9DC527"/>
+        <text x="100" y="186" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="16" font-weight="800" letter-spacing="3" fill="#9DC527">SPORTS</text>
+
+        <!-- Tagline -->
+        <text x="100" y="214" text-anchor="middle" font-family="Barlow, sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#9DC527">ONE PASSION • THREE SPORTS</text>
+      </svg>
+
+      <div class="on-white">
+        <svg width="100" height="114" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sg2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#162740"/>
+              <stop offset="100%" stop-color="#0a1520"/>
+            </linearGradient>
+          </defs>
+          <path d="M100 6 L192 32 L192 118 Q192 182 100 222 Q8 182 8 118 L8 32 Z" fill="#9DC527"/>
+          <path d="M100 12 L186 36 L186 118 Q186 178 100 216 Q14 178 14 118 L14 36 Z" fill="url(#sg2)"/>
+          <circle cx="68" cy="80" r="28" fill="#c8dc20"/>
+          <path d="M46 70 Q54 55 68 72 Q82 89 90 78" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M46 90 Q54 105 68 88 Q82 71 90 82" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="132" cy="80" r="28" fill="#F97316"/>
+          <circle cx="132" cy="60" r="5" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="118" cy="88" r="5" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="146" cy="88" r="5" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="100" cy="62" r="24" fill="#CC1100"/>
+          <path d="M80 62 Q88 52 100 62 Q112 72 120 62" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <rect x="14" y="116" width="172" height="52" fill="#0a1015"/>
+          <rect x="14" y="116" width="172" height="5" fill="#9DC527"/>
+          <text x="100" y="148" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="38" font-weight="900" letter-spacing="1" fill="white">VENLAX</text>
+          <rect x="30" y="170" width="140" height="24" fill="#0d0d0d"/>
+          <polygon points="14,170 30,170 30,194 14,194" fill="#9DC527"/>
+          <polygon points="186,170 170,170 170,194 186,194" fill="#9DC527"/>
+          <text x="100" y="186" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="16" font-weight="800" letter-spacing="3" fill="#9DC527">SPORTS</text>
+          <text x="100" y="214" text-anchor="middle" font-family="Barlow, sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#9DC527">ONE PASSION • THREE SPORTS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18: HORIZONTAL BADGE — navbar / website header -->
+  <div class="card navy-card">
+    <div class="card-meta">
+      <div class="num">18</div>
+      <div class="name">Horizontal Badge</div>
+      <div class="desc">Navbar / header lockup. Shield icon left, wordmark right. Three balls become compact dots. Works at 40px height.</div>
+    </div>
+    <div class="logo-row">
+      <svg width="320" height="80" viewBox="0 0 460 112" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hShield" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#1a3050"/>
+            <stop offset="100%" stop-color="#0a1520"/>
+          </linearGradient>
+        </defs>
+        <!-- Mini shield -->
+        <path d="M52 4 L96 16 L96 62 Q96 94 52 108 Q8 94 8 62 L8 16 Z" fill="#9DC527"/>
+        <path d="M52 10 L90 20 L90 62 Q90 90 52 102 Q14 90 14 62 L14 20 Z" fill="url(#hShield)"/>
+        <!-- Three balls compact in shield -->
+        <circle cx="36" cy="52" r="13" fill="#c8dc20"/>
+        <path d="M25 47 Q29 41 36 49 Q43 57 47 52" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M25 57 Q29 63 36 55 Q43 47 47 52" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="52" cy="42" r="12" fill="#CC1100"/>
+        <path d="M42 42 Q46 37 52 42 Q58 47 62 42" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <circle cx="68" cy="52" r="13" fill="#F97316"/>
+        <circle cx="68" cy="44" r="3.5" fill="rgba(0,0,0,0.25)"/>
+        <circle cx="62" cy="57" r="3.5" fill="rgba(0,0,0,0.25)"/>
+        <circle cx="74" cy="57" r="3.5" fill="rgba(0,0,0,0.25)"/>
+        <!-- Lime bottom of shield -->
+        <rect x="14" y="84" width="76" height="4" fill="#9DC527"/>
+
+        <!-- Wordmark -->
+        <text x="116" y="66" font-family="Barlow Condensed, sans-serif" font-size="62" font-weight="900" letter-spacing="1" fill="white">VENLAX</text>
+        <!-- SPORTS -->
+        <text x="118" y="86" font-family="Barlow, sans-serif" font-size="13" font-weight="700" letter-spacing="7" fill="#9DC527">SPORTS</text>
+        <!-- Tagline far right -->
+        <text x="452" y="86" text-anchor="end" font-family="Barlow, sans-serif" font-size="9" font-weight="400" letter-spacing="2" fill="#2a3a20" font-style="italic">ONE PASSION • THREE SPORTS</text>
+      </svg>
+    </div>
+    <div class="logo-row">
+      <div class="on-white">
+        <svg width="240" height="60" viewBox="0 0 460 112" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hShield2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#1a3050"/>
+              <stop offset="100%" stop-color="#0a1520"/>
+            </linearGradient>
+          </defs>
+          <path d="M52 4 L96 16 L96 62 Q96 94 52 108 Q8 94 8 62 L8 16 Z" fill="#9DC527"/>
+          <path d="M52 10 L90 20 L90 62 Q90 90 52 102 Q14 90 14 62 L14 20 Z" fill="url(#hShield2)"/>
+          <circle cx="36" cy="52" r="13" fill="#c8dc20"/>
+          <path d="M25 47 Q29 41 36 49 Q43 57 47 52" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M25 57 Q29 63 36 55 Q43 47 47 52" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="52" cy="42" r="12" fill="#CC1100"/>
+          <path d="M42 42 Q46 37 52 42 Q58 47 62 42" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <circle cx="68" cy="52" r="13" fill="#F97316"/>
+          <circle cx="68" cy="44" r="3.5" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="62" cy="57" r="3.5" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="74" cy="57" r="3.5" fill="rgba(0,0,0,0.25)"/>
+          <rect x="14" y="84" width="76" height="4" fill="#9DC527"/>
+          <text x="116" y="66" font-family="Barlow Condensed, sans-serif" font-size="62" font-weight="900" letter-spacing="1" fill="#0a1520">VENLAX</text>
+          <text x="118" y="86" font-family="Barlow, sans-serif" font-size="13" font-weight="700" letter-spacing="7" fill="#8ab820">SPORTS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 19: FLAT MODERN SHIELD — single-color fields, designer-grade -->
+  <div class="card dark-card">
+    <div class="card-meta">
+      <div class="num">19</div>
+      <div class="name">Flat Modern Shield</div>
+      <div class="desc">Geometric flat illustration. No gradients, no photorealism. Dribbble-quality. Scales perfectly to 16px or billboard.</div>
+    </div>
+    <div class="logo-row">
+      <svg width="130" height="160" viewBox="0 0 185 230" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shield -->
+        <path d="M92 4 L178 26 L178 112 Q178 174 92 222 Q6 174 6 112 L6 26 Z" fill="#9DC527"/>
+        <path d="M92 12 L170 32 L170 112 Q170 168 92 212 Q14 168 14 112 L14 32 Z" fill="#0D1E35"/>
+
+        <!-- Flat geometric balls — three triangular arrangement -->
+        <!-- Tennis (flat) -->
+        <circle cx="60" cy="82" r="26" fill="#d4e840"/>
+        <path d="M38 74 Q46 60 60 74 Q74 88 82 78" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M38 90 Q46 104 60 90 Q74 76 82 86" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+        <!-- Cricket (flat) -->
+        <circle cx="124" cy="82" r="26" fill="#CC1100"/>
+        <path d="M104 82 Q112 72 124 82 Q136 92 144 82" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <line x1="110" y1="76" x2="110" y2="80" stroke="white" stroke-width="2"/>
+        <line x1="116" y1="73" x2="116" y2="77" stroke="white" stroke-width="2"/>
+        <line x1="132" y1="87" x2="132" y2="91" stroke="white" stroke-width="2"/>
+        <line x1="138" y1="84" x2="138" y2="88" stroke="white" stroke-width="2"/>
+
+        <!-- Pickleball center top -->
+        <circle cx="92" cy="58" r="22" fill="#F97316"/>
+        <circle cx="92" cy="44" r="4.5" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="82" cy="64" r="4.5" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="102" cy="64" r="4.5" fill="rgba(0,0,0,0.3)"/>
+
+        <!-- VENLAX ribbon -->
+        <rect x="14" y="110" width="156" height="48" fill="#0a1218"/>
+        <rect x="14" y="110" width="156" height="5" fill="#9DC527"/>
+        <text x="92" y="143" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="34" font-weight="900" letter-spacing="1" fill="white">VENLAX</text>
+
+        <!-- Bottom banner -->
+        <rect x="14" y="160" width="156" height="22" fill="#060e18"/>
+        <text x="92" y="175" text-anchor="middle" font-family="Barlow, sans-serif" font-size="9" font-weight="800" letter-spacing="3" fill="#9DC527">ONE PASSION • THREE SPORTS</text>
+
+        <!-- Bottom shield point -->
+        <path d="M14 182 Q92 218 170 182" fill="#060e18"/>
+        <text x="92" y="210" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="14" font-weight="700" letter-spacing="5" fill="#9DC527">SPORTS</text>
+      </svg>
+
+      <!-- Compact version -->
+      <svg width="88" height="108" viewBox="0 0 185 230" xmlns="http://www.w3.org/2000/svg">
+        <path d="M92 4 L178 26 L178 112 Q178 174 92 222 Q6 174 6 112 L6 26 Z" fill="#9DC527"/>
+        <path d="M92 12 L170 32 L170 112 Q170 168 92 212 Q14 168 14 112 L14 32 Z" fill="#0D1E35"/>
+        <circle cx="60" cy="82" r="26" fill="#d4e840"/>
+        <path d="M38 74 Q46 60 60 74 Q74 88 82 78" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M38 90 Q46 104 60 90 Q74 76 82 86" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="124" cy="82" r="26" fill="#CC1100"/>
+        <path d="M104 82 Q112 72 124 82 Q136 92 144 82" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="92" cy="58" r="22" fill="#F97316"/>
+        <circle cx="92" cy="44" r="4.5" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="82" cy="64" r="4.5" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="102" cy="64" r="4.5" fill="rgba(0,0,0,0.3)"/>
+        <rect x="14" y="110" width="156" height="48" fill="#0a1218"/>
+        <rect x="14" y="110" width="156" height="5" fill="#9DC527"/>
+        <text x="92" y="143" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="34" font-weight="900" letter-spacing="1" fill="white">VENLAX</text>
+        <rect x="14" y="160" width="156" height="22" fill="#060e18"/>
+        <text x="92" y="175" text-anchor="middle" font-family="Barlow, sans-serif" font-size="9" font-weight="800" letter-spacing="3" fill="#9DC527">ONE PASSION • THREE SPORTS</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 20: DARK PREMIUM — all black, lime only -->
+  <div class="card dark-card">
+    <div class="card-meta">
+      <div class="num">20</div>
+      <div class="name">Dark Premium</div>
+      <div class="desc">Black + lime only. Two-color max. Luxury sportswear energy — Kith, Palace, Supreme crossover. Balls in silhouette.</div>
+    </div>
+    <div class="logo-row">
+      <svg width="260" height="100" viewBox="0 0 370 142" xmlns="http://www.w3.org/2000/svg">
+        <!-- Mini shield silhouette all lime -->
+        <path d="M52 6 L94 18 L94 62 Q94 92 52 106 Q10 92 10 62 L10 18 Z" fill="#9DC527"/>
+        <!-- Ball silhouettes inside shield in black -->
+        <circle cx="38" cy="52" r="14" fill="#0a0a0a"/>
+        <path d="M27 46 Q32 39 38 47 Q44 55 49 50" stroke="#9DC527" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M27 58 Q32 65 38 57 Q44 49 49 54" stroke="#9DC527" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="52" cy="38" r="12" fill="#0a0a0a"/>
+        <path d="M43 38 Q47 33 52 38 Q57 43 61 38" stroke="#9DC527" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <circle cx="66" cy="52" r="14" fill="#0a0a0a"/>
+        <circle cx="66" cy="43" r="3.5" fill="#9DC527" opacity="0.6"/>
+        <circle cx="60" cy="58" r="3.5" fill="#9DC527" opacity="0.6"/>
+        <circle cx="72" cy="58" r="3.5" fill="#9DC527" opacity="0.6"/>
+
+        <!-- VENLAX big -->
+        <text x="114" y="72" font-family="Barlow Condensed, sans-serif" font-size="68" font-weight="900" letter-spacing="-1" fill="white">VENLAX</text>
+        <!-- Lime underline full width -->
+        <rect x="114" y="78" width="252" height="3" fill="#9DC527"/>
+        <!-- SPORTS + tagline split -->
+        <text x="116" y="100" font-family="Barlow, sans-serif" font-size="13" font-weight="700" letter-spacing="7" fill="#9DC527">SPORTS</text>
+        <text x="366" y="100" text-anchor="end" font-family="Barlow, sans-serif" font-size="10" font-weight="400" letter-spacing="2" fill="#2a3a20">ONE PASSION • THREE SPORTS</text>
+      </svg>
+    </div>
+    <div class="logo-row">
+      <div class="on-white">
+        <svg width="195" height="75" viewBox="0 0 370 142" xmlns="http://www.w3.org/2000/svg">
+          <path d="M52 6 L94 18 L94 62 Q94 92 52 106 Q10 92 10 62 L10 18 Z" fill="#9DC527"/>
+          <circle cx="38" cy="52" r="14" fill="white"/>
+          <path d="M27 46 Q32 39 38 47 Q44 55 49 50" stroke="#9DC527" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M27 58 Q32 65 38 57 Q44 49 49 54" stroke="#9DC527" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="52" cy="38" r="12" fill="white"/>
+          <path d="M43 38 Q47 33 52 38 Q57 43 61 38" stroke="#9DC527" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <circle cx="66" cy="52" r="14" fill="white"/>
+          <circle cx="66" cy="43" r="3.5" fill="#9DC527" opacity="0.6"/>
+          <circle cx="60" cy="58" r="3.5" fill="#9DC527" opacity="0.6"/>
+          <circle cx="72" cy="58" r="3.5" fill="#9DC527" opacity="0.6"/>
+          <text x="114" y="72" font-family="Barlow Condensed, sans-serif" font-size="68" font-weight="900" letter-spacing="-1" fill="#111">VENLAX</text>
+          <rect x="114" y="78" width="252" height="3" fill="#9DC527"/>
+          <text x="116" y="100" font-family="Barlow, sans-serif" font-size="13" font-weight="700" letter-spacing="7" fill="#8ab820">SPORTS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 21: WORDMARK ONLY — drop the shield, keep the lime -->
+  <div class="card navy-card">
+    <div class="card-meta">
+      <div class="num">21</div>
+      <div class="name">Wordmark Pure</div>
+      <div class="desc">Brand confident enough to drop the shield entirely. Lime VENLAX on navy. Tagline becomes the sport identity. Stripe-only sport nod.</div>
+    </div>
+    <div class="logo-row">
+      <svg width="310" height="90" viewBox="0 0 440 128" xmlns="http://www.w3.org/2000/svg">
+        <!-- Three thin sport stripes top left -->
+        <rect x="0" y="0" width="4" height="40" rx="2" fill="#d4e840"/>
+        <rect x="8" y="0" width="4" height="40" rx="2" fill="#F97316"/>
+        <rect x="16" y="0" width="4" height="40" rx="2" fill="#CC1100"/>
+
+        <!-- VENLAX in lime -->
+        <text x="34" y="62" font-family="Barlow Condensed, sans-serif" font-size="68" font-weight="900" letter-spacing="-1" fill="#9DC527">VENLAX</text>
+        <!-- SPORTS in white -->
+        <text x="36" y="88" font-family="Barlow Condensed, sans-serif" font-size="28" font-weight="800" letter-spacing="10" fill="white">SPORTS</text>
+        <!-- Tagline -->
+        <text x="36" y="108" font-family="Barlow, sans-serif" font-size="10" font-weight="400" letter-spacing="2.5" fill="#2a3a20">ONE PASSION • THREE SPORTS</text>
+      </svg>
+    </div>
+    <div class="logo-row">
+      <div class="on-white">
+        <svg width="232" height="67" viewBox="0 0 440 128" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="4" height="40" rx="2" fill="#d4e840"/>
+          <rect x="8" y="0" width="4" height="40" rx="2" fill="#F97316"/>
+          <rect x="16" y="0" width="4" height="40" rx="2" fill="#CC1100"/>
+          <text x="34" y="62" font-family="Barlow Condensed, sans-serif" font-size="68" font-weight="900" letter-spacing="-1" fill="#0D1E35">VENLAX</text>
+          <text x="36" y="88" font-family="Barlow Condensed, sans-serif" font-size="28" font-weight="800" letter-spacing="10" fill="#9DC527">SPORTS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 22: TROPHY / CHAMPION — premium league platform -->
+  <div class="card dark-card">
+    <div class="card-meta">
+      <div class="num">22</div>
+      <div class="name">Champion Mark</div>
+      <div class="desc">Arc of sport balls like a trophy base. VENLAX as the champion name. Awards ceremony, season finale energy.</div>
+    </div>
+    <div class="logo-row">
+      <svg width="240" height="120" viewBox="0 0 340 168" xmlns="http://www.w3.org/2000/svg">
+        <!-- Arc of balls above wordmark -->
+        <!-- Tennis left -->
+        <circle cx="68" cy="52" r="28" fill="#d4e840"/>
+        <path d="M46 44 Q54 31 68 46 Q82 61 90 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M46 60 Q54 73 68 58 Q82 43 90 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Cricket top center -->
+        <circle cx="170" cy="30" r="28" fill="#CC1100"/>
+        <path d="M149 30 Q157 20 170 30 Q183 40 191 30" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <line x1="157" y1="24" x2="157" y2="28" stroke="white" stroke-width="1.8"/>
+        <line x1="163" y1="21" x2="163" y2="25" stroke="white" stroke-width="1.8"/>
+        <line x1="177" y1="35" x2="177" y2="39" stroke="white" stroke-width="1.8"/>
+        <line x1="183" y1="32" x2="183" y2="36" stroke="white" stroke-width="1.8"/>
+
+        <!-- Pickleball right -->
+        <circle cx="272" cy="52" r="28" fill="#F97316"/>
+        <circle cx="272" cy="36" r="5.5" fill="rgba(0,0,0,0.28)"/>
+        <circle cx="261" cy="60" r="5.5" fill="rgba(0,0,0,0.28)"/>
+        <circle cx="283" cy="60" r="5.5" fill="rgba(0,0,0,0.28)"/>
+        <circle cx="264" cy="46" r="4" fill="rgba(0,0,0,0.18)"/>
+        <circle cx="280" cy="46" r="4" fill="rgba(0,0,0,0.18)"/>
+
+        <!-- Connecting arc (subtle) -->
+        <path d="M68 80 Q170 58 272 80" stroke="#9DC527" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+        <!-- VENLAX -->
+        <text x="170" y="126" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="62" font-weight="900" letter-spacing="-1" fill="white">VENLAX</text>
+
+        <!-- Lime bar -->
+        <rect x="20" y="132" width="300" height="3" fill="#9DC527"/>
+
+        <!-- SPORTS + tagline -->
+        <text x="170" y="152" text-anchor="middle" font-family="Barlow, sans-serif" font-size="12" font-weight="700" letter-spacing="7" fill="#9DC527">SPORTS</text>
+        <text x="170" y="165" text-anchor="middle" font-family="Barlow, sans-serif" font-size="8.5" font-weight="400" letter-spacing="2" fill="#2a3820">ONE PASSION • THREE SPORTS</text>
+      </svg>
+    </div>
+    <div class="logo-row">
+      <div class="on-white">
+        <svg width="180" height="90" viewBox="0 0 340 168" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="68" cy="52" r="28" fill="#d4e840"/>
+          <path d="M46 44 Q54 31 68 46 Q82 61 90 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M46 60 Q54 73 68 58 Q82 43 90 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="170" cy="30" r="28" fill="#CC1100"/>
+          <path d="M149 30 Q157 20 170 30 Q183 40 191 30" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="272" cy="52" r="28" fill="#F97316"/>
+          <circle cx="272" cy="36" r="5.5" fill="rgba(0,0,0,0.28)"/>
+          <circle cx="261" cy="60" r="5.5" fill="rgba(0,0,0,0.28)"/>
+          <circle cx="283" cy="60" r="5.5" fill="rgba(0,0,0,0.28)"/>
+          <path d="M68 80 Q170 58 272 80" stroke="#9DC527" stroke-width="1.5" fill="none" opacity="0.5"/>
+          <text x="170" y="126" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-size="62" font-weight="900" letter-spacing="-1" fill="#0D1E35">VENLAX</text>
+          <rect x="20" y="132" width="300" height="3" fill="#9DC527"/>
+          <text x="170" y="152" text-anchor="middle" font-family="Barlow, sans-serif" font-size="12" font-weight="700" letter-spacing="7" fill="#9DC527">SPORTS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
