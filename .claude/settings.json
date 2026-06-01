@@ -19,7 +19,8 @@
       "Bash(npm uninstall *)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(xargs sed -i 's/process\\\\.env\\\\.REACT_APP_/import.meta.env.VITE_/g')",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Bash(npm run *)"
     ]
   }
 }
