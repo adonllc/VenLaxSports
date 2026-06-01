@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Trophy } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 export default function Standings() {
   const { id: leagueId } = useParams();

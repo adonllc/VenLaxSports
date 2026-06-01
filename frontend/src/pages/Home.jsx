@@ -6,7 +6,7 @@ import platformConfig, { activeSportIds } from "../config/platformConfig";
 import HowItWorks from "../components/HowItWorks";
 import VenLaxHero from "../components/VenLaxHero";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 const SPORT_ICONS = { tennis: Target, pickleball: Zap, cricket: Shield };
 
 const ALL_SPORT_CONFIG = {

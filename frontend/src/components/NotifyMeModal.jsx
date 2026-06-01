@@ -2,7 +2,7 @@ import { useState } from "react";
 import { X, Bell } from "lucide-react";
 import axios from "axios";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 export default function NotifyMeModal({ isOpen, onClose, city, sport }) {
   const [email, setEmail] = useState("");

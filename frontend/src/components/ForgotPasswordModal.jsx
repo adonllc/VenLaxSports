@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { X, Mail, CheckCircle } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }) {
   const [email, setEmail] = useState(prefillEmail);

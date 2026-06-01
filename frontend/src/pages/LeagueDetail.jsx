@@ -6,7 +6,7 @@ import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle, C
 import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const formatDate = (iso) => {
   if (!iso) return "";
@@ -155,7 +155,7 @@ export default function LeagueDetail() {
       } else {
         body.partner_email = partnerEmail.trim().toLowerCase();
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leagues/${league.id}/join`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/leagues/${league.id}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

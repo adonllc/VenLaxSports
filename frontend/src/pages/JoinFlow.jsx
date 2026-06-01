@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { activeSports } from "../config/platformConfig";
 import { ChevronRight, ChevronLeft, Users, Calendar, MapPin, Trophy, CheckCircle } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const formatDate = (iso) => {
   if (!iso) return "";

@@ -4,7 +4,7 @@ import NotifyMeModal from "./NotifyMeModal";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 export default function NotifyMeBanner({ city, sport }) {
   const { user } = useAuth();
@@ -91,7 +91,7 @@ export default function NotifyMeBanner({ city, sport }) {
 
 async function _registerPush() {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
-  const vapidKey = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
   if (!vapidKey) return;
   try {
     const reg = await navigator.serviceWorker.ready;
@@ -100,7 +100,7 @@ async function _registerPush() {
       applicationServerKey: _urlBase64ToUint8Array(vapidKey),
     });
     const subJson = sub.toJSON();
-    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/notifications/push-subscription`, {
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/notifications/push-subscription`, {
       endpoint: subJson.endpoint,
       keys: subJson.keys,
     }, { withCredentials: true });

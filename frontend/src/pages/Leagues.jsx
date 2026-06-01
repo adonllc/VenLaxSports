@@ -4,7 +4,7 @@ import axios from "axios";
 import { Search, MapPin, Users, Calendar, Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const fmtDate = (iso) => {
   if (!iso) return "";

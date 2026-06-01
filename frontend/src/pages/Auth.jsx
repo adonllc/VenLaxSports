@@ -8,7 +8,7 @@ import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 import axios from "axios";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 // PHASE-DRIVEN: only the active country is offered during registration.
 // PHASE 3 introduces "India" via REACT_APP_PHASE=3.

@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Trophy, Users, Calendar, Share2, AlertCircle } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_COLORS = {
   tennis: "text-emerald-600",

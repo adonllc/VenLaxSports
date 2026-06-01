@@ -5,7 +5,7 @@ import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_CONFIG = {
   tennis: { label: "Tennis", emoji: "🎾", color: "text-emerald-600" },

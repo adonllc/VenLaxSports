@@ -4,7 +4,7 @@ import axios from "axios";
 import { Users, Trophy } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_CONFIG = {
   tennis: { label: "Tennis", icon: "🎾", color: "text-tennis" },

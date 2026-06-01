@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_COLOR = {
   tennis: "#10b981",

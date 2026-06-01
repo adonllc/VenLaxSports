@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { Search, X, CheckCircle } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 /**
  * Partner search with name/email autocomplete + email-invite fallback.

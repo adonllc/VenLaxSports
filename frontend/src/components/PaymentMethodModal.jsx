@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { CreditCard, X, Wallet, CheckCircle } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const METHOD_VISUALS = {
   stripe: { icon: <CreditCard className="w-4 h-4" />, color: "bg-indigo-50 text-indigo-700 border-indigo-200" },

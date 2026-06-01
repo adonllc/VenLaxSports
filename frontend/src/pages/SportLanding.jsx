@@ -7,7 +7,7 @@ import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import VenLaxHero from "../components/VenLaxHero";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const BORDER    = "#E5E7EB";
 const TEXT_PRI  = "#111827";

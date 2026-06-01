@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { CheckCircle, ChevronRight } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SKILL_LEVELS = [
   { value: "2.0", label: "2.0", desc: "Beginner" },

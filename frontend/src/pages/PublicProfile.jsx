@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import { Trophy, Share2, Swords, MapPin } from "lucide-react";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_COLORS = {
   tennis: "#10B981",

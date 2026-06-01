@@ -38,7 +38,7 @@ const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
 const Ladders = lazy(() => import("./pages/Ladders"));
 const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 
-const IS_PRELAUNCH = process.env.REACT_APP_PRELAUNCH === "true";
+const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
 
 function PageFallback() {
   return (

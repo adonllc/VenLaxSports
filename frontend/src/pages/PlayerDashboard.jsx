@@ -6,7 +6,7 @@ import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, 
 import OpponentSearch from "../components/OpponentSearch";
 import RatingHistoryChart from "../components/RatingHistoryChart";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_COLORS = {
   tennis: { badge: "sport-badge-tennis", color: "text-tennis", icon: "🎾" },
@@ -70,7 +70,7 @@ export default function PlayerDashboard() {
     axios.get(`${API}/notifications/interests`, { withCredentials: true })
       .then(r => setInterests(r.data))
       .catch(() => {});
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data?.invites) setPendingInvites(data.invites); })
       .catch(() => {});
@@ -349,7 +349,7 @@ export default function PlayerDashboard() {
                     <button
                       onClick={async () => {
                         if (!window.confirm("Cancel this invite?")) return;
-                        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/${invite.token}`, {
+                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/${invite.token}`, {
                           method: "DELETE", credentials: "include",
                         });
                         setPendingInvites(prev => prev.filter(i => i.token !== invite.token));

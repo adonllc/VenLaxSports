@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
 import { activeSportIds, activeCountry } from "../config/platformConfig";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 // PHASE-DRIVEN: admin can only create leagues for active sports & country.
 // PHASE 2 unlocks Cricket; PHASE 3 unlocks India.
@@ -1065,7 +1065,7 @@ function AutoGenerateTab({ onSuccess }) {
 
 // ─────────── Zelle Queue Tab ───────────
 function ZelleQueueTab() {
-  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actioning, setActioning] = useState(null);
@@ -1178,7 +1178,7 @@ function ZelleQueueTab() {
 
 // ─────────── Waitlist Tab ───────────
 function WaitlistTab() {
-  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

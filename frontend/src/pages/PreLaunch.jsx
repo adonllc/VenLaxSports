@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Logo from "../components/Logo";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://api.venlaxsports.com";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsports.com";
 
 const NAVY = "#1B2B4B";
 const NAVY_MID = "#1B2B4B";

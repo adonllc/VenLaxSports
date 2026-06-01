@@ -7,7 +7,7 @@ import RRScheduleView from "../components/RRScheduleView";
 import RRBracketView from "../components/RRBracketView";
 import PartnerSearch from "../components/PartnerSearch";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const TABS = ["Overview", "Schedule", "Standings", "Playoffs"];
 

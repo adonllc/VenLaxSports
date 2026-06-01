@@ -22,7 +22,7 @@ export default function DoublesInviteConfirm() {
     const checkStatus = async () => {
       try {
         const res = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/status?token=${token}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/status?token=${token}`,
           { credentials: "include" }
         );
         if (res.status === 404) {
@@ -71,7 +71,7 @@ export default function DoublesInviteConfirm() {
     setErrorMsg("");
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/doubles-invite/confirm`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/confirm`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

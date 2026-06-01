@@ -149,10 +149,10 @@ const PHASE_3 = {
 // ─────────────────────────────────────────────────────────────────────
 const PHASE_CONFIGS = { 1: PHASE_1, 2: PHASE_2, 3: PHASE_3 };
 
-export const PHASE = parseInt(process.env.REACT_APP_PHASE || "1");
+export const PHASE = parseInt(import.meta.env.VITE_PHASE || "1");
 const baseConfig = PHASE_CONFIGS[PHASE] || PHASE_1;
 
-const CRICKET_ENABLED = process.env.REACT_APP_CRICKET_ENABLED === "true";
+const CRICKET_ENABLED = import.meta.env.VITE_CRICKET_ENABLED === "true";
 export const platformConfig = (CRICKET_ENABLED && !baseConfig.activeSports.includes("cricket"))
   ? { ...baseConfig, activeSports: [...baseConfig.activeSports, "cricket"] }
   : baseConfig;
