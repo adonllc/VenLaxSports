@@ -185,6 +185,20 @@ export default function PlayerDashboard() {
   const wins = matches.filter((m) => m.status === "completed" && (m.winner_id === user.id || m.winner_id === user._id)).length;
   const losses = matches.filter((m) => m.status === "completed" && m.winner_id && m.winner_id !== user.id && m.winner_id !== user._id).length;
   const upcoming = matches.filter((m) => m.status === "scheduled");
+
+  const scorePending = upcoming.filter((m) => {
+    const d = m.scheduled_date ? new Date(m.scheduled_date) : null;
+    return d && d < new Date();
+  });
+  const nextStep = (() => {
+    if (leagues.length === 0)
+      return { title: "Join your first league.", body: "Browse leagues in your city and sport. New seasons open year-round.", cta: "Find a League", href: "/join", accent: "#C24A1D", bg: "#FAE0D5", border: "#E5A885" };
+    if (scorePending.length > 0)
+      return { title: `${scorePending.length} match${scorePending.length > 1 ? "es" : ""} need a score.`, body: "Submit your result to update your rating and standings.", cta: "Submit Score", href: `/matches/${scorePending[0].id}/score`, accent: "#0B6E4F", bg: "#EDF7F3", border: "#A7D7C5" };
+    if (matches.length === 0)
+      return { title: "Schedule your first match.", body: "You're in a league — time to get on the court.", cta: "View My Leagues", href: "#leagues", accent: "#1D4ED8", bg: "#EFF6FF", border: "#BFDBFE" };
+    return null;
+  })();
   const recent = matches.filter((m) => m.status === "completed").slice(0, 5);
 
   return (
@@ -308,21 +322,23 @@ export default function PlayerDashboard() {
           ))}
         </div>
 
-        {/* Find a League CTA */}
-        <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }}>
-          <div>
-            <p className="font-heading font-bold text-sm" style={{ color: "#111827" }}>Find your next league.</p>
-            <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Browse by sport, city, and format. New seasons open year-round.</p>
+        {/* Your Next Step — contextual action card */}
+        {nextStep && (
+          <div className="rounded-2xl p-5 mb-6 flex items-center justify-between gap-4" style={{ background: nextStep.bg, border: `1px solid ${nextStep.border}` }} data-testid="next-step-card">
+            <div>
+              <p className="font-heading font-bold text-sm" style={{ color: "#111827" }}>{nextStep.title}</p>
+              <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{nextStep.body}</p>
+            </div>
+            <Link
+              to={nextStep.href}
+              className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap"
+              style={{ background: nextStep.accent }}
+              data-testid="next-step-btn"
+            >
+              {nextStep.cta}
+            </Link>
           </div>
-          <Link
-            to="/join"
-            className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors"
-            style={{ background: "#C24A1D" }}
-            data-testid="dashboard-find-league-btn"
-          >
-            Find a League
-          </Link>
-        </div>
+        )}
 
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (

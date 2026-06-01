@@ -474,10 +474,10 @@ function LeagueCard({ league }) {
           <span className="text-xs" style={{ color: TEXT_MUTED }}>
             {league.current_players || 0}/{league.max_players} joined
           </span>
-          {league.start_date && (
-            <span className="text-xs" style={{ color: TEXT_MUTED }}>
-              {fmtDate(league.start_date)}
-            </span>
+          {league.entry_fee && league.entry_fee > 0 ? (
+            <span className="text-xs font-bold" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
+          ) : (
+            <span className="text-xs font-bold" style={{ color: "#0B6E4F" }}>Free</span>
           )}
         </div>
       </div>

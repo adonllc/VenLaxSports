@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Users, Calendar, Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
+import { useAuth } from "../contexts/AuthContext";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -56,6 +57,7 @@ const DUPR_TO_DIVISION = {
 export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [leagues, setLeagues] = useState([]);
   const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +71,16 @@ export default function Leagues() {
     format: searchParams.get("format") || "",
     search: "",
   });
+
+  // Once user loads, default sport + city from profile if not set via URL params
+  useEffect(() => {
+    if (!user) return;
+    setFilters(prev => ({
+      ...prev,
+      sport: prev.sport || user.sport_preferences?.[0] || platformConfig.defaultSport || "",
+      city:  prev.city  || user.city || "",
+    }));
+  }, [user?.id]);
 
   useEffect(() => {
     fetchLeagues();
@@ -371,7 +383,11 @@ function LeagueCard({ league, onClick }) {
           <span className={`text-xs font-semibold px-2 py-1 rounded-full ${STATUS_COLORS[league.status] || "bg-gray-50 text-gray-500"}`}>
             {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
           </span>
-          <span className="text-xs" style={{ color: "#E5E7EB" }}>{league.season}</span>
+          {league.entry_fee && league.entry_fee > 0 ? (
+            <span className="text-xs font-bold" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
+          ) : (
+            <span className="text-xs font-bold" style={{ color: "#0B6E4F" }}>Free</span>
+          )}
         </div>
       </div>
     </div>
