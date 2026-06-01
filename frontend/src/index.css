@@ -9,8 +9,9 @@ body {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: #FFFFFF;
-    color: #111827;
+    background: var(--vl-bg);
+    color: var(--vl-text);
+    transition: background-color 220ms ease-out, color 180ms ease-out;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -39,6 +40,56 @@ h1, h2, h3, h4, h5, h6 {
         --input: 220 13% 91%;
         --ring: 17 65% 48%;
         --radius: 0.625rem;
+
+        /* Landing page color tokens */
+        --vl-bg: #FFFFFF;
+        --vl-bg-alt: #F9FAFB;
+        --vl-bg-card: #FFFFFF;
+        --vl-text: #111827;
+        --vl-text-sub: #374151;
+        --vl-text-muted: #6B7280;
+        --vl-text-subtle: #9CA3AF;
+        --vl-border: #E5E7EB;
+        --vl-border-light: #F3F4F6;
+        --vl-green-label: #0B6E4F;
+        --vl-orange-pale: #FEF2EE;
+        --vl-step-num: #E5E7EB;
+    }
+
+    .dark {
+        --background: 220 13% 7%;
+        --foreground: 213 31% 91%;
+        --card: 215 14% 11%;
+        --card-foreground: 213 31% 91%;
+        --popover: 215 14% 11%;
+        --popover-foreground: 213 31% 91%;
+        --primary: 17 65% 48%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 215 14% 14%;
+        --secondary-foreground: 213 31% 91%;
+        --muted: 215 14% 14%;
+        --muted-foreground: 215 10% 60%;
+        --accent: 215 14% 14%;
+        --accent-foreground: 213 31% 91%;
+        --destructive: 0 63% 31%;
+        --destructive-foreground: 213 31% 91%;
+        --border: 215 13% 20%;
+        --input: 215 13% 20%;
+        --ring: 17 65% 48%;
+
+        /* Landing page color tokens — dark */
+        --vl-bg: #0f1117;
+        --vl-bg-alt: #161b22;
+        --vl-bg-card: #1c2128;
+        --vl-text: #e6edf3;
+        --vl-text-sub: #c9d1d9;
+        --vl-text-muted: #8b949e;
+        --vl-text-subtle: #6b7280;
+        --vl-border: #30363d;
+        --vl-border-light: #21262d;
+        --vl-green-label: #34D399;
+        --vl-orange-pale: rgba(201, 87, 42, 0.18);
+        --vl-step-num: #30363d;
     }
 }
 

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
 
@@ -15,12 +16,19 @@ const SPORTS = activeSports.map((s) => ({
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
+  const isDark = theme === "dark";
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const userRef = useRef(null);
   const isActive = (path) => location.pathname === path;
+
+  const NAV_TEXT    = isDark ? "#c9d1d9" : "#374151";
+  const NAV_MUTED   = isDark ? "#8b949e" : "#6B7280";
+  const NAV_HOVER_BG = isDark ? "#1c2128" : "#F9FAFB";
+  const ORANGE_PALE = isDark ? "rgba(201,87,42,0.18)" : "#FEF2EE";
 
   useEffect(() => {
     const handler = (e) => {
@@ -41,7 +49,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100"
+      className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-200"
       data-testid="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +66,7 @@ export default function Navbar() {
               <Link
                 key={s.id}
                 to={`/sport/${s.id}`}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800"
                 data-testid={`nav-sport-${s.id}`}
               >
                 <span className="text-base leading-none">{s.icon}</span>
@@ -69,9 +77,9 @@ export default function Navbar() {
             <Link
               to="/join"
               className="px-3 py-2 text-sm font-semibold rounded-lg transition-colors"
-              style={isActive("/join") ? { color: "#C9572A", background: "#FEF2EE" } : { color: "#374151" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#C9572A"; e.currentTarget.style.background = "#FEF2EE"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = isActive("/join") ? "#C9572A" : "#374151"; e.currentTarget.style.background = isActive("/join") ? "#FEF2EE" : "transparent"; }}
+              style={isActive("/join") ? { color: "#C9572A", background: ORANGE_PALE } : { color: NAV_TEXT }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#C9572A"; e.currentTarget.style.background = ORANGE_PALE; }}
+              onMouseLeave={e => { e.currentTarget.style.color = isActive("/join") ? "#C9572A" : NAV_TEXT; e.currentTarget.style.background = isActive("/join") ? ORANGE_PALE : "transparent"; }}
               data-testid="nav-join"
             >
               Find a League
@@ -80,9 +88,9 @@ export default function Navbar() {
             <Link
               to="/ladders"
               className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={isActive("/ladders") ? { color: "#C9572A", background: "#FEF2EE" } : { color: "#6B7280" }}
-              onMouseEnter={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = "#374151"; e.currentTarget.style.background = "#F9FAFB"; } }}
-              onMouseLeave={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.background = "transparent"; } }}
+              style={isActive("/ladders") ? { color: "#C9572A", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              onMouseEnter={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
+              onMouseLeave={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-ladders"
             >
               Ladders
@@ -91,9 +99,9 @@ export default function Navbar() {
             <Link
               to="/rules"
               className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={isActive("/rules") ? { color: "#C9572A", background: "#FEF2EE" } : { color: "#6B7280" }}
-              onMouseEnter={e => { if (!isActive("/rules")) { e.currentTarget.style.color = "#374151"; e.currentTarget.style.background = "#F9FAFB"; } }}
-              onMouseLeave={e => { if (!isActive("/rules")) { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.background = "transparent"; } }}
+              style={isActive("/rules") ? { color: "#C9572A", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              onMouseEnter={e => { if (!isActive("/rules")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
+              onMouseLeave={e => { if (!isActive("/rules")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-rules"
             >
               Rules
@@ -112,6 +120,15 @@ export default function Navbar() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-2">
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              data-testid="theme-toggle"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             {user ? (
               <div className="relative" ref={userRef}>
                 <button
@@ -130,14 +147,14 @@ export default function Navbar() {
                 </button>
 
                 {userOpen && (
-                  <div className="absolute top-full right-0 mt-1.5 w-52 bg-white border border-gray-100 rounded-xl shadow-lg shadow-gray-900/5 p-1.5 z-50">
-                    <div className="px-3 py-2 border-b border-gray-100 mb-1">
-                      <p className="text-xs text-gray-400">Signed in as</p>
-                      <p className="text-sm font-semibold text-gray-900 truncate">{user.email}</p>
+                  <div className="absolute top-full right-0 mt-1.5 w-52 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg shadow-gray-900/5 p-1.5 z-50">
+                    <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Signed in as</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.email}</p>
                     </div>
                     <Link
                       to="/dashboard"
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
                       data-testid="nav-dashboard"
                     >
                       <LayoutDashboard className="w-4 h-4 text-gray-400" /> My Dashboard
@@ -145,7 +162,7 @@ export default function Navbar() {
                     {user.role === "admin" && (
                       <Link
                         to="/admin"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
                         data-testid="nav-admin-panel"
                       >
                         <Shield className="w-4 h-4 text-gray-400" /> Admin Panel
@@ -197,7 +214,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-1">
+        <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-4 space-y-1">
           <Link
             to="/join"
             className="block px-3 py-2.5 text-sm font-semibold rounded-lg"
@@ -210,7 +227,7 @@ export default function Navbar() {
             <Link
               key={s.id}
               to={`/sport/${s.id}`}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
               data-testid={`mobile-sport-${s.id}`}
             >
               <span>{s.icon}</span> {s.label}
@@ -218,14 +235,14 @@ export default function Navbar() {
           ))}
           <Link
             to="/ladders"
-            className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+            className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
             data-testid="nav-ladders-mobile"
           >
             Ladders
           </Link>
           <Link
             to="/rules"
-            className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+            className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
             data-testid="nav-rules-mobile"
           >
             Rules

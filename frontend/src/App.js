@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./App.css";
@@ -88,7 +89,7 @@ function AppShell() {
     return <PreLaunch />;
   }
   return (
-    <div className="min-h-screen bg-white flex flex-col font-body">
+    <div className="min-h-screen bg-[var(--vl-bg)] flex flex-col font-body">
       <Navbar />
       <main className="flex-1">
         <AppRouter />
@@ -101,11 +102,13 @@ function AppShell() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppShell />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppShell />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

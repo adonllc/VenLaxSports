@@ -36,7 +36,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-24 bg-white border-t border-gray-100" data-testid="how-it-works">
+    <section className="py-24 bg-[var(--vl-bg)] border-t border-[var(--vl-border-light)]" data-testid="how-it-works">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
 
@@ -49,13 +49,13 @@ export default function HowItWorks() {
               The Process
             </p>
             <h2
-              className="font-heading font-black leading-[0.9] tracking-tight mb-6 uppercase text-gray-900"
-              style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)" }}
+              className="font-heading font-black leading-[0.9] tracking-tight mb-6 uppercase"
+              style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: "var(--vl-text)" }}
             >
               Six moves.<br />
               <span style={{ color: "#C9572A" }}>One championship<br />season.</span>
             </h2>
-            <p className="text-sm leading-relaxed mb-8 max-w-[28ch] text-gray-500">
+            <p className="text-sm leading-relaxed mb-8 max-w-[28ch]" style={{ color: "var(--vl-text-muted)" }}>
               No admin chaos. No spreadsheets. Ranked competition, handled.
             </p>
             <Link
@@ -71,7 +71,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Right: step list */}
-          <div className="flex-1 divide-y divide-gray-100">
+          <div className="flex-1 divide-y divide-[var(--vl-border-light)]">
             {STEPS.map((s) => (
               <div
                 key={s.n}
@@ -84,21 +84,21 @@ export default function HowItWorks() {
                     fontSize: "2rem",
                     width: "2.5rem",
                     textAlign: "right",
-                    color: "#E5E7EB",
+                    color: "var(--vl-step-num)",
                   }}
                   onMouseEnter={e => e.currentTarget.style.color = "#C9572A"}
-                  onMouseLeave={e => e.currentTarget.style.color = "#E5E7EB"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--vl-step-num)"}
                 >
                   {s.n}
                 </span>
                 <div>
                   <h3
-                    className="font-heading font-bold mb-1.5 leading-tight tracking-tight text-gray-900"
-                    style={{ fontSize: "1.25rem" }}
+                    className="font-heading font-bold mb-1.5 leading-tight tracking-tight"
+                    style={{ fontSize: "1.25rem", color: "var(--vl-text)" }}
                   >
                     {s.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-gray-500">{s.body}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--vl-text-muted)" }}>{s.body}</p>
                 </div>
               </div>
             ))}

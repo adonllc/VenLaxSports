@@ -55,20 +55,20 @@ const SPORT_CONFIG = Object.fromEntries(
   activeSportIds.map((id) => [id, ALL_SPORT_CONFIG[id]]).filter(([, v]) => v)
 );
 
-// ── Color tokens ──────────────────────────────────────────────────
-const PAGE_BG    = "#FFFFFF";
-const SECTION_ALT = "#F9FAFB";
-const ORANGE     = "#C9572A";
-const ORANGE_DARK = "#B04823";
-const ORANGE_PALE = "#FEF2EE";
-const GREEN      = "#0B6E4F";
-const BORDER     = "#E5E7EB";
-const BORDER_LIGHT = "#F3F4F6";
+// ── Color tokens — CSS vars switch automatically with .dark class ──
+const PAGE_BG      = "var(--vl-bg)";
+const SECTION_ALT  = "var(--vl-bg-alt)";
+const ORANGE       = "#C9572A";
+const ORANGE_DARK  = "#B04823";
+const ORANGE_PALE  = "var(--vl-orange-pale)";
+const GREEN        = "var(--vl-green-label)";
+const BORDER       = "var(--vl-border)";
+const BORDER_LIGHT = "var(--vl-border-light)";
 
-const TEXT_PRIMARY = "#111827";
-const TEXT_SECONDARY = "#374151";
-const TEXT_MUTED = "#6B7280";
-const TEXT_SUBTLE = "#9CA3AF";
+const TEXT_PRIMARY   = "var(--vl-text)";
+const TEXT_SECONDARY = "var(--vl-text-sub)";
+const TEXT_MUTED     = "var(--vl-text-muted)";
+const TEXT_SUBTLE    = "var(--vl-text-subtle)";
 
 const fmtDate = (iso) => {
   if (!iso) return "";
@@ -134,8 +134,8 @@ export default function Home() {
               <div
                 key={sport}
                 onClick={() => navigate(`/sport/${sport}`)}
-                className="group rounded-2xl p-8 cursor-pointer transition-all duration-200 bg-white"
-                style={{ border: `1px solid ${BORDER}` }}
+                className="group rounded-2xl p-8 cursor-pointer transition-all duration-200"
+                style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = config.accent;
                   e.currentTarget.style.transform = "translateY(-4px)";
@@ -239,7 +239,7 @@ export default function Home() {
                   className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition cursor-pointer"
                   style={activeSport === sport
                     ? { background: config.accent, color: config.textOnAccent }
-                    : { background: "#FFFFFF", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}
+                    : { background: "var(--vl-bg-card)", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}
                   data-testid={`tab-${sport}`}
                 >
                   <Icon className="w-4 h-4" />
@@ -306,8 +306,8 @@ export default function Home() {
               <div
                 key={city.name}
                 onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
-                className="rounded-2xl p-5 cursor-pointer group transition-all duration-200 flex items-start gap-4 bg-white"
-                style={{ border: `1px solid ${BORDER}` }}
+                className="rounded-2xl p-5 cursor-pointer group transition-all duration-200 flex items-start gap-4"
+                style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = GREEN; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "translateY(0)"; }}
                 data-testid={`city-card-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
@@ -422,8 +422,8 @@ function LeagueCard({ league }) {
   return (
     <div
       onClick={() => navigate(`/leagues/${league.id}`)}
-      className="rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 bg-white"
-      style={{ border: `1px solid ${BORDER}` }}
+      className="rounded-2xl overflow-hidden cursor-pointer transition-all duration-200"
+      style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = config.accent || ORANGE;
         e.currentTarget.style.transform = "translateY(-2px)";
