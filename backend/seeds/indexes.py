@@ -22,6 +22,7 @@ async def create_indexes(db) -> None:
     await db.notification_interests.create_index([("city", 1), ("sport", 1)])
     await db.notification_interests.create_index([("email", 1)])
     await db.push_subscriptions.create_index([("user_id", 1)])
+    await db.push_subscriptions.create_index("endpoint")
     # Doubles invite indexes
     await db.doubles_invites.create_index("token", unique=True)
     await db.doubles_invites.create_index([("expires_at", 1)], expireAfterSeconds=0)

@@ -252,15 +252,16 @@ async def _run_generate_schedule(db, league_id: str) -> dict:
 
     import email_service
     all_player_ids = [p["id"] for p in players]
-    for pid in all_player_ids:
-        try:
-            user = await db.users.find_one({"_id": ObjectId(pid)})
-            if user and user.get("email") and user.get("email_notifications", True):
-                email_service.schedule(email_service.send_league_started(
-                    user["email"], user["name"], league["name"], league_id
-                ))
-        except Exception:
-            pass
+    valid_pids = [ObjectId(pid) for pid in all_player_ids if ObjectId.is_valid(pid)]
+    rr_users = await db.users.find(
+        {"_id": {"$in": valid_pids}, "email": {"$exists": True}, "email_notifications": {"$ne": False}},
+        {"email": 1, "name": 1}
+    ).to_list(len(valid_pids))
+    for user in rr_users:
+        if user.get("email"):
+            email_service.schedule(email_service.send_league_started(
+                user["email"], user["name"], league["name"], league_id
+            ))
 
     return {"generated": True, "rounds": len(rounds_doc)}
 

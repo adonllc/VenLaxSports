@@ -95,11 +95,12 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
             regs = await db.player_leagues.find(
                 {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}},
             ).to_list(200)
-            for reg in regs:
-                player = await db.users.find_one(
-                    {"_id": ObjectId(reg["player_id"])}, {"email": 1, "name": 1}
-                ) if ObjectId.is_valid(reg["player_id"]) else None
-                if player and player.get("email_notifications", True):
+            valid_pids = [ObjectId(r["player_id"]) for r in regs if ObjectId.is_valid(r["player_id"])]
+            notif_players = await db.users.find(
+                {"_id": {"$in": valid_pids}}, {"email": 1, "name": 1, "email_notifications": 1}
+            ).to_list(len(valid_pids))
+            for player in notif_players:
+                if player.get("email_notifications", True):
                     email_service.schedule(email_service.send_schedule_released(
                         player["email"], player["name"],
                         prev["name"], league_id, league_type,

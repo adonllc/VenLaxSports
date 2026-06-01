@@ -147,7 +147,6 @@ async def get_user(user_id: str, request: Request):
     return {
         "id": str(u["_id"]),
         "name": u.get("name"),
-        "email": u.get("email"),
         "city": u.get("city"),
         "country": u.get("country"),
         "tennis_rating": u.get("tennis_rating"),

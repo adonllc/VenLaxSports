@@ -217,6 +217,9 @@ async def get_payment_status(session_id: str, request: Request):
     txn = await db.payment_transactions.find_one({"session_id": session_id})
     if not txn:
         raise HTTPException(status_code=404, detail="Payment not found")
+    # IDOR: requesting user must own this transaction
+    if str(txn.get("user_id", "")) != str(user["_id"]):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     if txn.get("payment_status") == "paid":
         return {"status": "complete", "payment_status": "paid"}

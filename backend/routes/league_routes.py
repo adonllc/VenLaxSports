@@ -400,6 +400,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
 @router.get("/{league_id}/players")
 async def get_league_players(league_id: str, request: Request):
     db = request.app.state.db
+    await get_current_user(request, db)
     players = await db.player_leagues.find(
         {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}},
         {"_id": 0},

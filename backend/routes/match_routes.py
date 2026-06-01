@@ -205,14 +205,15 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
                     sport = ladder.get("sport", "tennis")
                     elo_field = f"{sport}_rating"
 
-                    # Refresh ELO from users collection into ladder entries
+                    # Refresh ELO — bulk fetch the two relevant players
+                    two_ids = [_ObjId(challenger_id), _ObjId(challenged_id)]
+                    elo_docs = await db.users.find({"_id": {"$in": two_ids}}, {elo_field: 1}).to_list(2)
+                    elo_map = {str(d["_id"]): d.get(elo_field) for d in elo_docs}
                     for entry in entries:
                         if entry["player_id"] in (challenger_id, challenged_id):
-                            u = await db.users.find_one(
-                                {"_id": _ObjId(entry["player_id"])}, {elo_field: 1}
-                            )
-                            if u:
-                                entry["elo"] = u.get(elo_field, entry["elo"])
+                            new_elo = elo_map.get(entry["player_id"])
+                            if new_elo is not None:
+                                entry["elo"] = new_elo
 
                     # If challenger won: swap their positions in the list
                     if winner_id == challenger_id:
@@ -272,6 +273,7 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
 @router.get("/{match_id}")
 async def get_match(match_id: str, request: Request):
     db = request.app.state.db
+    await get_current_user(request, db)
     try:
         match = await db.matches.find_one({"_id": ObjectId(match_id)})
     except Exception:
@@ -508,15 +510,18 @@ async def _maybe_advance_playoffs(db, league_id: str, round_num: int):
         {"$set": {"playoffs_status": f"round_{next_round}", "updated_at": now}},
     )
 
-    # Notify next-round players (best-effort)
+    # Notify next-round players (best-effort) — bulk fetch, not N+1
     try:
-        for mid in created_ids:
-            new_match = await db.matches.find_one({"_id": ObjectId(mid)})
-            if not new_match:
-                continue
-            p1 = await db.users.find_one({"_id": ObjectId(new_match["player1_id"])})
-            p2 = await db.users.find_one({"_id": ObjectId(new_match["player2_id"])})
-            for p, opp in ((p1, new_match["player2_name"]), (p2, new_match["player1_name"])):
+        match_objs = [ObjectId(mid) for mid in created_ids]
+        new_matches = await db.matches.find({"_id": {"$in": match_objs}}).to_list(len(match_objs))
+        pid_set = {ObjectId(m[k]) for m in new_matches for k in ("player1_id", "player2_id") if m.get(k)}
+        all_notif_users = await db.users.find({"_id": {"$in": list(pid_set)}}).to_list(len(pid_set))
+        u_map = {str(u["_id"]): u for u in all_notif_users}
+        for new_match in new_matches:
+            p1 = u_map.get(new_match.get("player1_id"))
+            p2 = u_map.get(new_match.get("player2_id"))
+            mid = str(new_match["_id"])
+            for p, opp in ((p1, new_match.get("player2_name")), (p2, new_match.get("player1_name"))):
                 if _should_notify(p):
                     email_service.schedule(email_service.send_match_scheduled(
                         p["email"], p["name"], opp, sport,

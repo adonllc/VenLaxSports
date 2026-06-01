@@ -145,7 +145,7 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
         raise HTTPException(status_code=400, detail="You must accept the Liability Waiver to register")
 
     # P2 cannot be the same person as P1
-    if current_user["_id"] == invite["initiator_id"]:
+    if str(current_user["_id"]) == str(invite["initiator_id"]):
         raise HTTPException(status_code=400, detail="Cannot confirm your own invite")
 
     # P2 not already registered in this league

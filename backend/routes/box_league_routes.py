@@ -58,17 +58,20 @@ async def assign_boxes(league_id: str, request: Request):
     if len(regs) < group_size:
         raise HTTPException(status_code=400, detail=f"Need at least {group_size} players to assign boxes")
 
-    # Fetch ELO for each player
+    # Fetch ELO for each player — bulk fetch, not N+1
     sport = league.get("sport", "tennis")
     elo_field = f"{sport}_rating"
+    reg_ids = [ObjectId(r["player_id"]) for r in regs if ObjectId.is_valid(r["player_id"])]
+    bulk_users = await db.users.find({"_id": {"$in": reg_ids}}, {elo_field: 1, "name": 1}).to_list(len(reg_ids))
+    user_map = {str(u["_id"]): u for u in bulk_users}
     player_data = []
     for reg in regs:
         uid = reg["player_id"]
-        user = await db.users.find_one({"_id": ObjectId(uid)}, {elo_field: 1, "name": 1})
+        u = user_map.get(uid, {})
         player_data.append({
             "player_id": uid,
-            "name": user.get("name", "") if user else "",
-            "elo": user.get(elo_field, 1500) if user else 1500,
+            "name": u.get("name", ""),
+            "elo": u.get(elo_field, 1500),
         })
 
     groups = _serpentine_groups(player_data, group_size)
@@ -166,17 +169,17 @@ async def box_standings(league_id: str, request: Request):
             stats[p2]["games_won"] += games.get(p2, 0)
             stats[p2]["games_lost"] += games.get(p1, 0)
 
-        # Fetch player names + ELO
+        # Bulk fetch player names + ELO and promotion status
+        valid_pids = [ObjectId(p) for p in player_ids if ObjectId.is_valid(p)]
+        box_users = await db.users.find({"_id": {"$in": valid_pids}}, {"name": 1, elo_field: 1}).to_list(len(valid_pids))
+        box_user_map = {str(u["_id"]): u for u in box_users}
+        box_regs = await db.player_leagues.find({"league_id": league_id, "player_id": {"$in": player_ids}}).to_list(len(player_ids))
+        box_reg_map = {r["player_id"]: r for r in box_regs}
         for pid in player_ids:
-            try:
-                user = await db.users.find_one({"_id": ObjectId(pid)}, {"name": 1, elo_field: 1})
-                if user:
-                    stats[pid]["name"] = user.get("name", "")
-                    stats[pid]["elo"] = user.get(elo_field, 1500)
-            except Exception:
-                pass
-
-            reg = await db.player_leagues.find_one({"league_id": league_id, "player_id": pid})
+            u = box_user_map.get(pid, {})
+            stats[pid]["name"] = u.get("name", "")
+            stats[pid]["elo"] = u.get(elo_field, 1500)
+            reg = box_reg_map.get(pid)
             stats[pid]["promotion_status"] = reg.get("promotion_status") if reg else None
 
         sorted_players = sorted(
