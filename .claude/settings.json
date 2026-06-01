@@ -20,7 +20,12 @@
       "Bash(echo \"EXIT:$?\")",
       "Bash(xargs sed -i 's/process\\\\.env\\\\.REACT_APP_/import.meta.env.VITE_/g')",
       "Bash(echo \"exit:$?\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(sed -n '140,160p' routes/doubles_routes.py)",
+      "Bash(sed -n '35,55p' routes/auth_routes.py)",
+      "Bash(sed -n '130,165p' routes/user_routes.py)",
+      "Bash(sed -n '395,415p' routes/league_routes.py)",
+      "Bash(sed -n '275,295p' routes/match_routes.py)"
     ]
   }
 }
