@@ -196,16 +196,15 @@ export default function RoundRobinDetail() {
                 <li><strong>Scoring:</strong> {rr.scoring_format || (league.sport === "tennis" ? "Fast-4" : "Games to 11")}</li>
                 <li><strong>Division:</strong> {isDoubles ? "Fixed-Partner Doubles" : "Singles"}</li>
                 <li><strong>Playoff qualifiers:</strong> Top {rr.playoff_threshold || 4}</li>
-                <li><strong>Fixtures:</strong> Match pairings auto-generated once {rr.min_players}+ players join — your league organizer is notified</li>
+                <li><strong>Match pairings:</strong> Platform-generated on {rr.min_players}+ registrations — organizer handles times &amp; venues</li>
               </ul>
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-              <h2 className="font-bold text-amber-900 mb-2 text-sm">Scheduling — Organizer Responsibility</h2>
+              <h2 className="font-bold text-amber-900 mb-2 text-sm">Scheduling is Your Organizer's Responsibility</h2>
               <p className="text-amber-800 text-sm leading-relaxed">
-                <strong>VenLax generates match pairings only.</strong> Your league organizer — not VenLax — is responsible
-                for coordinating all match times and venues. Players: respond to scheduling requests within 48 hours
-                and offer at least 3 available slots. Courts are arranged directly between players and the organizer.
-                One reschedule per season.
+                VenLax generates who plays who. Your league organizer handles everything else: match times, court bookings,
+                and rescheduling. VenLax platform support does not manage match scheduling. Respond to your organizer
+                within 48 hours. One reschedule per season.
               </p>
             </div>
           </div>

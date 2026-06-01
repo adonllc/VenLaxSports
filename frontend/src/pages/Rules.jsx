@@ -243,12 +243,12 @@ const FLEX_LEAGUE_RULES = [
 
 const ROUND_ROBIN_RULES = [
   {
-    category: "Scheduling — Organizer's Responsibility",
+    category: "Scheduling",
     items: [
-      "VenLax generates match pairings only. All scheduling is the league organizer's responsibility — not VenLax platform admin.",
-      "The organizer assigns match times and venues before each round begins.",
-      "Players confirm attendance. No slot negotiation is needed between players.",
-      "Reschedule requests go to the organizer, not to VenLax support.",
+      "VenLax generates pairings only. Match times, courts, and dates are entirely the organizer's responsibility.",
+      "Your organizer will communicate the schedule before each round — check in with them, not VenLax.",
+      "Confirm attendance when notified. Respond within 48 hours.",
+      "Rescheduling? Contact your organizer directly.",
     ],
   },
   {
