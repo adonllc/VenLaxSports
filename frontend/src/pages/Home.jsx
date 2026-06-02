@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, ArrowRight, Users, Zap, Trophy, Target, CheckCircle, Flame } from "lucide-react";
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import platformConfig, { activeSports, activeSportIds } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -81,11 +80,11 @@ export default function Home() {
   const leaguesRef = useRef();
   const citiesRef = useRef();
 
-  const heroInView = useInView(heroRef);
-  const pillarsInView = useInView(pillarsRef);
-  const stepsInView = useInView(stepsRef);
-  const leaguesInView = useInView(leaguesRef);
-  const citiesInView = useInView(citiesRef);
+  const heroInView = true;
+  const pillarsInView = true;
+  const stepsInView = true;
+  const leaguesInView = true;
+  const citiesInView = true;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -543,7 +542,7 @@ export default function Home() {
         >
           <div
             className="absolute top-10 right-20 w-32 h-32 rounded-full blur-3xl"
-            style={{ background: ACCENT_DARK }}
+            style={{ background: `${ACCENT}33` }}
           />
         </motion.div>
 

@@ -25,7 +25,29 @@
       "Bash(sed -n '35,55p' routes/auth_routes.py)",
       "Bash(sed -n '130,165p' routes/user_routes.py)",
       "Bash(sed -n '395,415p' routes/league_routes.py)",
-      "Bash(sed -n '275,295p' routes/match_routes.py)"
+      "Bash(sed -n '275,295p' routes/match_routes.py)",
+      "mcp__coolify__control",
+      "Bash(node .claude/skills/impeccable/scripts/load-context.mjs)",
+      "Bash(find ~/.claude/skills -name \"load-context.mjs\" 2>/dev/null | head -1)",
+      "Read(//c/Users/hemkp/.claude/skills/**)",
+      "Bash(yarn add *)",
+      "Bash(/c/Users/hemkp/.claude/skills/gstack/browse/dist/browse snapshot *)",
+      "Bash(/c/Users/hemkp/.claude/skills/gstack/browse/dist/browse text *)",
+      "Bash(pkill -f \"vite\\\\|node.*start\")",
+      "Bash(mcp__coolify__list_applications)",
+      "Bash(curl -s https://www.venlaxsports.com/)",
+      "Skill(design-consultation)",
+      "Skill(design-consultation:*)",
+      "Bash(cat /tmp/venlax-landing-preview.html)",
+      "Read(//c/Users/hemkp/Desktop/**)",
+      "Bash(/c/Users/hemkp/.claude/skills/gstack/browse/dist/browse reload *)",
+      "Bash(/c/Users/hemkp/.claude/skills/gstack/browse/dist/browse html *)",
+      "Bash(pkill -f \"vite\\\\|node\")",
+      "Bash(/c/Users/hemkp/.claude/skills/gstack/browse/dist/browse eval *)",
+      "Bash(curl -s http://localhost:8001/api/health)",
+      "Bash(uvicorn server:app --reload --port 8001)",
+      "Bash(npm start *)",
+      "Bash(tee /tmp/vite.log)"
     ]
   }
 }
