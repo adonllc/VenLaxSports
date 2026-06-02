@@ -16,15 +16,20 @@ const SPORT_CONFIG = {
 
 const ACTIVE_SPORTS = activeSportIds.map(id => SPORT_CONFIG[id]).filter(Boolean);
 
-const ORANGE = "#C9572A";
-const ORANGE_DARK = "#B04823";
-const GREEN = "#0B6E4F";
-const TEXT_PRIMARY = "var(--vl-text)";
-const TEXT_SECONDARY = "var(--vl-text-sub)";
-const TEXT_MUTED = "var(--vl-text-muted)";
-const BORDER = "var(--vl-border)";
-const PAGE_BG = "var(--vl-bg)";
-const SECTION_ALT = "var(--vl-bg-alt)";
+// Design System Colors (from DESIGN.md)
+const PRIMARY = "#10B981";
+const ACCENT = "#F97316";
+const DARK = "#1F2937";
+const LIGHT = "#F9FAFB";
+const GRAY_100 = "#F3F4F6";
+const GRAY_300 = "#D1D5DB";
+const GRAY_600 = "#4B5563";
+const TEXT_PRIMARY = DARK;
+const TEXT_SECONDARY = GRAY_600;
+const TEXT_MUTED = "#9CA3AF";
+const BORDER = GRAY_300;
+const PAGE_BG = LIGHT;
+const SECTION_ALT = GRAY_100;
 
 // Animation variants for reusable patterns
 const fadeInUp = {
@@ -124,13 +129,13 @@ export default function Home() {
         {/* Animated gradient orbs */}
         <motion.div
           className="absolute top-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-5"
-          style={{ background: ORANGE }}
+          style={{ background: ACCENT }}
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 4, repeat: Infinity }}
         />
         <motion.div
           className="absolute bottom-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-5"
-          style={{ background: GREEN }}
+          style={{ background: PRIMARY }}
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
         />
@@ -145,8 +150,8 @@ export default function Home() {
           <motion.div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8"
             style={{
-              background: `${ORANGE}12`,
-              border: `1px solid ${ORANGE}25`,
+              background: `${PRIMARY}12`,
+              border: `1px solid ${PRIMARY}25`,
             }}
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -155,18 +160,18 @@ export default function Home() {
           >
             <motion.span
               className="w-2 h-2 rounded-full"
-              style={{ background: ORANGE }}
+              style={{ background: PRIMARY }}
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             />
-            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: ORANGE }}>
-              Open Now: Spring Season
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: PRIMARY }}>
+              SPRING SEASON NOW LIVE
             </span>
           </motion.div>
 
-          {/* Headline with gradient */}
+          {/* Headline */}
           <motion.h1
-            className="font-heading font-black leading-[1.1] tracking-tight mb-6 uppercase"
+            className="font-heading font-black leading-[1.1] tracking-tight mb-6"
             style={{
               fontSize: "clamp(2.5rem, 8vw, 5.5rem)",
               color: TEXT_PRIMARY,
@@ -176,16 +181,16 @@ export default function Home() {
             variants={fadeInUp}
             custom={0.15}
           >
-            Your Sport.<br />Your City.<br />
+            Find Your Competition.<br />
             <span
               style={{
-                background: `linear-gradient(90deg, ${ORANGE} 0%, ${GREEN} 100%)`,
+                background: `linear-gradient(90deg, ${ACCENT} 0%, ${PRIMARY} 100%)`,
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 color: "transparent",
               }}
             >
-              Real Competition.
+              Win Your League.
             </span>
           </motion.h1>
 
@@ -201,14 +206,14 @@ export default function Home() {
             variants={fadeInUp}
             custom={0.25}
           >
-            Join ranked leagues across Tennis, Pickleball, and Cricket. Rise through rankings, compete with skill-matched players, earn unforgettable moments.
+            Ranked matches against skill-matched opponents. Track your rating. Climb the leaderboard. This is competitive tennis and pickleball for real players.
           </motion.p>
 
           {/* CTA with hover effect */}
           <motion.button
-            onClick={() => navigate("/auth?mode=register")}
+            onClick={() => navigate("/leagues")}
             className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-white transition-all hover:shadow-2xl active:scale-95"
-            style={{ background: ORANGE }}
+            style={{ background: PRIMARY }}
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeInUp}
@@ -216,32 +221,45 @@ export default function Home() {
             whileHover={{ y: -4 }}
             data-testid="hero-cta"
           >
-            Start Your Season <ArrowRight className="w-5 h-5" />
+            Find Your League <ArrowRight className="w-5 h-5" />
           </motion.button>
 
-          {/* Social proof with stagger */}
-          <motion.div
-            className="flex gap-8 justify-center mt-16 pt-12 border-t flex-wrap sm:flex-nowrap"
-            style={{ borderColor: BORDER }}
-            initial="hidden"
-            animate={heroInView ? "visible" : "hidden"}
-            variants={containerVariants}
-          >
-            {[
-              { num: stats.players, label: "Active Players" },
-              { num: stats.leagues, label: "Live Leagues" },
-              { num: stats.cities, label: "Cities" },
-            ].map((stat, i) => (
-              <motion.div key={i} className="text-center" variants={scaleIn} custom={0.35 + i * 0.1}>
-                <div className="text-2xl font-black" style={{ color: TEXT_PRIMARY }}>
-                  {stat.num.toLocaleString()}+
-                </div>
-                <div className="text-xs uppercase tracking-widest mt-1" style={{ color: TEXT_MUTED }}>
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+        </motion.div>
+
+        {/* Stat Card (Personal Rating) - DESIGN.md style */}
+        <motion.div
+          className="relative max-w-md mx-auto px-4 sm:px-6 lg:px-8 rounded-xl border p-8"
+          style={{
+            background: "white",
+            borderColor: BORDER,
+            marginTop: "60px",
+            marginBottom: "60px",
+          }}
+          initial="hidden"
+          animate={heroInView ? "visible" : "hidden"}
+          variants={fadeInUp}
+          custom={0.3}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "2px", color: TEXT_SECONDARY, marginBottom: "12px", textTransform: "uppercase", fontWeight: 600 }}>
+              Your Rating
+            </div>
+            <div style={{ fontSize: "48px", fontWeight: 700, color: PRIMARY, marginBottom: "8px", fontFamily: "DM Sans, monospace" }}>
+              1,847
+            </div>
+            <div style={{ fontSize: "14px", color: TEXT_SECONDARY, marginBottom: "20px" }}>
+              You're in the top 12% of players in your region
+            </div>
+            <motion.button
+              onClick={() => navigate("/leagues")}
+              className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-lg text-white transition-all"
+              style={{ background: ACCENT }}
+              whileHover={{ scale: 1.02 }}
+              data-testid="hero-cta-secondary"
+            >
+              Schedule Your Next Match <ArrowRight className="w-5 h-5" />
+            </motion.button>
+          </div>
         </motion.div>
       </motion.div>
 
