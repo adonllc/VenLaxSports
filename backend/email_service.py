@@ -105,7 +105,7 @@ def _wrap(title: str, body_html: str, cta_label: Optional[str] = None, cta_url: 
       <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
         <div style="background:#000;padding:20px 24px">
           <div style="color:#fff;font-weight:900;font-size:20px;letter-spacing:-0.5px">
-            League<span style="color:#10b981">Pro</span>
+            VENLAX <span style="color:#10b981">Sports</span>
           </div>
         </div>
         <div style="padding:28px 24px;color:#111">

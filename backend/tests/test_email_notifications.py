@@ -1,4 +1,4 @@
-"""Email notification & password reset tests for LeaguePro.
+"""Email notification & password reset tests for VENLAX Sports.
 
 SMTP not configured in test env => emails are logged to backend console.
 We grep /var/log/supervisor/backend.err.log for '[EMAIL:console]' to verify.
@@ -67,10 +67,10 @@ class TestForgotPassword:
         # Generic message — no enumeration
         assert "reset" in body["message"].lower() or "if an account" in body["message"].lower()
 
-        log = wait_for_log(["[EMAIL:console]", "Reset your LeaguePro password",
+        log = wait_for_log(["[EMAIL:console]", "Reset your VENLAX Sports password",
                             ADMIN_EMAIL], offset, timeout=10)
         assert "[EMAIL:console]" in log, f"No console email logged. Tail:\n{log[-2000:]}"
-        assert "Reset your LeaguePro password" in log
+        assert "Reset your VENLAX Sports password" in log
 
     def test_forgot_password_nonexistent_user_returns_200(self):
         offset = current_log_size()
@@ -141,7 +141,7 @@ class TestOptOut:
         log = tail_log_since(offset)
         # No console email should be emitted to the admin
         for line in log.splitlines():
-            if "[EMAIL:console]" in line and ADMIN_EMAIL in line and "Reset your LeaguePro password" in line:
+            if "[EMAIL:console]" in line and ADMIN_EMAIL in line and "Reset your VENLAX Sports password" in line:
                 # Restore preference before failing
                 s.patch(f"{BASE_URL}/api/auth/preferences", json={"email_notifications": True})
                 pytest.fail(f"Email sent though user opted out: {line}")
