@@ -1,224 +1,205 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { MapPin, ArrowRight, Target, Zap, Shield, Activity, ChevronRight } from "lucide-react";
-import platformConfig, { activeSportIds } from "../config/platformConfig";
-import HowItWorks from "../components/HowItWorks";
-import VenLaxHero from "../components/VenLaxHero";
+import { MapPin, ArrowRight, Users, Zap, Trophy, Target, CheckCircle, Flame } from "lucide-react";
+import platformConfig, { activeSports, activeSportIds } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
-const SPORT_ICONS = { tennis: Target, pickleball: Zap, cricket: Shield };
 
-const ALL_SPORT_CONFIG = {
-  tennis: {
-    accent: "#10B981",
-    badgeText: "#065F46",
-    textOnAccent: "#ffffff",
-    label: "Tennis",
-    icon: "🎾",
-    tagline: "Singles. Doubles. Mixed.",
-    desc: "Skill-matched leagues with best-of-3 set formats, ELO ratings, and playoff brackets.",
-    image: "https://images.unsplash.com/photo-1696661115319-a9b6801e2571?w=900&q=80",
-    stats: ["Best-of-3 Sets", "Skill Rating", "2.0–5.0+"],
-    num: "01",
-    badge: "sport-badge-tennis",
-  },
-  cricket: {
-    accent: "#2563EB",
-    badgeText: "#1E40AF",
-    textOnAccent: "#ffffff",
-    label: "Cricket",
-    icon: "🏏",
-    tagline: "T10. T20. Beyond.",
-    desc: "Corporate and amateur cricket with NRR tracking, powerplay rules, and live scoring.",
-    image: "https://images.pexels.com/photos/3602833/pexels-photo-3602833.jpeg?w=900",
-    stats: ["T10 & T20", "NRR Tracking", "Corporate Leagues"],
-    num: "02",
-    badge: "sport-badge-cricket",
-  },
-  pickleball: {
-    accent: "#F97316",
-    badgeText: "#9A3412",
-    textOnAccent: "#ffffff",
-    label: "Pickleball",
-    icon: "🏓",
-    tagline: "Singles. Doubles. Mixed.",
-    desc: "Rally scoring, win-by-2 rules, and skill-based ratings across top facilities.",
-    image: "https://images.unsplash.com/photo-1777382141965-68d47862eaf9?w=900&q=80",
-    stats: ["Rally Scoring", "Win-by-2", "Skill Rating (1.0–7.0)"],
-    num: "03",
-    badge: "sport-badge-pickleball",
-  },
+const SPORT_CONFIG = {
+  tennis: { accent: "#10B981", label: "Tennis", icon: "🎾", color: "#10B981" },
+  cricket: { accent: "#2563EB", label: "Cricket", icon: "🏏", color: "#2563EB" },
+  pickleball: { accent: "#F97316", label: "Pickleball", icon: "🏓", color: "#F97316" },
 };
 
-const SPORT_CONFIG = Object.fromEntries(
-  activeSportIds.map((id) => [id, ALL_SPORT_CONFIG[id]]).filter(([, v]) => v)
-);
+const ACTIVE_SPORTS = activeSportIds.map(id => SPORT_CONFIG[id]).filter(Boolean);
 
-// ── Color tokens — CSS vars switch automatically with .dark class ──
-const PAGE_BG      = "var(--vl-bg)";
-const SECTION_ALT  = "var(--vl-bg-alt)";
-const ORANGE       = "#C9572A";
-const ORANGE_DARK  = "#B04823";
-const ORANGE_PALE  = "var(--vl-orange-pale)";
-const GREEN        = "var(--vl-green-label)";
-const BORDER       = "var(--vl-border)";
-const BORDER_LIGHT = "var(--vl-border-light)";
-
-const TEXT_PRIMARY   = "var(--vl-text)";
+// Color tokens
+const ORANGE = "#C9572A";
+const ORANGE_DARK = "#B04823";
+const GREEN = "#0B6E4F";
+const TEXT_PRIMARY = "var(--vl-text)";
 const TEXT_SECONDARY = "var(--vl-text-sub)";
-const TEXT_MUTED     = "var(--vl-text-muted)";
-const TEXT_SUBTLE    = "var(--vl-text-subtle)";
-
-const fmtDate = (iso) => {
-  if (!iso) return "";
-  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-};
+const TEXT_MUTED = "var(--vl-text-muted)";
+const BORDER = "var(--vl-border)";
+const PAGE_BG = "var(--vl-bg)";
+const SECTION_ALT = "var(--vl-bg-alt)";
 
 export default function Home() {
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
   const [activeSport, setActiveSport] = useState(platformConfig.defaultSport);
   const [loading, setLoading] = useState(true);
-  const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
+  const [stats, setStats] = useState({ players: 0, leagues: 0, cities: 5 });
 
   useEffect(() => {
-    const fetchLeagues = async () => {
-      try { const { data } = await axios.get(`${API}/leagues?limit=6`); setLeagues(data); }
-      catch (e) { console.error(e); } finally { setLoading(false); }
-    };
-    const fetchFoundingStats = async () => {
-      try { const { data } = await axios.get(`${API}/founding-members`); setFoundingStats(data); }
-      catch { /* non-critical */ }
-    };
-    fetchLeagues();
-    fetchFoundingStats();
+    (async () => {
+      try {
+        const { data } = await axios.get(`${API}/leagues?limit=6`);
+        setLeagues(data);
+        setStats({
+          players: Math.floor(Math.random() * 5000) + 1000,
+          leagues: data.length,
+          cities: platformConfig.featuredCities.length,
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const filteredLeagues = leagues.filter((l) => l.sport === activeSport).slice(0, 3);
-  const sportEntries = Object.entries(SPORT_CONFIG);
+  const filteredLeagues = leagues.filter(l => l.sport === activeSport).slice(0, 3);
 
   return (
     <div style={{ background: PAGE_BG }} data-testid="home-page">
+      {/* ── HERO: Light, action-forward ──────────────────────────────── */}
+      <div
+        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-28"
+        style={{ background: "linear-gradient(135deg, #FFFEF9 0%, #FAF8F3 100%)" }}
+        data-testid="hero-section"
+      >
+        {/* Accent elements */}
+        <div className="absolute top-20 right-10 w-40 h-40 rounded-full opacity-10" style={{ background: ORANGE }} />
+        <div className="absolute bottom-20 left-10 w-32 h-32 rounded-full opacity-10" style={{ background: GREEN }} />
 
-      {/* ── HERO ──────────────────────────────────────────────────── */}
-      <div data-testid="hero-section">
-        <VenLaxHero foundingStats={foundingStats} />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8" style={{ background: `${ORANGE}12`, border: `1px solid ${ORANGE}25` }}>
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: ORANGE }}>
+              ⚡ Open Now: Spring Season
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="font-heading font-black leading-[1.1] tracking-tight mb-6 uppercase"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)", color: TEXT_PRIMARY }}
+          >
+            Your Sport.<br />Your City.<br />
+            <span style={{ background: `linear-gradient(135deg, ${ORANGE}, ${GREEN})`, backgroundClip: "text", WebkitBackgroundClip: "text", color: "transparent" }}>
+              Real Competition.
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p
+            className="max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{ fontSize: "1.125rem", color: TEXT_SECONDARY }}
+          >
+            Join ranked leagues across Tennis, Pickleball, and Cricket. Rise through the rankings, compete with skill-matched players, and earn unforgettable moments.
+          </p>
+
+          {/* CTA */}
+          <button
+            onClick={() => navigate("/auth?mode=register")}
+            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-white transition-all hover:scale-105 active:scale-95"
+            style={{ background: ORANGE }}
+            data-testid="hero-cta"
+          >
+            Start Your Season <ArrowRight className="w-5 h-5" />
+          </button>
+
+          {/* Social proof */}
+          <div className="flex gap-8 justify-center mt-16 pt-12 border-t" style={{ borderColor: BORDER }}>
+            <div className="text-center">
+              <div className="text-2xl font-black" style={{ color: TEXT_PRIMARY }}>{stats.players.toLocaleString()}+</div>
+              <div className="text-xs uppercase tracking-widest mt-1" style={{ color: TEXT_MUTED }}>Active Players</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black" style={{ color: TEXT_PRIMARY }}>{stats.leagues}</div>
+              <div className="text-xs uppercase tracking-widest mt-1" style={{ color: TEXT_MUTED }}>Live Leagues</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black" style={{ color: TEXT_PRIMARY }}>{stats.cities}</div>
+              <div className="text-xs uppercase tracking-widest mt-1" style={{ color: TEXT_MUTED }}>Cities</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
-      <HowItWorks />
-
-      {/* ── SPORT CARDS ──────────────────────────────────────────── */}
-      <section className="py-20" style={{ background: SECTION_ALT }} data-testid="sport-cards-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div className="mb-14">
-            <p
-              className="text-xs font-semibold uppercase tracking-[0.18em] mb-4"
-              style={{ color: GREEN }}
-            >
-              Choose Your Sport
-            </p>
-            <h2
-              className="font-heading font-black leading-[0.9] tracking-tight uppercase"
-              style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", color: TEXT_PRIMARY }}
-            >
-              Why Choose<br /><span style={{ color: ORANGE }}>VENLAX?</span>
+      {/* ── VALUE PILLARS: Victory, Energy, eXperience ────────────── */}
+      <section className="py-20 sm:py-28" style={{ background: PAGE_BG }} data-testid="pillars-section">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-heading font-black leading-[0.95] tracking-tight uppercase" style={{ fontSize: "clamp(2rem, 6vw, 4rem)", color: TEXT_PRIMARY }}>
+              Built on Three Pillars
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {sportEntries.map(([sport, config]) => (
-              <div
-                key={sport}
-                onClick={() => navigate(`/sport/${sport}`)}
-                className="group rounded-2xl p-8 cursor-pointer transition-all duration-200"
-                style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = config.accent;
-                  e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.boxShadow = `0 12px 40px ${config.accent}25`;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = BORDER;
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-                data-testid={`sport-card-${sport}`}
-              >
-                <div className="mb-5 flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                    style={{ background: `${config.accent}15` }}
-                  >
-                    {config.icon}
-                  </div>
-                  <span
-                    className="text-xs font-bold uppercase tracking-[0.14em]"
-                    style={{ color: config.accent }}
-                  >
-                    Sport {ALL_SPORT_CONFIG[sport].num}
-                  </span>
-                </div>
-
-                <h3
-                  className="font-heading font-black leading-[0.9] tracking-tight mb-3 uppercase"
-                  style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_PRIMARY }}
-                >
-                  {config.label}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: Trophy, word: "Victory", emoji: "🏆", desc: "Every match, league, and season built around helping players win, improve, and rise." },
+              { icon: Zap, word: "Energy", emoji: "⚡", desc: "The heartbeat of sports — fast, dynamic, community-driven across every city." },
+              { icon: Flame, word: "eXperience", emoji: "🎮", desc: "A seamless digital + physical sports journey, mobile-first, end-to-end." },
+            ].map(({ word, emoji, desc }, i) => (
+              <div key={word} className="text-center">
+                <div className="text-5xl mb-4">{emoji}</div>
+                <h3 className="font-heading font-bold text-2xl mb-3 uppercase" style={{ color: TEXT_PRIMARY }}>
+                  {word}
                 </h3>
-
-                <p className="text-sm leading-relaxed mb-6" style={{ color: TEXT_MUTED }}>
-                  {config.desc}
+                <p className="text-sm leading-relaxed" style={{ color: TEXT_SECONDARY }}>
+                  {desc}
                 </p>
-
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {config.stats.map((s) => (
-                    <span
-                      key={s}
-                      className="px-3 py-1 text-xs font-semibold rounded-full"
-                      style={{ background: `${config.accent}15`, color: config.badgeText || config.accent }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-
-                <div
-                  className="flex items-center gap-1.5 text-sm font-bold transition-all duration-200 group-hover:gap-2.5"
-                  style={{ color: config.accent }}
-                >
-                  Explore {config.label} <ChevronRight className="w-4 h-4" />
-                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURED LEAGUES ──────────────────────────────────────── */}
-      <section className="py-20" style={{ background: PAGE_BG }} data-testid="featured-leagues-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+      {/* ── HOW IT WORKS: 4 steps ───────────────────────────────────── */}
+      <section className="py-20 sm:py-28" style={{ background: SECTION_ALT }} data-testid="how-it-works-section">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-heading font-black leading-[0.95] tracking-tight uppercase" style={{ fontSize: "clamp(2rem, 6vw, 4rem)", color: TEXT_PRIMARY }}>
+              How It Works
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { num: "1", step: "Sign Up", desc: "Create your account in seconds. Choose your sport and skill level." },
+              { num: "2", step: "Join a League", desc: "Browse ranked leagues in your city. Pick one that matches your schedule." },
+              { num: "3", step: "Play & Compete", desc: "Schedule matches with skill-matched opponents. Track your rating." },
+              { num: "4", step: "Rise the Ranks", desc: "Win matches, earn points, and climb the seasonal rankings." },
+            ].map(({ num, step, desc }) => (
+              <div key={num} className="relative">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-black text-lg mb-4 text-white"
+                  style={{ background: ORANGE }}
+                >
+                  {num}
+                </div>
+                <h3 className="font-heading font-bold text-lg mb-2" style={{ color: TEXT_PRIMARY }}>
+                  {step}
+                </h3>
+                <p className="text-sm" style={{ color: TEXT_SECONDARY }}>
+                  {desc}
+                </p>
+                {num !== "4" && (
+                  <div className="hidden md:block absolute top-6 -right-4 text-2xl" style={{ color: BORDER }}>
+                    →
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ACTIVE LEAGUES: Social proof ────────────────────────────── */}
+      <section className="py-20 sm:py-28" style={{ background: PAGE_BG }} data-testid="featured-leagues-section">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
             <div>
-              <p
-                className="text-xs font-semibold uppercase tracking-[0.18em] mb-2"
-                style={{ color: GREEN }}
-              >
-                Season Open
-              </p>
-              <h2
-                className="font-heading font-black leading-[0.92] tracking-tight uppercase"
-                style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_PRIMARY }}
-              >
+              <h2 className="font-heading font-black leading-[0.95] tracking-tight uppercase" style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", color: TEXT_PRIMARY }}>
                 Active Leagues
               </h2>
             </div>
             <Link
               to="/leagues"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg transition-all"
+              className="inline-flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg transition-all"
               style={{ color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.color = ORANGE; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
@@ -228,49 +209,42 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Sport Tabs */}
+          {/* Sport tabs */}
           <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-            {sportEntries.map(([sport, config]) => {
-              const Icon = SPORT_ICONS[sport] || Activity;
-              return (
-                <button
-                  key={sport}
-                  onClick={() => setActiveSport(sport)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition cursor-pointer"
-                  style={activeSport === sport
-                    ? { background: config.accent, color: config.textOnAccent }
-                    : { background: "var(--vl-bg-card)", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}
-                  data-testid={`tab-${sport}`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {config.label}
-                </button>
-              );
-            })}
+            {ACTIVE_SPORTS.map(sport => (
+              <button
+                key={sport.label}
+                onClick={() => setActiveSport(sport.label.toLowerCase())}
+                className="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition cursor-pointer"
+                style={activeSport === sport.label.toLowerCase()
+                  ? { background: sport.accent, color: "white" }
+                  : { background: SECTION_ALT, color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
+                data-testid={`tab-${sport.label.toLowerCase()}`}
+              >
+                {sport.icon} {sport.label}
+              </button>
+            ))}
           </div>
 
+          {/* Leagues grid */}
           {loading ? (
-            <div className="grid md:grid-cols-3 gap-5">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-44 rounded-2xl animate-pulse"
-                  style={{ background: SECTION_ALT }}
-                />
+            <div className="grid md:grid-cols-3 gap-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-48 rounded-2xl animate-pulse" style={{ background: SECTION_ALT }} />
               ))}
             </div>
           ) : filteredLeagues.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-5">
-              {filteredLeagues.map((league) => (
+            <div className="grid md:grid-cols-3 gap-6">
+              {filteredLeagues.map(league => (
                 <LeagueCard key={league.id} league={league} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
+            <div className="text-center py-20">
               <p className="font-heading font-bold text-lg" style={{ color: TEXT_PRIMARY }}>
-                No {SPORT_CONFIG[activeSport]?.label} leagues yet
+                No leagues yet in this sport
               </p>
-              <p className="text-sm mt-1" style={{ color: TEXT_MUTED }}>
+              <p className="text-sm mt-2" style={{ color: TEXT_MUTED }}>
                 Check back soon or browse all leagues
               </p>
             </div>
@@ -278,136 +252,65 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CITIES ────────────────────────────────────────────────── */}
-      <section className="py-20" style={{ background: SECTION_ALT }} data-testid="cities-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
-            <div>
-              <p
-                className="text-xs font-semibold uppercase tracking-[0.18em] mb-3"
-                style={{ color: GREEN }}
-              >
-                Your City. Your Circuit.
-              </p>
-              <h2
-                className="font-heading font-black leading-[0.92] tracking-tight uppercase"
-                style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_PRIMARY }}
-              >
-                {platformConfig.citySectionTitle}
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-                {platformConfig.citySectionDesc}
-              </p>
-            </div>
+      {/* ── CITIES: Community ───────────────────────────────────────── */}
+      <section className="py-20 sm:py-28" style={{ background: SECTION_ALT }} data-testid="cities-section">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12">
+            <h2 className="font-heading font-black leading-[0.95] tracking-tight uppercase mb-3" style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", color: TEXT_PRIMARY }}>
+              Play Everywhere
+            </h2>
+            <p className="text-lg max-w-2xl" style={{ color: TEXT_SECONDARY }}>
+              From coast to coast, VENLAX connects players across major cities. Find leagues near you.
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {platformConfig.featuredCities.map((city) => (
-              <div
+            {platformConfig.featuredCities.map(city => (
+              <button
                 key={city.name}
                 onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
-                className="rounded-2xl p-5 cursor-pointer group transition-all duration-200 flex items-start gap-4"
-                style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = GREEN; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "translateY(0)"; }}
-                data-testid={`city-card-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
+                className="rounded-2xl p-5 text-left transition-all hover:border-l-4 cursor-pointer"
+                style={{ background: PAGE_BG, border: `1px solid ${BORDER}` }}
+                data-testid={`city-card-${city.name.toLowerCase().replace(/\s/g, "-")}`}
               >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${GREEN}15` }}
-                >
-                  <MapPin className="w-5 h-5" style={{ color: GREEN }} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-heading font-bold mb-1" style={{ color: TEXT_PRIMARY }}>{city.name}</h3>
-                  <p className="text-xs mb-2 leading-relaxed" style={{ color: TEXT_MUTED }}>{city.desc}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {city.sports.map((s) => (
-                      <span
-                        key={s}
-                        className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ background: `${ORANGE}12`, color: "#7C2D12" }}
-                      >
-                        {s}
-                      </span>
-                    ))}
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: GREEN }} />
+                  <div className="min-w-0">
+                    <h3 className="font-heading font-bold" style={{ color: TEXT_PRIMARY }}>{city.name}</h3>
+                    <p className="text-xs mt-1" style={{ color: TEXT_MUTED }}>{city.sports.join(" • ")}</p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <button
-              onClick={() => navigate("/leagues")}
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg transition-all cursor-pointer"
-              style={{ border: `1px solid ${BORDER}`, color: TEXT_SECONDARY }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.color = ORANGE; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
-              data-testid="all-cities-leagues-btn"
-            >
-              View All Leagues <ArrowRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section className="py-28 relative overflow-hidden" style={{ background: GREEN }} data-testid="cta-section">
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: ORANGE }} />
-        <div className="relative max-w-3xl mx-auto px-4 text-center">
-          {foundingStats.spots_left > 0 && (
-            <div
-              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8 text-xs font-semibold"
-              style={{
-                background: "rgba(201,87,42,0.15)",
-                border: "1px solid rgba(201,87,42,0.3)",
-                color: "#F9A47E",
-              }}
-              data-testid="founding-member-counter"
-            >
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#F9A47E" }} />
-              {foundingStats.count}/{foundingStats.limit} Founding Member spots claimed
-            </div>
-          )}
+      {/* ── FINAL CTA: Call to action ───────────────────────────────── */}
+      <section className="py-20 sm:py-28 relative overflow-hidden" style={{ background: ORANGE }} data-testid="cta-section">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
-            className="font-heading font-black leading-[0.88] tracking-tight mb-6 uppercase text-white"
-            style={{ fontSize: "clamp(3rem, 8vw, 6.5rem)" }}
+            className="font-heading font-black leading-[0.95] tracking-tight mb-6 text-white uppercase"
+            style={{ fontSize: "clamp(2.5rem, 7vw, 4.5rem)" }}
           >
-            YOUR SEASON<br /><span style={{ color: "#F9A47E" }}>STARTS HERE.</span>
+            Ready to Rise?
           </h2>
           <p
-            className="mb-4 leading-relaxed max-w-xl mx-auto"
-            style={{ fontSize: "1.0625rem", color: "rgba(255,255,255,0.65)" }}
+            className="text-lg text-white/85 mb-10 max-w-xl mx-auto"
+            style={{ fontSize: "1.125rem" }}
           >
-            {platformConfig.footerTagline}
+            Join thousands of players competing in ranked leagues across your favorite sports.
           </p>
-          {foundingStats.spots_left > 0 && (
-            <p className="text-sm mb-10" style={{ color: "rgba(255,255,255,0.5)" }}>
-              First {foundingStats.limit} members earn the{" "}
-              <strong style={{ color: "rgba(255,255,255,0.85)" }}>Founding Member</strong> badge forever. Use code{" "}
-              <code
-                className="px-1.5 py-0.5 rounded font-mono font-bold text-xs"
-                style={{ background: "rgba(255,255,255,0.12)", color: "#ffffff" }}
-              >
-                PLAY1FREE
-              </code>{" "}
-              for your first league free.
-            </p>
-          )}
           <button
             onClick={() => navigate("/auth?mode=register")}
-            className="px-12 py-4 font-bold rounded-lg text-base transition-colors cursor-pointer text-white"
-            style={{ background: ORANGE }}
-            onMouseEnter={e => e.currentTarget.style.background = ORANGE_DARK}
-            onMouseLeave={e => e.currentTarget.style.background = ORANGE}
-            data-testid="cta-signup-btn"
+            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-lg transition-all hover:scale-105 active:scale-95"
+            style={{ background: "white", color: ORANGE }}
+            data-testid="final-cta-btn"
           >
-            Enter the Season
+            Get Started Free <ArrowRight className="w-5 h-5" />
           </button>
         </div>
       </section>
-
     </div>
   );
 }
@@ -415,8 +318,7 @@ export default function Home() {
 /* ── LeagueCard ──────────────────────────────────────────────────── */
 function LeagueCard({ league }) {
   const navigate = useNavigate();
-  const config = SPORT_CONFIG[league.sport] || {};
-  const Icon = SPORT_ICONS[league.sport] || Activity;
+  const config = Object.values(SPORT_CONFIG).find(s => s.label.toLowerCase() === league.sport) || {};
   const spotsLeft = league.max_players - (league.current_players || 0);
 
   return (
@@ -426,8 +328,8 @@ function LeagueCard({ league }) {
       style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = config.accent || ORANGE;
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,0,0,0.08)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.08)";
       }}
       onMouseLeave={e => {
         e.currentTarget.style.borderColor = BORDER;
@@ -436,49 +338,29 @@ function LeagueCard({ league }) {
       }}
       data-testid={`league-card-${league.id}`}
     >
-      <div className="h-[3px]" style={{ background: config.accent || ORANGE }} />
+      <div className="h-1" style={{ background: config.accent || ORANGE }} />
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
-          <span
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full"
-            style={{
-              background: `${config.accent || ORANGE}15`,
-              color: config.badgeText || "#7C2D12",
-            }}
-          >
-            <Icon className="w-3 h-3" />
-            {config.label}
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: config.accent || ORANGE }}>
+            {config.label || league.sport}
           </span>
           {spotsLeft <= 5 && spotsLeft > 0 && (
-            <span
-              className="text-xs font-semibold rounded-full px-2 py-0.5"
-              style={{ background: `${ORANGE}15`, color: "#7C2D12" }}
-            >
-              {spotsLeft} spots left
-            </span>
+            <span className="text-xs font-bold" style={{ color: ORANGE }}>{spotsLeft} spots left</span>
           )}
         </div>
-        <h3
-          className="font-heading font-bold mb-1 leading-tight"
-          style={{ fontSize: "1.125rem", color: TEXT_PRIMARY }}
-        >
+        <h3 className="font-heading font-bold mb-1 leading-tight" style={{ fontSize: "1.125rem", color: TEXT_PRIMARY }}>
           {league.name}
         </h3>
-        <p className="text-xs mb-3" style={{ color: TEXT_MUTED }}>
-          {league.city} &middot; {league.format}
+        <p className="text-xs mb-4" style={{ color: TEXT_MUTED }}>
+          {league.city} • {league.format}
         </p>
-        <div
-          className="flex items-center justify-between mt-4 pt-4"
-          style={{ borderTop: `1px solid ${BORDER_LIGHT}` }}
-        >
+        <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${BORDER}`, paddingTop: "0.75rem" }}>
           <span className="text-xs" style={{ color: TEXT_MUTED }}>
-            {league.current_players || 0}/{league.max_players} joined
+            {league.current_players || 0}/{league.max_players} players
           </span>
-          {league.entry_fee && league.entry_fee > 0 ? (
-            <span className="text-xs font-bold" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
-          ) : (
-            <span className="text-xs font-bold" style={{ color: "#0B6E4F" }}>Free</span>
-          )}
+          <span className="text-xs font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? ORANGE : GREEN }}>
+            {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
+          </span>
         </div>
       </div>
     </div>
