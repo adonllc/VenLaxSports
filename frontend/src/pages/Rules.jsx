@@ -438,6 +438,20 @@ export default function Rules() {
         </div>
       </section>
 
+      {/* Quick-Scan Summary */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="rounded-xl p-5 bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200">
+          <h2 className="font-heading font-bold text-lg mb-3" style={{ color: "#111827" }}>Quick Scan</h2>
+          <ul className="space-y-2 text-sm" style={{ color: "#374151" }}>
+            <li className="flex gap-2"><span>→</span> <strong>4 formats:</strong> Flex, Round Robin, Box League, Ladder</li>
+            <li className="flex gap-2"><span>→</span> <strong>Scoring:</strong> Win = 2pts, Draw = 1pt, Loss = 0pts. Sets/games as tiebreakers</li>
+            <li className="flex gap-2"><span>→</span> <strong>Ratings:</strong> ELO-based. Tennis (NTRP), Pickleball (DUPR). Updated per match</li>
+            <li className="flex gap-2"><span>→</span> <strong>Playoffs:</strong> Seeded by standings. Best-of series format</li>
+            <li className="flex gap-2"><span>→</span> <strong>Code of Conduct:</strong> Fair play enforced. Violations may result in suspension</li>
+          </ul>
+        </div>
+      </div>
+
       {/* Quick nav */}
       <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#E5E7EB", background: "rgba(253,246,238,0.92)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap gap-1 text-xs font-semibold">
