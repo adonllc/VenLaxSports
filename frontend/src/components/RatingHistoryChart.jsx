@@ -22,6 +22,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
   const [sport, setSport] = useState(eligibleSports.includes(defaultSport) ? defaultSport : eligibleSports[0] || "tennis");
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showList, setShowList] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,6 +90,18 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
         </div>
       </div>
 
+      {chartData.length > 0 && (
+        <div className="mb-3 flex md:hidden">
+          <button
+            onClick={() => setShowList(!showList)}
+            className="text-xs text-gray-500 hover:text-gray-700 font-semibold"
+            data-testid="rating-view-toggle"
+          >
+            {showList ? "Chart" : "List"}
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <div className="h-48 flex items-center justify-center text-sm text-gray-400">Loading...</div>
       ) : chartData.length === 0 ? (
@@ -96,6 +109,21 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
           <p className="text-sm text-gray-400">
             No matches scored yet. Play a {sport} match and your rating curve will appear here.
           </p>
+        </div>
+      ) : showList ? (
+        <div className="space-y-2 max-h-48 overflow-y-auto" data-testid="rating-list">
+          {chartData.map((d) => (
+            <div key={d.idx} className="text-xs p-2 border border-gray-100 rounded-md hover:bg-gray-50">
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-900">Match #{d.idx}</span>
+                <span className={`font-bold ${d.delta > 0 ? "text-emerald-600" : d.delta < 0 ? "text-red-500" : "text-gray-400"}`}>
+                  {d.delta > 0 ? "+" : ""}{d.delta?.toFixed(2)}
+                </span>
+              </div>
+              <div className="text-gray-500 mt-1">{d.label}</div>
+              <div className="text-gray-600 font-semibold">Rating: {d.rating?.toFixed(2)}</div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="h-48" data-testid="rating-chart-svg">
