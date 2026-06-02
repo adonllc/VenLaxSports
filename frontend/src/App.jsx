@@ -39,6 +39,7 @@ const Ladders = lazy(() => import("./pages/Ladders"));
 const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 
 const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
+const IS_LAUNCH_LIVE = import.meta.env.VITE_LAUNCH_LIVE === "true";
 
 function PageFallback() {
   return (
@@ -85,7 +86,7 @@ function AppRouter() {
 
 function AppShell() {
   const location = useLocation();
-  if (IS_PRELAUNCH && location.pathname === "/") {
+  if (IS_PRELAUNCH && !IS_LAUNCH_LIVE && location.pathname === "/") {
     return <PreLaunch />;
   }
   return (
