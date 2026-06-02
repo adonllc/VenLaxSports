@@ -100,6 +100,7 @@ export default function ScoreReport() {
   const [retired, setRetired] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submittedResult, setSubmittedResult] = useState(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -155,9 +156,15 @@ export default function ScoreReport() {
     );
   }, [scoreSummary, winnerId, match]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmitClick = (e) => {
     e.preventDefault();
     if (!winnerId) { setMsg("Please select the winner"); return; }
+    setMsg("");
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setConfirmModalOpen(false);
     setSubmitting(true);
     setMsg("");
     const finalScoreData = retired
@@ -365,7 +372,7 @@ export default function ScoreReport() {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmitClick} className="space-y-6">
 
               {/* 1. WINNER — primary action at top — T1 */}
               <div>
@@ -638,6 +645,56 @@ export default function ScoreReport() {
                 {submitting ? "Submitting..." : "Submit Score"}
               </button>
             </form>
+
+            {confirmModalOpen && (
+              <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-6 space-y-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Confirm Score</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Review before submitting</p>
+                  </div>
+
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Winner:</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                        {winnerId === match.player1_id ? match.player1_name : match.player2_name}
+                      </span>
+                    </div>
+                    {!retired && scoreSummary && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Score:</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{scoreSummary.scoreStr}</span>
+                      </div>
+                    )}
+                    {retired && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Result:</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">Retired / Walkover</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => setConfirmModalOpen(false)}
+                      className="flex-1 py-2 px-4 text-sm font-semibold border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      data-testid="confirm-cancel-btn"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleConfirmSubmit}
+                      disabled={submitting}
+                      className="flex-1 py-2 px-4 text-sm font-semibold bg-[#1B2B4B] text-white rounded-lg hover:bg-[#142040] transition-colors disabled:opacity-60"
+                      data-testid="confirm-submit-btn"
+                    >
+                      {submitting ? "Submitting..." : "Confirm"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
