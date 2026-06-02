@@ -322,8 +322,8 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h1 className="font-heading font-black text-3xl" style={{ color: "#111827" }}>{league.name}</h1>
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <h1 className="font-heading font-semibold text-lg" style={{ color: "#111827" }}>{league.name}</h1>
                 {league.division_label && (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium" style={{ background: "#F3F4F6", color: "#C24A1D", border: "1px solid #E5E7EB" }} data-testid="league-division-badge">
                     {league.division_label}
