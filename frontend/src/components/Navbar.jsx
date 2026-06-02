@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon, Users } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
+import axios from "axios";
 
 const SPORTS = activeSports.map((s) => ({
   id: s.id,
@@ -22,8 +23,10 @@ export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const [pendingInvitesCount, setPendingInvitesCount] = useState(0);
   const userRef = useRef(null);
   const isActive = (path) => location.pathname === path;
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
   const NAV_TEXT    = isDark ? "#c9d1d9" : "#374151";
   const NAV_MUTED   = isDark ? "#8b949e" : "#6B7280";
@@ -41,6 +44,14 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.invites) setPendingInvitesCount(data.invites.length); })
+      .catch(() => {});
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -150,6 +161,19 @@ export default function Navbar() {
                     >
                       <LayoutDashboard className="w-4 h-4 text-gray-400" /> My Dashboard
                     </Link>
+                    {pendingInvitesCount > 0 && (
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg relative"
+                        data-testid="nav-doubles-invites"
+                      >
+                        <Users className="w-4 h-4 text-gray-400" />
+                        <span>Doubles Invites</span>
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" data-testid="doubles-invites-badge">
+                          {pendingInvitesCount}
+                        </span>
+                      </Link>
+                    )}
                     {user.role === "admin" && (
                       <Link
                         to="/admin"
