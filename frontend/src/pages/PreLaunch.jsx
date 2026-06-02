@@ -4,20 +4,33 @@ import Logo from "../components/Logo";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsports.com";
 
-const PRIMARY = "#10B981";
-const ACCENT = "#F97316";
+const PRIMARY = "#06B6D4";
+const ACCENT = "#FF6B6B";
 const DARK = "#1F2937";
 const LIGHT = "#F9FAFB";
 const BORDER = "#E5E7EB";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: (custom = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut", delay: custom * 0.1 },
+  }),
+};
+
+const scaleReveal = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: (custom = 0) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, ease: "easeOut", delay: custom * 0.08 },
+  }),
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.2 } },
 };
 
 const staggerItem = {
@@ -28,6 +41,11 @@ const staggerItem = {
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.5 } },
+};
+
+const counter = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
 };
 
 const viewportConfig = { once: true, margin: "-80px" };
@@ -181,8 +199,19 @@ export default function PreLaunch() {
       </nav>
 
       {/* Hero */}
-      <section style={{ background: "linear-gradient(135deg, #F9FAFB 0%, #E8FAEF 100%)" }} className="py-28 px-6 relative overflow-hidden">
-        <div className="absolute top-10 right-10 w-40 h-40 rounded-full" style={{ background: `${PRIMARY}20`, filter: "blur(60px)" }} />
+      <section style={{ background: "linear-gradient(135deg, #F9FAFB 0%, #E0F7FF 100%)" }} className="py-28 px-6 relative overflow-hidden">
+        <motion.div
+          className="absolute top-10 right-10 w-40 h-40 rounded-full"
+          style={{ background: `${PRIMARY}15`, filter: "blur(60px)" }}
+          animate={{ y: [0, 20, 0] }}
+          transition={{ duration: 6, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute bottom-20 left-5 w-56 h-56 rounded-full"
+          style={{ background: `${ACCENT}10`, filter: "blur(80px)" }}
+          animate={{ y: [0, -30, 0] }}
+          transition={{ duration: 8, repeat: Infinity }}
+        />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
@@ -206,11 +235,15 @@ export default function PreLaunch() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.1 }}
+            custom={0}
           >
             Stop Hunting for Good Matches.
             <br />
-            <motion.span style={{ color: PRIMARY }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            <motion.span
+              style={{ color: PRIMARY, display: "inline-block" }}
+              animate={{ opacity: [0.8, 1], y: [10, 0] }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+            >
               Play in a Real League.
             </motion.span>
           </motion.h1>
@@ -221,7 +254,7 @@ export default function PreLaunch() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.2 }}
+            custom={1}
           >
             VENLAX runs competitive Tennis and Pickleball leagues in your city — real rankings, skill-matched opponents, and players who actually show up.
           </motion.p>
@@ -231,7 +264,6 @@ export default function PreLaunch() {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.3 }}
           >
             <motion.a
               href="#early-access"
@@ -425,10 +457,11 @@ export default function PreLaunch() {
               <motion.div
                 key={feat.title}
                 className={`flex flex-col md:flex-row items-center gap-12 ${idx % 2 === 1 ? "md:flex-row-reverse" : ""}`}
-                variants={fadeUp}
+                variants={scaleReveal}
                 initial="hidden"
                 whileInView="visible"
                 viewport={viewportConfig}
+                custom={idx}
               >
                 <div className="flex-1">
                   <div className="text-5xl mb-4">{feat.icon}</div>
