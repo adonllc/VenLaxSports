@@ -192,6 +192,46 @@ export default function LeagueDetail() {
     }
   };
 
+  const requestPushNotificationAfterJoin = async () => {
+    if ("Notification" in window && Notification.permission === "default") {
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm === "granted") {
+          await registerPushSubscription();
+        }
+      } catch (e) {
+        console.warn("Push permission request failed", e);
+      }
+    }
+  };
+
+  const registerPushSubscription = async () => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+      const subJson = sub.toJSON();
+      await axios.post(`${API}/notifications/push-subscription`, {
+        endpoint: subJson.endpoint,
+        keys: subJson.keys,
+      }, { withCredentials: true });
+    } catch (e) {
+      console.warn("Push registration failed", e);
+    }
+  };
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = atob(base64);
+    return new Uint8Array([...rawData].map((c) => c.charCodeAt(0)));
+  };
+
   const handleJoin = async () => {
     if (!user) { navigate("/auth"); return; }
     setJoining(true);
@@ -208,6 +248,7 @@ export default function LeagueDetail() {
           setJoinMsg("Promo applied — you're registered!");
           setIsRegistered(true);
           fetchLeague();
+          requestPushNotificationAfterJoin();
           return;
         }
       }
@@ -218,6 +259,7 @@ export default function LeagueDetail() {
         setJoinMsg(data.message || "Joined successfully!");
         setIsRegistered(true);
         fetchLeague();
+        requestPushNotificationAfterJoin();
       }
     } catch (err) {
       const detail = err.response?.data?.detail;
@@ -715,6 +757,7 @@ export default function LeagueDetail() {
             setIsRegistered(true);
             fetchLeague();
             setJoinMsg("Registration complete!");
+            requestPushNotificationAfterJoin();
           }
           setPaymentModalOpen(false);
         }}
