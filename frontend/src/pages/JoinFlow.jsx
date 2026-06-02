@@ -49,7 +49,7 @@ function ProgressBar({ step }) {
           <div className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${i < step ? "bg-tennis w-8" : i === step ? "bg-tennis w-8" : "bg-gray-200 w-5"}`} />
         </div>
       ))}
-      <span className="text-xs text-emerald-600 font-semibold ml-2">{STEPS[step]}</span>
+      <span className="text-xs text-emerald-600 font-semibold ml-2">Step {step + 1} of {STEPS.length} — {STEPS[step]}</span>
     </div>
   );
 }
