@@ -138,6 +138,17 @@ export default function Leagues() {
         </div>
       </div>
 
+      {/* Promo Banner */}
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold text-orange-900">
+              First league free! Use code <code className="bg-orange-200 px-2 py-1 rounded font-mono text-orange-900">PLAY1FREE</code>
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
         <div className="rounded-2xl p-4 mb-8 flex flex-wrap gap-3" style={{ background: "white", border: "1px solid #E5E7EB" }}>
