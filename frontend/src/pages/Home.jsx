@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, ArrowRight, Users, Zap, Trophy, Target, CheckCircle, Flame } from "lucide-react";
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
 import platformConfig, { activeSports, activeSportIds } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -24,68 +26,42 @@ const BORDER = "var(--vl-border)";
 const PAGE_BG = "var(--vl-bg)";
 const SECTION_ALT = "var(--vl-bg-alt)";
 
-// Animation styles
-const FADE_IN_UP = `
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-`;
+// Animation variants for reusable patterns
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, delay, ease: "easeOut" },
+  }),
+};
 
-// Intersection Observer hook for scroll animations
-function useInView(ref, threshold = 0.1) {
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-  return inView;
-}
+const slideInLeft = {
+  hidden: { opacity: 0, x: -40 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, delay, ease: "easeOut" },
+  }),
+};
+
+const slideInRight = {
+  hidden: { opacity: 0, x: 40 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, delay, ease: "easeOut" },
+  }),
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, delay, ease: "easeOut" },
+  }),
+};
 
 export default function Home() {
   const navigate = useNavigate();
@@ -105,6 +81,14 @@ export default function Home() {
   const stepsInView = useInView(stepsRef);
   const leaguesInView = useInView(leaguesRef);
   const citiesInView = useInView(citiesRef);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -128,10 +112,8 @@ export default function Home() {
 
   return (
     <div style={{ background: PAGE_BG }} data-testid="home-page">
-      <style>{FADE_IN_UP}</style>
-
       {/* ── HERO ──────────────────────────────────────────────────────── */}
-      <div
+      <motion.div
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-28"
         style={{
@@ -140,49 +122,59 @@ export default function Home() {
         data-testid="hero-section"
       >
         {/* Animated gradient orbs */}
-        <div
-          className="absolute top-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-5 animate-pulse"
+        <motion.div
+          className="absolute top-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-5"
           style={{ background: ORANGE }}
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 4, repeat: Infinity }}
         />
-        <div
-          className="absolute bottom-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-5 animate-pulse"
-          style={{ background: GREEN, animationDelay: "0.5s" }}
+        <motion.div
+          className="absolute bottom-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-5"
+          style={{ background: GREEN }}
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
         />
 
-        <div
+        <motion.div
           className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-          style={{
-            animation: heroInView ? "fadeInUp 0.8s ease-out forwards" : "none",
-          }}
+          initial="hidden"
+          animate={heroInView ? "visible" : "hidden"}
+          variants={fadeInUp}
         >
           {/* Badge with pulse */}
-          <div
+          <motion.div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8"
             style={{
               background: `${ORANGE}12`,
               border: `1px solid ${ORANGE}25`,
-              animation: heroInView ? "slideInLeft 0.6s ease-out 0.1s forwards" : "none",
-              opacity: heroInView ? 1 : 0,
             }}
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={slideInLeft}
+            custom={0.1}
           >
-            <span
-              className="w-2 h-2 rounded-full animate-pulse"
+            <motion.span
+              className="w-2 h-2 rounded-full"
               style={{ background: ORANGE }}
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             />
             <span className="text-xs font-bold uppercase tracking-widest" style={{ color: ORANGE }}>
               Open Now: Spring Season
             </span>
-          </div>
+          </motion.div>
 
           {/* Headline with gradient */}
-          <h1
+          <motion.h1
             className="font-heading font-black leading-[1.1] tracking-tight mb-6 uppercase"
             style={{
               fontSize: "clamp(2.5rem, 8vw, 5.5rem)",
               color: TEXT_PRIMARY,
-              animation: heroInView ? "fadeInUp 0.8s ease-out 0.15s forwards" : "none",
-              opacity: heroInView ? 1 : 0,
             }}
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeInUp}
+            custom={0.15}
           >
             Your Sport.<br />Your City.<br />
             <span
@@ -195,80 +187,77 @@ export default function Home() {
             >
               Real Competition.
             </span>
-          </h1>
+          </motion.h1>
 
           {/* Subheadline */}
-          <p
+          <motion.p
             className="max-w-2xl mx-auto mb-10 leading-relaxed"
             style={{
               fontSize: "1.125rem",
               color: TEXT_SECONDARY,
-              animation: heroInView ? "fadeInUp 0.8s ease-out 0.25s forwards" : "none",
-              opacity: heroInView ? 1 : 0,
             }}
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeInUp}
+            custom={0.25}
           >
             Join ranked leagues across Tennis, Pickleball, and Cricket. Rise through rankings, compete with skill-matched players, earn unforgettable moments.
-          </p>
+          </motion.p>
 
           {/* CTA with hover effect */}
-          <button
+          <motion.button
             onClick={() => navigate("/auth?mode=register")}
-            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-white transition-all hover:shadow-2xl active:scale-95 hover:-translate-y-1"
-            style={{
-              background: ORANGE,
-              animation: heroInView ? "fadeInUp 0.8s ease-out 0.3s forwards" : "none",
-              opacity: heroInView ? 1 : 0,
-            }}
+            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-white transition-all hover:shadow-2xl active:scale-95"
+            style={{ background: ORANGE }}
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeInUp}
+            custom={0.3}
+            whileHover={{ y: -4 }}
             data-testid="hero-cta"
           >
             Start Your Season <ArrowRight className="w-5 h-5" />
-          </button>
+          </motion.button>
 
           {/* Social proof with stagger */}
-          <div
+          <motion.div
             className="flex gap-8 justify-center mt-16 pt-12 border-t flex-wrap sm:flex-nowrap"
             style={{ borderColor: BORDER }}
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={containerVariants}
           >
             {[
               { num: stats.players, label: "Active Players" },
               { num: stats.leagues, label: "Live Leagues" },
               { num: stats.cities, label: "Cities" },
             ].map((stat, i) => (
-              <div
-                key={i}
-                className="text-center"
-                style={{
-                  animation: heroInView ? "scaleIn 0.6s ease-out forwards" : "none",
-                  opacity: heroInView ? 1 : 0,
-                  animationDelay: `${0.35 + i * 0.1}s`,
-                }}
-              >
+              <motion.div key={i} className="text-center" variants={scaleIn} custom={0.35 + i * 0.1}>
                 <div className="text-2xl font-black" style={{ color: TEXT_PRIMARY }}>
                   {stat.num.toLocaleString()}+
                 </div>
                 <div className="text-xs uppercase tracking-widest mt-1" style={{ color: TEXT_MUTED }}>
                   {stat.label}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       {/* ── VALUE PILLARS ────────────────────────────────────────────── */}
-      <section
+      <motion.section
         ref={pillarsRef}
         className="py-20 sm:py-28"
         style={{ background: PAGE_BG }}
         data-testid="pillars-section"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
+          <motion.div
             className="text-center mb-16"
-            style={{
-              animation: pillarsInView ? "fadeInUp 0.8s ease-out forwards" : "none",
-              opacity: pillarsInView ? 1 : 0,
-            }}
+            initial="hidden"
+            animate={pillarsInView ? "visible" : "hidden"}
+            variants={fadeInUp}
           >
             <h2
               className="font-heading font-black leading-[0.95] tracking-tight uppercase"
@@ -276,51 +265,58 @@ export default function Home() {
             >
               Built on Three Pillars
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden"
+            animate={pillarsInView ? "visible" : "hidden"}
+            variants={containerVariants}
+          >
             {[
               { icon: "🏆", word: "Victory", desc: "Every match, league, and season built around helping players win, improve, and rise." },
               { icon: "⚡", word: "Energy", desc: "The heartbeat of sports — fast, dynamic, community-driven across every city." },
               { icon: "🎮", word: "eXperience", desc: "A seamless digital + physical sports journey, mobile-first, end-to-end." },
-            ].map(({ icon, word, desc }, i) => (
-              <div
+            ].map(({ icon, word, desc }) => (
+              <motion.div
                 key={word}
-                className="text-center p-6 rounded-2xl transition-all hover:shadow-lg hover:-translate-y-2 cursor-default"
-                style={{
-                  background: SECTION_ALT,
-                  animation: pillarsInView ? "scaleIn 0.6s ease-out forwards" : "none",
-                  opacity: pillarsInView ? 1 : 0,
-                  animationDelay: `${i * 0.1}s`,
-                }}
+                className="text-center p-6 rounded-2xl transition-all cursor-default"
+                style={{ background: SECTION_ALT }}
+                variants={scaleIn}
+                whileHover={{ y: -8, boxShadow: "0 12px 24px rgba(0,0,0,0.1)" }}
               >
-                <div className="text-5xl mb-4">{icon}</div>
+                <motion.div
+                  className="text-5xl mb-4"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {icon}
+                </motion.div>
                 <h3 className="font-heading font-bold text-2xl mb-3 uppercase" style={{ color: TEXT_PRIMARY }}>
                   {word}
                 </h3>
                 <p className="text-sm leading-relaxed" style={{ color: TEXT_SECONDARY }}>
                   {desc}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── HOW IT WORKS ───────────────────────────────────────────────── */}
-      <section
+      <motion.section
         ref={stepsRef}
         className="py-20 sm:py-28"
         style={{ background: SECTION_ALT }}
         data-testid="how-it-works-section"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
+          <motion.div
             className="text-center mb-16"
-            style={{
-              animation: stepsInView ? "fadeInUp 0.8s ease-out forwards" : "none",
-              opacity: stepsInView ? 1 : 0,
-            }}
+            initial="hidden"
+            animate={stepsInView ? "visible" : "hidden"}
+            variants={fadeInUp}
           >
             <h2
               className="font-heading font-black leading-[0.95] tracking-tight uppercase"
@@ -328,30 +324,29 @@ export default function Home() {
             >
               How It Works
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <motion.div
+            className="grid md:grid-cols-4 gap-8"
+            initial="hidden"
+            animate={stepsInView ? "visible" : "hidden"}
+            variants={containerVariants}
+          >
             {[
               { num: "1", step: "Sign Up", desc: "Create your account in seconds. Choose your sport and skill level." },
               { num: "2", step: "Join a League", desc: "Browse ranked leagues in your city. Pick one that matches your schedule." },
               { num: "3", step: "Play & Compete", desc: "Schedule matches with skill-matched opponents. Track your rating." },
               { num: "4", step: "Rise the Ranks", desc: "Win matches, earn points, and climb the seasonal rankings." },
             ].map(({ num, step, desc }, i) => (
-              <div
-                key={num}
-                className="relative"
-                style={{
-                  animation: stepsInView ? "fadeInUp 0.6s ease-out forwards" : "none",
-                  opacity: stepsInView ? 1 : 0,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              >
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center font-black text-lg mb-4 text-white shadow-lg transition-all hover:scale-110"
+              <motion.div key={num} className="relative" variants={fadeInUp} custom={i * 0.1}>
+                <motion.div
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-black text-lg mb-4 text-white shadow-lg"
                   style={{ background: ORANGE }}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
                 >
                   {num}
-                </div>
+                </motion.div>
                 <h3 className="font-heading font-bold text-lg mb-2" style={{ color: TEXT_PRIMARY }}>
                   {step}
                 </h3>
@@ -363,26 +358,25 @@ export default function Home() {
                     →
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── ACTIVE LEAGUES ────────────────────────────────────────────── */}
-      <section
+      <motion.section
         ref={leaguesRef}
         className="py-20 sm:py-28"
         style={{ background: PAGE_BG }}
         data-testid="featured-leagues-section"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
+          <motion.div
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4"
-            style={{
-              animation: leaguesInView ? "fadeInUp 0.8s ease-out forwards" : "none",
-              opacity: leaguesInView ? 1 : 0,
-            }}
+            initial="hidden"
+            animate={leaguesInView ? "visible" : "hidden"}
+            variants={fadeInUp}
           >
             <div>
               <h2
@@ -392,55 +386,56 @@ export default function Home() {
                 Active Leagues
               </h2>
             </div>
-            <Link
-              to="/leagues"
-              className="inline-flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg transition-all hover:gap-3"
-              style={{ color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.color = ORANGE; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
-              data-testid="view-all-leagues"
-            >
-              See All <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+            <motion.div whileHover={{ gap: "0.75rem" }}>
+              <Link
+                to="/leagues"
+                className="inline-flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg transition-all"
+                style={{ color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.color = ORANGE; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
+                data-testid="view-all-leagues"
+              >
+                See All <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+          </motion.div>
 
           <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
             {ACTIVE_SPORTS.map(sport => (
-              <button
+              <motion.button
                 key={sport.label}
                 onClick={() => setActiveSport(sport.label.toLowerCase())}
                 className="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all cursor-pointer"
                 style={activeSport === sport.label.toLowerCase()
                   ? { background: sport.accent, color: "white", boxShadow: `0 4px 12px ${sport.accent}40` }
                   : { background: SECTION_ALT, color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
+                whileHover={{ scale: 1.05 }}
                 data-testid={`tab-${sport.label.toLowerCase()}`}
               >
                 {sport.icon} {sport.label}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {loading ? (
             <div className="grid md:grid-cols-3 gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-48 rounded-2xl animate-pulse" style={{ background: SECTION_ALT }} />
+                <motion.div key={i} className="h-48 rounded-2xl" style={{ background: SECTION_ALT }} animate={{ opacity: [0.5, 1] }} transition={{ duration: 1, repeat: Infinity }} />
               ))}
             </div>
           ) : filteredLeagues.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {filteredLeagues.map((league, i) => (
-                <div
-                  key={league.id}
-                  style={{
-                    animation: leaguesInView ? "scaleIn 0.6s ease-out forwards" : "none",
-                    opacity: leaguesInView ? 1 : 0,
-                    animationDelay: `${0.2 + i * 0.1}s`,
-                  }}
-                >
+            <motion.div
+              className="grid md:grid-cols-3 gap-6"
+              initial="hidden"
+              animate={leaguesInView ? "visible" : "hidden"}
+              variants={containerVariants}
+            >
+              {filteredLeagues.map((league) => (
+                <motion.div key={league.id} variants={scaleIn}>
                   <LeagueCard league={league} />
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <div className="text-center py-20">
               <p className="font-heading font-bold text-lg" style={{ color: TEXT_PRIMARY }}>
@@ -449,22 +444,21 @@ export default function Home() {
             </div>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── CITIES ────────────────────────────────────────────────────── */}
-      <section
+      <motion.section
         ref={citiesRef}
         className="py-20 sm:py-28"
         style={{ background: SECTION_ALT }}
         data-testid="cities-section"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
+          <motion.div
             className="mb-12"
-            style={{
-              animation: citiesInView ? "fadeInUp 0.8s ease-out forwards" : "none",
-              opacity: citiesInView ? 1 : 0,
-            }}
+            initial="hidden"
+            animate={citiesInView ? "visible" : "hidden"}
+            variants={fadeInUp}
           >
             <h2
               className="font-heading font-black leading-[0.95] tracking-tight uppercase mb-3"
@@ -475,28 +469,34 @@ export default function Home() {
             <p className="text-lg max-w-2xl" style={{ color: TEXT_SECONDARY }}>
               From coast to coast, VENLAX connects players across major cities.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {platformConfig.featuredCities.map((city, i) => (
-              <button
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            initial="hidden"
+            animate={citiesInView ? "visible" : "hidden"}
+            variants={containerVariants}
+          >
+            {platformConfig.featuredCities.map((city) => (
+              <motion.button
                 key={city.name}
                 onClick={() => navigate(`/leagues?city=${encodeURIComponent(city.name)}`)}
-                className="rounded-2xl p-5 text-left transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer group"
+                className="rounded-2xl p-5 text-left transition-all cursor-pointer group"
                 style={{
                   background: PAGE_BG,
                   border: `1px solid ${BORDER}`,
-                  animation: citiesInView ? "slideInLeft 0.6s ease-out forwards" : "none",
-                  opacity: citiesInView ? 1 : 0,
-                  animationDelay: `${i * 0.05}s`,
                 }}
+                variants={slideInLeft}
+                whileHover={{ y: -4, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
                 data-testid={`city-card-${city.name.toLowerCase().replace(/\s/g, "-")}`}
               >
                 <div className="flex items-start gap-3">
-                  <MapPin
-                    className="w-5 h-5 flex-shrink-0 mt-0.5 transition-all group-hover:scale-110"
-                    style={{ color: GREEN }}
-                  />
+                  <motion.div whileHover={{ scale: 1.1 }}>
+                    <MapPin
+                      className="w-5 h-5 flex-shrink-0 mt-0.5"
+                      style={{ color: GREEN }}
+                    />
+                  </motion.div>
                   <div className="min-w-0">
                     <h3 className="font-heading font-bold" style={{ color: TEXT_PRIMARY }}>
                       {city.name}
@@ -506,48 +506,63 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── FINAL CTA ────────────────────────────────────────────────── */}
-      <section
+      <motion.section
         className="py-20 sm:py-28 relative overflow-hidden"
         style={{ background: ORANGE }}
         data-testid="cta-section"
       >
-        <div className="absolute inset-0 opacity-10">
+        <motion.div
+          className="absolute inset-0 opacity-10"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        >
           <div
             className="absolute top-10 right-20 w-32 h-32 rounded-full blur-3xl"
             style={{ background: ORANGE_DARK }}
           />
-        </div>
+        </motion.div>
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2
+          <motion.h2
             className="font-heading font-black leading-[0.95] tracking-tight mb-6 text-white uppercase"
             style={{ fontSize: "clamp(2.5rem, 7vw, 4.5rem)" }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
             Ready to Rise?
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
             className="text-lg text-white/85 mb-10 max-w-xl mx-auto"
             style={{ fontSize: "1.125rem" }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
           >
             Join thousands of players competing in ranked leagues across your favorite sports.
-          </p>
-          <button
+          </motion.p>
+          <motion.button
             onClick={() => navigate("/auth?mode=register")}
-            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-lg transition-all hover:scale-105 active:scale-95 hover:shadow-2xl"
+            className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-lg"
             style={{ background: "white", color: ORANGE }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             data-testid="final-cta-btn"
           >
             Get Started Free <ArrowRight className="w-5 h-5" />
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
