@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VENLAX Sports — Design Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #10B981;
+            --accent: #F97316;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-300: #D1D5DB;
+            --gray-600: #4B5563;
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--dark);
+            background: var(--light);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Toggle Button */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        body.dark-mode {
+            background: #111827;
+            color: #F9FAFB;
+        }
+
+        body.dark-mode .card {
+            background: #1F2937;
+            border-color: #374151;
+        }
+
+        body.dark-mode .section-alt {
+            background: #1F2937;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-300);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-family: 'Geist'; font-size: 20px; font-weight: 900; }
+        header nav { display: flex; gap: 24px; font-size: 14px; }
+
+        body.dark-mode header {
+            background: #1F2937;
+            border-color: #374151;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--light) 0%, #FFFBF0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero h2 {
+            font-family: 'Geist';
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            color: var(--dark);
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Plus Jakarta Sans';
+        }
+
+        .cta-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+        }
+
+        .cta-button.accent {
+            background: var(--accent);
+        }
+
+        .cta-button.accent:hover {
+            background: #EA580C;
+        }
+
+        /* Stat Card (Personal Rating) */
+        .stat-card {
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            padding: 32px;
+            margin-top: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .stat-card h4 {
+            font-family: 'DM Sans';
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .rating-display {
+            font-family: 'DM Sans';
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .rating-label {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        /* Font Specimen */
+        .section-title {
+            font-family: 'Geist';
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin: 60px 0 40px;
+            text-align: center;
+        }
+
+        .section-alt {
+            background: var(--gray-100);
+            padding: 60px 20px;
+            margin-top: 60px;
+        }
+
+        .specimen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin: 40px 0;
+        }
+
+        .specimen-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-300);
+        }
+
+        .specimen-label {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .specimen-geist {
+            font-family: 'Geist';
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .specimen-jakarta {
+            font-family: 'Plus Jakarta Sans';
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--gray-600);
+        }
+
+        .specimen-dm {
+            font-family: 'DM Sans';
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            color: var(--dark);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Color Swatches */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .color-swatch {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gray-300);
+        }
+
+        .color-block {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .color-label {
+            padding: 12px;
+            background: white;
+            font-size: 12px;
+            font-family: 'DM Sans';
+        }
+
+        /* Component Examples */
+        .components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .component-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-300);
+        }
+
+        .component-box h5 {
+            font-family: 'Geist';
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* League Card Mockup */
+        .league-card {
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .league-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .league-header {
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .league-content {
+            padding: 20px;
+        }
+
+        .league-sport {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .league-name {
+            font-family: 'Geist';
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .league-details {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-bottom: 16px;
+        }
+
+        .league-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            border-top: 1px solid var(--gray-300);
+            padding-top: 12px;
+        }
+
+        .league-fee {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Leaderboard Preview */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .leaderboard-table th {
+            font-family: 'DM Sans';
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .leaderboard-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-300);
+            font-family: 'Plus Jakarta Sans';
+        }
+
+        .rank-number {
+            font-family: 'DM Sans';
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .player-name {
+            font-weight: 600;
+        }
+
+        .rating-badge {
+            display: inline-block;
+            background: var(--gray-100);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'DM Sans';
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .trend-down {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body.dark-mode {
+            --dark: #F9FAFB;
+            --light: #111827;
+            --gray-100: #1F2937;
+            --gray-300: #374151;
+            --gray-600: #D1D5DB;
+        }
+
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--gray-300);
+            margin-top: 60px;
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" onclick="document.body.classList.toggle('dark-mode')">Toggle Dark Mode</button>
+
+    <header>
+        <div class="container">
+            <h1>VENLAX</h1>
+            <nav>
+                <span>How It Works</span>
+                <span>Leaderboards</span>
+                <span>Sign Up</span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">SPRING SEASON NOW LIVE</div>
+            <h2>Find Your Competition.<br><span style="background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Win Your League.</span></h2>
+            <p>Ranked matches against skill-matched opponents. Track your rating. Climb the leaderboard. This is competitive tennis and pickleball for real players.</p>
+            <button class="cta-button">Find Your League →</button>
+        </div>
+
+        <div class="stat-card">
+            <h4>Your Rating</h4>
+            <div class="rating-display">1,847</div>
+            <div class="rating-label">You're in the top 12% of players in your region</div>
+            <button class="cta-button accent" style="margin-top: 20px; width: 100%;">Schedule Your Next Match →</button>
+        </div>
+    </section>
+
+    <!-- TYPOGRAPHY SPECIMEN -->
+    <section class="section-alt">
+        <div class="container">
+            <h3 class="section-title">Typography System</h3>
+
+            <div class="specimen-grid">
+                <div class="specimen-card">
+                    <div class="specimen-label">Display – Geist</div>
+                    <div class="specimen-geist">Rise Through Ranks</div>
+                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px;">Modern, confident, tech-forward</div>
+                </div>
+
+                <div class="specimen-card">
+                    <div class="specimen-label">Body – Plus Jakarta Sans</div>
+                    <div class="specimen-jakarta">Join a league, play matches with skill-matched opponents, and watch your rating climb season after season.</div>
+                </div>
+
+                <div class="specimen-card">
+                    <div class="specimen-label">Data – DM Sans Tabular</div>
+                    <div class="specimen-dm">1,847 • 1,623 • 1,445 • 1,338</div>
+                    <div style="font-size: 11px; color: var(--gray-600); margin-top: 8px;">Aligned numbers for leaderboards</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COLOR PALETTE -->
+    <section>
+        <div class="container">
+            <h3 class="section-title">Color System</h3>
+
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #10B981; color: white;">Primary</div>
+                    <div class="color-label">#10B981<br>Victory, Action, Confirmation</div>
+                </div>
+
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #F97316; color: white;">Accent</div>
+                    <div class="color-label">#F97316<br>Next Match, Progression</div>
+                </div>
+
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #1F2937;">Dark</div>
+                    <div class="color-label">#1F2937<br>Text, Headers</div>
+                </div>
+
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #F9FAFB; border: 1px solid #ddd;">Light</div>
+                    <div class="color-label">#F9FAFB<br>Backgrounds</div>
+                </div>
+
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #EF4444; color: white;">Loss</div>
+                    <div class="color-label">#EF4444<br>Alert, Loss</div>
+                </div>
+
+                <div class="color-swatch">
+                    <div class="color-block" style="background: #F3F4F6;">Neutral</div>
+                    <div class="color-label">#F3F4F6<br>Secondary BG</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEAGUE CARDS SECTION -->
+    <section class="section-alt">
+        <div class="container">
+            <h3 class="section-title">Active Leagues</h3>
+
+            <div class="specimen-grid" style="margin-bottom: 40px;">
+                <div class="league-card">
+                    <div class="league-header"></div>
+                    <div class="league-content">
+                        <div class="league-sport">🎾 Tennis</div>
+                        <div class="league-name">Manhattan Spring League</div>
+                        <div class="league-details">New York • Singles</div>
+                        <div class="league-footer">
+                            <span>24/32 players</span>
+                            <span class="league-fee">$9.99</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="league-card">
+                    <div class="league-header" style="background: #F97316;"></div>
+                    <div class="league-content">
+                        <div class="league-sport" style="color: #F97316;">🏓 Pickleball</div>
+                        <div class="league-name">Brooklyn Doubles</div>
+                        <div class="league-details">New York • Doubles</div>
+                        <div class="league-footer">
+                            <span>16/20 players</span>
+                            <span class="league-fee" style="color: #F97316;">$19.99</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="league-card">
+                    <div class="league-header"></div>
+                    <div class="league-content">
+                        <div class="league-sport">🎾 Tennis</div>
+                        <div class="league-name">Queens Casual</div>
+                        <div class="league-details">New York • Singles</div>
+                        <div class="league-footer">
+                            <span>8/24 players</span>
+                            <span class="league-fee">Free</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEADERBOARD PREVIEW -->
+    <section>
+        <div class="container">
+            <h3 class="section-title">Live Leaderboard</h3>
+
+            <div style="overflow-x: auto; margin: 40px 0;">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Rating</th>
+                            <th>Change</th>
+                            <th>Wins</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="rank-number">1</span></td>
+                            <td><span class="player-name">Alex Chen</span></td>
+                            <td><span class="rating-badge">1,847</span></td>
+                            <td><span class="trend-up">↑ +23</span></td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-number">2</span></td>
+                            <td><span class="player-name">Jordan Smith</span></td>
+                            <td><span class="rating-badge">1,792</span></td>
+                            <td><span class="trend-down">↓ -8</span></td>
+                            <td>11</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-number">3</span></td>
+                            <td><span class="player-name">Casey Wong</span></td>
+                            <td><span class="rating-badge">1,756</span></td>
+                            <td><span class="trend-up">↑ +15</span></td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-number">4</span></td>
+                            <td><span class="player-name">Morgan Davis</span></td>
+                            <td><span class="rating-badge">1,701</span></td>
+                            <td><span class="trend-up">↑ +6</span></td>
+                            <td>9</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-number">5</span></td>
+                            <td><span class="player-name">Riley Jackson</span></td>
+                            <td><span class="rating-badge">1,645</span></td>
+                            <td><span class="trend-up">↑ +34</span></td>
+                            <td>8</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section style="background: var(--primary); color: white; padding: 80px 20px; margin-top: 60px;">
+        <div class="container" style="text-align: center; max-width: 600px;">
+            <h3 style="font-family: 'Geist'; font-size: 3rem; font-weight: 900; margin-bottom: 16px;">Ready to Climb?</h3>
+            <p style="font-size: 18px; margin-bottom: 32px; opacity: 0.95;">Join a league in your city. Play matches. Watch your rating rise. Compete with players at your level.</p>
+            <button class="cta-button" style="background: white; color: var(--primary); border: none;">Get Started →</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>VENLAX Sports. Ranked leagues. Real competition. Every city. Every season.</p>
+        <p style="margin-top: 12px;">Preview of design system — fonts: Geist (display), Plus Jakarta Sans (body), DM Sans (data) | Colors: #10B981 (primary), #F97316 (accent) | Motion: Fade-in animations on scroll</p>
+    </footer>
+
+    <script>
+        // Simple dark mode toggle
+        const toggle = document.querySelector('.dark-mode-toggle');
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode === 'true') {
+            document.body.classList.add('dark-mode');
+            toggle.textContent = 'Light Mode';
+        }
+
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            toggle.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        });
+    </script>
+</body>
+</html>

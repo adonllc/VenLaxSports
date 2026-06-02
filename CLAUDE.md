@@ -126,6 +126,21 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 
 `.env.usa` and `.env.india` in root — Atlas-ready Mongo placeholders, CORS pre-configured for `venlaxsports.com`. Use these as the basis for production env files.
 
+## Design System
+
+**Read DESIGN.md before any UI/frontend work.** All typography, colors, spacing, border-radius, motion, and component patterns are defined there. Do not deviate without explicit user approval.
+
+**Key system:**
+- **Typography:** Geist (display), Plus Jakarta Sans (body), DM Sans (data)
+- **Colors:** #10B981 (primary/victory), #F97316 (accent/next action)
+- **Spacing:** 8px base unit. Cards: 16px padding, sections: 24px gaps
+- **Motion:** Minimal. Fade-in on scroll, hover elevate, no playful bounces
+- **Philosophy:** Lead with player progression. Athletic competitive vibe. Serious, not trendy.
+
+When reviewing code/components, flag anything that doesn't match DESIGN.md.
+
+---
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
