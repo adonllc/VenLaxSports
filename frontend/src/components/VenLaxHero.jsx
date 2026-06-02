@@ -141,7 +141,7 @@ export default function VenLaxHero({
             </h1>
 
             {/* Sub */}
-            <p className="vl-fade-in vl-d3 max-w-xl text-lg text-zinc-400 leading-relaxed">
+            <p className="vl-fade-in vl-d3 max-w-xl text-lg text-zinc-200 leading-relaxed">
               {sportMeta
                 ? sportMeta.tagline
                 : platformConfig.heroSubtitle}
