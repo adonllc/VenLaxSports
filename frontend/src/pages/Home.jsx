@@ -359,7 +359,7 @@ export default function Home() {
               <motion.div key={num} className="relative" variants={fadeInUp} custom={i * 0.1}>
                 <motion.div
                   className="w-12 h-12 rounded-full flex items-center justify-center font-black text-lg mb-4 text-white shadow-lg"
-                  style={{ background: ORANGE }}
+                  style={{ background: ACCENT }}
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 10 }}
                 >
@@ -409,7 +409,7 @@ export default function Home() {
                 to="/leagues"
                 className="inline-flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg transition-all"
                 style={{ color: TEXT_SECONDARY, border: `1px solid ${BORDER}` }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.color = ORANGE; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_SECONDARY; }}
                 data-testid="view-all-leagues"
               >
@@ -512,7 +512,7 @@ export default function Home() {
                   <motion.div whileHover={{ scale: 1.1 }}>
                     <MapPin
                       className="w-5 h-5 flex-shrink-0 mt-0.5"
-                      style={{ color: GREEN }}
+                      style={{ color: PRIMARY }}
                     />
                   </motion.div>
                   <div className="min-w-0">
@@ -533,7 +533,7 @@ export default function Home() {
       {/* ── FINAL CTA ────────────────────────────────────────────────── */}
       <motion.section
         className="py-20 sm:py-28 relative overflow-hidden"
-        style={{ background: ORANGE }}
+        style={{ background: ACCENT }}
         data-testid="cta-section"
       >
         <motion.div
@@ -543,7 +543,7 @@ export default function Home() {
         >
           <div
             className="absolute top-10 right-20 w-32 h-32 rounded-full blur-3xl"
-            style={{ background: ORANGE_DARK }}
+            style={{ background: ACCENT_DARK }}
           />
         </motion.div>
 
@@ -569,7 +569,7 @@ export default function Home() {
           <motion.button
             onClick={() => navigate("/auth?mode=register")}
             className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg text-lg"
-            style={{ background: "white", color: ORANGE }}
+            style={{ background: "white", color: ACCENT }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -597,14 +597,14 @@ function LeagueCard({ league }) {
       style={{ background: "var(--vl-bg-card)", border: `1px solid ${BORDER}` }}
       data-testid={`league-card-${league.id}`}
     >
-      <div className="h-1 transition-all" style={{ background: config.accent || ORANGE }} />
+      <div className="h-1 transition-all" style={{ background: config.accent || ACCENT }} />
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: config.accent || ORANGE }}>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: config.accent || ACCENT }}>
             {config.label || league.sport}
           </span>
           {spotsLeft <= 5 && spotsLeft > 0 && (
-            <span className="text-xs font-bold animate-pulse" style={{ color: ORANGE }}>
+            <span className="text-xs font-bold animate-pulse" style={{ color: ACCENT }}>
               {spotsLeft} spots left
             </span>
           )}
@@ -627,7 +627,7 @@ function LeagueCard({ league }) {
           </span>
           <span
             className="text-xs font-bold"
-            style={{ color: league.entry_fee && league.entry_fee > 0 ? ORANGE : GREEN }}
+            style={{ color: league.entry_fee && league.entry_fee > 0 ? ACCENT : PRIMARY }}
           >
             {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
           </span>
