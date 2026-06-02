@@ -148,43 +148,53 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         elif discount_type == "amount_off":
             entry_fee = max(0.01, round(entry_fee - discount_value, 2))
 
-    try:
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
-    except ImportError:
-        raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
+    import stripe
 
     api_key = os.environ.get("STRIPE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="Payment processing is not configured. Please contact support.")
-    host_url = str(request.base_url)
-    webhook_url = f"{host_url}api/webhook/stripe"
-    stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+
+    stripe.api_key = api_key
 
     currency = league.get("currency", "USD").lower()
     # Stripe only accepts USD for test; for INR use USD equivalent
     stripe_currency = "usd"
-    stripe_amount = entry_fee if currency == "usd" else round(entry_fee / 83.0, 2)
+    stripe_amount = int(entry_fee * 100)  # Convert to cents
 
     success_url = f"{data.origin_url}/leagues/{data.league_id}?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{data.origin_url}/leagues/{data.league_id}"
 
     stripe_meta = {
-        "league_id": data.league_id,
-        "user_id": user["_id"],
+        "league_id": str(data.league_id),
+        "user_id": str(user["_id"]),
         "user_email": user["email"],
     }
     if data.invite_token:
         stripe_meta["invite_token"] = data.invite_token
         stripe_meta["is_doubles"] = "true"
 
-    checkout_req = CheckoutSessionRequest(
-        amount=stripe_amount,
-        currency=stripe_currency,
-        success_url=success_url,
-        cancel_url=cancel_url,
-        metadata=stripe_meta,
-    )
-    session = await stripe.create_checkout_session(checkout_req)
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": stripe_currency,
+                        "product_data": {
+                            "name": league["name"],
+                        },
+                        "unit_amount": stripe_amount,
+                    },
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata=stripe_meta,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to create checkout session: {str(e)}")
 
     txn_meta = {"league_id": data.league_id, "user_id": user["_id"]}
     if data.promo_code:
@@ -198,15 +208,15 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         user_email=user["email"],
         league_id=data.league_id,
         league_name=league["name"],
-        session_id=session.session_id,
-        amount=stripe_amount,
+        session_id=session.id,
+        amount=stripe_amount / 100,
         currency="USD",
         status="initiated",
         payment_status="unpaid",
         metadata=txn_meta,
     )
     await db.payment_transactions.insert_one(txn.to_mongo())
-    return {"url": session.url, "session_id": session.session_id}
+    return {"url": session.url, "session_id": session.id}
 
 
 @router.get("/status/{session_id}")

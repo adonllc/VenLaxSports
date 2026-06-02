@@ -197,44 +197,53 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
         return {"accepted": True, "league_id": league_id, "gender_warning": gender_warning}
 
     # Paid league (initiator hasn't paid) — create Stripe checkout for initiator (P1)
-    try:
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
-    except ImportError:
-        raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
+    import stripe
 
     api_key = os.environ.get("STRIPE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="Payment processing is not configured. Please contact support.")
 
-    host_url = str(request.base_url)
-    webhook_url = f"{host_url}api/webhook/stripe"
-    stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+    stripe.api_key = api_key
 
     currency = league.get("currency", "USD").lower()
     stripe_currency = "usd"
-    stripe_amount = entry_fee if currency == "usd" else round(entry_fee / 83.0, 2)
+    stripe_amount = int(entry_fee * 100)  # Convert to cents
 
     frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
     success_url = f"{frontend_url}/leagues/{league_id}?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{frontend_url}/leagues/{league_id}"
 
-    checkout_req = CheckoutSessionRequest(
-        amount=stripe_amount,
-        currency=stripe_currency,
-        success_url=success_url,
-        cancel_url=cancel_url,
-        metadata={
-            "league_id": league_id,
-            "user_id": invite["initiator_id"],
-            "invite_token": invite["token"],
-            "is_doubles": "true",
-        },
-    )
-    session = await stripe.create_checkout_session(checkout_req)
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": stripe_currency,
+                        "product_data": {
+                            "name": league["name"],
+                        },
+                        "unit_amount": stripe_amount,
+                    },
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "league_id": str(league_id),
+                "user_id": str(invite["initiator_id"]),
+                "invite_token": invite["token"],
+                "is_doubles": "true",
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to create checkout session: {str(e)}")
 
     await db.doubles_invites.update_one(
         {"token": body.token},
-        {"$set": {"payment_session_id": session.session_id, "status": "accepted"}},
+        {"$set": {"payment_session_id": session.id, "status": "accepted"}},
     )
 
     return {
