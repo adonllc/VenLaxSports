@@ -47,7 +47,9 @@
       "Bash(curl -s http://localhost:8001/api/health)",
       "Bash(uvicorn server:app --reload --port 8001)",
       "Bash(npm start *)",
-      "Bash(tee /tmp/vite.log)"
+      "Bash(tee /tmp/vite.log)",
+      "Bash(tail -30 /tmp/vite.log | grep -A 5 -B 5 \"error\\\\|Error\\\\|ERR\")",
+      "Read(//tmp/**)"
     ]
   }
 }

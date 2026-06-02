@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { MapPin, ArrowRight, Users, Zap, Trophy, Target, CheckCircle, Flame } from "lucide-react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import platformConfig, { activeSports, activeSportIds } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
