@@ -120,15 +120,6 @@ export default function Navbar() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              data-testid="theme-toggle"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
             {user ? (
               <div className="relative" ref={userRef}>
                 <button
@@ -168,6 +159,14 @@ export default function Navbar() {
                         <Shield className="w-4 h-4 text-gray-400" /> Admin Panel
                       </Link>
                     )}
+                    <button
+                      onClick={toggleTheme}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg w-full"
+                      data-testid="theme-toggle"
+                    >
+                      {isDark ? <Sun className="w-4 h-4 text-gray-400" /> : <Moon className="w-4 h-4 text-gray-400" />}
+                      {isDark ? "Light Mode" : "Dark Mode"}
+                    </button>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg w-full"
