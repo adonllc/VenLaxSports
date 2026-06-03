@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, AlertCircle, Users, CheckCircle, Heart, AlertTriangle } from "lucide-react";
+import { Shield, AlertCircle, Users, CheckCircle, Heart, AlertTriangle, TrendingUp } from "lucide-react";
 
 const HANDBOOK_SECTIONS = [
   {
