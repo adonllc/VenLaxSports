@@ -243,38 +243,54 @@ const FLEX_LEAGUE_RULES = [
 
 const ROUND_ROBIN_RULES = [
   {
-    category: "Scheduling",
+    category: "Organizer & Player Coordination",
     items: [
-      "VenLax generates pairings only. Match times, courts, and dates are entirely the organizer's responsibility.",
-      "Your organizer will communicate the schedule before each round — check in with them, not VenLax.",
-      "Confirm attendance when notified. Respond within 48 hours.",
-      "Rescheduling? Contact your organizer directly.",
+      "Organizers or players finalize the actual match date, time, and court location for each round.",
+      "Your local organizer will communicate court locations and match times before each round.",
+      "Contact your organizer, not VenLax, for schedule updates or changes.",
     ],
   },
   {
-    category: "Match Order",
+    category: "Scheduling & Attendance",
     items: [
-      "Every player faces every other player in the group at least once.",
-      "Number of rounds = number of players minus 1 for even groups.",
-      "Bye weeks assigned for odd-player groups. Byes count as a rest, not a win.",
+      "Players must confirm attendance within 48 hours of receiving a match notification.",
+      "Missing the RSVP window may result in a forfeit.",
+      "Any schedule changes must be coordinated directly with the league organizer.",
+      "VenLax does not manage or guarantee reschedule availability.",
+    ],
+  },
+  {
+    category: "Match Order & Structure",
+    items: [
+      "True Round Robin: Every player competes against every other player in the group exactly once during the main season.",
+      "Even-Sized Groups: Number of rounds = number of players minus one.",
+      "Odd-Sized Groups: One player receives a Bye each round. A Bye is a rest round, not a win or loss.",
       "No player faces the same opponent twice during the main group phase.",
     ],
   },
   {
-    category: "Season Structure",
+    category: "Season Structure & Withdrawals",
     items: [
-      "Group phase: everyone plays everyone. No early exits until the group phase is complete.",
-      "Top finishers from each group advance to playoffs (structure depends on group size).",
-      "No mid-season replacements. Spots are fixed at registration close.",
-      "Withdrawal: completed matches stand; remaining matches recorded as opponent walkovers.",
+      "Fixed Roster: Once registration closes, no permanent mid-season replacements are allowed.",
+      "Withdrawals: Completed match results remain valid. All remaining unplayed matches are recorded as walkover wins (3 points) for the scheduled opponents.",
+      "Optional: Organizers may allow a non-scoring substitute to play matches for fun only (no impact on standings).",
+      "Top finishers from each group advance to a single-elimination playoff bracket.",
     ],
   },
   {
-    category: "Standings",
+    category: "Standings & Scoring System",
     items: [
-      "Same points formula as Flex League: 3(W) + 1(L) + 0.5(SW-SL) + 0.1(GW-GL) + Bonus.",
-      "Tiebreakers: head-to-head result first, then set differential, game differential, opponent strength.",
-      "Head-to-head carries more weight in Round Robin because all players face each other directly.",
+      "Points Formula: 3 × Wins + 1 × Losses + 0.5 × (Sets Won − Sets Lost) + 0.1 × (Games Won − Games Lost) + [Optional Bonus].",
+      "Organizers may define a bonus category (e.g., sportsmanship, full attendance, straight-set wins).",
+      "Head-to-head carries extra weight in Round Robin because all players face each other directly.",
+    ],
+  },
+  {
+    category: "Tiebreakers",
+    items: [
+      "If players finish with the same total points, apply in order: Head-to-Head Result → Set Differential → Game Differential → Opponent Strength.",
+      "Opponent Strength: Players who beat undefeated opponents rank higher.",
+      "Special Note: For 3-way ties where Head-to-Head creates a loop (A beats B, B beats C, C beats A), the system immediately defaults to Set Differential.",
     ],
   },
 ];
