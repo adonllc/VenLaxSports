@@ -15,6 +15,9 @@ import PreLaunch from "./pages/PreLaunch";
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Rules = lazy(() => import("./pages/Rules"));
+const Handbook = lazy(() => import("./pages/Handbook"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Waiver = lazy(() => import("./pages/Waiver"));
 const Leagues = lazy(() => import("./pages/Leagues"));
 const LeagueDetail = lazy(() => import("./pages/LeagueDetail"));
 const RoundRobinLeagues = lazy(() => import("./pages/RoundRobinLeagues"));
@@ -25,7 +28,6 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const SportLanding = lazy(() => import("./pages/SportLanding"));
 const ScoreReport = lazy(() => import("./pages/ScoreReport"));
 const Standings = lazy(() => import("./pages/Standings"));
-const Terms = lazy(() => import("./pages/Terms"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const LeagueSpectator = lazy(() => import("./pages/LeagueSpectator"));
 const CityLeaderboard = lazy(() => import("./pages/CityLeaderboard"));
@@ -61,13 +63,15 @@ function AppRouter() {
         <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
         <Route path="/leagues/:id" element={<LeagueDetail />} />
         <Route path="/rules" element={<Rules />} />
+        <Route path="/handbook" element={<Handbook />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/waiver" element={<Waiver />} />
         <Route path="/dashboard" element={<PlayerDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/matches/:id/score" element={<ScoreReport />} />
         <Route path="/leagues/:id/standings" element={<Standings />} />
         <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
         <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
-        <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
         <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />

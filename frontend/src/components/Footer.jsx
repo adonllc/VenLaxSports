@@ -59,7 +59,9 @@ export default function Footer() {
               {[
                 { to: "/leagues",   label: "Browse Leagues" },
                 { to: "/rules",     label: "Rules & Conduct" },
+                { to: "/handbook",  label: "Player Handbook" },
                 { to: "/terms",     label: "Terms & Conditions" },
+                { to: "/waiver",    label: "Liability Waiver" },
                 { to: "/privacy",   label: "Privacy Policy" },
                 { to: "/dashboard", label: "My Dashboard" },
                 { to: "/auth",      label: "Sign Up" },
