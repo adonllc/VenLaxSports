@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsports.com";
 
-const PRIMARY = "#06B6D4";
-const ACCENT = "#FF6B6B";
-const DARK = "#1F2937";
-const LIGHT = "#F9FAFB";
-const BORDER = "#E5E7EB";
+const PRIMARY = "#10B981";
+const ACCENT = "#F97316";
+const DARK = "#3F4652";
+const LIGHT = "#FAF6F1";
+const CREAM = "#F9F7F4";
+const PALE_BLUE = "#F0F7FF";
+const PALE_AMBER = "#FFFAF0";
+const BORDER = "#E8E3DE";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -46,6 +49,42 @@ const fadeIn = {
 const counter = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+};
+
+const floatingBlob = (duration) => ({
+  animate: {
+    y: [0, 30, -20, 0],
+    x: [0, 15, -10, 0],
+    rotate: [0, 360],
+  },
+  transition: {
+    duration,
+    repeat: Infinity,
+    ease: "easeInOut",
+  },
+});
+
+const pulseEffect = {
+  animate: {
+    scale: [1, 1.05, 1],
+    opacity: [0.7, 1, 0.7],
+  },
+  transition: {
+    duration: 3,
+    repeat: Infinity,
+    ease: "easeInOut",
+  },
+};
+
+const shimmer = {
+  animate: {
+    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+  },
+  transition: {
+    duration: 4,
+    repeat: Infinity,
+    ease: "linear",
+  },
 };
 
 const viewportConfig = { once: true, margin: "-80px" };
@@ -105,24 +144,24 @@ export default function PreLaunch() {
       title: "Smart Matchmaking",
       body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
       mockup: (
-        <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: "#1F2937", border: `1px solid ${BORDER}` }}>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Opponent Found</p>
+        <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Opponent Found</p>
           {[
             { name: "Marcus T.", rating: 1847, record: "12W 3L" },
             { name: "Sarah K.", rating: 1823, record: "9W 4L" },
           ].map((player) => (
-            <div key={player.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }}>
+            <motion.div key={player.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }} whileHover={{ y: -2, boxShadow: `0 8px 16px ${PRIMARY}15` }}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style={{ background: "#DBEAFE", color: PRIMARY }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style={{ background: PALE_BLUE, color: PRIMARY }}>
                   {player.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: DARK }}>{player.name}</p>
-                  <p className="text-xs" style={{ color: "#6B7A96" }}>{player.record}</p>
+                  <p className="text-sm font-medium" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{player.name}</p>
+                  <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{player.record}</p>
                 </div>
               </div>
-              <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ color: "white", background: PRIMARY }}>{player.rating}</span>
-            </div>
+              <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ color: "white", background: PRIMARY, fontFamily: "'DM Sans', monospace" }}>{player.rating}</span>
+            </motion.div>
           ))}
         </div>
       ),
@@ -132,27 +171,28 @@ export default function PreLaunch() {
       title: "Live City Rankings",
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       mockup: (
-        <div className="flex-1 rounded-xl p-6" style={{ background: "#1F2937", border: `1px solid ${BORDER}` }}>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Austin TX — Tennis Singles</p>
+        <div className="flex-1 rounded-xl p-6" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Austin TX — Tennis Singles</p>
           <div className="space-y-2">
             {[
               { rank: 1, name: "Alex M.", rating: 2103, delta: "+12" },
               { rank: 2, name: "Jordan P.", rating: 1984, delta: "+5" },
               { rank: 3, name: "Taylor S.", rating: 1947, delta: "-3" },
             ].map((row) => (
-              <div
+              <motion.div
                 key={row.rank}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg"
                 style={row.rank === 3
-                  ? { background: "#DBEAFE", border: `1px solid ${PRIMARY}20` }
+                  ? { background: PALE_BLUE, border: `1px solid ${PRIMARY}20` }
                   : { background: "white", border: `1px solid ${BORDER}` }
                 }
+                whileHover={{ x: 2 }}
               >
-                <span className="text-xs font-bold w-4" style={{ color: "#6B7A96" }}>{row.rank}</span>
-                <span className="text-sm font-medium flex-1" style={{ color: DARK }}>{row.name}</span>
-                <span className="text-xs" style={{ color: "#6B7A96" }}>{row.rating}</span>
-                <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? PRIMARY : "#EF4444" }}>{row.delta}</span>
-              </div>
+                <span className="text-xs font-bold w-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rank}</span>
+                <span className="text-sm font-medium flex-1" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{row.name}</span>
+                <span className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rating}</span>
+                <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? PRIMARY : "#EF4444", fontFamily: "'DM Sans', monospace" }}>{row.delta}</span>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -163,19 +203,19 @@ export default function PreLaunch() {
       title: "Flexible League Formats",
       body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. You choose the intensity.",
       mockup: (
-        <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: "#1F2937", border: `1px solid ${BORDER}` }}>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96" }}>Choose Your Format</p>
+        <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Choose Your Format</p>
           {[
-            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Popular", badgeBg: "#DBEAFE", badgeColor: PRIMARY },
-            { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeBg: "#FED7AA", badgeColor: "#92400E" },
+            { name: "Singles League", sub: "Round Robin · 6 matches", badge: "Popular", badgeBg: PALE_BLUE, badgeColor: PRIMARY },
+            { name: "Doubles League", sub: "Round Robin · 6 matches", badge: "Team Play", badgeBg: PALE_AMBER, badgeColor: "#92400E" },
           ].map((fmt) => (
-            <div key={fmt.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }}>
+            <motion.div key={fmt.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }} whileHover={{ y: -2 }}>
               <div>
-                <p className="text-sm font-semibold" style={{ color: DARK }}>{fmt.name}</p>
-                <p className="text-xs" style={{ color: "#6B7A96" }}>{fmt.sub}</p>
+                <p className="text-sm font-semibold" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{fmt.name}</p>
+                <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{fmt.sub}</p>
               </div>
-              <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ background: fmt.badgeBg, color: fmt.badgeColor }}>{fmt.badge}</span>
-            </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ background: fmt.badgeBg, color: fmt.badgeColor, fontFamily: "'DM Sans', monospace" }}>{fmt.badge}</span>
+            </motion.div>
           ))}
         </div>
       ),
@@ -183,39 +223,39 @@ export default function PreLaunch() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Barlow', sans-serif", background: "#FFFFFF" }}>
+    <div className="min-h-screen" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: LIGHT }}>
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b bg-white" style={{ borderColor: BORDER }}>
+      <nav className="sticky top-0 z-50 border-b" style={{ background: CREAM, borderColor: BORDER }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Logo size="md" />
-          <a
+          <motion.a
             href="#early-access"
             className="text-sm font-bold px-4 py-2 rounded-md transition-colors"
             style={{ background: PRIMARY, color: "white" }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Get Early Access
-          </a>
+          </motion.a>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ background: "linear-gradient(135deg, #F9FAFB 0%, #E0F7FF 100%)" }} className="py-28 px-6 relative overflow-hidden">
+      <section style={{ background: `linear-gradient(135deg, ${PALE_BLUE} 0%, ${PALE_AMBER} 100%)` }} className="py-28 px-6 relative overflow-hidden">
         <motion.div
           className="absolute top-10 right-10 w-40 h-40 rounded-full"
           style={{ background: `${PRIMARY}15`, filter: "blur(60px)" }}
-          animate={{ y: [0, 20, 0] }}
-          transition={{ duration: 6, repeat: Infinity }}
+          {...floatingBlob(8)}
         />
         <motion.div
           className="absolute bottom-20 left-5 w-56 h-56 rounded-full"
-          style={{ background: `${ACCENT}10`, filter: "blur(80px)" }}
-          animate={{ y: [0, -30, 0] }}
-          transition={{ duration: 8, repeat: Infinity }}
+          style={{ background: `${ACCENT}12`, filter: "blur(80px)" }}
+          {...floatingBlob(10)}
         />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
-            style={{ background: "white", border: `1px solid ${BORDER}` }}
+            style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${BORDER}`, backdropFilter: "blur(10px)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -223,7 +263,7 @@ export default function PreLaunch() {
             <motion.span
               className="w-1.5 h-1.5 rounded-full inline-block"
               style={{ background: PRIMARY }}
-              animate={{ opacity: [0.5, 1, 0.5] }}
+              animate={{ scale: [0.8, 1.2, 0.8] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
             Launching in select cities — 2026
@@ -269,8 +309,8 @@ export default function PreLaunch() {
               href="#early-access"
               className="font-semibold px-8 py-4 rounded-lg transition-all text-base"
               style={{ background: PRIMARY, color: "white" }}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.05, y: -3, boxShadow: `0 12px 32px ${PRIMARY}30` }}
+              whileTap={{ scale: 0.95 }}
               data-testid="hero-cta-primary"
             >
               Join the Early Access List
@@ -278,9 +318,9 @@ export default function PreLaunch() {
             <motion.a
               href="#early-access"
               className="font-medium px-8 py-4 rounded-lg transition-all text-base"
-              style={{ border: `2px solid ${PRIMARY}`, color: PRIMARY }}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              style={{ border: `2px solid ${PRIMARY}`, color: PRIMARY, background: PALE_BLUE }}
+              whileHover={{ scale: 1.05, y: -3 }}
+              whileTap={{ scale: 0.95 }}
               data-testid="hero-cta-secondary"
             >
               Notify Me When My City Opens
@@ -300,11 +340,11 @@ export default function PreLaunch() {
       </section>
 
       {/* Trust Bar */}
-      <section className="border-b py-5 px-6 bg-white">
+      <section className="border-b py-5 px-6" style={{ background: CREAM, borderColor: BORDER }}>
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm"
-            style={{ color: DARK }}
+            style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -326,7 +366,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Problem */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6" style={{ background: LIGHT }}>
         <div className="max-w-3xl mx-auto">
           <motion.p
             className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
@@ -365,9 +405,9 @@ export default function PreLaunch() {
               <motion.div
                 key={item.title}
                 className="flex gap-5 p-6 rounded-lg"
-                style={{ border: `1px solid ${BORDER}`, background: "#F9FAFB" }}
+                style={{ border: `1px solid ${BORDER}`, background: CREAM }}
                 variants={staggerItem}
-                whileHover={{ y: -4, boxShadow: `0 4px 12px ${PRIMARY}10` }}
+                whileHover={{ y: -4, boxShadow: `0 12px 24px ${PRIMARY}12` }}
               >
                 <div className="text-3xl flex-shrink-0">{item.icon}</div>
                 <div>
@@ -383,11 +423,11 @@ export default function PreLaunch() {
       </section>
 
       {/* Solution */}
-      <section className="py-20 px-6" style={{ background: "#1F2937", color: "white" }}>
+      <section className="py-20 px-6" style={{ background: `linear-gradient(135deg, ${PALE_AMBER} 0%, ${PALE_BLUE} 100%)` }}>
         <div className="max-w-4xl mx-auto">
           <motion.p
             className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
-            style={{ color: `${PRIMARY}` }}
+            style={{ color: PRIMARY, fontFamily: "'DM Sans', monospace" }}
             variants={fadeIn}
             initial="hidden"
             whileInView="visible"
@@ -398,7 +438,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-14"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -423,12 +463,12 @@ export default function PreLaunch() {
               <motion.div
                 key={item.before}
                 className="rounded-lg p-5"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                style={{ background: "rgba(255,255,255,0.5)", border: `1px solid ${BORDER}`, backdropFilter: "blur(10px)" }}
                 variants={staggerItem}
-                whileHover={{ x: 4 }}
+                whileHover={{ x: 4, boxShadow: `0 8px 16px ${PRIMARY}15` }}
               >
-                <p className="text-sm line-through mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>{item.before}</p>
-                <p className="font-medium flex items-start gap-2" style={{ color: "#fff" }}>
+                <p className="text-sm line-through mb-2" style={{ color: "#8B8B8B" }}>{item.before}</p>
+                <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   <span className="mt-0.5 flex-shrink-0" style={{ color: PRIMARY }}>→</span>
                   {item.after}
                 </p>
@@ -439,7 +479,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Features Zig-Zag */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6" style={{ background: LIGHT }}>
         <div className="max-w-5xl mx-auto">
           <motion.p
             className="font-semibold text-sm uppercase tracking-widest text-center mb-16"
@@ -483,7 +523,7 @@ export default function PreLaunch() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6" style={{ background: CREAM }}>
         <div className="max-w-4xl mx-auto">
           <motion.p
             className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
@@ -542,7 +582,7 @@ export default function PreLaunch() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6" style={{ background: CREAM }}>
         <div className="max-w-2xl mx-auto">
           <motion.p
             className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
@@ -587,7 +627,7 @@ export default function PreLaunch() {
                 <button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
-                  style={{ background: openFaq === i ? LIGHT : "white" }}
+                  style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   data-testid={`faq-${i}`}
                 >
@@ -605,7 +645,7 @@ export default function PreLaunch() {
                       transition={{ duration: 0.3 }}
                       style={{ overflow: "hidden" }}
                     >
-                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563" }}>
+                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                         {item.a}
                       </div>
                     </motion.div>
@@ -770,10 +810,10 @@ export default function PreLaunch() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t bg-white" style={{ borderColor: BORDER }}>
+      <footer className="py-8 px-6 border-t" style={{ borderColor: BORDER, background: CREAM }}>
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="md" />
-          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96" }}>
+          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </div>
