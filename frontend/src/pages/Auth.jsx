@@ -6,6 +6,7 @@ import platformConfig, { activeSports, activeCountry } from "../config/platformC
 import BRAND from "../config/brandConfig";
 import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
+import WaiverModal from "../components/WaiverModal";
 import axios from "axios";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -23,6 +24,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [emailExists, setEmailExists] = useState(null);
+  const [waiverOpen, setWaiverOpen] = useState(false);
+  const [waiverAgreed, setWaiverAgreed] = useState(false);
   const { login, register, user, formatError } = useAuth();
   const navigate = useNavigate();
 
@@ -58,6 +61,13 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Registration: show waiver modal if not yet agreed
+    if (mode === "register" && !waiverAgreed) {
+      setWaiverOpen(true);
+      return;
+    }
+
     setLoading(true);
     try {
       if (mode === "login") {
@@ -85,6 +95,21 @@ export default function Auth() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWaiverAgree = (agreed) => {
+    if (agreed) {
+      setWaiverAgreed(true);
+      setWaiverOpen(false);
+      // Auto-submit the form after user agrees
+      setTimeout(() => {
+        document.querySelector('[data-testid="auth-submit-btn"]')?.click();
+      }, 100);
+    }
+  };
+
+  const handleWaiverCancel = () => {
+    setWaiverOpen(false);
   };
 
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -129,7 +154,7 @@ export default function Auth() {
           {/* Mode Toggle */}
           <div className="flex rounded-xl p-1 mb-8" style={{ background: "#F3F4F6" }}>
             <button
-              onClick={() => { setMode("login"); setError(""); setEmailExists(null); }}
+              onClick={() => { setMode("login"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
               style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
               data-testid="login-tab"
@@ -137,7 +162,7 @@ export default function Auth() {
               Log In
             </button>
             <button
-              onClick={() => { setMode("register"); setError(""); setEmailExists(null); }}
+              onClick={() => { setMode("register"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
               style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
               data-testid="register-tab"
@@ -337,7 +362,7 @@ export default function Auth() {
               onMouseLeave={e => e.currentTarget.style.background = "#C24A1D"}
               data-testid="auth-submit-btn"
             >
-              {loading ? (mode === "login" ? "Signing in..." : "Creating account...") : mode === "login" ? "Log In" : "Create Account"}
+              {loading ? (mode === "login" ? "Signing in..." : "Creating account...") : mode === "login" ? "Log In" : mode === "register" && !waiverAgreed ? "Review & Accept Terms" : "Create Account"}
             </button>
           </form>
 
@@ -359,6 +384,12 @@ export default function Auth() {
         open={forgotOpen}
         onClose={() => setForgotOpen(false)}
         prefillEmail={form.email}
+      />
+
+      <WaiverModal
+        isOpen={waiverOpen}
+        onAgree={handleWaiverAgree}
+        onCancel={handleWaiverCancel}
       />
     </div>
   );
