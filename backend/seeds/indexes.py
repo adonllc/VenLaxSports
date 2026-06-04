@@ -46,3 +46,17 @@ async def create_indexes(db) -> None:
     await db.ladders.create_index([("city", 1), ("sport", 1), ("division_label", 1), ("format", 1)])
     await db.ladder_challenges.create_index([("ladder_id", 1), ("status", 1)])
     await db.ladder_challenges.create_index([("challenger_id", 1), ("status", 1)])
+    # Legal Compliance — Dispute Escalation
+    await db.disputes.create_index([("league_id", 1), ("status", 1)])
+    await db.disputes.create_index([("reported_by_id", 1), ("created_at", -1)])
+    await db.disputes.create_index([("reported_against_id", 1)])
+    await db.disputes.create_index([("dispute_type", 1), ("status", 1)])
+    await db.disputes.create_index("match_id")
+    # Organizer Decisions
+    await db.decisions.create_index([("dispute_id", 1)])
+    await db.decisions.create_index([("organizer_id", 1), ("created_at", -1)])
+    await db.decisions.create_index([("appeal_eligible", 1), ("appeal_deadline", 1)])
+    # Player Appeals
+    await db.appeals.create_index([("decision_id", 1)])
+    await db.appeals.create_index([("player_id", 1), ("status", 1)])
+    await db.appeals.create_index([("status", 1), ("created_at", -1)])
