@@ -39,6 +39,7 @@ from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
 from routes.box_league_routes import router as box_league_router
 from routes.ladder_routes import router as ladder_router
+from routes.legal_routes import router as legal_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(social_auth_router, prefix="/auth", tags=["social-auth"])
@@ -58,6 +59,7 @@ api_router.include_router(doubles_router, prefix="/doubles-invite", tags=["doubl
 api_router.include_router(waitlist_router, prefix="/waitlist", tags=["waitlist"])
 api_router.include_router(box_league_router, prefix="/box-leagues", tags=["box-leagues"])
 api_router.include_router(ladder_router, prefix="/ladders", tags=["ladders"])
+api_router.include_router(legal_router)  # /api/legal/* endpoints
 
 
 @api_router.get("/")

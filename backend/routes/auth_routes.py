@@ -64,6 +64,15 @@ async def register(user_data: UserCreate, response: Response, request: Request):
         skill_level=user_data.skill_level,
         role="player",
         founding_member=is_founding,
+        date_of_birth=user_data.date_of_birth,
+        emergency_contact_name=user_data.emergency_contact_name,
+        emergency_contact_phone=user_data.emergency_contact_phone,
+        medical_conditions=user_data.medical_conditions,
+        terms_accepted=user_data.terms_accepted,
+        terms_accepted_at=datetime.now(timezone.utc).isoformat() if user_data.terms_accepted else None,
+        parental_consent=user_data.parental_consent,
+        parental_consent_guardian_name=user_data.parental_consent_guardian_name,
+        parental_consent_timestamp=datetime.now(timezone.utc).isoformat() if user_data.parental_consent else None,
     )
     result = await db.users.insert_one(user.to_mongo())
     user_id = str(result.inserted_id)

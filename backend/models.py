@@ -63,6 +63,17 @@ class User(BaseDocument):
     oauth_providers: List[dict] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+    # Legal & Compliance ─────────────────────────────
+    date_of_birth: Optional[str] = None  # ISO format: YYYY-MM-DD
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    medical_conditions: Optional[str] = None  # encrypted field
+    terms_accepted: bool = False
+    terms_accepted_at: Optional[str] = None
+    parental_consent: bool = False
+    parental_consent_guardian_name: Optional[str] = None
+    parental_consent_timestamp: Optional[str] = None
+
 
 class UserCreate(BaseModel):
     email: str
@@ -72,6 +83,13 @@ class UserCreate(BaseModel):
     city: Optional[str] = None
     phone: Optional[str] = None
     skill_level: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    medical_conditions: Optional[str] = None
+    terms_accepted: bool = False
+    parental_consent: bool = False
+    parental_consent_guardian_name: Optional[str] = None
 
 
 class UserLogin(BaseModel):
@@ -359,3 +377,45 @@ class LadderChallenge(BaseDocument):
 class LadderChallengeCreate(BaseModel):
     ladder_id: str
     challenged_player_id: str
+
+
+# ─── Dispute Escalation (Legal/Compliance) ──────────────
+class DisputeEscalation(BaseDocument):
+    league_id: str
+    dispute_type: str  # "score"|"conduct"|"playoff_seeding"|"rating"
+    reported_by_id: str
+    reported_by_name: str
+    reported_against_id: Optional[str] = None
+    reported_against_name: Optional[str] = None
+    description: str
+    evidence: Optional[List[str]] = None  # URLs/file paths to evidence
+    match_id: Optional[str] = None
+    status: str = "pending"  # "pending"|"investigating"|"resolved"|"appealed"|"closed"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+    resolution_date: Optional[str] = None
+
+
+class OrganizerDecision(BaseDocument):
+    dispute_id: str
+    organizer_id: str
+    organizer_name: str
+    decision: str  # description of ruling
+    ruling_type: str  # "upheld"|"overturned"|"remanded"|"partial"
+    penalty: Optional[str] = None  # "warning"|"point_penalty"|"game_penalty"|"match_default"|"suspension"|"removal"
+    penalty_duration: Optional[str] = None  # "1 match"|"season"|"permanent"
+    appeal_eligible: bool = True
+    appeal_deadline: Optional[str] = None  # ISO datetime
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class PlayerAppeal(BaseDocument):
+    decision_id: str
+    player_id: str
+    player_name: str
+    appeal_reason: str
+    evidence: Optional[List[str]] = None
+    status: str = "pending"  # "pending"|"reviewing"|"upheld"|"overturned"
+    commissioner_review: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    reviewed_at: Optional[str] = None

@@ -44,28 +44,32 @@ const TENNIS_RULES = [
   {
     title: "Score Reporting",
     items: [
-      "Winner reports: all set scores, tiebreak scores, match location, and duration.",
-      "Opponent must confirm within 24 hours. No response = auto-confirmed.",
-      "Disputes must be raised within 24 hours of result posting. Both players resolve between themselves and resubmit agreed score.",
+      "Winner reports within 24 hours: set scores, tiebreak scores, match start/end time, court location, surface.",
+      "Photo of completed scorecard (signed by both players) is strongly encouraged as evidence.",
+      "Opponent confirms within 24 hours. No response = auto-confirmed.",
+      "Disputes must be raised within 24 hours with specific error (e.g., 'Set 2 was 7–5, not 6–4') and photographic evidence.",
+      "Organizer reviews evidence and rules final within 24 hours. Disputes raised after 24 hours require photo evidence to be eligible.",
     ],
   },
   {
-    title: "Court Conduct",
+    title: "Court Conduct & Violations",
     items: [
       "Sportsmanship required at all times. Respect your opponent.",
       "No profanity, racquet abuse, ball abuse, or intimidation.",
-      "Penalty progression (player self-governed): Warning → Point penalty → Game penalty → Match default.",
-      "No coaching during singles. Doubles partners may communicate freely.",
-      "Players are fully responsible for their own conduct. Disputes are resolved between players.",
+      "First violation: verbal warning (player self-administered or opponent-called). Second violation: point penalty. Third: game penalty. Fourth: match default.",
+      "No coaching during singles. Doubles partners may communicate verbally only (no electronics). Coaching from sidelines permitted but must not distract match.",
+      "Suspected match fixing or score manipulation is reported to organizer with evidence. Organizer investigates and provides written decision. First offense: season suspension. Second: permanent removal. Player may appeal.",
     ],
   },
   {
-    title: "Equipment & Surfaces",
+    title: "Equipment & Venue Standards",
     items: [
       "Home player provides new, unopened balls for the match.",
-      "Approved surfaces: hard court, clay, turf, indoor carpet (standard tennis court surfaces).",
-      "Players provide their own racquet. No restrictions on string type or tension.",
-      "Appropriate tennis footwear required.",
+      "Approved surfaces: hard court, clay, turf, indoor carpet. Court must be hazard-free (no potholes, debris, standing water).",
+      "If evening match, court must have functioning lights. Home player confirms safety before match day.",
+      "If court is unsafe on match day, home player reschedules within 7 days. If unable, opponent awarded walkover win (no forfeit).",
+      "Players provide own racquet. No restrictions on string type or tension.",
+      "Appropriate tennis footwear required. Home player is responsible for facility safety and liability; VENLAX provides no facility insurance.",
     ],
   },
   {
@@ -77,11 +81,13 @@ const TENNIS_RULES = [
     ],
   },
   {
-    title: "Safety",
+    title: "Safety & Medical Emergency",
     items: [
-      "Heat policy: above 95°F / 35°C both players may mutually agree to take a hydration break between sets.",
-      "If a player cannot continue safely, they may retire from the match. Opponent is awarded the win.",
-      "All player safety decisions are made by the players themselves.",
+      "Registration requires emergency contact name + phone number (required) and any known medical conditions (optional, confidential).",
+      "Heat policy: above 95°F / 35°C, organizer MUST offer hydration breaks between sets. Both players may accept.",
+      "If unsafe: flooded court, no water, no shade — match is rescheduled within 7 days. No forfeit penalty.",
+      "Player retirement: if unable to continue safely, may retire from match. Opponent awarded win. Organizer calls 911 if player is injured or unresponsive.",
+      "On-court injury: organizer immediately assesses. If medical attention needed, organizer calls 911 and notifies emergency contact.",
     ],
   },
 ];
@@ -351,10 +357,12 @@ const LADDER_RULES = [
     ],
   },
   {
-    category: "Rank Changes",
+    category: "Rank Changes & No-Show",
     items: [
       "Challenger wins → challenger and challenged player swap ranks.",
       "Challenger loses → ranks unchanged. The challenged player keeps their position.",
+      "No-show by either player: 7-day challenge cooldown is waived for non-offending player. Offending player gets second-offense penalty if repeated.",
+      "Pattern: 3+ no-shows in season → player flagged as inactive; admin may remove from ladder.",
       "ELO ratings update after every completed ladder match.",
     ],
   },
@@ -371,11 +379,12 @@ const LADDER_RULES = [
 // ─── Pickleball Data (unchanged) ───────────────────────────────────
 const PICKLEBALL_RULES = [
   {
-    title: "Match Format",
+    title: "Match Format & Scoring Method",
     items: [
-      "Singles & Doubles matches are first to 11 points, win by 2 (rally scoring allowed in tournament play; VENLAX defaults to traditional side-out).",
-      "Best of 3 games per match.",
-      "VENLAX tournament finals may be played as 15-point or 21-point games at organiser's discretion.",
+      "Default: Traditional Side-Out Scoring. First to 11 points, win by 2. Score announced: Server-Receiver-ServerCount (e.g., '5-3-2').",
+      "Rally Scoring (optional, organizer-announced only in tournament finals). Must be agreed BEFORE match starts. Cannot change mid-match.",
+      "Best of 3 games per match. VENLAX tournament finals may use 15-point or 21-point games at organizer discretion (announced pre-season).",
+      "If scoring method disputed mid-match, revert to side-out scoring (VENLAX default). Organizer reviews match evidence to determine final score.",
     ],
   },
   {
@@ -422,10 +431,11 @@ const RATINGS = [
 const CODE_OF_CONDUCT = [
   "Arrive on time. Forfeit clock starts 15 minutes after the scheduled match time.",
   "Treat your opponent with respect — on and off court.",
-  "No coaching from the sidelines during recreational singles.",
-  "Photography is welcome. Live streaming requires opponent consent.",
-  "Suspected match fixing or score manipulation results in immediate removal.",
-  "All disputes, line calls, and conduct issues are resolved between the players on court.",
+  "No coaching from the sidelines during singles. Doubles partners may communicate freely (verbal only, no electronics).",
+  "Photography is welcome. Live streaming requires consent from both players and organizer.",
+  "Match fixing, score manipulation, or unsportsmanlike conduct may result in suspension or removal after investigation and written notice.",
+  "Score disputes must be escalated to organizer within 24 hours with photographic evidence. Organizer decision is final.",
+  "Conduct violations follow: Warning → Point Penalty → Game Penalty → Match Default. Players may appeal organizer decisions.",
 ];
 
 export default function Rules() {
@@ -927,15 +937,42 @@ export default function Rules() {
             </ul>
           </div>
 
-          {/* Player resolution notice */}
-          <div className="mt-4 bg-gray-50 border border-gray-200 rounded-2xl p-5 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-semibold text-gray-700 mb-1">Player-Governed League</p>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                VENLAX is a self-governed competitive platform. All line calls, disputes, and conduct matters are resolved directly between players.
-                Players are responsible for their own conduct, agreed scores, and scheduling decisions.
-              </p>
+          {/* Legal & liability notice */}
+          <div className="mt-6 space-y-4">
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-red-900 mb-1">Assumption of Risk & Liability Waiver</p>
+                <p className="text-sm text-red-800 leading-relaxed mb-3">
+                  By registering and participating in VENLAX leagues, you assume all risks of personal injury, death, or property damage.
+                  You waive and release VENLAX Sports, organizers, venues, and match opponents from all claims, damages, or liability related to your participation.
+                </p>
+                <Link to="/terms" className="text-sm font-semibold text-red-700 hover:text-red-900">
+                  Read full Terms of Service →
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-blue-900 mb-1">Dispute Escalation & Organizer Authority</p>
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  Score disputes, conduct violations, and playoff challenges are escalated to organizers for investigation and final decision.
+                  Organizer decisions are binding. Players may appeal in writing within 7 days; league commissioner reviews appeal and issues final ruling.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-1">Emergency Contact & Medical</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Registration requires an emergency contact name + phone number. You authorize organizers to call 911 if you are injured or unresponsive on court.
+                  Medical conditions are optional but recommended for organizer awareness.
+                </p>
+              </div>
             </div>
           </div>
         </section>
