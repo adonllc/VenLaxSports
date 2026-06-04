@@ -7,6 +7,7 @@ import BRAND from "../config/brandConfig";
 import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 import WaiverModal from "../components/WaiverModal";
+import ParentalConsentModal from "../components/ParentalConsentModal";
 import axios from "axios";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -18,7 +19,21 @@ const COUNTRIES = [activeCountry];
 export default function Auth() {
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.get("mode") === "register" ? "register" : "login");
-  const [form, setForm] = useState({ email: "", password: "", name: "", country: platformConfig.country, city: "", skill_level: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    name: "",
+    country: platformConfig.country,
+    city: "",
+    skill_level: "",
+    date_of_birth: "",
+    emergency_contact_name: "",
+    emergency_contact_phone: "",
+    medical_conditions: "",
+    terms_accepted: false,
+    parental_consent: false,
+    parental_consent_guardian_name: "",
+  });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,6 +41,7 @@ export default function Auth() {
   const [emailExists, setEmailExists] = useState(null);
   const [waiverOpen, setWaiverOpen] = useState(false);
   const [waiverAgreed, setWaiverAgreed] = useState(false);
+  const [parentalConsentOpen, setParentalConsentOpen] = useState(false);
   const { login, register, user, formatError } = useAuth();
   const navigate = useNavigate();
 
@@ -62,10 +78,29 @@ export default function Auth() {
     e.preventDefault();
     setError("");
 
+    // Registration: check terms acceptance
+    if (mode === "register" && !form.terms_accepted) {
+      setError("You must accept Terms of Service to continue");
+      return;
+    }
+
     // Registration: show waiver modal if not yet agreed
     if (mode === "register" && !waiverAgreed) {
       setWaiverOpen(true);
       return;
+    }
+
+    // Registration: check if <18 and parental consent required
+    if (mode === "register" && form.date_of_birth) {
+      const dob = new Date(form.date_of_birth);
+      const today = new Date();
+      const age = today.getFullYear() - dob.getFullYear();
+      const isUnder18 = age < 18 || (age === 18 && today.getMonth() < dob.getMonth()) || (age === 18 && today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate());
+
+      if (isUnder18 && !form.parental_consent) {
+        setParentalConsentOpen(true);
+        return;
+      }
     }
 
     setLoading(true);
@@ -110,6 +145,19 @@ export default function Auth() {
 
   const handleWaiverCancel = () => {
     setWaiverOpen(false);
+  };
+
+  const handleParentalConsentSubmit = (consentData) => {
+    setForm((f) => ({
+      ...f,
+      parental_consent: true,
+      parental_consent_guardian_name: consentData.guardianName,
+    }));
+    setParentalConsentOpen(false);
+    // Auto-submit after consent
+    setTimeout(() => {
+      document.querySelector('[data-testid="auth-submit-btn"]')?.click();
+    }, 100);
   };
 
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -343,6 +391,97 @@ export default function Auth() {
                     <option value="6.0+">6.0+ — Open / Pro</option>
                   </select>
                 </div>
+
+                {/* Legal Compliance Fields */}
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Date of Birth (optional)</label>
+                  <input
+                    type="date"
+                    value={form.date_of_birth}
+                    onChange={update("date_of_birth")}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    data-testid="input-dob"
+                  />
+                  <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Required for players under 18 to get parental consent.</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Emergency Contact Name (optional)</label>
+                  <input
+                    type="text"
+                    value={form.emergency_contact_name}
+                    onChange={update("emergency_contact_name")}
+                    placeholder="e.g. Parent's name"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    data-testid="input-emergency-contact-name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Emergency Contact Phone (optional)</label>
+                  <input
+                    type="tel"
+                    value={form.emergency_contact_phone}
+                    onChange={update("emergency_contact_phone")}
+                    placeholder="e.g. +1-555-0123"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    data-testid="input-emergency-contact-phone"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Medical Conditions (optional)</label>
+                  <input
+                    type="text"
+                    value={form.medical_conditions}
+                    onChange={update("medical_conditions")}
+                    placeholder="e.g. Asthma, allergies (confidential)"
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    data-testid="input-medical-conditions"
+                  />
+                  <p className="text-xs mt-1" style={{ color: "#6B7280" }}>For organizer awareness only. Kept confidential.</p>
+                </div>
+
+                {/* Terms Acceptance */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.terms_accepted}
+                      onChange={(e) => setForm((f) => ({ ...f, terms_accepted: e.target.checked }))}
+                      className="mt-1"
+                      data-testid="input-terms-accepted"
+                      required
+                    />
+                    <span className="text-xs text-blue-900 leading-relaxed">
+                      I have read and agree to the{" "}
+                      <a
+                        href="/terms"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold hover:underline"
+                        style={{ color: "#1E40AF" }}
+                      >
+                        Terms of Service
+                      </a>
+                      , including the Waiver of Liability. I understand the risks
+                      of playing competitive sports and assume full responsibility
+                      for my safety.
+                    </span>
+                  </label>
+                </div>
               </>
             )}
 
@@ -390,6 +529,13 @@ export default function Auth() {
         isOpen={waiverOpen}
         onAgree={handleWaiverAgree}
         onCancel={handleWaiverCancel}
+      />
+
+      <ParentalConsentModal
+        isOpen={parentalConsentOpen}
+        onClose={() => setParentalConsentOpen(false)}
+        onSubmit={handleParentalConsentSubmit}
+        playerName={form.name}
       />
     </div>
   );
