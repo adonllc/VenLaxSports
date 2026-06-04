@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VENLAX Sports - Local Tennis & Pickleball Leagues</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=DM+Sans:wght@400;500;700&display=swap');
+
+        * {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        .accent-lime { color: #D4AF37; }
+        .bg-accent-lime { background-color: #D4AF37; }
+        .border-accent-lime { border-color: #D4AF37; }
+
+        .ticker {
+            overflow: hidden;
+            background: #F3F4F6;
+            border-top: 1px solid #E5E7EB;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card.locked {
+            position: relative;
+        }
+
+        .bento-card.locked::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .unlock-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #1F2937;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .sport-toggle {
+            display: flex;
+            background: #F3F4F6;
+            border-radius: 8px;
+            padding: 0.25rem;
+            width: fit-content;
+        }
+
+        .sport-toggle button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sport-toggle button.active {
+            background: white;
+            color: #1F2937;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sport-toggle button:not(.active) {
+            color: #6B7280;
+        }
+
+        .skill-slider {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .skill-slider input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #E5E7EB;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .skill-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #D4AF37;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .skill-slider input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #D4AF37;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #D4AF37;
+            transition: width 0.5s ease;
+        }
+
+        .hero-cta {
+            background: #1F2937;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            background: #111827;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-cta.secondary {
+            background: #D4AF37;
+            color: #1F2937;
+        }
+
+        .hero-cta.secondary:hover {
+            background: #C9A027;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- HERO SECTION -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background image overlay -->
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&h=900&fit=crop" alt="Tennis court" class="w-full h-full object-cover opacity-20">
+            <div class="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <!-- Accent badge -->
+            <div class="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-slate-100 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-sm font-semibold text-slate-700">SPRING SEASON LIVE</span>
+            </div>
+
+            <!-- Main headline -->
+            <h1 class="text-6xl md:text-7xl font-black leading-tight mb-6 text-slate-900">
+                Find Your<br>
+                <span class="accent-lime">Bracket</span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Join ranked tennis & pickleball leagues in your city. Compete against skill-matched opponents. Track your rating. Rise the leaderboard.
+            </p>
+
+            <!-- Dual CTAs -->
+            <div class="flex flex-col md:flex-row gap-4 justify-center mb-16">
+                <button class="hero-cta">
+                    ▶ Find Your Bracket
+                </button>
+                <button class="hero-cta secondary">
+                    Register a Team →
+                </button>
+            </div>
+
+            <!-- Stats row -->
+            <div class="flex flex-col md:flex-row gap-8 justify-center text-sm font-semibold text-slate-600">
+                <div>
+                    <div class="text-3xl accent-lime font-black">2,847</div>
+                    <div>Active Players</div>
+                </div>
+                <div>
+                    <div class="text-3xl accent-lime font-black">156</div>
+                    <div>Weekly Matches</div>
+                </div>
+                <div>
+                    <div class="text-3xl accent-lime font-black">12</div>
+                    <div>Cities</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REGISTRATION TICKER -->
+    <div class="ticker">
+        <div class="ticker-content">
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #10B981;"></span>
+                <span class="font-semibold text-slate-900">Tennis Tier 1:</span>
+                <span class="text-slate-600">3 spots left</span>
+            </div>
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #F97316;"></span>
+                <span class="font-semibold text-slate-900">Pickleball Open:</span>
+                <span class="text-slate-600">1 spot left</span>
+            </div>
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #2563EB;"></span>
+                <span class="font-semibold text-slate-900">Recent Match:</span>
+                <span class="text-slate-600">Sarah beat Marcus 21-18</span>
+            </div>
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #D4AF37;"></span>
+                <span class="font-semibold text-slate-900">Tennis Tier 2:</span>
+                <span class="text-slate-600">6 spots available</span>
+            </div>
+            <!-- Duplicate for seamless loop -->
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #10B981;"></span>
+                <span class="font-semibold text-slate-900">Tennis Tier 1:</span>
+                <span class="text-slate-600">3 spots left</span>
+            </div>
+            <div class="ticker-item">
+                <span class="badge-dot" style="background: #F97316;"></span>
+                <span class="font-semibold text-slate-900">Pickleball Open:</span>
+                <span class="text-slate-600">1 spot left</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERACTIVE SPORT SELECTOR & BENTO GRID -->
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <!-- Section title -->
+            <div class="mb-16 text-center">
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                    Personalize Your Experience
+                </h2>
+                <p class="text-lg text-slate-600">
+                    Choose your sport and skill level to see your perfect bracket
+                </p>
+            </div>
+
+            <!-- Sport toggle + skill selector -->
+            <div class="bg-white border border-slate-200 rounded-lg p-8 mb-12">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Sport toggle -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-900 mb-4">Select Sport</label>
+                        <div class="sport-toggle">
+                            <button class="active" onclick="toggleSport(this, 'tennis')">🎾 Tennis</button>
+                            <button onclick="toggleSport(this, 'pickleball')">🏓 Pickleball</button>
+                        </div>
+                    </div>
+
+                    <!-- Skill slider -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-900 mb-4">Your Skill Level</label>
+                        <div class="skill-slider">
+                            <span class="text-sm text-slate-600">Beginner</span>
+                            <input type="range" min="1" max="5" value="3" id="skillLevel">
+                            <span class="text-sm text-slate-600">Advanced</span>
+                        </div>
+                        <div id="skillLabel" class="mt-2 text-sm font-semibold text-slate-900">Intermediate (3/5)</div>
+                    </div>
+                </div>
+
+                <!-- View schedule button -->
+                <div class="mt-8 flex justify-center">
+                    <button class="hero-cta">
+                        View Schedule →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bento grid teaser -->
+            <div class="bento-grid">
+                <!-- Player Profile Card -->
+                <div class="bento-card">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Your Profile</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-slate-600 mb-1">Current Rating</p>
+                            <p class="text-3xl font-black accent-lime">1,847</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-600 mb-1">Win Rate</p>
+                            <p class="text-xl font-bold text-slate-900">67%</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-600 mb-1">Rank in Region</p>
+                            <p class="text-2xl font-bold text-slate-900">#12</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skill Rating Progress -->
+                <div class="bento-card">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Progress</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-semibold text-slate-900">Serve Accuracy</span>
+                                <span class="text-sm text-slate-600">72%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 72%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-semibold text-slate-900">Volley Control</span>
+                                <span class="text-sm text-slate-600">58%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 58%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roster Management (Locked) -->
+                <div class="bento-card locked">
+                    <div class="unlock-badge">Unlocks after Week 1</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 opacity-50">Roster Management</h3>
+                    <div class="space-y-3 opacity-50">
+                        <div class="h-8 bg-slate-200 rounded"></div>
+                        <div class="h-8 bg-slate-200 rounded"></div>
+                        <div class="h-8 bg-slate-200 rounded"></div>
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics (Locked) -->
+                <div class="bento-card locked">
+                    <div class="unlock-badge">Unlocks after Week 1</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 opacity-50">Match Analytics</h3>
+                    <div class="space-y-3 opacity-50">
+                        <div class="flex gap-2">
+                            <div class="h-16 bg-slate-200 rounded flex-1"></div>
+                            <div class="h-16 bg-slate-200 rounded flex-1"></div>
+                        </div>
+                        <p class="text-sm text-slate-600">Detailed performance charts</p>
+                    </div>
+                </div>
+
+                <!-- Schedule Widget -->
+                <div class="bento-card">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Upcoming Matches</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-50 rounded">
+                            <p class="text-sm font-semibold text-slate-900">vs Marcus</p>
+                            <p class="text-xs text-slate-600">Sat, 2:00 PM</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded">
+                            <p class="text-sm font-semibold text-slate-900">vs Sarah & Jessica</p>
+                            <p class="text-xs text-slate-600">Mon, 6:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <section class="py-20 px-6 bg-slate-900 text-white text-center">
+        <h2 class="text-4xl font-black mb-4">Ready to Compete?</h2>
+        <p class="text-lg text-slate-300 mb-8">Join thousands of players building their legacy on the court.</p>
+        <button class="hero-cta" style="background: #D4AF37; color: #1F2937;">
+            Get Started Now →
+        </button>
+    </section>
+
+    <script>
+        function toggleSport(btn, sport) {
+            document.querySelectorAll('.sport-toggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        document.getElementById('skillLevel').addEventListener('input', function() {
+            const level = this.value;
+            const levels = ['', 'Beginner', 'Beginner-Intermediate', 'Intermediate', 'Intermediate-Advanced', 'Advanced'];
+            document.getElementById('skillLabel').textContent = levels[level] + ' (' + level + '/5)';
+        });
+    </script>
+</body>
+</html>
