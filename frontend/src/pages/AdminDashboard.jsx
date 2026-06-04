@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
 import { activeSportIds, activeCountry } from "../config/platformConfig";
+import DisputeEscalationPanel from "../components/DisputeEscalationPanel";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -222,6 +223,7 @@ export default function AdminDashboard() {
     { id: "ladders", label: "Ladders" },
     { id: "seasons", label: "Seasons" },
     { id: "playoffs", label: "Playoffs" },
+    { id: "disputes", label: "Disputes" },
     { id: "zelle", label: "Zelle Queue" },
     { id: "waitlist", label: "Waitlist" },
   ];
@@ -632,6 +634,13 @@ export default function AdminDashboard() {
         {tab === "seasons" && <SeasonsTab />}
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
         {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
+        {tab === "disputes" && (
+          <div className="py-8">
+            <div className="max-w-5xl">
+              <DisputeEscalationPanel isOrganizerView={true} />
+            </div>
+          </div>
+        )}
         {tab === "zelle" && <ZelleQueueTab />}
         {tab === "waitlist" && <WaitlistTab />}
       </div>
