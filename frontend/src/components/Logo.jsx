@@ -52,7 +52,7 @@ export default function Logo({
       <NexusIcon size={iconSize} />
       <span
         className={`font-black tracking-tight leading-none ${textSize}`}
-        style={{ fontFamily: "'Outfit', sans-serif", color: variant === "light" ? "white" : "#2D5016" }}
+        style={{ fontFamily: "'Outfit', sans-serif", color: variant === "light" ? "white" : "#004D40" }}
       >
         <span>VEN</span>
         <span style={{ color: "#10B981" }}>LAX</span>
