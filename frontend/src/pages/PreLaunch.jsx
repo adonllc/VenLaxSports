@@ -269,6 +269,16 @@ export default function PreLaunch() {
             Launching in select cities — 2026
           </motion.div>
 
+          <motion.div
+            className="text-center text-sm font-semibold mb-6"
+            style={{ color: PRIMARY }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            🚀 100+ founding members claimed their spots — only 15 left
+          </motion.div>
+
           <motion.h1
             className="font-black leading-tight mb-6"
             style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}
@@ -313,7 +323,7 @@ export default function PreLaunch() {
               whileTap={{ scale: 0.95 }}
               data-testid="hero-cta-primary"
             >
-              Join the Early Access List
+              Secure My Spot — 15 Left
             </motion.a>
             <motion.a
               href="#early-access"
