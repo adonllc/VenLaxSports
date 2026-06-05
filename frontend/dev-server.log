@@ -1,0 +1,27 @@
+
+> frontend@0.1.0 start
+> vite
+
+Port 3000 is in use, trying another one...
+Port 3001 is in use, trying another one...
+Port 3002 is in use, trying another one...
+Port 3003 is in use, trying another one...
+
+  [32m[1mVITE[22m v8.0.14[39m  [2mready in [0m[1m918[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3004[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m12:38:15 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mReferenceError[22m: TrendingUp is not defined
+[39m > src/pages/Handbook.jsx:79:10
+    77 |      id: "ratings",
+    78 |      title: "Ratings Policy",
+    79 |      icon: TrendingUp,
+       |            ^
+    80 |      color: "text-purple-600",
+    81 |      items: [
+
+[2m12:38:15 AM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mAn error occurred in the <Route> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+

@@ -49,7 +49,37 @@
       "Bash(npm start *)",
       "Bash(tee /tmp/vite.log)",
       "Bash(tail -30 /tmp/vite.log | grep -A 5 -B 5 \"error\\\\|Error\\\\|ERR\")",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Skill(ship)",
+      "Skill(ship:*)",
+      "Bash(curl -s \"https://www.venlaxsports.com/?t=$\\(date +%s\\)\")",
+      "Bash(curl -s \"https://www.venlaxsports.com/?t=$\\(date +%s%N\\)\")",
+      "Read(//c/c/Users/hemkp/VENLAX-SPORTS/VenLaxSports/frontend/dist/**)",
+      "Read(//c/c/Users/hemkp/VENLAX-SPORTS/VenLaxSports/frontend/**)",
+      "Bash(mcp__coolify__list_deployments --per_page 3)",
+      "Bash(curl -s \"https://www.venlaxsports.com/\")",
+      "Bash(mcp__coolify__list_deployments --per_page 5)",
+      "Bash(curl -s -I \"https://www.venlaxsports.com/\")",
+      "Bash(curl -s https://venlaxsports.com)",
+      "Bash(node ~/.claude/skills/impeccable/scripts/load-context.mjs)",
+      "Bash(tee dev-server.log)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(pkill -f \"node.*webpack\")",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "Bash(curl -s https://venlaxsports.com/handbook)",
+      "Bash(curl -sI https://venlaxsports.com/handbook)",
+      "Bash(curl -s http://localhost:3000/handbook)",
+      "Bash(npx @playwright/mcp@latest)",
+      "Read(//c/Users/hemkp/.claude/**)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(python -m py_compile models.py routes/legal_routes.py server.py)",
+      "Bash(python -m py_compile routes/auth_routes.py)",
+      "Bash(node -c frontend/src/pages/Auth.jsx)",
+      "Bash(python -m py_compile models.py routes/legal_routes.py server.py routes/auth_routes.py seeds/indexes.py)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\hemkp\\.claude"
     ]
   }
 }
