@@ -121,7 +121,7 @@ async def auto_generate_leagues(data: AutoGenerateIn, request: Request):
                         f"Open {cadence_label} {sport.title()} {fmt} league — players from any USA city welcome. "
                         f"Standardized entry fee of ${fee:.2f}."
                     ),
-                    "venue": "Multiple — see league page",
+                    "venue": "Players will coordinate",
                     "season": CADENCES[cadence]["season_label"],
                     "auto_generated": True,
                     "auto_cadence": cadence,
