@@ -6,7 +6,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsport
 
 const PRIMARY = "#10B981";
 const ACCENT = "#F97316";
-const DARK = "#3F4652";
+const DARK = "#004D40";
 const LIGHT = "#FAF6F1";
 const CREAM = "#F9F7F4";
 const PALE_BLUE = "#F0F7FF";
