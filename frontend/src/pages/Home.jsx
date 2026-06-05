@@ -10,81 +10,146 @@ export default function Home() {
 
   const skillLevels = ["", "Beginner", "Beginner-Intermediate", "Intermediate", "Intermediate-Advanced", "Advanced"];
 
+  const statVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, delay: i * 0.15 },
+    }),
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: (i) => ({
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, delay: i * 0.1 },
+    }),
+  };
+
   return (
     <div className="bg-white">
       {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background image overlay */}
         <div className="absolute inset-0">
-          <img
+          <motion.img
             src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&h=900&fit=crop"
             alt="Tennis court"
             className="w-full h-full object-cover opacity-20"
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.2 }}
+            transition={{ duration: 1, ease: "easeOut" }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white"></div>
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           {/* Accent badge */}
-          <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-slate-100 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <motion.div
+            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-slate-100 rounded-full"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.span
+              className="w-2 h-2 rounded-full bg-green-500"
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <span className="text-sm font-semibold text-slate-700">SPRING SEASON LIVE</span>
-          </div>
+          </motion.div>
 
           {/* Main headline */}
-          <h1 className="text-6xl md:text-7xl font-black leading-tight mb-6 text-slate-900">
+          <motion.h1
+            className="text-6xl md:text-7xl font-black leading-tight mb-6 text-slate-900"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
             Find Your<br />
-            <span style={{ color: "#D4AF37" }}>Bracket</span>
-          </h1>
+            <motion.span
+              style={{ color: "#D4AF37", display: "inline-block" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              Bracket
+            </motion.span>
+          </motion.h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <motion.p
+            className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             Join ranked tennis & pickleball leagues in your city. Compete against skill-matched opponents. Track your rating. Rise the leaderboard.
-          </p>
+          </motion.p>
 
           {/* Dual CTAs */}
-          <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
-            <button
+          <motion.div
+            className="flex flex-col md:flex-row gap-4 justify-center mb-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3, staggerChildren: 0.1 }}
+          >
+            <motion.button
               onClick={() => navigate("/leagues")}
-              className="px-8 py-4 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="px-8 py-4 bg-slate-900 text-white rounded-lg font-semibold transition-all"
+              whileHover={{ scale: 1.05, y: -3, boxShadow: "0 12px 32px rgba(0,0,0,0.2)" }}
+              whileTap={{ scale: 0.95 }}
             >
               ▶ Find Your Bracket
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => navigate("/auth")}
-              className="px-8 py-4 bg-amber-500 text-slate-900 rounded-lg font-semibold hover:bg-amber-600 transition-all hover:-translate-y-0.5"
+              className="px-8 py-4 rounded-lg font-semibold transition-all text-slate-900"
               style={{ backgroundColor: "#D4AF37" }}
+              whileHover={{ scale: 1.05, y: -3, boxShadow: "0 12px 32px rgba(212,175,55,0.3)" }}
+              whileTap={{ scale: 0.95 }}
             >
               Register a Team →
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Stats row */}
-          <div className="flex flex-col md:flex-row gap-8 justify-center text-sm font-semibold text-slate-600">
-            <div>
-              <div className="text-3xl font-black" style={{ color: "#D4AF37" }}>
-                2,847
-              </div>
-              <div>Active Players</div>
-            </div>
-            <div>
-              <div className="text-3xl font-black" style={{ color: "#D4AF37" }}>
-                156
-              </div>
-              <div>Weekly Matches</div>
-            </div>
-            <div>
-              <div className="text-3xl font-black" style={{ color: "#D4AF37" }}>
-                12
-              </div>
-              <div>Cities</div>
-            </div>
-          </div>
+          <motion.div
+            className="flex flex-col md:flex-row gap-8 justify-center text-sm font-semibold text-slate-600"
+            initial="hidden"
+            animate="visible"
+            variants={motionConfigs.staggerContainer}
+          >
+            {[
+              { value: "2,847", label: "Active Players" },
+              { value: "156", label: "Weekly Matches" },
+              { value: "12", label: "Cities" },
+            ].map((stat, i) => (
+              <motion.div key={i} custom={i} variants={statVariants}>
+                <motion.div
+                  className="text-3xl font-black"
+                  style={{ color: "#D4AF37" }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                >
+                  {stat.value}
+                </motion.div>
+                <div>{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* REGISTRATION TICKER */}
-      <div className="overflow-hidden bg-slate-100 border-t border-b border-slate-200">
+      <motion.div
+        className="overflow-hidden bg-slate-100 border-t border-b border-slate-200"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={viewportConfig}
+      >
         <style>{`
           @keyframes scroll {
             0% { transform: translateX(0); }
@@ -118,60 +183,70 @@ export default function Home() {
             <span className="font-semibold text-slate-900">Tennis Tier 2:</span>
             <span className="text-slate-600">6 spots available</span>
           </div>
-          {/* Duplicate for loop */}
           <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
             <span className="font-semibold text-slate-900">Tennis Tier 1:</span>
             <span className="text-slate-600">3 spots left</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* INTERACTIVE SECTION */}
-      <section className="py-24 px-6 bg-white">
+      <motion.section
+        className="py-24 px-6 bg-white"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={viewportConfig}
+      >
         <div className="max-w-6xl mx-auto">
           {/* Section title */}
-          <div className="mb-16 text-center">
+          <motion.div
+            className="mb-16 text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={motionConfigs.fadeUp}
+          >
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
               Personalize Your Experience
             </h2>
             <p className="text-lg text-slate-600">
               Choose your sport and skill level to see your perfect bracket
             </p>
-          </div>
+          </motion.div>
 
           {/* Sport toggle + skill selector */}
-          <div className="bg-white border border-slate-200 rounded-lg p-8 mb-12">
+          <motion.div
+            className="bg-white border border-slate-200 rounded-lg p-8 mb-12"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportConfig}
+            whileHover={{ y: -4, boxShadow: "0 20px 40px rgba(0,0,0,0.08)" }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="grid md:grid-cols-2 gap-8">
               {/* Sport toggle */}
-              <div>
+              <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={viewportConfig}>
                 <label className="block text-sm font-bold text-slate-900 mb-4">Select Sport</label>
                 <div className="flex bg-slate-100 rounded-lg p-1 w-fit">
-                  <button
-                    onClick={() => setSport("tennis")}
-                    className={`px-6 py-3 rounded-md font-semibold transition-all ${
-                      sport === "tennis"
-                        ? "bg-white text-slate-900 shadow-md"
-                        : "bg-transparent text-slate-600"
-                    }`}
-                  >
-                    🎾 Tennis
-                  </button>
-                  <button
-                    onClick={() => setSport("pickleball")}
-                    className={`px-6 py-3 rounded-md font-semibold transition-all ${
-                      sport === "pickleball"
-                        ? "bg-white text-slate-900 shadow-md"
-                        : "bg-transparent text-slate-600"
-                    }`}
-                  >
-                    🏓 Pickleball
-                  </button>
+                  {["tennis", "pickleball"].map((s) => (
+                    <motion.button
+                      key={s}
+                      onClick={() => setSport(s)}
+                      className={`px-6 py-3 rounded-md font-semibold transition-all ${
+                        sport === s ? "bg-white text-slate-900 shadow-md" : "bg-transparent text-slate-600"
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {s === "tennis" ? "🎾 Tennis" : "🏓 Pickleball"}
+                    </motion.button>
+                  ))}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Skill slider */}
-              <div>
+              <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={viewportConfig}>
                 <label className="block text-sm font-bold text-slate-900 mb-4">Your Skill Level</label>
                 <div className="flex gap-4 items-center">
                   <span className="text-sm text-slate-600">Beginner</span>
@@ -183,134 +258,164 @@ export default function Home() {
                     onChange={(e) => setSkillLevel(parseInt(e.target.value))}
                     className="flex-1 h-1.5 bg-slate-200 rounded-full cursor-pointer"
                     style={{
-                      background: `linear-gradient(to right, #D4AF37 0%, #D4AF37 ${(skillLevel / 5) * 100}%, #E5E7EB ${(skillLevel / 5) * 100}%, #E5E7EB 100%)`,
+                      background: `linear-gradient(to right, #D4AF37 0%, #D4AF37 ${(skillLevel / 5) * 100}%, #E5E7EB ${
+                        (skillLevel / 5) * 100
+                      }%, #E5E7EB 100%)`,
                     }}
                   />
                   <span className="text-sm text-slate-600">Advanced</span>
                 </div>
-                <div className="mt-2 text-sm font-semibold text-slate-900">
+                <motion.div
+                  className="mt-2 text-sm font-semibold text-slate-900"
+                  key={skillLevel}
+                  initial={{ scale: 1.2, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
                   {skillLevels[skillLevel]} ({skillLevel}/5)
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
 
             {/* View schedule button */}
-            <div className="mt-8 flex justify-center">
-              <button
+            <motion.div
+              className="mt-8 flex justify-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={viewportConfig}
+              transition={{ delay: 0.3 }}
+            >
+              <motion.button
                 onClick={() => navigate("/leagues")}
-                className="px-8 py-4 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                className="px-8 py-4 bg-slate-900 text-white rounded-lg font-semibold transition-all"
+                whileHover={{ scale: 1.05, y: -3, boxShadow: "0 12px 32px rgba(0,0,0,0.2)" }}
+                whileTap={{ scale: 0.95 }}
               >
                 View Schedule →
-              </button>
-            </div>
-          </div>
+              </motion.button>
+            </motion.div>
+          </motion.div>
 
           {/* Bento grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Player Profile */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Your Profile</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Current Rating</p>
-                  <p className="text-3xl font-black" style={{ color: "#D4AF37" }}>
-                    1,847
-                  </p>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={motionConfigs.staggerContainer}
+          >
+            {[
+              {
+                title: "Your Profile",
+                items: [
+                  { label: "Current Rating", value: "1,847", gold: true },
+                  { label: "Win Rate", value: "67%" },
+                  { label: "Rank in Region", value: "#12" },
+                ],
+              },
+              {
+                title: "Progress",
+                items: [
+                  { label: "Serve Accuracy", value: "72%", progress: 72 },
+                  { label: "Volley Control", value: "58%", progress: 58 },
+                ],
+              },
+              {
+                title: "Upcoming Matches",
+                items: [
+                  { match: "vs Marcus", time: "Sat, 2:00 PM" },
+                  { match: "vs Sarah & Jessica", time: "Mon, 6:00 PM" },
+                ],
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                className="bg-white border border-slate-200 rounded-xl p-6"
+                custom={i}
+                variants={cardVariants}
+                whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+              >
+                <h3 className="text-lg font-bold text-slate-900 mb-4">{card.title}</h3>
+                <div className="space-y-4">
+                  {card.items &&
+                    card.items.map((item, j) =>
+                      item.progress !== undefined ? (
+                        <motion.div key={j} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={viewportConfig}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-semibold text-slate-900">{item.label}</span>
+                            <span className="text-sm text-slate-600">{item.value}</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full"
+                              style={{ backgroundColor: "#D4AF37" }}
+                              initial={{ width: 0 }}
+                              whileInView={{ width: `${item.progress}%` }}
+                              viewport={viewportConfig}
+                              transition={{ duration: 0.8, delay: 0.2 }}
+                            />
+                          </div>
+                        </motion.div>
+                      ) : item.match ? (
+                        <motion.div key={j} className="p-3 bg-slate-50 rounded" whileHover={{ backgroundColor: "#F3F4F6" }}>
+                          <p className="text-sm font-semibold text-slate-900">{item.match}</p>
+                          <p className="text-xs text-slate-600">{item.time}</p>
+                        </motion.div>
+                      ) : (
+                        <div key={j}>
+                          <p className="text-sm text-slate-600 mb-1">{item.label}</p>
+                          <motion.p
+                            className="text-3xl font-black"
+                            style={{ color: item.gold ? "#D4AF37" : "inherit" }}
+                            animate={{ scale: [1, 1.02, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            {item.value}
+                          </motion.p>
+                        </div>
+                      )
+                    )}
                 </div>
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Win Rate</p>
-                  <p className="text-xl font-bold text-slate-900">67%</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Rank in Region</p>
-                  <p className="text-2xl font-bold text-slate-900">#12</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Skill Progress */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Progress</h3>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-slate-900">Serve Accuracy</span>
-                    <span className="text-sm text-slate-600">72%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full" style={{ width: "72%", backgroundColor: "#D4AF37" }}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-slate-900">Volley Control</span>
-                    <span className="text-sm text-slate-600">58%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full" style={{ width: "58%", backgroundColor: "#D4AF37" }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Roster (Locked) */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6 relative opacity-50">
-              <div className="absolute top-4 right-4 bg-slate-900 text-white px-3 py-1 rounded text-xs font-semibold">
-                Unlocks after Week 1
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Roster Management</h3>
-              <div className="space-y-3">
-                <div className="h-8 bg-slate-200 rounded"></div>
-                <div className="h-8 bg-slate-200 rounded"></div>
-              </div>
-            </div>
-
-            {/* Analytics (Locked) */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6 relative opacity-50">
-              <div className="absolute top-4 right-4 bg-slate-900 text-white px-3 py-1 rounded text-xs font-semibold">
-                Unlocks after Week 1
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Match Analytics</h3>
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="h-16 bg-slate-200 rounded flex-1"></div>
-                  <div className="h-16 bg-slate-200 rounded flex-1"></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Schedule */}
-            <div className="bg-white border border-slate-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Upcoming Matches</h3>
-              <div className="space-y-3">
-                <div className="p-3 bg-slate-50 rounded">
-                  <p className="text-sm font-semibold text-slate-900">vs Marcus</p>
-                  <p className="text-xs text-slate-600">Sat, 2:00 PM</p>
-                </div>
-                <div className="p-3 bg-slate-50 rounded">
-                  <p className="text-sm font-semibold text-slate-900">vs Sarah & Jessica</p>
-                  <p className="text-xs text-slate-600">Mon, 6:00 PM</p>
-                </div>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* FOOTER CTA */}
-      <section className="py-20 px-6 bg-slate-900 text-white text-center">
-        <h2 className="text-4xl font-black mb-4">Ready to Compete?</h2>
-        <p className="text-lg text-slate-300 mb-8">
+      <motion.section
+        className="py-20 px-6 bg-slate-900 text-white text-center"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={viewportConfig}
+      >
+        <motion.h2
+          className="text-4xl font-black mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportConfig}
+        >
+          Ready to Compete?
+        </motion.h2>
+        <motion.p
+          className="text-lg text-slate-300 mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={viewportConfig}
+          transition={{ delay: 0.1 }}
+        >
           Join thousands of players building their legacy on the court.
-        </p>
-        <button
+        </motion.p>
+        <motion.button
           onClick={() => navigate("/auth")}
-          className="px-8 py-4 rounded-lg font-semibold transition-all hover:-translate-y-0.5"
+          className="px-8 py-4 rounded-lg font-semibold transition-all"
           style={{ backgroundColor: "#D4AF37", color: "#1F2937" }}
+          whileHover={{ scale: 1.08, y: -4, boxShadow: "0 20px 40px rgba(212,175,55,0.4)" }}
+          whileTap={{ scale: 0.95 }}
         >
           Get Started Now →
-        </button>
-      </section>
+        </motion.button>
+      </motion.section>
     </div>
   );
 }
