@@ -255,7 +255,7 @@ export default function PreLaunch() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
             className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
-            style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${BORDER}`, backdropFilter: "blur(10px)" }}
+            style={{ background: "rgba(255,255,255,0.85)", border: `1px solid ${BORDER}`, backdropFilter: "blur(10px)", color: DARK }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}

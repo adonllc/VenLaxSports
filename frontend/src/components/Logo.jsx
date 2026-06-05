@@ -41,7 +41,7 @@ export default function Logo({
 }) {
   const iconSize = ICON_SIZES[size] || ICON_SIZES.md;
   const textSize = TEXT_SIZES[size] || TEXT_SIZES.md;
-  const textColor = variant === "light" ? "text-white" : "text-gray-900 dark:text-white";
+  const textColor = variant === "light" ? "text-white" : "text-black dark:text-white";
 
   return (
     <div
