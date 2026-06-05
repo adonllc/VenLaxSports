@@ -748,10 +748,10 @@ export default function PreLaunch() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
                 required
-                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white" }}
-                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"}
-                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"}
+                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors placeholder:text-white/60"
+                style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
+                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"}
                 variants={staggerItem}
                 data-testid="waitlist-email"
               />
@@ -761,10 +761,10 @@ export default function PreLaunch() {
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Your city (e.g. Austin, TX)"
                 required
-                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white" }}
-                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"}
-                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"}
+                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors placeholder:text-white/60"
+                style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
+                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"}
                 variants={staggerItem}
                 data-testid="waitlist-city"
               />
@@ -803,7 +803,7 @@ export default function PreLaunch() {
               >
                 {submitting ? "Securing your spot..." : "Secure My Early Access Spot"}
               </motion.button>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Limited early-access spots per city. First come, first placed. No spam, ever.</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.75)" }}>Limited early-access spots per city. First come, first placed. No spam, ever.</p>
             </motion.form>
           )}
         </div>
