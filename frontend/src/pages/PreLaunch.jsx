@@ -411,13 +411,14 @@ export default function PreLaunch() {
               { icon: "😤", title: "You're stuck in dead group chats.", body: "No-shows, cancellations, zero accountability." },
               { icon: "📊", title: "You have no idea where you stand.", body: "No ranking, no record, no proof — just vibes." },
               { icon: "🎾", title: "Real competitive leagues? Don't exist.", body: "Clubs cost thousands. Pickup courts are chaos." },
-            ].map((item) => (
+            ].map((item, idx) => (
               <motion.div
                 key={item.title}
-                className="flex gap-5 p-6 rounded-lg"
+                className="flex gap-5 p-6 rounded-lg cursor-pointer"
                 style={{ border: `1px solid ${BORDER}`, background: CREAM }}
                 variants={staggerItem}
-                whileHover={{ y: -4, boxShadow: `0 12px 24px ${PRIMARY}12` }}
+                whileHover={{ y: -6, boxShadow: `0 16px 32px ${PRIMARY}15`, background: PALE_BLUE }}
+                transition={{ duration: 0.3 }}
               >
                 <div className="text-3xl flex-shrink-0">{item.icon}</div>
                 <div>
@@ -469,13 +470,14 @@ export default function PreLaunch() {
               { before: "No idea of your actual skill level", after: "An official VENLAX ranking that grows with every win" },
               { before: "Hunting for opponents who match you", after: "Auto-matched by skill, location, and availability" },
               { before: "Playing alone with no community", after: "A city-wide network of players who show up" },
-            ].map((item) => (
+            ].map((item, idx) => (
               <motion.div
                 key={item.before}
-                className="rounded-lg p-5"
+                className="rounded-lg p-5 cursor-pointer"
                 style={{ background: "rgba(255,255,255,0.5)", border: `1px solid ${BORDER}`, backdropFilter: "blur(10px)" }}
                 variants={staggerItem}
-                whileHover={{ x: 4, boxShadow: `0 8px 16px ${PRIMARY}15` }}
+                whileHover={{ x: 6, scale: 1.02, boxShadow: `0 12px 24px ${PRIMARY}20` }}
+                transition={{ duration: 0.3 }}
               >
                 <p className="text-sm line-through mb-2" style={{ color: "#8B8B8B" }}>{item.before}</p>
                 <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -568,19 +570,23 @@ export default function PreLaunch() {
               { step: "01", title: "Join", body: "Sign up in 2 minutes. Set your sport, skill level, and city." },
               { step: "02", title: "Get Matched", body: "We place you in the right league, at your level, in your city." },
               { step: "03", title: "Play & Rise", body: "Win matches. Climb the city leaderboard. Your ranking follows you." },
-            ].map((s) => (
+            ].map((s, idx) => (
               <motion.div
                 key={s.step}
                 className="text-center"
                 variants={staggerItem}
-                whileHover={{ y: -4 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ duration: 0.3 }}
               >
-                <div
+                <motion.div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6"
                   style={{ background: PRIMARY, color: "white", fontFamily: "'Barlow Condensed', sans-serif" }}
+                  whileHover={{ scale: 1.15 }}
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
                 >
                   {s.step}
-                </div>
+                </motion.div>
                 <h3 className="font-bold mb-3" style={{ fontSize: "1.25rem", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}>
                   {s.title}
                 </h3>
@@ -634,18 +640,25 @@ export default function PreLaunch() {
                 style={{ border: `1px solid ${BORDER}` }}
                 variants={staggerItem}
               >
-                <button
+                <motion.button
                   type="button"
-                  className="w-full text-left px-6 py-4 flex justify-between items-center transition-colors"
+                  className="w-full text-left px-6 py-4 flex justify-between items-center transition-all cursor-pointer"
                   style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  whileHover={{ background: openFaq === i ? LIGHT : PALE_AMBER }}
+                  whileTap={{ scale: 0.98 }}
                   data-testid={`faq-${i}`}
                 >
                   <span className="font-medium text-sm" style={{ color: DARK }}>{item.q}</span>
-                  <span className="text-lg flex-shrink-0 ml-4" style={{ color: PRIMARY }}>
+                  <motion.span
+                    className="text-lg flex-shrink-0 ml-4"
+                    style={{ color: PRIMARY }}
+                    animate={{ rotate: openFaq === i ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     {openFaq === i ? "−" : "+"}
-                  </span>
-                </button>
+                  </motion.span>
+                </motion.button>
                 <AnimatePresence>
                   {openFaq === i && (
                     <motion.div
@@ -758,11 +771,12 @@ export default function PreLaunch() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
                 required
-                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors placeholder:text-white/60"
+                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-all placeholder:text-white/60"
                 style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
-                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"}
-                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"}
+                onFocus={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.8)"; e.currentTarget.style.background = "rgba(0,0,0,0.25)"; e.currentTarget.style.boxShadow = `0 0 0 3px rgba(16,185,129,0.2)`; }}
+                onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; e.currentTarget.style.background = "rgba(0,0,0,0.15)"; e.currentTarget.style.boxShadow = "none"; }}
                 variants={staggerItem}
+                whileFocus={{ scale: 1.01 }}
                 data-testid="waitlist-email"
               />
               <motion.input
@@ -771,11 +785,12 @@ export default function PreLaunch() {
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Your city (e.g. Austin, TX)"
                 required
-                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-colors placeholder:text-white/60"
+                className="w-full rounded-lg px-4 py-4 text-base focus:outline-none transition-all placeholder:text-white/60"
                 style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
-                onFocus={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"}
-                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"}
+                onFocus={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.8)"; e.currentTarget.style.background = "rgba(0,0,0,0.25)"; e.currentTarget.style.boxShadow = `0 0 0 3px rgba(16,185,129,0.2)`; }}
+                onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; e.currentTarget.style.background = "rgba(0,0,0,0.15)"; e.currentTarget.style.boxShadow = "none"; }}
                 variants={staggerItem}
+                whileFocus={{ scale: 1.01 }}
                 data-testid="waitlist-city"
               />
               <motion.div className="flex gap-3" variants={staggerItem}>
@@ -820,14 +835,26 @@ export default function PreLaunch() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t" style={{ borderColor: BORDER, background: CREAM }}>
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <motion.footer
+        className="py-8 px-6 border-t"
+        style={{ borderColor: BORDER, background: CREAM }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={viewportConfig}
+      >
+        <motion.div
+          className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4"
+          initial={{ y: 20, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={viewportConfig}
+          transition={{ duration: 0.5 }}
+        >
           <Logo size="md" />
           <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
-        </div>
-      </footer>
+        </motion.div>
+      </motion.footer>
     </div>
   );
 }
