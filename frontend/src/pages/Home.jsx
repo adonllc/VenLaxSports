@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { motionConfigs, viewportConfig } from "../config/motionConfig";
 
 export default function Home() {
   const navigate = useNavigate();
