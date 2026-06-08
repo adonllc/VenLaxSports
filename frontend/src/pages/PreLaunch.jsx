@@ -820,7 +820,7 @@ export default function PreLaunch() {
                 type="submit"
                 disabled={submitting || !email || !city}
                 className="w-full font-bold py-4 rounded-lg text-base transition-all disabled:opacity-50"
-                style={{ background: "#FED7AA", color: "#1F2937" }}
+                style={{ background: "#D1FAE5", color: "#065F46" }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 variants={staggerItem}
