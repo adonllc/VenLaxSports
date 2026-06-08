@@ -805,10 +805,10 @@ export default function PreLaunch() {
                     onClick={() => setSport(opt.value)}
                     className="flex-1 py-3 rounded-lg text-sm font-medium transition-colors"
                     style={sport === opt.value
-                      ? { background: "#FED7AA", color: "#1F2937" }
+                      ? { background: "#D1FAE5", color: "#065F46" }
                       : { border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.55)" }
                     }
-                    whileHover={{ background: sport === opt.value ? "#FED7AA" : "rgba(255,255,255,0.1)" }}
+                    whileHover={{ background: sport === opt.value ? "#D1FAE5" : "rgba(255,255,255,0.1)" }}
                     data-testid={`sport-${opt.value}`}
                   >
                     {opt.label}
