@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from auth_utils import get_current_user
+from email_service import send_early_access_confirmed, schedule
 
 router = APIRouter()
 
@@ -40,6 +41,7 @@ async def join_waitlist(entry: WaitlistEntry, request: Request):
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     result = await db.waitlist.insert_one(doc)
+    schedule(send_early_access_confirmed(email))
     return {
         "message": "You're on the list!",
         "already_registered": False,

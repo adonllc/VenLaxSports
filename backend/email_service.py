@@ -301,6 +301,15 @@ async def send_partner_declined(initiator_email: str, initiator_name: str, leagu
     )
 
 
+async def send_early_access_confirmed(to: str) -> None:
+    body = """
+      <p>Thanks for signing up. You're now part of a small group getting early access to VENLAX Sports.</p>
+      <p>We'll send you updates, previews, and opportunities to share feedback that directly influences the platform.</p>
+      <p>Glad to have you with us.</p>
+    """
+    await send_email(to, "You're In — VENLAX Sports Early Access Confirmed", _wrap("You're In", body))
+
+
 async def send_generic(to: str, subject: str, body: str) -> None:
     html_body = "".join(f"<p>{line}</p>" for line in body.split("\n\n") if line.strip())
     await send_email(to, subject, _wrap(subject, html_body, None, None))
