@@ -74,3 +74,13 @@ async def list_waitlist(request: Request):
         "by_city": sorted(by_city.items(), key=lambda x: -x[1]),
         "by_sport": by_sport,
     }
+
+
+@router.delete("/clear")
+async def clear_waitlist(request: Request):
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
+    if current_user.get("role") != "admin":
+        raise HTTPException(403, "Admin only")
+    result = await db.waitlist.delete_many({})
+    return {"deleted": result.deleted_count}
