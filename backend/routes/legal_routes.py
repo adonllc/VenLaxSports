@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from bson import ObjectId
 from datetime import datetime, timezone
 from typing import Optional, List
 
 from models import User, DisputeEscalation, OrganizerDecision, PlayerAppeal
-from auth_utils import verify_token
+from auth_utils import get_current_user
 
 router = APIRouter(prefix="/api/legal", tags=["legal"])
 
@@ -16,10 +16,12 @@ async def submit_parental_consent(
     guardian_name: str,
     relationship: str,
     consent: bool,
-    db=None,
-    current_user: dict = Depends(verify_token),
+    request: Request,
 ):
     """Submit parental consent for <18 player."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
+
     if not consent:
         raise HTTPException(status_code=400, detail="Parental consent required")
 
@@ -55,13 +57,14 @@ async def create_dispute(
     league_id: str,
     dispute_type: str,  # score|conduct|playoff_seeding|rating
     description: str,
+    request: Request,
     reported_against_id: Optional[str] = None,
     evidence: Optional[List[str]] = None,
     match_id: Optional[str] = None,
-    db=None,
-    current_user: dict = Depends(verify_token),
 ):
     """Report a score, conduct, or playoff seeding dispute."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     # Validate dispute type
     valid_types = ["score", "conduct", "playoff_seeding", "rating"]
@@ -71,7 +74,7 @@ async def create_dispute(
     dispute = DisputeEscalation(
         league_id=league_id,
         dispute_type=dispute_type,
-        reported_by_id=current_user["user_id"],
+        reported_by_id=current_user["_id"],
         reported_by_name=current_user["name"],
         reported_against_id=reported_against_id,
         description=description,
@@ -87,10 +90,12 @@ async def create_dispute(
 @router.get("/disputes/{dispute_id}")
 async def get_dispute(
     dispute_id: str,
-    db=None,
-    current_user: dict = Depends(verify_token),
+    request: Request,
 ):
     """Get dispute details."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
+
     dispute = await db.disputes.find_one({"_id": ObjectId(dispute_id)})
     if not dispute:
         raise HTTPException(status_code=404, detail="Dispute not found")
@@ -100,12 +105,13 @@ async def get_dispute(
 
 @router.get("/disputes")
 async def list_disputes(
+    request: Request,
     league_id: Optional[str] = None,
     status: Optional[str] = None,
-    db=None,
-    current_user: dict = Depends(verify_token),
 ):
     """List disputes. Organizers can see all; players see their own."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     query = {}
     if league_id:
@@ -116,8 +122,8 @@ async def list_disputes(
     # If player (not organizer), filter to disputes they reported or against them
     if current_user["role"] != "admin" and current_user["role"] != "city_admin":
         query["$or"] = [
-            {"reported_by_id": current_user["user_id"]},
-            {"reported_against_id": current_user["user_id"]},
+            {"reported_by_id": current_user["_id"]},
+            {"reported_against_id": current_user["_id"]},
         ]
 
     disputes = await db.disputes.find(query).to_list(100)
@@ -130,12 +136,13 @@ async def issue_decision(
     dispute_id: str,
     decision: str,
     ruling_type: str,  # upheld|overturned|remanded|partial
+    request: Request,
     penalty: Optional[str] = None,
     penalty_duration: Optional[str] = None,
-    db=None,
-    current_user: dict = Depends(verify_token),
 ):
     """Organizer issues final decision on dispute."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     # Verify organizer authority
     if current_user["role"] not in ["admin", "city_admin"]:
@@ -148,7 +155,7 @@ async def issue_decision(
     # Create decision record
     org_decision = OrganizerDecision(
         dispute_id=dispute_id,
-        organizer_id=current_user["user_id"],
+        organizer_id=current_user["_id"],
         organizer_name=current_user["name"],
         decision=decision,
         ruling_type=ruling_type,
@@ -173,11 +180,12 @@ async def issue_decision(
 async def appeal_decision(
     decision_id: str,
     appeal_reason: str,
+    request: Request,
     evidence: Optional[List[str]] = None,
-    db=None,
-    current_user: dict = Depends(verify_token),
 ):
     """Player appeals an organizer decision within 7-day window."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     decision = await db.decisions.find_one({"_id": ObjectId(decision_id)})
     if not decision:
@@ -188,7 +196,7 @@ async def appeal_decision(
 
     appeal = PlayerAppeal(
         decision_id=decision_id,
-        player_id=current_user["user_id"],
+        player_id=current_user["_id"],
         player_name=current_user["name"],
         appeal_reason=appeal_reason,
         evidence=evidence or [],
@@ -202,13 +210,14 @@ async def appeal_decision(
 # ─── Terms Acceptance ──────────────────────────────────
 @router.post("/terms/accept")
 async def accept_terms(
-    db=None,
-    current_user: dict = Depends(verify_token),
+    request: Request,
 ):
     """Mark terms as accepted by current user."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     result = await db.users.update_one(
-        {"_id": ObjectId(current_user["user_id"])},
+        {"_id": ObjectId(current_user["_id"])},
         {
             "$set": {
                 "terms_accepted": True,
@@ -228,13 +237,14 @@ async def accept_terms(
 async def update_emergency_contact(
     emergency_contact_name: str,
     emergency_contact_phone: str,
-    db=None,
-    current_user: dict = Depends(verify_token),
+    request: Request,
 ):
     """Update emergency contact info."""
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     result = await db.users.update_one(
-        {"_id": ObjectId(current_user["user_id"])},
+        {"_id": ObjectId(current_user["_id"])},
         {
             "$set": {
                 "emergency_contact_name": emergency_contact_name,
