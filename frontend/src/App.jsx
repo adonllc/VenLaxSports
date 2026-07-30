@@ -94,9 +94,9 @@ function AppShell() {
     return <PreLaunch />;
   }
   return (
-    <div className="min-h-screen bg-[var(--vl-bg)] flex flex-col font-body">
+    <div className="min-h-screen bg-[var(--vl-bg)] flex flex-col font-body overflow-x-hidden">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 w-full overflow-x-hidden">
         <AppRouter />
       </main>
       <Footer />

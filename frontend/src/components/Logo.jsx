@@ -17,6 +17,46 @@ function NexusIcon({ size }) {
   );
 }
 
+// Premium wordmark: VEN (teal) + LAX (white)
+function VenlaxWordmark({ size = "md" }) {
+  const sizeMap = {
+    sm: { fontSize: 20, letterSpacing: -0.5 },
+    md: { fontSize: 36, letterSpacing: -1 },
+    lg: { fontSize: 52, letterSpacing: -1.5 },
+    xl: { fontSize: 72, letterSpacing: -2 },
+    hero: { fontSize: 104, letterSpacing: -3 },
+  };
+
+  const { fontSize, letterSpacing } = sizeMap[size] || sizeMap.md;
+
+  return (
+    <div style={{ display: "flex", lineHeight: 1 }}>
+      <span
+        style={{
+          fontSize: `${fontSize}px`,
+          fontWeight: 900,
+          fontFamily: "'Outfit', sans-serif",
+          color: "#004D40",
+          letterSpacing: `${letterSpacing}px`,
+        }}
+      >
+        VEN
+      </span>
+      <span
+        style={{
+          fontSize: `${fontSize}px`,
+          fontWeight: 900,
+          fontFamily: "'Outfit', sans-serif",
+          color: "#10B981",
+          letterSpacing: `${letterSpacing}px`,
+        }}
+      >
+        LAX
+      </span>
+    </div>
+  );
+}
+
 const ICON_SIZES = {
   sm:   36,
   md:   52,
@@ -25,38 +65,23 @@ const ICON_SIZES = {
   hero: 110,
 };
 
-const TEXT_SIZES = {
-  sm:   "text-xl",
-  md:   "text-3xl",
-  lg:   "text-4xl",
-  xl:   "text-5xl",
-  hero: "text-6xl",
-};
-
 export default function Logo({
   size = "md",
   variant = "default",
   className = "",
   testId = "brand-logo",
+  withIcon = true,
 }) {
   const iconSize = ICON_SIZES[size] || ICON_SIZES.md;
-  const textSize = TEXT_SIZES[size] || TEXT_SIZES.md;
-  const textColor = variant === "light" ? "text-white" : "text-black dark:text-white";
 
   return (
     <div
       className={`flex items-center gap-2.5 ${className}`}
       data-testid={testId}
-      style={{ flexShrink: 0 }}
+      style={{ flexShrink: 0, alignItems: "center" }}
     >
-      <NexusIcon size={iconSize} />
-      <span
-        className={`font-black tracking-tight leading-none ${textSize}`}
-        style={{ fontFamily: "'Outfit', sans-serif", color: variant === "light" ? "white" : "#004D40" }}
-      >
-        <span>VEN</span>
-        <span style={{ color: "#10B981" }}>LAX</span>
-      </span>
+      {withIcon && <NexusIcon size={iconSize} />}
+      <VenlaxWordmark size={size} />
     </div>
   );
 }

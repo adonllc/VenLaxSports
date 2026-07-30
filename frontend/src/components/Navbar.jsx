@@ -58,17 +58,28 @@ export default function Navbar() {
     navigate("/");
   };
 
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   return (
     <nav
       className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-200"
       data-testid="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-28">
+        <div className="flex items-center justify-between h-20">
 
           {/* Logo */}
-          <Link to="/" data-testid="nav-logo" className="flex-shrink-0">
-            <Logo size="md" variant="dark" testId="nav-logo-mark" />
+          <Link to="/" data-testid="nav-logo" className="flex-shrink-0 flex items-center">
+            <div style={{ height: "60px", display: "flex", alignItems: "center" }}>
+              <Logo size="md" variant="default" testId="nav-logo-mark" />
+            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -237,7 +248,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-4 space-y-1">
+        <div className="md:hidden fixed top-20 left-0 right-0 bottom-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto px-4 py-4 space-y-1 z-40" style={{ maxHeight: "calc(100vh - 80px)" }}>
           <Link
             to="/join"
             className="block px-3 py-2.5 text-sm font-semibold rounded-lg"

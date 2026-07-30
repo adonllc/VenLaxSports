@@ -433,9 +433,9 @@ export default function AdminDashboard() {
         {/* Manage Leagues Tab */}
         {tab === "leagues" && (
           <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
-            <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F3F4F6" }}>
+            <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
               <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>All Leagues ({leagues.length})</h2>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                 <button
                   data-testid="btn-create-rr-league"
                   onClick={() => setShowRRForm(true)}
@@ -444,7 +444,7 @@ export default function AdminDashboard() {
                 >
                   + Create Round Robin League
                 </button>
-                <button onClick={() => setTab("create")} className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#1B2B4B" }} data-testid="add-league-btn">
+                <button onClick={() => setTab("create")} className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#1B2B4B" }} data-testid="add-league-btn">
                   <Plus className="w-4 h-4" /> Add League
                 </button>
               </div>
@@ -1284,32 +1284,32 @@ function WaitlistTab() {
       )}
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border-b border-gray-100">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search email or city..."
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="text-sm border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             data-testid="waitlist-search"
           />
           <button
             onClick={copyCSV}
-            className="text-xs bg-[#1B2B4B] text-white px-3 py-2 rounded-lg hover:bg-[#142040] transition-colors"
+            className="text-xs bg-[#1B2B4B] text-white px-3 py-2 rounded-lg hover:bg-[#142040] transition-colors whitespace-nowrap"
             data-testid="waitlist-copy-csv"
           >
             Copy CSV
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-max sm:min-w-full">
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
               <tr>
-                <th className="px-4 py-3 text-left">#</th>
-                <th className="px-4 py-3 text-left">Email</th>
-                <th className="px-4 py-3 text-left">City</th>
-                <th className="px-4 py-3 text-left">Sport</th>
-                <th className="px-4 py-3 text-left">Signed Up</th>
-                <th className="px-4 py-3 text-left">Action</th>
+                <th className="px-3 sm:px-4 py-3 text-left">#</th>
+                <th className="px-3 sm:px-4 py-3 text-left">Email</th>
+                <th className="hidden sm:table-cell px-3 sm:px-4 py-3 text-left">City</th>
+                <th className="px-3 sm:px-4 py-3 text-left">Sport</th>
+                <th className="hidden md:table-cell px-3 sm:px-4 py-3 text-left">Signed Up</th>
+                <th className="px-3 sm:px-4 py-3 text-left">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -1318,11 +1318,11 @@ function WaitlistTab() {
               ) : (
                 filtered.map((e, i) => (
                   <tr key={e.email} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{e.email}</td>
-                    <td className="px-4 py-3 text-gray-600">{e.city}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    <td className="px-3 sm:px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
+                    <td className="px-3 sm:px-4 py-3 font-medium text-gray-900 text-xs sm:text-sm max-w-[150px] sm:max-w-none truncate">{e.email}</td>
+                    <td className="hidden sm:table-cell px-3 sm:px-4 py-3 text-gray-600 text-sm">{e.city}</td>
+                    <td className="px-3 sm:px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
                         e.sport === "tennis" ? "bg-emerald-100 text-emerald-700" :
                         e.sport === "pickleball" ? "bg-orange-100 text-orange-700" :
                         "bg-gray-100 text-gray-700"
@@ -1330,10 +1330,10 @@ function WaitlistTab() {
                         {e.sport}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">
+                    <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-gray-400 text-xs">
                       {e.created_at ? new Date(e.created_at).toLocaleDateString() : "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 sm:px-4 py-3">
                       <button
                         onClick={() => handleDelete(e.email)}
                         disabled={deleting === e.email}

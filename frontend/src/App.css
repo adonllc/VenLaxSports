@@ -124,3 +124,41 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ─── Mobile Viewport & Body Fixes ────────────────────────────── */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* Prevent layout shift when mobile menu opens */
+body.mobile-menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 640px) {
+  /* Ensure tables scroll horizontally on mobile */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile-friendly modals */
+  [role="dialog"] {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Reduce padding on small screens */
+  main {
+    padding: 0;
+  }
+
+  /* Make cards stack better */
+  .grid {
+    gap: 1rem;
+  }
+}
