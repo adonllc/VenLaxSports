@@ -303,11 +303,28 @@ async def send_partner_declined(initiator_email: str, initiator_name: str, leagu
 
 async def send_early_access_confirmed(to: str) -> None:
     body = """
-      <p>Thanks for signing up. You're now part of a small group getting early access to VENLAX Sports.</p>
-      <p>We'll send you updates, previews, and opportunities to share feedback that directly influences the platform.</p>
-      <p>Glad to have you with us.</p>
+      <p>Welcome to VENLAX Sports! 🎉</p>
+      <p>You're officially on the Early Access list.</p>
+      <p>Thanks for joining us at the beginning of our journey. As one of our early members, you'll get exclusive access to new features, previews, and updates before they're released to everyone else.</p>
+      <p>We're building more than just another sports app—we're creating a platform that makes it easier for players to connect, compete, and grow their local sports communities.</p>
+      <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">What to expect</h2>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li>🎾 Early access to new features</li>
+        <li>🏓 Multiple play formats including Singles, Doubles, Round Robin, Social Games, and Tournaments</li>
+        <li>📍 City-wide player matchmaking</li>
+        <li>🚀 Early invitations to beta releases and special events</li>
+        <li>💡 Opportunities to help shape the future of VENLAX Sports</li>
+      </ul>
+      <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">Help Us Build Something Players Love</h2>
+      <p>The best ideas come from the community.</p>
+      <p>Whether you have a suggestion for a new feature, a different tournament format, a sport you'd like us to support, improvements to matchmaking, ideas for your city, or anything that would make the experience better for players—we'd love to hear from you.</p>
+      <p>📧 Email us anytime at: <strong>feedback@venlaxsports.com</strong></p>
+      <p>Every piece of feedback is read by our team, and many of our upcoming features will be driven directly by community suggestions.</p>
+      <p>Thank you for being one of our earliest supporters. We can't wait to share what's coming next.</p>
+      <p>See you on the court!</p>
+      <p><strong>The VENLAX Sports Team</strong></p>
     """
-    await send_email(to, "You're In — VENLAX Sports Early Access Confirmed", _wrap("You're In", body))
+    await send_email(to, "Welcome to VENLAX Sports Early Access", _wrap("Welcome to VENLAX Sports", body))
 
 
 async def send_generic(to: str, subject: str, body: str) -> None:
