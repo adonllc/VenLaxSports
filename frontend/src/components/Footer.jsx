@@ -100,7 +100,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-800">
           <p className="text-sm text-gray-600">
-            &copy; {new Date().getFullYear()} {BRAND.full_name} ({BRAND.domain}). All rights reserved.
+            © {new Date().getFullYear()} VENLAX Sports. All rights reserved. Owned and operated by Cloudy Labs LLC.
           </p>
           <div className="flex items-center gap-4">
             {activeSports.map((s) => (
