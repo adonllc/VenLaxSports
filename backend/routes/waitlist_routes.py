@@ -74,3 +74,23 @@ async def list_waitlist(request: Request):
         "by_city": sorted(by_city.items(), key=lambda x: -x[1]),
         "by_sport": by_sport,
     }
+
+
+@router.delete("")
+async def delete_waitlist_entry(request: Request):
+    db = request.app.state.db
+    current_user = await get_current_user(request, db)
+    if current_user.get("role") != "admin":
+        raise HTTPException(403, "Admin only")
+
+    body = await request.json()
+    email = body.get("email", "").lower().strip()
+
+    if not email:
+        raise HTTPException(400, "Email required")
+
+    result = await db.waitlist.delete_one({"email": email})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Waitlist entry not found")
+
+    return {"message": f"Removed {email} from waitlist", "deleted": True}

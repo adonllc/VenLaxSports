@@ -1191,19 +1191,38 @@ function WaitlistTab() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [deleting, setDeleting] = useState(null);
+  const [deleteMsg, setDeleteMsg] = useState("");
+
+  const fetchWaitlist = async () => {
+    try {
+      const res = await axios.get(`${API}/waitlist/list`, { withCredentials: true });
+      setData(res.data);
+    } catch {
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await axios.get(`${API}/waitlist/list`, { withCredentials: true });
-        setData(res.data);
-      } catch {
-        setData(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchWaitlist();
   }, []);
+
+  const handleDelete = async (email) => {
+    if (!window.confirm(`Remove ${email} from waitlist?`)) return;
+    setDeleting(email);
+    setDeleteMsg("");
+    try {
+      await axios.delete(`${API}/waitlist`, { data: { email }, withCredentials: true });
+      setDeleteMsg(`Removed ${email}`);
+      fetchWaitlist();
+    } catch (err) {
+      setDeleteMsg(err.response?.data?.detail || "Failed to delete");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const copyCSV = () => {
     if (!data) return;
@@ -1258,6 +1277,12 @@ function WaitlistTab() {
         </div>
       )}
 
+      {deleteMsg && (
+        <div className={`text-sm px-4 py-3 rounded-xl border ${deleteMsg.startsWith("Removed") ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`} data-testid="waitlist-delete-msg">
+          {deleteMsg}
+        </div>
+      )}
+
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <input
@@ -1284,11 +1309,12 @@ function WaitlistTab() {
                 <th className="px-4 py-3 text-left">City</th>
                 <th className="px-4 py-3 text-left">Sport</th>
                 <th className="px-4 py-3 text-left">Signed Up</th>
+                <th className="px-4 py-3 text-left">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-xs">No entries found.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-xs">No entries found.</td></tr>
               ) : (
                 filtered.map((e, i) => (
                   <tr key={e.email} className="hover:bg-gray-50">
@@ -1306,6 +1332,16 @@ function WaitlistTab() {
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">
                       {e.created_at ? new Date(e.created_at).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleDelete(e.email)}
+                        disabled={deleting === e.email}
+                        className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50 transition-colors font-medium"
+                        data-testid={`waitlist-delete-${e.email}`}
+                      >
+                        {deleting === e.email ? "Deleting..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 ))
