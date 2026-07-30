@@ -24,7 +24,10 @@ export default function OAuthCallback() {
 
     (async () => {
       try {
-        await axios.post(`${API}/auth/google/callback`, { code, state }, { withCredentials: true });
+        await axios.post(`${API}/auth/google/callback`, { code, state }, {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" }
+        });
         await fetchMe();
         navigate("/dashboard", { replace: true });
       } catch (err) {
