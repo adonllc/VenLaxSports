@@ -8,11 +8,23 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
+                geist: ["Geist", "system-ui", "sans-serif"],
+                jakarta: ["Plus Jakarta Sans", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                dm: ["DM Sans", "monospace"],
                 heading: ["Barlow Condensed", "sans-serif"],
-                body: ["Inter", "Barlow", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-                sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                body: ["Plus Jakarta Sans", "Barlow", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                sans: ["Plus Jakarta Sans", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
             },
             colors: {
+                "venlax-primary": "#10B981",
+                "venlax-accent": "#F97316",
+                "venlax-dark": "#1F2937",
+                "venlax-light": "#F9FAFB",
+                "venlax-gray": {
+                    100: "#F3F4F6",
+                    300: "#D1D5DB",
+                    600: "#4B5563",
+                },
                 espresso: {
                     DEFAULT: "#1F0A03",
                     mid: "#2C1206",
