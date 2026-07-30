@@ -249,7 +249,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto px-4 py-4 space-y-1" style={{ top: "80px", zIndex: 50, maxHeight: "calc(100vh - 80px)" }}>
+        <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-4 space-y-1 max-h-screen overflow-y-auto">
           <Link
             to="/join"
             className="block px-3 py-2.5 text-sm font-semibold rounded-lg"
