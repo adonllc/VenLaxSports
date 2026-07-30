@@ -69,7 +69,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-200"
+      className="sticky top-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-200"
+      style={{ zIndex: 40 }}
       data-testid="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,7 +249,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed top-20 left-0 right-0 bottom-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto px-4 py-4 space-y-1 z-40" style={{ maxHeight: "calc(100vh - 80px)" }}>
+        <div className="md:hidden fixed inset-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto px-4 py-4 space-y-1" style={{ top: "80px", zIndex: 50, maxHeight: "calc(100vh - 80px)" }}>
           <Link
             to="/join"
             className="block px-3 py-2.5 text-sm font-semibold rounded-lg"
