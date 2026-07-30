@@ -18,7 +18,7 @@ function NexusIcon({ size }) {
 }
 
 // Premium wordmark: VEN (teal) + LAX (white)
-function VenlaxWordmark({ size = "md" }) {
+function VenlaxWordmark({ size = "md", variant = "default" }) {
   const sizeMap = {
     sm: { fontSize: 20, letterSpacing: -0.5 },
     md: { fontSize: 36, letterSpacing: -1 },
@@ -29,6 +29,10 @@ function VenlaxWordmark({ size = "md" }) {
 
   const { fontSize, letterSpacing } = sizeMap[size] || sizeMap.md;
 
+  const isLight = variant === "light";
+  const venColor = isLight ? "#FFFFFF" : "#004D40";
+  const laxColor = isLight ? "#10B981" : "#10B981";
+
   return (
     <div style={{ display: "flex", lineHeight: 1 }}>
       <span
@@ -36,7 +40,7 @@ function VenlaxWordmark({ size = "md" }) {
           fontSize: `${fontSize}px`,
           fontWeight: 900,
           fontFamily: "'Outfit', sans-serif",
-          color: "#004D40",
+          color: venColor,
           letterSpacing: `${letterSpacing}px`,
         }}
       >
@@ -47,7 +51,7 @@ function VenlaxWordmark({ size = "md" }) {
           fontSize: `${fontSize}px`,
           fontWeight: 900,
           fontFamily: "'Outfit', sans-serif",
-          color: "#10B981",
+          color: laxColor,
           letterSpacing: `${letterSpacing}px`,
         }}
       >
@@ -81,7 +85,7 @@ export default function Logo({
       style={{ flexShrink: 0, alignItems: "center" }}
     >
       {withIcon && <NexusIcon size={iconSize} />}
-      <VenlaxWordmark size={size} />
+      <VenlaxWordmark size={size} variant={variant} />
     </div>
   );
 }
