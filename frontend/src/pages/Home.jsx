@@ -143,53 +143,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REGISTRATION TICKER */}
-      <motion.div
-        className="overflow-hidden bg-slate-100 border-t border-b border-slate-200"
+      {/* LIVE ACTIVITY SECTION */}
+      <motion.section
+        className="py-12 px-6 bg-slate-50"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={viewportConfig}
       >
-        <style>{`
-          @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .ticker-content {
-            display: flex;
-            animation: scroll 30s linear infinite;
-            gap: 2rem;
-            padding: 1rem 0;
-          }
-        `}</style>
-        <div className="ticker-content">
-          <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-            <span className="font-semibold text-slate-900">Tennis Tier 1:</span>
-            <span className="text-slate-600">3 spots left</span>
-          </div>
-          <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
-            <span className="font-semibold text-slate-900">Pickleball Open:</span>
-            <span className="text-slate-600">1 spot left</span>
-          </div>
-          <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
-            <span className="font-semibold text-slate-900">Recent Match:</span>
-            <span className="text-slate-600">Sarah beat Marcus 21-18</span>
-          </div>
-          <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: "#D4AF37" }}></span>
-            <span className="font-semibold text-slate-900">Tennis Tier 2:</span>
-            <span className="text-slate-600">6 spots available</span>
-          </div>
-          <div className="whitespace-nowrap flex-shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-            <span className="font-semibold text-slate-900">Tennis Tier 1:</span>
-            <span className="text-slate-600">3 spots left</span>
-          </div>
+        <div className="max-w-6xl mx-auto">
+          <motion.h3
+            className="text-center text-lg font-semibold text-slate-900 mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportConfig}
+          >
+            Live Activity
+          </motion.h3>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            {[
+              { dot: "bg-green-500", label: "Tennis Tier 1", value: "3 spots left" },
+              { dot: "bg-orange-500", label: "Pickleball Open", value: "1 spot left" },
+              { dot: "bg-blue-500", label: "Recent Match", value: "Sarah beat Marcus 21-18" },
+              { dot: "bg-yellow-500", label: "Tennis Tier 2", value: "6 spots available" },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                className="bg-white border border-slate-200 rounded-lg p-4 flex items-center gap-3"
+                custom={i}
+                variants={cardVariants}
+                whileHover={{ y: -2, boxShadow: "0 8px 16px rgba(0,0,0,0.08)" }}
+              >
+                <span className={`w-3 h-3 rounded-full ${item.dot} flex-shrink-0`}></span>
+                <div className="min-w-0">
+                  <div className="font-semibold text-sm text-slate-900 truncate">{item.label}</div>
+                  <div className="text-xs text-slate-600">{item.value}</div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </motion.div>
+      </motion.section>
 
       {/* INTERACTIVE SECTION */}
       <motion.section
