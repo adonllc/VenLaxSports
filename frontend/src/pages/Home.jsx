@@ -28,6 +28,14 @@ export default function Home() {
     }),
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
   return (
     <div className="bg-white">
       {/* HERO SECTION */}
