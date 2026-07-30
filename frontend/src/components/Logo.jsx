@@ -29,7 +29,7 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
 
   const { fontSize, letterSpacing } = sizeMap[size] || sizeMap.md;
 
-  const isLight = variant === "light";
+  const isLight = variant === "light" || variant === "hero";
   const venColor = isLight ? "#FFFFFF" : "#004D40";
   const laxColor = isLight ? "#10B981" : "#10B981";
 
