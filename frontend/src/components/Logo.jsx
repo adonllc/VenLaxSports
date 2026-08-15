@@ -17,46 +17,64 @@ function NexusIcon({ size }) {
   );
 }
 
-// Premium wordmark: VEN (teal) + LAX (white)
+// Premium wordmark: VEN (dark) + LAX (teal) with SPORTS subtitle + dashes
 function VenlaxWordmark({ size = "md", variant = "default" }) {
   const sizeMap = {
-    sm: { fontSize: 20, letterSpacing: -0.5 },
-    md: { fontSize: 36, letterSpacing: -1 },
-    lg: { fontSize: 52, letterSpacing: -1.5 },
-    xl: { fontSize: 72, letterSpacing: -2 },
-    hero: { fontSize: 104, letterSpacing: -3 },
+    sm: { fontSize: 20, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "24px" },
+    md: { fontSize: 36, letterSpacing: -1, subtitleFz: 14, subtitleLs: -0.4, dashLen: "32px" },
+    lg: { fontSize: 52, letterSpacing: -1.5, subtitleFz: 18, subtitleLs: -0.5, dashLen: "40px" },
+    xl: { fontSize: 72, letterSpacing: -2, subtitleFz: 24, subtitleLs: -0.6, dashLen: "48px" },
+    hero: { fontSize: 104, letterSpacing: -3, subtitleFz: 32, subtitleLs: -0.8, dashLen: "56px" },
   };
 
-  const { fontSize, letterSpacing } = sizeMap[size] || sizeMap.md;
+  const { fontSize, letterSpacing, subtitleFz, subtitleLs, dashLen } = sizeMap[size] || sizeMap.md;
 
   const isLight = variant === "light" || variant === "hero";
   const venColor = isLight ? "#FFFFFF" : "#004D40";
-  const laxColor = isLight ? "#10B981" : "#10B981";
+  const laxColor = "#10B981";
 
   return (
-    <div style={{ display: "flex", lineHeight: 1 }}>
-      <span
-        style={{
-          fontSize: `${fontSize}px`,
-          fontWeight: 900,
-          fontFamily: "'Outfit', sans-serif",
-          color: venColor,
-          letterSpacing: `${letterSpacing}px`,
-        }}
-      >
-        VEN
-      </span>
-      <span
-        style={{
-          fontSize: `${fontSize}px`,
-          fontWeight: 900,
-          fontFamily: "'Outfit', sans-serif",
-          color: laxColor,
-          letterSpacing: `${letterSpacing}px`,
-        }}
-      >
-        LAX
-      </span>
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "4px", alignItems: "center" }}>
+      <div style={{ display: "flex", lineHeight: 1 }}>
+        <span
+          style={{
+            fontSize: `${fontSize}px`,
+            fontWeight: 900,
+            fontFamily: "'Outfit', sans-serif",
+            color: venColor,
+            letterSpacing: `${letterSpacing}px`,
+          }}
+        >
+          VEN
+        </span>
+        <span
+          style={{
+            fontSize: `${fontSize}px`,
+            fontWeight: 900,
+            fontFamily: "'Outfit', sans-serif",
+            color: laxColor,
+            letterSpacing: `${letterSpacing}px`,
+          }}
+        >
+          LAX
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+        <div style={{ width: dashLen, height: "2px", background: "#F97316" }} />
+        <span
+          style={{
+            fontSize: `${subtitleFz}px`,
+            fontWeight: 600,
+            fontFamily: "'Outfit', sans-serif",
+            color: "#F97316",
+            letterSpacing: `${subtitleLs}px`,
+            fontStyle: "italic",
+          }}
+        >
+          SPORTS
+        </span>
+        <div style={{ width: dashLen, height: "2px", background: "#F97316" }} />
+      </div>
     </div>
   );
 }
