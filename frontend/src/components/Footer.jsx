@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
+import ContactForm from "./ContactForm";
 
 const SPORT_DOT = {
   tennis:     "#10B981",
@@ -10,14 +12,18 @@ const SPORT_DOT = {
 };
 
 export default function Footer() {
+  const [contactOpen, setContactOpen] = useState(false);
+
   return (
+    <>
+    <ContactForm isOpen={contactOpen} onClose={() => setContactOpen(false)} />
     <footer
       className="bg-gray-950 border-t-[3px]"
       style={{ borderTopColor: "#C9572A" }}
       data-testid="footer"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="mb-3">
@@ -96,6 +102,32 @@ export default function Footer() {
               ))}
             </ul>
           </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-4 text-gray-600">
+              Support
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => setContactOpen(true)}
+                  className="text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
+                  data-testid="footer-contact-us"
+                >
+                  Contact Us
+                </button>
+              </li>
+              <li>
+                <a
+                  href="mailto:feedback@venlaxsports.com"
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Feedback
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-800">
@@ -116,5 +148,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }

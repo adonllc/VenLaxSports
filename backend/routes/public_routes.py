@@ -195,3 +195,41 @@ async def send_challenge(data: ChallengeIn, request: Request):
         ))
 
     return {"message": "Challenge sent!", "challenged_name": challenged.get("name")}
+
+
+class ContactFormData(BaseModel):
+  name: str
+  email: str
+  message: str
+
+
+@router.post("/contact")
+async def send_contact_message(data: ContactFormData):
+  """Send contact form submission to feedback email."""
+  if not data.name or not data.email or not data.message:
+    raise HTTPException(status_code=400, detail="All fields are required")
+
+  feedback_email = "feedback@venlaxsports.com"
+  subject = f"New Contact Form Submission from {data.name}"
+  body = f"""
+New contact form submission:
+
+Name: {data.name}
+Email: {data.email}
+
+Message:
+{data.message}
+
+---
+Reply to: {data.email}
+"""
+
+  try:
+    email_service.schedule(email_service.send_generic(
+      feedback_email,
+      subject=subject,
+      body=body,
+    ))
+    return {"message": "Your message has been sent successfully"}
+  except Exception as e:
+    raise HTTPException(status_code=500, detail="Failed to send message. Please try again later.")
