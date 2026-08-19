@@ -142,7 +142,7 @@ export default function PreLaunch() {
     {
       icon: "🎯",
       title: "Smart Matchmaking",
-      body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city — every time.",
+      body: "No more sandbaggers. No more mismatches. We match you with players at your exact level in your city - every time.",
       mockup: (
         <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Opponent Found</p>
@@ -172,7 +172,7 @@ export default function PreLaunch() {
       body: "Every match counts. Every win moves you up. Your VENLAX ranking is the official record of where you stand.",
       mockup: (
         <div className="flex-1 rounded-xl p-6" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Austin TX — Tennis Singles</p>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Austin TX - Tennis Singles</p>
           <div className="space-y-2">
             {[
               { rank: 1, name: "Alex M.", rating: 2103, delta: "+12" },
@@ -201,7 +201,7 @@ export default function PreLaunch() {
     {
       icon: "📅",
       title: "Flexible League Formats",
-      body: "Singles, Doubles, Mixed Doubles, or Casual — pick the format that fits your game. You choose the intensity.",
+      body: "Singles, Doubles, Mixed Doubles, or Casual - pick the format that fits your game. You choose the intensity.",
       mockup: (
         <div className="flex-1 rounded-xl p-6 space-y-3" style={{ background: CREAM, border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>Choose Your Format</p>
@@ -266,7 +266,7 @@ export default function PreLaunch() {
               animate={{ scale: [0.8, 1.2, 0.8] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
-            Launching in select cities — 2026
+            Launching in select cities - 2026
           </motion.div>
 
           <motion.div
@@ -276,7 +276,7 @@ export default function PreLaunch() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            🚀 100+ founding members claimed their spots — only 15 left
+            🚀 100+ founding members claimed their spots - only 15 left
           </motion.div>
 
           <motion.h1
@@ -306,7 +306,7 @@ export default function PreLaunch() {
             animate="visible"
             custom={1}
           >
-            VENLAX runs competitive Tennis and Pickleball leagues in your city — real rankings, skill-matched opponents, and players who actually show up.
+            VENLAX runs competitive Tennis and Pickleball leagues in your city - real rankings, skill-matched opponents, and players who actually show up.
           </motion.p>
 
           <motion.div
@@ -323,7 +323,7 @@ export default function PreLaunch() {
               whileTap={{ scale: 0.95 }}
               data-testid="hero-cta-primary"
             >
-              Secure My Spot — 15 Left
+              Secure My Spot - 15 Left
             </motion.a>
             <motion.a
               href="#early-access"
@@ -361,8 +361,8 @@ export default function PreLaunch() {
             viewport={viewportConfig}
           >
             {[
-              "Placed by skill — no sandbaggers",
-              "Flexible scheduling — you set times",
+              "Placed by skill - no sandbaggers",
+              "Flexible scheduling - you set times",
               "Official VENLAX city ranking",
               "Tennis + Pickleball on one profile",
             ].map((point) => (
@@ -409,7 +409,7 @@ export default function PreLaunch() {
           >
             {[
               { icon: "😤", title: "You're stuck in dead group chats.", body: "No-shows, cancellations, zero accountability." },
-              { icon: "📊", title: "You have no idea where you stand.", body: "No ranking, no record, no proof — just vibes." },
+              { icon: "📊", title: "You have no idea where you stand.", body: "No ranking, no record, no proof - just vibes." },
               { icon: "🎾", title: "Real competitive leagues? Don't exist.", body: "Clubs cost thousands. Pickup courts are chaos." },
             ].map((item, idx) => (
               <motion.div
@@ -727,7 +727,7 @@ export default function PreLaunch() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <p className="text-white font-semibold text-sm text-center">Move up the list — invite players from your city</p>
+                  <p className="text-white font-semibold text-sm text-center">Move up the list - invite players from your city</p>
                   <div className="rounded-md px-3 py-2.5 text-xs font-mono truncate" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
                     {`${window.location.origin}/?ref=${waitlistId}`}
                   </div>
@@ -743,7 +743,7 @@ export default function PreLaunch() {
                       Copy Link
                     </motion.button>
                     <motion.a
-                      href={`https://wa.me/?text=${encodeURIComponent(`I'm getting early access to VENLAX — competitive Tennis/Pickleball leagues. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
+                      href={`https://wa.me/?text=${encodeURIComponent(`I'm getting early access to VENLAX - competitive Tennis/Pickleball leagues. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="py-2.5 rounded-md text-sm font-medium text-center block transition-colors"
