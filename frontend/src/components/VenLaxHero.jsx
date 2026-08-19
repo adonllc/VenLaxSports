@@ -194,7 +194,7 @@ export default function VenLaxHero({
                     <Trophy className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold tracking-tight text-white">1,200+</div>
+                    <div className="text-3xl font-bold tracking-tight text-white">{sportMeta?.rankedPlayers ?? "1,200+"}</div>
                     <div className="text-sm text-zinc-400">Ranked Players</div>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function VenLaxHero({
 
                 {/* Grid stats */}
                 <div className="grid grid-cols-3 gap-4 text-center">
-                  <StatItem value="80+" label="Leagues" />
+                  <StatItem value={sportMeta?.leaguesCount ?? "80+"} label="Leagues" />
                   <div className="w-px bg-white/10" />
                   <StatItem value={platformConfig.featuredCities.length + "+"} label="Cities" />
                   <div className="w-px bg-white/10" />

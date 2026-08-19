@@ -25,6 +25,8 @@ const SPORT_META = {
     rating: "Skill Rating (2.0 – 7.0 scale)",
     image: "https://images.unsplash.com/photo-1696661115319-a9b6801e2571?w=1200&q=80",
     features: ["Skill Rating Tracking", "Best-of-3 Sets", "Match Tiebreak Rules", "Weekly Scheduling", "Online Score Reporting", "Live Standings"],
+    rankedPlayers: "1,200+",
+    leaguesCount: "95+",
   },
   cricket: {
     label: "Cricket", icon: "🏏",
@@ -37,6 +39,8 @@ const SPORT_META = {
     rating: "Custom Team Rating & NRR",
     image: "https://images.pexels.com/photos/3602833/pexels-photo-3602833.jpeg?w=1200",
     features: ["NRR Tracking", "Powerplay Rules", "Team Dashboard", "Umpire Assignment", "Live Scoring", "Corporate Packages"],
+    rankedPlayers: "450+",
+    leaguesCount: "42+",
   },
   pickleball: {
     label: "Pickleball", icon: "🏓",
@@ -49,6 +53,8 @@ const SPORT_META = {
     rating: "Skill Rating System (1.0 – 7.0)",
     image: "https://images.unsplash.com/photo-1777382141965-68d47862eaf9?w=1200&q=80",
     features: ["Rally Scoring", "Win-by-2 Rules", "Skill Ratings", "Flexible Scheduling", "Beginner Friendly", "Growing Community"],
+    rankedPlayers: "850+",
+    leaguesCount: "78+",
   },
 };
 
