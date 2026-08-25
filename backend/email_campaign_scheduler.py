@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime, timezone, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
-from email_service import schedule_email
+from email_service import send_email
 import secrets
 import string
 
@@ -135,7 +135,7 @@ async def send_weekly_campaign():
 
         # Send email
         try:
-            await schedule_email(
+            await send_email(
                 to_email=email,
                 subject=subject,
                 html_content=html_content
