@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from models import User, ReferralCredit
 from auth_utils import get_current_user
 from datetime import datetime, timezone, timedelta
@@ -119,7 +119,7 @@ async def get_my_credits(request: Request, current_user: User = Depends(get_curr
 @router.post("/me/credits/apply")
 async def apply_credit_to_league(
     request: Request,
-    payload: dict,
+    payload: dict = Body(...),
     current_user: User = Depends(get_current_user)
 ):
     """Apply credit to league entry fee (manual button click)"""
