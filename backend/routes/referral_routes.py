@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Body
+from fastapi import APIRouter, HTTPException, Request, Body
 from models import User, ReferralCredit
 from auth_utils import get_current_user
 from datetime import datetime, timezone, timedelta
@@ -73,9 +73,10 @@ async def redeem_referral_code(code: str, request: Request):
     }
 
 @router.get("/me/referral-code")
-async def get_my_referral_code(request: Request, current_user: User = Depends(get_current_user)):
+async def get_my_referral_code(request: Request):
     """Get current user's referral code"""
     db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     user = await db.users.find_one({"_id": current_user.id})
     if not user:
@@ -98,9 +99,10 @@ async def get_my_referral_code(request: Request, current_user: User = Depends(ge
     }
 
 @router.get("/me/credits")
-async def get_my_credits(request: Request, current_user: User = Depends(get_current_user)):
+async def get_my_credits(request: Request):
     """Get user's current credit balance"""
     db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     user = await db.users.find_one({"_id": current_user.id})
     if not user:
@@ -119,11 +121,11 @@ async def get_my_credits(request: Request, current_user: User = Depends(get_curr
 @router.post("/me/credits/apply")
 async def apply_credit_to_league(
     request: Request,
-    payload: dict = Body(...),
-    current_user: User = Depends(get_current_user)
+    payload: dict = Body(...)
 ):
     """Apply credit to league entry fee (manual button click)"""
     db = request.app.state.db
+    current_user = await get_current_user(request, db)
 
     league_id = payload.get("league_id")
     amount_to_apply = payload.get("amount", 0)
