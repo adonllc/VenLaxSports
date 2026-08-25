@@ -192,12 +192,12 @@ async def startup_event():
     await seed_promo_codes_wrapper()
     await seed_demo_wrapper()
     import scheduler as _sched
-    _sched.start(db)
+    _sched.start_scheduler()
     logger.info("Application startup complete")
 
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     import scheduler as _sched
-    _sched.stop()
+    _sched.stop_scheduler()
     client.close()
