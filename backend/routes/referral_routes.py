@@ -73,7 +73,7 @@ async def redeem_referral_code(code: str, request: Request):
     }
 
 @router.get("/me/referral-code")
-async def get_my_referral_code(current_user: User = Depends(get_current_user), request: Request = None):
+async def get_my_referral_code(request: Request, current_user: User = Depends(get_current_user)):
     """Get current user's referral code"""
     db = request.app.state.db
 
@@ -98,7 +98,7 @@ async def get_my_referral_code(current_user: User = Depends(get_current_user), r
     }
 
 @router.get("/me/credits")
-async def get_my_credits(current_user: User = Depends(get_current_user), request: Request = None):
+async def get_my_credits(request: Request, current_user: User = Depends(get_current_user)):
     """Get user's current credit balance"""
     db = request.app.state.db
 
@@ -118,9 +118,9 @@ async def get_my_credits(current_user: User = Depends(get_current_user), request
 
 @router.post("/me/credits/apply")
 async def apply_credit_to_league(
+    request: Request,
     payload: dict,
-    current_user: User = Depends(get_current_user),
-    request: Request = None
+    current_user: User = Depends(get_current_user)
 ):
     """Apply credit to league entry fee (manual button click)"""
     db = request.app.state.db
