@@ -63,6 +63,11 @@ class User(BaseDocument):
     oauth_providers: List[dict] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+    # Referral & Credits ─────────────────────────────
+    referral_code: Optional[str] = None
+    credits_balance: float = 0.0
+    credits_expiry: Optional[str] = None  # date when credits expire (12 months from earn)
+
     # Legal & Compliance ─────────────────────────────
     date_of_birth: Optional[str] = None  # ISO format: YYYY-MM-DD
     emergency_contact_name: Optional[str] = None
@@ -419,3 +424,29 @@ class PlayerAppeal(BaseDocument):
     commissioner_review: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     reviewed_at: Optional[str] = None
+
+
+# ─── Email Campaign (Weekly Feedback + Referral) ────────
+class EmailCampaign(BaseDocument):
+    user_id: str
+    user_email: str
+    campaign_type: str  # "waitlist" | "completed_reg"
+    week_number: int  # 1-6
+    sent_at: Optional[str] = None
+    opened_at: Optional[str] = None
+    feedback_submitted: bool = False
+    referral_clicked: bool = False
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+# ─── Referral Credits ────────────────────────────────
+class ReferralCredit(BaseDocument):
+    referrer_id: str
+    referee_id: Optional[str] = None  # None until referee signs up
+    referral_code: str
+    credit_amount: float
+    league_id: Optional[str] = None  # which league triggered the credit
+    status: str = "pending"  # "pending" | "applied"
+    applied_at: Optional[str] = None
+    expires_at: str  # 12 months from creation
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())

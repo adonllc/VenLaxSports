@@ -1,43 +1,45 @@
-"""APScheduler setup for VENLAX Sports background jobs."""
-from __future__ import annotations
+"""APScheduler configuration for weekly email campaigns"""
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
+import asyncio
+from email_campaign_scheduler import send_weekly_campaign
+import logging
 
-_scheduler = AsyncIOScheduler(timezone="UTC")
+logger = logging.getLogger(__name__)
 
+scheduler = AsyncIOScheduler()
 
-def start(db) -> None:
-    from scheduler_jobs import (
-        auto_status_transitions,
-        send_match_reminders,
-        auto_forfeit_stale_matches,
-    )
-    _scheduler.add_job(
-        auto_status_transitions,
-        CronTrigger(hour=0, minute=5),
-        args=[db],
-        id="status_transitions",
-        replace_existing=True,
-    )
-    _scheduler.add_job(
-        send_match_reminders,
-        IntervalTrigger(hours=1),
-        args=[db],
-        id="match_reminders",
-        replace_existing=True,
-    )
-    _scheduler.add_job(
-        auto_forfeit_stale_matches,
-        CronTrigger(hour=1, minute=0),
-        args=[db],
-        id="auto_forfeit",
-        replace_existing=True,
-    )
-    _scheduler.start()
+def start_scheduler():
+    """Start scheduler for weekly campaign (every Monday 9am UTC)"""
+    try:
+        # Schedule weekly email campaign: every Monday 9:00 AM UTC
+        scheduler.add_job(
+            send_weekly_campaign,
+            trigger=CronTrigger(day_of_week=0, hour=9, minute=0),
+            id="weekly_email_campaign",
+            name="Weekly Email Campaign (Feedback + Referral)",
+            replace_existing=True,
+            max_instances=1
+        )
 
+        if not scheduler.running:
+            scheduler.start()
+            logger.info("✅ Scheduler started - weekly email campaign enabled")
+        else:
+            logger.info("✅ Scheduler already running")
 
-def stop() -> None:
-    if _scheduler.running:
-        _scheduler.shutdown(wait=False)
+    except Exception as e:
+        logger.error(f"❌ Error starting scheduler: {str(e)}")
+
+def stop_scheduler():
+    """Stop scheduler"""
+    if scheduler.running:
+        scheduler.shutdown(wait=False)
+        logger.info("✅ Scheduler stopped")
+
+async def trigger_campaign_now():
+    """Manually trigger the campaign (for testing)"""
+    logger.info("🔔 Manually triggering weekly campaign...")
+    await send_weekly_campaign()
+    logger.info("✅ Campaign completed")
