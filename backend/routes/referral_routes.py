@@ -78,7 +78,7 @@ async def get_my_referral_code(request: Request):
     db = request.app.state.db
     current_user = await get_current_user(request, db)
 
-    user = await db.users.find_one({"_id": current_user.id})
+    user = await db.users.find_one({"_id": current_user.get("_id")})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -86,7 +86,7 @@ async def get_my_referral_code(request: Request):
     if not user.get("referral_code"):
         ref_code = generate_referral_code()
         await db.users.update_one(
-            {"_id": current_user.id},
+            {"_id": current_user.get("_id")},
             {"$set": {"referral_code": ref_code}}
         )
     else:
@@ -104,12 +104,12 @@ async def get_my_credits(request: Request):
     db = request.app.state.db
     current_user = await get_current_user(request, db)
 
-    user = await db.users.find_one({"_id": current_user.id})
+    user = await db.users.find_one({"_id": current_user.get("_id")})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     # Get referral earnings history
-    referrals = await db.referral_credits.find({"referrer_id": current_user.id}).to_list(None)
+    referrals = await db.referral_credits.find({"referrer_id": current_user.get("_id")}).to_list(None)
 
     return {
         "credits_balance": user.get("credits_balance", 0.0),
@@ -133,7 +133,7 @@ async def apply_credit_to_league(
     if not league_id or amount_to_apply <= 0:
         raise HTTPException(status_code=400, detail="Invalid league_id or amount")
 
-    user = await db.users.find_one({"_id": current_user.id})
+    user = await db.users.find_one({"_id": current_user.get("_id")})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -149,13 +149,13 @@ async def apply_credit_to_league(
     # Deduct credit (will be used in payment processing)
     new_balance = available_credit - amount_to_apply
     await db.users.update_one(
-        {"_id": current_user.id},
+        {"_id": current_user.get("_id")},
         {"$set": {"credits_balance": new_balance}}
     )
 
     # Store credit application record for audit
     await db.credit_applications.insert_one({
-        "user_id": current_user.id,
+        "user_id": current_user.get("_id"),
         "league_id": league_id,
         "amount": amount_to_apply,
         "applied_at": datetime.now(timezone.utc).isoformat()
