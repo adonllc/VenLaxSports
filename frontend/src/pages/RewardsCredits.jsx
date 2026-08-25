@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Copy, Share2, DollarSign, TrendingUp, Gift } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8001';
 
@@ -69,8 +67,6 @@ export default function RewardsCredits() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
-      <Navbar />
-
       <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -239,8 +235,6 @@ export default function RewardsCredits() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }
