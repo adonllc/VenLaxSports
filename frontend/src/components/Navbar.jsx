@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon, Users } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon, Users, Gift } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
 import axios from "axios";
@@ -172,6 +172,13 @@ export default function Navbar() {
                       data-testid="nav-dashboard"
                     >
                       <LayoutDashboard className="w-4 h-4 text-gray-400" /> My Dashboard
+                    </Link>
+                    <Link
+                      to="/rewards"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                      data-testid="nav-rewards"
+                    >
+                      <Gift className="w-4 h-4 text-gray-400" /> Rewards & Credits
                     </Link>
                     {pendingInvitesCount > 0 && (
                       <Link
