@@ -226,8 +226,13 @@ export default function PreLaunch() {
     <div className="min-h-screen" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: LIGHT }}>
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b" style={{ background: CREAM, borderColor: BORDER }}>
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Logo size="md" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+          <div className="hidden sm:block">
+            <Logo size="md" />
+          </div>
+          <div className="sm:hidden">
+            <Logo size="sm" withIcon={true} />
+          </div>
           <motion.a
             href="#early-access"
             className="text-sm font-bold px-4 py-2 rounded-md transition-colors"

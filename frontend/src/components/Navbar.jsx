@@ -79,7 +79,12 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" data-testid="nav-logo" className="flex-shrink-0 flex items-center">
             <div style={{ height: "60px", display: "flex", alignItems: "center" }}>
-              <Logo size="md" variant="default" testId="nav-logo-mark" />
+              <div className="hidden sm:block">
+                <Logo size="md" variant="default" testId="nav-logo-mark" />
+              </div>
+              <div className="sm:hidden">
+                <Logo size="sm" variant="default" testId="nav-logo-mark-mobile" withIcon={true} />
+              </div>
             </div>
           </Link>
 
