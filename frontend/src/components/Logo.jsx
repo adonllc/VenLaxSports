@@ -20,7 +20,7 @@ function NexusIcon({ size }) {
 // UFC-Style wordmark: VEN (green) + LAX (orange, bold) with SPORTS subtitle
 function VenlaxWordmark({ size = "md", variant = "default" }) {
   const sizeMap = {
-    sm: { fontSize: 20, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "20px" },
+    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "18px" },
     md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: -0.4, dashLen: "24px" },
     lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: -0.5, dashLen: "32px" },
     xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: -0.6, dashLen: "40px" },
