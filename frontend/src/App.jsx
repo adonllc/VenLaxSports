@@ -40,6 +40,7 @@ const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
 const Ladders = lazy(() => import("./pages/Ladders"));
 const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 const RewardsCredits = lazy(() => import("./pages/RewardsCredits"));
+const LogoDemo = lazy(() => import("./pages/LogoDemo"));
 
 const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
 const IS_LAUNCH_LIVE = import.meta.env.VITE_LAUNCH_LIVE === "true";
@@ -85,6 +86,7 @@ function AppRouter() {
         <Route path="/ladders" element={<Ladders />} />
         <Route path="/ladders/:id" element={<LadderDetail />} />
         <Route path="/rewards" element={<RewardsCredits />} />
+        <Route path="/logo-demo" element={<LogoDemo />} />
       </Routes>
     </Suspense>
   );

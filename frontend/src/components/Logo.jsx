@@ -10,32 +10,32 @@ function NexusIcon({ size }) {
       style={{ display: "block", flexShrink: 0 }}
       aria-hidden="true"
     >
-      <circle cx="26" cy="13" r="12" fill="none" stroke="#10B981" strokeWidth="4" />
-      <circle cx="14" cy="34" r="12" fill="none" stroke="#F97316" strokeWidth="4" />
-      <circle cx="38" cy="34" r="12" fill="none" stroke="#2563EB" strokeWidth="4" />
+      <circle cx="26" cy="13" r="12" fill="none" stroke="#10B981" strokeWidth="2.5" />
+      <circle cx="14" cy="34" r="12" fill="none" stroke="#F97316" strokeWidth="2.5" />
+      <circle cx="38" cy="34" r="12" fill="none" stroke="#2563EB" strokeWidth="2.5" />
     </svg>
   );
 }
 
-// Premium wordmark: VEN (dark) + LAX (teal) with SPORTS subtitle + dashes
+// UFC-Style wordmark: VEN (green) + LAX (orange, bold) with SPORTS subtitle
 function VenlaxWordmark({ size = "md", variant = "default" }) {
   const sizeMap = {
-    sm: { fontSize: 20, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "24px" },
-    md: { fontSize: 36, letterSpacing: -1, subtitleFz: 14, subtitleLs: -0.4, dashLen: "32px" },
-    lg: { fontSize: 52, letterSpacing: -1.5, subtitleFz: 18, subtitleLs: -0.5, dashLen: "40px" },
-    xl: { fontSize: 72, letterSpacing: -2, subtitleFz: 24, subtitleLs: -0.6, dashLen: "48px" },
-    hero: { fontSize: 104, letterSpacing: -3, subtitleFz: 32, subtitleLs: -0.8, dashLen: "56px" },
+    sm: { fontSize: 20, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "20px" },
+    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: -0.4, dashLen: "24px" },
+    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: -0.5, dashLen: "32px" },
+    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: -0.6, dashLen: "40px" },
+    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: -0.8, dashLen: "56px" },
   };
 
   const { fontSize, letterSpacing, subtitleFz, subtitleLs, dashLen } = sizeMap[size] || sizeMap.md;
 
   const isLight = variant === "light" || variant === "hero";
-  const venColor = isLight ? "#FFFFFF" : "#004D40";
-  const laxColor = "#10B981";
+  const venColor = isLight ? "#FFFFFF" : "#10B981";
+  const laxColor = isLight ? "#FFFFFF" : "#F97316";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "4px", alignItems: "center" }}>
-      <div style={{ display: "flex", lineHeight: 1 }}>
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "8px", alignItems: "center" }}>
+      <div style={{ display: "flex", lineHeight: 0.8 }}>
         <span
           style={{
             fontSize: `${fontSize}px`,
@@ -54,26 +54,26 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
             fontFamily: "'Outfit', sans-serif",
             color: laxColor,
             letterSpacing: `${letterSpacing}px`,
+            textTransform: "uppercase",
           }}
         >
           LAX
         </span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
-        <div style={{ width: dashLen, height: "2px", background: "#F97316" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px" }}>
+        <div style={{ width: dashLen, height: "2px", background: "#004D40" }} />
         <span
           style={{
             fontSize: `${subtitleFz}px`,
-            fontWeight: 600,
+            fontWeight: 800,
             fontFamily: "'Outfit', sans-serif",
-            color: "#F97316",
+            color: "#004D40",
             letterSpacing: `${subtitleLs}px`,
-            fontStyle: "italic",
           }}
         >
           SPORTS
         </span>
-        <div style={{ width: dashLen, height: "2px", background: "#F97316" }} />
+        <div style={{ width: dashLen, height: "2px", background: "#004D40" }} />
       </div>
     </div>
   );
@@ -98,7 +98,7 @@ export default function Logo({
 
   return (
     <div
-      className={`flex items-center gap-2.5 ${className}`}
+      className={`flex items-center gap-1.5 ${className}`}
       data-testid={testId}
       style={{ flexShrink: 0, alignItems: "center" }}
     >
