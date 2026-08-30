@@ -9,6 +9,7 @@ export default function RewardsCredits() {
   const [referralCode, setReferralCode] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCredits();
@@ -25,8 +26,10 @@ export default function RewardsCredits() {
         withCredentials: true,
       });
       setReferralCode(codeRes.data);
+      setError(null);
     } catch (err) {
-      console.error('Error fetching credits:', err);
+      console.error('Error fetching credits/referral code:', err);
+      setError(err.response?.data?.detail || 'Failed to load referral code. Please refresh.');
     } finally {
       setLoading(false);
     }
@@ -159,6 +162,18 @@ export default function RewardsCredits() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Share your code with friends. They get $5 off their first league, you get $5 credit.
           </p>
+
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <button
+                onClick={fetchCredits}
+                className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
 
           {referralCode && (
             <div className="space-y-6">
