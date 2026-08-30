@@ -60,3 +60,5 @@ async def create_indexes(db) -> None:
     await db.appeals.create_index([("decision_id", 1)])
     await db.appeals.create_index([("player_id", 1), ("status", 1)])
     await db.appeals.create_index([("status", 1), ("created_at", -1)])
+    # Token Blacklist — auto-cleanup expired tokens
+    await db.token_blacklist.create_index("expires_at", expireAfterSeconds=0)

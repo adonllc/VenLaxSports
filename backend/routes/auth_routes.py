@@ -135,9 +135,39 @@ async def login(credentials: UserLogin, response: Response, request: Request):
 
 
 @router.post("/logout")
-async def logout(response: Response):
-    response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token")
+async def logout(response: Response, request: Request):
+    db = request.app.state.db
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+
+    if access_token:
+        try:
+            payload = pyjwt.decode(access_token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+            await db.token_blacklist.insert_one({
+                "token": access_token,
+                "user_id": payload.get("sub"),
+                "type": "access",
+                "expires_at": datetime.fromtimestamp(payload["exp"], tz=timezone.utc),
+                "blacklisted_at": datetime.now(timezone.utc).isoformat()
+            })
+        except pyjwt.InvalidTokenError:
+            pass
+
+    if refresh_token:
+        try:
+            payload = pyjwt.decode(refresh_token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+            await db.token_blacklist.insert_one({
+                "token": refresh_token,
+                "user_id": payload.get("sub"),
+                "type": "refresh",
+                "expires_at": datetime.fromtimestamp(payload["exp"], tz=timezone.utc),
+                "blacklisted_at": datetime.now(timezone.utc).isoformat()
+            })
+        except pyjwt.InvalidTokenError:
+            pass
+
+    response.delete_cookie("access_token", domain=".venlaxsports.com", path="/")
+    response.delete_cookie("refresh_token", domain=".venlaxsports.com", path="/")
     return {"message": "Logged out"}
 
 
@@ -162,6 +192,12 @@ async def refresh(request: Request, response: Response):
         payload = pyjwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
         if payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid token type")
+
+        # Check if refresh token is blacklisted
+        blacklisted = await db.token_blacklist.find_one({"token": token})
+        if blacklisted:
+            raise HTTPException(status_code=401, detail="Token revoked")
+
         user = await db.users.find_one({"_id": ObjectId(payload["sub"])})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")

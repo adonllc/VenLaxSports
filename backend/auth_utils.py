@@ -48,6 +48,12 @@ def create_refresh_token(user_id: str) -> str:
     return pyjwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
 
+async def _is_token_blacklisted(token: str, db) -> bool:
+    """Check if token is in blacklist."""
+    blacklisted = await db.token_blacklist.find_one({"token": token})
+    return blacklisted is not None
+
+
 async def get_current_user(request: Request, db) -> dict:
     token = request.cookies.get("access_token")
     if not token:
@@ -60,6 +66,10 @@ async def get_current_user(request: Request, db) -> dict:
         payload = pyjwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
         if payload.get("type") != "access":
             raise HTTPException(status_code=401, detail="Invalid token type")
+
+        if await _is_token_blacklisted(token, db):
+            raise HTTPException(status_code=401, detail="Token revoked")
+
         user_id = payload["sub"]
         try:
             user = await db.users.find_one({"_id": ObjectId(user_id)})
@@ -89,6 +99,10 @@ async def get_optional_user(request: Request, db) -> Optional[dict]:
         payload = pyjwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
         if payload.get("type") != "access":
             return None
+
+        if await _is_token_blacklisted(token, db):
+            return None
+
         user_id = payload["sub"]
         try:
             user = await db.users.find_one({"_id": ObjectId(user_id)})
