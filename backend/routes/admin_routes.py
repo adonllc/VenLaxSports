@@ -271,3 +271,33 @@ async def reject_zelle(session_id: str, request: Request):
         ))
 
     return {"message": "Rejected", "session_id": session_id}
+
+
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: str, request: Request):
+    """Delete a user and all related data (matches, player_leagues, ratings, etc)."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    try:
+        oid = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+
+    user = await db.users.find_one({"_id": oid})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Delete user
+    await db.users.delete_one({"_id": oid})
+
+    # Clean up related data
+    await db.player_leagues.delete_many({"player_id": user_id})
+    await db.matches.delete_many({"$or": [{"player1_id": user_id}, {"player2_id": user_id}]})
+    await db.rating_history.delete_many({"user_id": user_id})
+    await db.payment_transactions.delete_many({"user_id": user_id})
+    await db.challenges.delete_many({"$or": [{"challenger_id": user_id}, {"challenged_id": user_id}]})
+    await db.referral_credits.delete_many({"$or": [{"referrer_id": oid}, {"referee_id": oid}]})
+    await db.ladder_challenges.delete_many({"$or": [{"challenger_id": user_id}, {"challenged_id": user_id}]})
+
+    return {"message": f"User {user['email']} deleted successfully"}

@@ -109,6 +109,18 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); }
   };
 
+  const handleDeleteUser = async (userId, email) => {
+    if (!window.confirm(`Delete user ${email}? This will remove all their data (matches, leagues, ratings).`)) return;
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`, { withCredentials: true });
+      fetchUsers();
+      fetchStats();
+      alert(`User ${email} deleted successfully`);
+    } catch (e) {
+      alert(`Failed to delete user: ${e.response?.data?.detail || e.message}`);
+    }
+  };
+
   const handleCreateLadder = async () => {
     if (!ladderForm.city || !ladderForm.sport || !ladderForm.division_label) {
       setLadderMsg("City, sport, and division required.");
@@ -334,6 +346,7 @@ export default function AdminDashboard() {
                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Country</th>
                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Joined</th>
                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Role</th>
+                        <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -349,6 +362,17 @@ export default function AdminDashboard() {
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-purple-100" : "bg-gray-100"}`} style={{ color: u.role === "admin" ? "#6B21A8" : "#374151" }}>
                               {u.role || "user"}
                             </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <button
+                              onClick={() => handleDeleteUser(u._id || u.id, u.email)}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              data-testid={`delete-user-${u.email}`}
+                              title="Delete user"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
