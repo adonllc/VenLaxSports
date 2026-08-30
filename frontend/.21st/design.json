@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "project": {
+    "name": "frontend",
+    "productType": null,
+    "stack": [
+      "react",
+      "shadcn",
+      "tailwind-v3",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css",
+      "src/app.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [
+      "src/assets"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light-and-dark",
+    "colors": {
+      "--background": {
+        "value": "220 13% 7%",
+        "source": "src/index.css"
+      },
+      "--foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--card-foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--popover-foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--primary": {
+        "value": "17 65% 48%",
+        "source": "src/index.css"
+      },
+      "--primary-foreground": {
+        "value": "0 0% 100%",
+        "source": "src/index.css"
+      },
+      "--secondary": {
+        "value": "215 14% 14%",
+        "source": "src/index.css"
+      },
+      "--secondary-foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--muted": {
+        "value": "215 14% 14%",
+        "source": "src/index.css"
+      },
+      "--muted-foreground": {
+        "value": "215 10% 60%",
+        "source": "src/index.css"
+      },
+      "--accent": {
+        "value": "215 14% 14%",
+        "source": "src/index.css"
+      },
+      "--accent-foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--destructive": {
+        "value": "0 63% 31%",
+        "source": "src/index.css"
+      },
+      "--destructive-foreground": {
+        "value": "213 31% 91%",
+        "source": "src/index.css"
+      },
+      "--border": {
+        "value": "215 13% 20%",
+        "source": "src/index.css"
+      },
+      "--ring": {
+        "value": "17 65% 48%",
+        "source": "src/index.css"
+      },
+      "--vl-text-muted": {
+        "value": "#8b949e",
+        "source": "src/index.css"
+      },
+      "--vl-border": {
+        "value": "#30363d",
+        "source": "src/index.css"
+      },
+      "--vl-border-light": {
+        "value": "#21262d",
+        "source": "src/index.css"
+      }
+    },
+    "typography": {
+      "--vl-text": {
+        "value": "#e6edf3",
+        "source": "src/index.css"
+      },
+      "--vl-text-sub": {
+        "value": "#c9d1d9",
+        "source": "src/index.css"
+      },
+      "--vl-text-subtle": {
+        "value": "#6b7280",
+        "source": "src/index.css"
+      }
+    },
+    "spacing": {},
+    "radius": {
+      "--radius": {
+        "value": "0.625rem",
+        "source": "src/index.css"
+      }
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [
+      "accordion",
+      "alert",
+      "alert-dialog",
+      "aspect-ratio",
+      "avatar",
+      "badge",
+      "breadcrumb",
+      "button",
+      "calendar",
+      "card",
+      "carousel",
+      "checkbox",
+      "collapsible",
+      "command",
+      "context-menu",
+      "dialog",
+      "drawer",
+      "dropdown-menu",
+      "form",
+      "glassmorphism-trust-hero",
+      "hover-card",
+      "input",
+      "input-otp",
+      "label",
+      "menubar",
+      "navigation-menu",
+      "pagination",
+      "popover",
+      "progress",
+      "radio-group",
+      "resizable",
+      "scroll-area",
+      "select",
+      "separator",
+      "sheet",
+      "skeleton",
+      "slider",
+      "sonner",
+      "switch",
+      "table",
+      "tabs",
+      "textarea",
+      "toast",
+      "toaster",
+      "toggle",
+      "toggle-group",
+      "tooltip"
+    ],
+    "preferredPrimitives": [
+      "radix-ui"
+    ],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [],
+  "evidence": [
+    {
+      "fact": "components.installed",
+      "source": "src/components/ui"
+    },
+    {
+      "fact": "design.colorMode:light-and-dark",
+      "source": "src/index.css, src/app.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/app.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:shadcn",
+      "source": "components.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v3",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-07-30T22:41:21.993Z"
+}

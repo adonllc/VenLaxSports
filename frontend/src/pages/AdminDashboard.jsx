@@ -60,6 +60,7 @@ export default function AdminDashboard() {
     description: "",
     rr_config: { min_players: 6, max_players: 12, division_type: "singles", playoff_threshold: 4 }
   });
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     if (loading) return;
@@ -70,6 +71,7 @@ export default function AdminDashboard() {
     fetchCities();
     fetchSeasons();
     fetchLadders();
+    fetchUsers();
   }, [user, loading]);
 
   const fetchStats = async () => {
@@ -97,6 +99,13 @@ export default function AdminDashboard() {
     try {
       const { data } = await axios.get(`${API}/ladders`, { withCredentials: true });
       setLadders(data);
+    } catch (e) { console.error(e); }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get(`${API}/admin/users?limit=500`, { withCredentials: true });
+      setUsers(data);
     } catch (e) { console.error(e); }
   };
 
@@ -217,6 +226,7 @@ export default function AdminDashboard() {
 
   const TABS = [
     { id: "overview", label: "Overview" },
+    { id: "users", label: "Users" },
     { id: "create", label: "Create League" },
     { id: "auto", label: "Auto-Generate" },
     { id: "leagues", label: "Manage Leagues" },
@@ -299,6 +309,56 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {tab === "users" && (
+          <div>
+            <div className="mb-6">
+              <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid #E5E7EB" }}>
+                <h2 className="font-heading font-bold text-2xl mb-2" style={{ color: "#111827" }}>Registered Users</h2>
+                <p className="text-sm" style={{ color: "#6B7280" }}>Total: <span className="font-bold" style={{ color: "#111827" }}>{users.length}</span></p>
+              </div>
+            </div>
+            {users && users.length > 0 ? (
+              <div className="rounded-2xl overflow-hidden bg-white" style={{ border: "1px solid #E5E7EB" }}>
+                <div className="overflow-x-auto">
+                  <table className="w-full" style={{ borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "1px solid #E5E7EB", background: "#F9FAFB" }}>
+                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Name</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Country</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Joined</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#374151" }}>Role</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((u, i) => (
+                        <tr key={u._id} style={{ borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }} data-testid="user-row">
+                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.email}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.full_name || "—"}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.country || "—"}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#6B7280" }}>
+                            {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-purple-100" : "bg-gray-100"}`} style={{ color: u.role === "admin" ? "#6B21A8" : "#374151" }}>
+                              {u.role || "user"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl p-12 bg-white text-center" style={{ border: "1px solid #E5E7EB" }}>
+                <p style={{ color: "#6B7280" }}>No users found</p>
               </div>
             )}
           </div>
