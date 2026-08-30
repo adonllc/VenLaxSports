@@ -78,24 +78,21 @@ async def get_my_referral_code(request: Request):
     db = request.app.state.db
     current_user = await get_current_user(request, db)
 
-    user = await db.users.find_one({"_id": current_user.get("_id")})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
     # Generate referral code if not exists
-    if not user.get("referral_code"):
+    if not current_user.get("referral_code"):
         ref_code = generate_referral_code()
+        from bson import ObjectId
         await db.users.update_one(
-            {"_id": current_user.get("_id")},
+            {"_id": ObjectId(current_user.get("_id"))},
             {"$set": {"referral_code": ref_code}}
         )
     else:
-        ref_code = user.get("referral_code")
+        ref_code = current_user.get("referral_code")
 
     return {
         "referral_code": ref_code,
         "referral_link": f"https://venlaxsports.com/auth?ref={ref_code}",
-        "credits_balance": user.get("credits_balance", 0.0)
+        "credits_balance": current_user.get("credits_balance", 0.0)
     }
 
 @router.get("/me/credits")
@@ -104,16 +101,12 @@ async def get_my_credits(request: Request):
     db = request.app.state.db
     current_user = await get_current_user(request, db)
 
-    user = await db.users.find_one({"_id": current_user.get("_id")})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
     # Get referral earnings history
     referrals = await db.referral_credits.find({"referrer_id": current_user.get("_id")}).to_list(None)
 
     return {
-        "credits_balance": user.get("credits_balance", 0.0),
-        "credits_expiry": user.get("credits_expiry"),
+        "credits_balance": current_user.get("credits_balance", 0.0),
+        "credits_expiry": current_user.get("credits_expiry"),
         "total_referrals": len(referrals),
         "earned_referrals": sum(r.get("credit_amount", 0) for r in referrals if r.get("referee_id"))
     }
