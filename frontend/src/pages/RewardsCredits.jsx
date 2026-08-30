@@ -40,6 +40,14 @@ export default function RewardsCredits() {
     }
   };
 
+  const handleCopyLink = () => {
+    if (referralCode) {
+      navigator.clipboard.writeText(referralCode.referral_link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleShare = async () => {
     if (referralCode && navigator.share) {
       try {
@@ -182,7 +190,7 @@ export default function RewardsCredits() {
                     className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-200"
                   />
                   <button
-                    onClick={handleCopyCode}
+                    onClick={handleCopyLink}
                     className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded transition-colors"
                   >
                     Copy
