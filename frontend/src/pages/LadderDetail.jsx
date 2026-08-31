@@ -123,7 +123,8 @@ export default function LadderDetail() {
           <div className="divide-y divide-gray-100">
             {(ladder.entries || []).map((entry) => {
               const isMe = user && entry.player_id === user.id;
-              const canChallenge = isInLadder && entry.can_challenge && !onCooldown;
+              const isRankedBelow = ladder.my_rank && entry.rank > ladder.my_rank;
+              const canChallenge = isInLadder && entry.can_challenge && !onCooldown && !isRankedBelow;
               return (
                 <div
                   key={entry.player_id}
@@ -147,7 +148,12 @@ export default function LadderDetail() {
                       {challengingId === entry.player_id ? "..." : "Challenge"}
                     </button>
                   )}
-                  {isInLadder && !isMe && !canChallenge && entry.rank > ladder.my_rank && (
+                  {isRankedBelow && (
+                    <span title="Can only challenge players ranked higher" className="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-500 rounded-md cursor-not-allowed">
+                      Ranked Lower
+                    </span>
+                  )}
+                  {isInLadder && !isMe && !canChallenge && !isRankedBelow && entry.rank > ladder.my_rank && (
                     <span className="text-xs text-gray-300">below you</span>
                   )}
                 </div>
