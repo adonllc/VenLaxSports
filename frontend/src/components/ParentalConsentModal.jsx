@@ -20,7 +20,7 @@ export default function ParentalConsentModal({ isOpen, onClose, onSubmit, player
 
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="font-heading font-black text-xl text-gray-900">Parental Consent Form</h2>
+          <h2 className="font-heading font-black text-xl text-heading-dark">Parental Consent Form</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-6 h-6" />
           </button>

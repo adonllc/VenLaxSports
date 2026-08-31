@@ -47,7 +47,7 @@ export default function RoundRobinLeagues() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-2">Structured Format</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl text-gray-900 mb-2">Round Robin Leagues</h1>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl text-heading-dark mb-2">Round Robin Leagues</h1>
           <p className="text-gray-500 max-w-lg">Auto-scheduled leagues for busy players. Every matchup assigned a week.</p>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function RoundRobinLeagues() {
                       {lg.status}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 text-lg leading-snug mb-1">{lg.name}</h3>
+                  <h3 className="font-bold text-heading-dark text-lg leading-snug mb-1">{lg.name}</h3>
                   <p className="text-sm text-gray-500 mb-4">{lg.city}</p>
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span className="flex items-center gap-1">

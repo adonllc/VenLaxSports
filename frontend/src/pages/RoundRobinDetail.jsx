@@ -118,7 +118,7 @@ export default function RoundRobinDetail() {
                 <span className="text-xs border border-emerald-500 text-emerald-600 rounded px-1.5 py-0.5 font-medium">Round Robin</span>
                 <span className="text-xs text-gray-500">{league.sport?.toUpperCase()}</span>
               </div>
-              <h1 className="text-2xl font-black text-gray-900">{league.name}</h1>
+              <h1 className="text-2xl font-black text-heading-dark">{league.name}</h1>
               <p className="text-gray-500 mt-1">{league.city} · {isDoubles ? "Doubles" : "Singles"}</p>
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
                 <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>
@@ -186,12 +186,12 @@ export default function RoundRobinDetail() {
           <div className="space-y-6">
             {league.description && (
               <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="font-bold text-gray-900 mb-2">About</h2>
+                <h2 className="font-bold text-heading-dark mb-2">About</h2>
                 <p className="text-gray-600 text-sm leading-relaxed">{league.description}</p>
               </div>
             )}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="font-bold text-gray-900 mb-3">Format</h2>
+              <h2 className="font-bold text-heading-dark mb-3">Format</h2>
               <ul className="text-sm text-gray-600 space-y-2">
                 <li><strong>Scoring:</strong> {rr.scoring_format || (league.sport === "tennis" ? "Fast-4" : "Games to 11")}</li>
                 <li><strong>Division:</strong> {isDoubles ? "Fixed-Partner Doubles" : "Singles"}</li>
@@ -230,8 +230,8 @@ export default function RoundRobinDetail() {
                   const isQualifier = i < (rr.playoff_threshold || 4) && isStarted;
                   return (
                     <tr key={s.id} className={isQualifier ? "bg-emerald-50" : ""}>
-                      <td className="px-4 py-3 font-bold text-gray-900">{s.rank}</td>
-                      <td className="px-4 py-3 font-medium text-gray-900">{s.player_name}</td>
+                      <td className="px-4 py-3 font-bold text-heading-dark">{s.rank}</td>
+                      <td className="px-4 py-3 font-medium text-heading-dark">{s.player_name}</td>
                       <td className="px-4 py-3 text-gray-700">{s.wins}</td>
                       <td className="px-4 py-3 text-gray-700">{s.losses}</td>
                       <td className="px-4 py-3 text-gray-700">{s.points?.toFixed(1)}</td>
@@ -256,7 +256,7 @@ export default function RoundRobinDetail() {
       {showInviteModal && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <h2 className="font-bold text-gray-900 text-lg mb-1">Register as Team</h2>
+            <h2 className="font-bold text-heading-dark text-lg mb-1">Register as Team</h2>
             <p className="text-sm text-gray-500 mb-4">Find your partner by name or email. If they're not on VenLax yet, invite them.</p>
             <div className="mb-4">
               <PartnerSearch

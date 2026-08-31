@@ -141,7 +141,7 @@ export default function PartnerSearch({ onPartnerSelect, onEmailChange }) {
                   {u.name?.[0]?.toUpperCase() || "?"}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                  <p className="text-sm font-medium text-heading-dark">{u.name}</p>
                   {u.city && <p className="text-xs text-gray-400">{u.city}</p>}
                 </div>
               </button>

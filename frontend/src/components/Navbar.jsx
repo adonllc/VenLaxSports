@@ -94,7 +94,7 @@ export default function Navbar() {
               <Link
                 key={s.id}
                 to={`/sport/${s.id}`}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-600 hover:text-heading-dark hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800"
                 data-testid={`nav-sport-${s.id}`}
               >
                 <span className="text-base leading-none">{s.icon}</span>
@@ -138,7 +138,7 @@ export default function Navbar() {
             {user?.role === "admin" && (
               <Link
                 to="/admin"
-                className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-heading-dark hover:bg-gray-50 rounded-lg transition-colors"
                 data-testid="nav-admin"
               >
                 Admin
@@ -169,7 +169,7 @@ export default function Navbar() {
                   <div className="absolute top-full right-0 mt-1.5 w-52 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg shadow-gray-900/5 p-1.5 z-50">
                     <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
                       <p className="text-xs text-gray-400 dark:text-gray-500">Signed in as</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-heading-dark dark:text-gray-100 truncate">{user.email}</p>
                     </div>
                     <Link
                       to="/dashboard"
@@ -229,7 +229,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/auth"
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-heading-dark transition-colors"
                   data-testid="nav-login"
                 >
                   Log In
@@ -250,7 +250,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+            className="md:hidden p-2 text-gray-500 hover:text-heading-dark hover:bg-gray-50 rounded-lg transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             data-testid="nav-mobile-toggle"
           >

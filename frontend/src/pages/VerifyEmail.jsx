@@ -80,7 +80,7 @@ export default function VerifyEmail() {
           <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-7 h-7 text-emerald-500" />
           </div>
-          <h1 className="font-heading font-black text-2xl text-gray-900 mb-2">Verify your email</h1>
+          <h1 className="font-heading font-black text-2xl text-heading-dark mb-2">Verify your email</h1>
           <p className="text-sm text-gray-500">
             We sent a 6-digit code to <strong className="text-gray-800">{user?.email}</strong>
           </p>

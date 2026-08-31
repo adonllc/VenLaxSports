@@ -47,7 +47,7 @@ export default function Footer() {
                 <li key={s.id}>
                   <Link
                     to={`/sport/${s.id}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
                   >
                     {s.label}
                   </Link>
@@ -75,7 +75,7 @@ export default function Footer() {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
                   >
                     {label}
                   </Link>
@@ -94,7 +94,7 @@ export default function Footer() {
                 <li key={city.name}>
                   <Link
                     to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
                   >
                     {city.icon} {city.name}
                   </Link>
@@ -112,7 +112,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => setContactOpen(true)}
-                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+                  className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
                   data-testid="footer-contact-us"
                 >
                   Contact Us
@@ -121,7 +121,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:feedback@venlaxsports.com"
-                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                  className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
                 >
                   Feedback
                 </a>

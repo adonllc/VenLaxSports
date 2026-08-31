@@ -204,7 +204,7 @@ export default function Auth() {
             <button
               onClick={() => { setMode("login"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
+              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#065F46" } : { color: "#6B7280" }}
               data-testid="login-tab"
             >
               Log In
@@ -212,14 +212,14 @@ export default function Auth() {
             <button
               onClick={() => { setMode("register"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
+              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#065F46" } : { color: "#6B7280" }}
               data-testid="register-tab"
             >
               Sign Up
             </button>
           </div>
 
-          <h1 className="font-heading font-black text-3xl mb-2" style={{ color: "#111827" }}>
+          <h1 className="font-heading font-black text-3xl mb-2" style={{ color: "#065F46" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
           <p className="text-sm mb-8" style={{ color: "#6B7280" }}>
@@ -267,7 +267,7 @@ export default function Auth() {
                   value={form.name}
                   onChange={update("name")}
                   placeholder="John Smith"
-                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                   data-testid="input-name"
                   autoComplete="name"
                   required
@@ -283,7 +283,7 @@ export default function Auth() {
                 onChange={(e) => { update("email")(e); setEmailExists(null); }}
                 placeholder="you@example.com"
                 className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                style={{ border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB", background: mode === "register" && emailExists ? "#FFFBEB" : "white", color: "#111827" }}
+                style={{ border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB", background: mode === "register" && emailExists ? "#FFFBEB" : "white", color: "#065F46" }}
                 onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                 onBlur={e => e.currentTarget.style.boxShadow="none"}
                 data-testid="input-email"
@@ -314,7 +314,7 @@ export default function Auth() {
                   onChange={update("password")}
                   placeholder={mode === "register" ? "At least 6 characters" : "Your password"}
                   className="w-full px-4 py-3 pr-12 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                  style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
                   onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                   onBlur={e => e.currentTarget.style.boxShadow="none"}
                   data-testid="input-password"
@@ -353,7 +353,7 @@ export default function Auth() {
                   <select
                     value={form.country}
                     onChange={update("country")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-country"
                   >
                     {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -366,7 +366,7 @@ export default function Auth() {
                     value={form.city}
                     onChange={update("city")}
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-city"
                     autoComplete="address-level2"
                   />
@@ -376,7 +376,7 @@ export default function Auth() {
                   <select
                     value={form.skill_level}
                     onChange={update("skill_level")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-skill-level"
                   >
                     <option value="">Select your USTA/USAPA level</option>
@@ -400,7 +400,7 @@ export default function Auth() {
                     value={form.date_of_birth}
                     onChange={update("date_of_birth")}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-dob"
@@ -416,7 +416,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_name")}
                     placeholder="e.g. Parent's name"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-name"
@@ -431,7 +431,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_phone")}
                     placeholder="e.g. +1-555-0123"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-phone"
@@ -446,7 +446,7 @@ export default function Auth() {
                     onChange={update("medical_conditions")}
                     placeholder="e.g. Asthma, allergies (confidential)"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-medical-conditions"

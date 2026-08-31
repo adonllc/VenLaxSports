@@ -133,7 +133,7 @@ export default function Leagues() {
       <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#C24A1D" }}>All Leagues</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#111827" }}>Browse Leagues</h1>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#065F46" }}>Browse Leagues</h1>
           <p className="max-w-lg" style={{ color: "#6B7280" }}>Find and join competitive leagues across all sports and cities</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function Leagues() {
               placeholder="Search leagues..."
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
               data-testid="filter-search"
             />
           </div>
@@ -169,7 +169,7 @@ export default function Leagues() {
           <select
             value={filters.sport}
             onChange={(e) => updateFilter("sport", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="filter-sport"
           >
             <option value="">All Sports</option>
@@ -182,7 +182,7 @@ export default function Leagues() {
             <select
               value={filters.season_id}
               onChange={(e) => updateFilter("season_id", e.target.value)}
-              className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+              className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
               data-testid="filter-season"
             >
               <option value="">All Seasons</option>
@@ -215,7 +215,7 @@ export default function Leagues() {
           <select
             value={filters.status}
             onChange={(e) => updateFilter("status", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="filter-status"
           >
             <option value="">Any Status</option>
@@ -296,7 +296,7 @@ export default function Leagues() {
         ) : (
           <div className="text-center py-20">
             <Trophy className="w-12 h-12 mx-auto mb-4" style={{ color: "#E5E7EB" }} />
-            <h3 className="font-heading font-bold text-xl mb-2" style={{ color: "#111827" }}>No leagues found</h3>
+            <h3 className="font-heading font-bold text-xl mb-2" style={{ color: "#065F46" }}>No leagues found</h3>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>No leagues match your current filters. Clear them to see all open leagues.</p>
           </div>
         )}
@@ -341,7 +341,7 @@ function LeagueCard({ league, onClick }) {
           ) : null}
         </div>
 
-        <h3 className="font-heading font-bold mb-1 line-clamp-2 leading-tight" style={{ color: "#111827" }}>{league.name}</h3>
+        <h3 className="font-heading font-bold mb-1 line-clamp-2 leading-tight" style={{ color: "#065F46" }}>{league.name}</h3>
 
         <div className="flex items-center gap-1 text-xs mb-1" style={{ color: "#6B7280" }}>
           <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}

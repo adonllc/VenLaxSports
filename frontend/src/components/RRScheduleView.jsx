@@ -31,7 +31,7 @@ export default function RRScheduleView({ rounds = [], currentUserId }) {
               className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors"
             >
               <div className="text-left">
-                <span className="font-bold text-gray-900">Round {rnd.round}</span>
+                <span className="font-bold text-heading-dark">Round {rnd.round}</span>
                 <span className="text-sm text-gray-500 ml-3">
                   Week of {rnd.week_start} – {rnd.week_end}
                 </span>
@@ -52,7 +52,7 @@ export default function RRScheduleView({ rounds = [], currentUserId }) {
                         data-testid={`rr-match-row-${m.match_id}`}
                         className={`px-5 py-3 flex items-center justify-between ${isUser ? "bg-emerald-50" : "bg-white"}`}
                       >
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-heading-dark">
                           {m.player1_name} <span className="text-gray-400 mx-2">vs</span> {m.player2_name}
                         </span>
                         <div className="flex items-center gap-3">

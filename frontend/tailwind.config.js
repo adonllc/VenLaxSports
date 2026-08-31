@@ -13,6 +13,9 @@ module.exports = {
                 sans: ["IBM Plex Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
                 mono: ["IBM Plex Mono", "monospace"],
             },
+            textColor: {
+                heading: "#065F46",
+            },
             colors: {
                 espresso: {
                     DEFAULT: "#1F0A03",
@@ -137,6 +140,7 @@ module.exports = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
+                "heading-dark": "#065F46",
             },
             borderRadius: {
                 lg: "var(--radius)",

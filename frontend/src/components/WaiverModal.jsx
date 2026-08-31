@@ -13,7 +13,7 @@ export default function WaiverModal({ isOpen, onAgree, onCancel }) {
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600" />
-            <h2 className="font-heading font-black text-lg text-gray-900">Liability Waiver</h2>
+            <h2 className="font-heading font-black text-lg text-heading-dark">Liability Waiver</h2>
           </div>
           <button
             onClick={onCancel}
@@ -36,28 +36,28 @@ export default function WaiverModal({ isOpen, onAgree, onCancel }) {
           {/* Waiver content */}
           <div className="space-y-4 text-xs">
             <div>
-              <p className="font-bold text-gray-900 mb-2">1. Assumption of Risk</p>
+              <p className="font-bold text-heading-dark mb-2">1. Assumption of Risk</p>
               <p className="text-gray-700 leading-relaxed">
                 You understand that racquet and paddle sports involve inherent risks including slips, falls, collisions, dehydration, heat exhaustion, errant equipment, and unsafe court conditions. You voluntarily assume all risks.
               </p>
             </div>
 
             <div>
-              <p className="font-bold text-gray-900 mb-2">2. Court & Facility Disclaimer</p>
+              <p className="font-bold text-heading-dark mb-2">2. Court & Facility Disclaimer</p>
               <p className="text-gray-700 leading-relaxed">
                 VenLax does not inspect, maintain, or guarantee court safety. You are responsible for checking court conditions and stopping play if unsafe.
               </p>
             </div>
 
             <div>
-              <p className="font-bold text-gray-900 mb-2">3. Limitation of Liability</p>
+              <p className="font-bold text-heading-dark mb-2">3. Limitation of Liability</p>
               <p className="text-gray-700 leading-relaxed">
                 VenLax is not liable for injuries, property damage, court conditions, organizer actions, weather, scheduling issues, or rating changes. Total liability is limited to your season entry fee.
               </p>
             </div>
 
             <div>
-              <p className="font-bold text-gray-900 mb-2">4. Agreement</p>
+              <p className="font-bold text-heading-dark mb-2">4. Agreement</p>
               <p className="text-gray-700 leading-relaxed">
                 By clicking "I Agree," you confirm you have read this waiver, understand all terms, and voluntarily agree to participate in VenLax at your own risk. This waiver is binding to the maximum extent permitted by law.
               </p>
@@ -75,7 +75,7 @@ export default function WaiverModal({ isOpen, onAgree, onCancel }) {
               className="w-4 h-4 rounded border-gray-300"
               data-testid="waiver-modal-agree-checkbox"
             />
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-heading-dark">
               I acknowledge and agree to this Liability Waiver and Participation Agreement
             </span>
           </label>
@@ -83,7 +83,7 @@ export default function WaiverModal({ isOpen, onAgree, onCancel }) {
           <div className="flex gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 px-4 py-2 text-sm font-semibold text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-sm font-semibold text-heading-dark bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               data-testid="waiver-modal-decline"
             >
               Decline

@@ -67,7 +67,7 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
           {selected.name?.[0]?.toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">{selected.name}</p>
+          <p className="text-sm font-medium text-heading-dark truncate">{selected.name}</p>
           <p className="text-xs text-gray-500 truncate">{selected.email}</p>
         </div>
         <button
@@ -117,7 +117,7 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
                 <User className="w-3 h-3 text-gray-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-heading-dark truncate">
                   {u.name}
                   <span className="text-xs text-gray-400 ml-1.5">
                     {u.gender === "male" ? "(M)" : u.gender === "female" ? "(F)" : ""}

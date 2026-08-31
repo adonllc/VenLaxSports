@@ -101,7 +101,7 @@ export default function PublicProfile() {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-heading font-black text-2xl text-gray-900">{profile.name}</h1>
+                <h1 className="font-heading font-black text-2xl text-heading-dark">{profile.name}</h1>
                 {profile.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge-public">
                     ★ Founding Member
@@ -131,11 +131,11 @@ export default function PublicProfile() {
           {/* Stats row */}
           <div className="mt-5 flex gap-6">
             <div className="text-center">
-              <p className="text-2xl font-black text-gray-900">{profile.wins}</p>
+              <p className="text-2xl font-black text-heading-dark">{profile.wins}</p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Wins</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-black text-gray-900">{profile.losses}</p>
+              <p className="text-2xl font-black text-heading-dark">{profile.losses}</p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Losses</p>
             </div>
             <div className="text-center">
@@ -173,7 +173,7 @@ export default function PublicProfile() {
         {/* ELO chart */}
         {chartData.length > 1 && (
           <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <h2 className="font-heading font-bold text-gray-900 mb-5">Rating History</h2>
+            <h2 className="font-heading font-bold text-heading-dark mb-5">Rating History</h2>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 16 }}>
                 <XAxis
@@ -204,7 +204,7 @@ export default function PublicProfile() {
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2">
               <Trophy className="w-4 h-4 text-yellow-500" />
-              <h2 className="font-heading font-bold text-gray-900">Recent Matches</h2>
+              <h2 className="font-heading font-bold text-heading-dark">Recent Matches</h2>
             </div>
             <div className="divide-y divide-gray-50">
               {profile.recent_matches.map((m, i) => {

@@ -36,7 +36,7 @@ export default function Standings() {
 
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-6 border-b border-gray-100">
-            <h1 className="font-heading font-black text-2xl text-gray-900">Standings</h1>
+            <h1 className="font-heading font-black text-2xl text-heading-dark">Standings</h1>
             {league && <p className={`text-sm font-medium mt-1 ${accentClass}`}>{league.name}</p>}
           </div>
 
@@ -65,7 +65,7 @@ export default function Standings() {
                       <td className="px-6 py-4 text-gray-400 font-heading font-bold">
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-heading-dark">
                         <Link
                           to={`/players/${s.player_id}`}
                           className="hover:underline"
@@ -78,7 +78,7 @@ export default function Standings() {
                       <td className="px-4 py-4 text-center text-red-500">{s.losses}</td>
                       <td className="px-4 py-4 text-center text-gray-500">{s.draws || 0}</td>
                       <td className="px-4 py-4 text-center text-gray-600">{s.matches_played}</td>
-                      <td className="px-4 py-4 text-center font-heading font-black text-gray-900 text-lg">{s.points}</td>
+                      <td className="px-4 py-4 text-center font-heading font-black text-heading-dark text-lg">{s.points}</td>
                     </tr>
                   ))}
                 </tbody>

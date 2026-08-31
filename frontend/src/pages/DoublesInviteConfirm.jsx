@@ -111,7 +111,7 @@ export default function DoublesInviteConfirm() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-4xl mb-4">&#128336;</div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Invite Expired</h1>
+          <h1 className="text-xl font-semibold text-heading-dark mb-2">Invite Expired</h1>
           <p className="text-sm text-gray-600">This invite link expired after 72 hours. Ask your partner to send a new invite.</p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function DoublesInviteConfirm() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-4xl mb-4">&#10003;</div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">You're Registered!</h1>
+          <h1 className="text-xl font-semibold text-heading-dark mb-2">You're Registered!</h1>
           <p className="text-sm text-gray-600 mb-4">
             {inviteData
               ? `You and ${inviteData.initiator_name} are confirmed for ${inviteData.league_name}.`
@@ -145,7 +145,7 @@ export default function DoublesInviteConfirm() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-4xl mb-4">&#10007;</div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Invite Declined</h1>
+          <h1 className="text-xl font-semibold text-heading-dark mb-2">Invite Declined</h1>
           <p className="text-sm text-gray-600">The invite has been declined. Your partner has been notified.</p>
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function DoublesInviteConfirm() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-4xl mb-4">&#9888;</div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Invalid Invite</h1>
+          <h1 className="text-xl font-semibold text-heading-dark mb-2">Invalid Invite</h1>
           <p className="text-sm text-gray-600">{errorMsg || "This invite link is invalid."}</p>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function DoublesInviteConfirm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8">
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">Doubles Partner Invite</h1>
+        <h1 className="text-xl font-semibold text-heading-dark mb-1">Doubles Partner Invite</h1>
         {inviteData && (
           <p className="text-sm text-gray-600 mb-6">
             <span className="font-medium">{inviteData.initiator_name}</span> invited you to join{" "}

@@ -105,7 +105,7 @@ export default function Waiver() {
         {/* Content sections */}
         {WAIVER_SECTIONS.map((section, i) => (
           <div key={i} className="bg-gray-50 border border-gray-100 rounded-lg p-6">
-            <h2 className="font-heading font-bold text-lg text-gray-900 mb-4">{section.title}</h2>
+            <h2 className="font-heading font-bold text-lg text-heading-dark mb-4">{section.title}</h2>
             <ul className="space-y-2">
               {section.content.map((line, j) => (
                 <li key={j} className={`text-sm ${line.startsWith("•") ? "ml-4 text-gray-700" : "text-gray-700 leading-relaxed font-medium"}`}>

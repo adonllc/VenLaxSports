@@ -7,7 +7,7 @@ const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 const METHOD_VISUALS = {
   stripe: { icon: <CreditCard className="w-4 h-4" />, color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   apple_pay: { icon: <span className="font-bold"></span>, color: "bg-black text-white border-black" },
-  google_pay: { icon: <span className="font-bold">G</span>, color: "bg-white text-gray-900 border-gray-300" },
+  google_pay: { icon: <span className="font-bold">G</span>, color: "bg-white text-heading-dark border-gray-300" },
   zelle: { icon: <span className="font-black">Z</span>, color: "bg-purple-50 text-purple-700 border-purple-200" },
 };
 
@@ -111,7 +111,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
 
         <div className="mb-5">
           <p className="text-xs uppercase tracking-wider font-semibold text-gray-500">Complete registration</p>
-          <h2 id="payment-modal-title" className="font-heading font-black text-xl text-gray-900 mt-1 truncate">{league.name}</h2>
+          <h2 id="payment-modal-title" className="font-heading font-black text-xl text-heading-dark mt-1 truncate">{league.name}</h2>
           <p className="text-sm text-gray-500 mt-1 capitalize">{league.format} · {league.city}</p>
         </div>
 

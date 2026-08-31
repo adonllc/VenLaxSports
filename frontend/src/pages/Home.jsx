@@ -416,7 +416,7 @@ export default function Home() {
         <motion.button
           onClick={() => navigate("/auth")}
           className="px-8 py-4 rounded-lg font-semibold transition-all"
-          style={{ backgroundColor: "#D4AF37", color: "#1F2937" }}
+          style={{ backgroundColor: "#D4AF37", color: "#065F46" }}
           whileHover={{ scale: 1.08, y: -4, boxShadow: "0 20px 40px rgba(212,175,55,0.4)" }}
           whileTap={{ scale: 0.95 }}
         >

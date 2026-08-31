@@ -232,7 +232,7 @@ export default function AdminDashboard() {
   const STAT_CARDS = stats ? [
     { label: "Total Users", value: stats.total_users, icon: Users, color: "#374151", bg: "#F3F4F6", border: "#E5E7EB" },
     { label: "Total Leagues", value: stats.total_leagues, icon: Trophy, color: "#C24A1D", bg: "#FAE0D5", border: "#E5A885" },
-    { label: "Total Matches", value: stats.total_matches, icon: Calendar, color: "#111827", bg: "#FFFFFF", border: "#E5E7EB" },
+    { label: "Total Matches", value: stats.total_matches, icon: Calendar, color: "#065F46", bg: "#FFFFFF", border: "#E5E7EB" },
     { label: "Revenue (USD)", value: `$${stats.total_revenue?.toFixed(2) || "0.00"}`, icon: DollarSign, color: "#065F46", bg: "#EDF7F3", border: "#0B6E4F" },
   ] : [];
 
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-heading font-black text-2xl" style={{ color: "#111827" }}>Admin Dashboard</h1>
+              <h1 className="font-heading font-black text-2xl" style={{ color: "#065F46" }}>Admin Dashboard</h1>
               <p className="text-sm" style={{ color: "#6B7280" }}>Manage leagues, players, and platform analytics</p>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
             {stats && (
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-                  <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#111827" }}>Sport Breakdown</h3>
+                  <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#065F46" }}>Sport Breakdown</h3>
                   {Object.entries(stats.sport_breakdown || {}).map(([sport, count]) => (
                     <div key={sport} className="flex items-center gap-3 mb-3">
                       <span className="text-sm font-medium w-20 capitalize" style={{ color: "#374151" }}>{sport}</span>
@@ -308,16 +308,16 @@ export default function AdminDashboard() {
                           style={{ width: `${Math.min((count / stats.total_leagues) * 100, 100)}%` }}
                         />
                       </div>
-                      <span className="text-sm font-bold w-6" style={{ color: "#111827" }}>{count}</span>
+                      <span className="text-sm font-bold w-6" style={{ color: "#065F46" }}>{count}</span>
                     </div>
                   ))}
                 </div>
                 <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-                  <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#111827" }}>Country Breakdown</h3>
+                  <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#065F46" }}>Country Breakdown</h3>
                   {Object.entries(stats.country_breakdown || {}).map(([country, count]) => (
                     <div key={country} className="flex items-center justify-between py-2 last:border-0" style={{ borderBottom: "1px solid #F3F4F6" }}>
                       <span className="text-sm font-medium" style={{ color: "#374151" }}>{country === "USA" ? "🇺🇸 USA" : "🇮🇳 India"}</span>
-                      <span className="font-heading font-bold text-lg" style={{ color: "#111827" }}>{count}</span>
+                      <span className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>{count}</span>
                     </div>
                   ))}
                 </div>
@@ -331,8 +331,8 @@ export default function AdminDashboard() {
           <div>
             <div className="mb-6">
               <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid #E5E7EB" }}>
-                <h2 className="font-heading font-bold text-2xl mb-2" style={{ color: "#111827" }}>Registered Users</h2>
-                <p className="text-sm" style={{ color: "#6B7280" }}>Total: <span className="font-bold" style={{ color: "#111827" }}>{users.length}</span></p>
+                <h2 className="font-heading font-bold text-2xl mb-2" style={{ color: "#065F46" }}>Registered Users</h2>
+                <p className="text-sm" style={{ color: "#6B7280" }}>Total: <span className="font-bold" style={{ color: "#065F46" }}>{users.length}</span></p>
               </div>
             </div>
             {users && users.length > 0 ? (
@@ -352,9 +352,9 @@ export default function AdminDashboard() {
                     <tbody>
                       {users.map((u, i) => (
                         <tr key={u._id} style={{ borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }} data-testid="user-row">
-                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.email}</td>
-                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.full_name || "—"}</td>
-                          <td className="px-6 py-4 text-sm" style={{ color: "#111827" }}>{u.country || "—"}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#065F46" }}>{u.email}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#065F46" }}>{u.full_name || "—"}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#065F46" }}>{u.country || "—"}</td>
                           <td className="px-6 py-4 text-sm" style={{ color: "#6B7280" }}>
                             {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
                           </td>
@@ -392,22 +392,22 @@ export default function AdminDashboard() {
         {tab === "create" && (
           <div className="max-w-2xl">
             <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h2 className="font-heading font-bold text-xl mb-6" style={{ color: "#111827" }}>Create New League</h2>
+              <h2 className="font-heading font-bold text-xl mb-6" style={{ color: "#065F46" }}>Create New League</h2>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>League Name *</label>
-                    <input type="text" value={form.name} onChange={update("name")} placeholder="e.g. NYC Tennis Open S1" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} required data-testid="create-league-name" />
+                    <input type="text" value={form.name} onChange={update("name")} placeholder="e.g. NYC Tennis Open S1" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} required data-testid="create-league-name" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Sport *</label>
-                    <select value={form.sport} onChange={update("sport")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-sport">
+                    <select value={form.sport} onChange={update("sport")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-sport">
                       {SPORTS.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Format *</label>
-                    <select value={form.format} onChange={update("format")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-format">
+                    <select value={form.format} onChange={update("format")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-format">
                       {(FORMATS[form.sport] || []).map((f) => <option key={f} value={f}>{FORMAT_LABELS[f] ?? f}</option>)}
                     </select>
                   </div>
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
                           division_ntrp_max: ranges[1] ?? null,
                         }));
                       }}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                      className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                     >
                       <option value="">Open Division (no skill gate)</option>
                       <option value="Beginner">Beginner (2.5–3.0 NTRP / 2.0–3.0 DUPR)</option>
@@ -451,14 +451,14 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Country *</label>
-                    <select value={form.country} onChange={update("country")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-country">
+                    <select value={form.country} onChange={update("country")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-country">
                       {activeCountry === "USA" && <option value="USA">🇺🇸 USA</option>}
                       {activeCountry === "India" && <option value="India">🇮🇳 India</option>}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>City *</label>
-                    <input type="text" value={form.city} onChange={update("city")} placeholder="Any city — e.g. Austin, Boise, or All Cities" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} required data-testid="create-league-city" list="cities-list" />
+                    <input type="text" value={form.city} onChange={update("city")} placeholder="Any city — e.g. Austin, Boise, or All Cities" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} required data-testid="create-league-city" list="cities-list" />
                     <datalist id="cities-list">
                       <option value="All Cities" />
                       {cities.filter((c) => c.country === form.country).map((c) => <option key={c.name} value={c.name} />)}
@@ -466,23 +466,23 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Entry Fee ({form.currency})</label>
-                    <input type="number" min="0" step="0.01" value={form.entry_fee} onChange={update("entry_fee")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-fee" />
+                    <input type="number" min="0" step="0.01" value={form.entry_fee} onChange={update("entry_fee")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-fee" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Max Players</label>
-                    <input type="number" min="2" max="100" value={form.max_players} onChange={update("max_players")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-max-players" />
+                    <input type="number" min="2" max="100" value={form.max_players} onChange={update("max_players")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-max-players" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Start Date *</label>
-                    <input type="date" value={form.start_date} onChange={update("start_date")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} required data-testid="create-league-start" />
+                    <input type="date" value={form.start_date} onChange={update("start_date")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} required data-testid="create-league-start" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>End Date *</label>
-                    <input type="date" value={form.end_date} onChange={update("end_date")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} required data-testid="create-league-end" />
+                    <input type="date" value={form.end_date} onChange={update("end_date")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} required data-testid="create-league-end" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Season</label>
-                    <select value={form.season_id || ""} onChange={update("season_id")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-season">
+                    <select value={form.season_id || ""} onChange={update("season_id")} className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-season">
                       <option value="">— None —</option>
                       {seasons.filter((s) => s.sport === form.sport).map((s) => (
                         <option key={s.id} value={s.id}>{s.name} ({s.status})</option>
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Venue</label>
-                    <input type="text" value={form.venue} onChange={update("venue")} placeholder="e.g. Central Park Tennis Center" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }} data-testid="create-league-venue" />
+                    <input type="text" value={form.venue} onChange={update("venue")} placeholder="e.g. Central Park Tennis Center" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }} data-testid="create-league-venue" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Description</label>
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
         {tab === "leagues" && (
           <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>All Leagues ({leagues.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>All Leagues ({leagues.length})</h2>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                 <button
                   data-testid="btn-create-rr-league"
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                 <tbody className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                   {leagues.map((l) => (
                     <tr key={l.id} style={{ background: "white" }} onMouseEnter={e => e.currentTarget.style.background = "#FFFFFF"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
-                      <td className="px-5 py-3 font-medium max-w-[200px] truncate" style={{ color: "#111827" }}>{l.name}</td>
+                      <td className="px-5 py-3 font-medium max-w-[200px] truncate" style={{ color: "#065F46" }}>{l.name}</td>
                       <td className="px-5 py-3 capitalize" style={{ color: "#374151" }}>{l.sport}</td>
                       <td className="px-5 py-3" style={{ color: "#374151" }}>{l.city}</td>
                       <td className="px-5 py-3" style={{ color: "#374151" }}>{l.current_players || 0}/{l.max_players}</td>
@@ -559,7 +559,7 @@ export default function AdminDashboard() {
                           value={l.status}
                           onChange={(e) => handleStatusChange(l.id, e.target.value)}
                           className="text-xs px-2 py-1 rounded-lg bg-white focus:outline-none"
-                          style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                          style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                           data-testid={`league-status-${l.id}`}
                         >
                           <option value="registration">Registration</option>
@@ -620,7 +620,7 @@ export default function AdminDashboard() {
         {tab === "ladders" && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#111827" }}>Create Challenge Ladder</h3>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#065F46" }}>Create Challenge Ladder</h3>
               {ladderMsg && (
                 <div className="mb-4 text-sm px-3 py-2 rounded-lg" style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", color: "#374151" }} data-testid="ladder-msg">{ladderMsg}</div>
               )}
@@ -631,7 +631,7 @@ export default function AdminDashboard() {
                     data-testid="ladder-city-select"
                     value={ladderForm.city}
                     onChange={(e) => setLadderForm((f) => ({ ...f, city: e.target.value }))}
-                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   >
                     <option value="">Select city</option>
                     {cities.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
@@ -643,7 +643,7 @@ export default function AdminDashboard() {
                     data-testid="ladder-sport-select"
                     value={ladderForm.sport}
                     onChange={(e) => setLadderForm((f) => ({ ...f, sport: e.target.value }))}
-                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   >
                     {SPORTS.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
                   </select>
@@ -654,7 +654,7 @@ export default function AdminDashboard() {
                     data-testid="ladder-division-select"
                     value={ladderForm.division_label}
                     onChange={(e) => setLadderForm((f) => ({ ...f, division_label: e.target.value }))}
-                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   >
                     {["Beginner", "Intermediate", "Advanced", "Competitive"].map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -667,7 +667,7 @@ export default function AdminDashboard() {
                     data-testid="ladder-format-select"
                     value={ladderForm.format}
                     onChange={(e) => setLadderForm((f) => ({ ...f, format: e.target.value }))}
-                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   >
                     <option value="singles">Singles</option>
                     <option value="doubles">Doubles</option>
@@ -686,7 +686,7 @@ export default function AdminDashboard() {
 
             <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
               <div className="p-5 flex items-center justify-between" style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <h3 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Existing Ladders</h3>
+                <h3 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>Existing Ladders</h3>
                 <span className="text-sm" style={{ color: "#6B7280" }}>{ladders.length} total</span>
               </div>
               {ladders.length === 0 ? (
@@ -696,7 +696,7 @@ export default function AdminDashboard() {
                   {ladders.map((l) => (
                     <div key={l.id} className="px-5 py-4 flex items-center justify-between">
                       <div>
-                        <p className="font-medium" style={{ color: "#111827" }}>{l.city} — {l.division_label} {l.sport.charAt(0).toUpperCase() + l.sport.slice(1)} ({l.format})</p>
+                        <p className="font-medium" style={{ color: "#065F46" }}>{l.city} — {l.division_label} {l.sport.charAt(0).toUpperCase() + l.sport.slice(1)} ({l.format})</p>
                         <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{l.entry_count ?? 0} players</p>
                       </div>
                       <a
@@ -737,7 +737,7 @@ export default function AdminDashboard() {
           aria-labelledby="rr-modal-title"
         >
           <div className="bg-white rounded-2xl p-6 max-w-lg w-full my-8 overscroll-contain" style={{ border: "1px solid #E5E7EB" }}>
-            <h2 id="rr-modal-title" className="font-bold text-lg mb-4" style={{ color: "#111827" }}>Create Round Robin League</h2>
+            <h2 id="rr-modal-title" className="font-bold text-lg mb-4" style={{ color: "#065F46" }}>Create Round Robin League</h2>
             <div className="space-y-4">
               {[
                 { label: "Name", field: "name", type: "text" },
@@ -754,7 +754,7 @@ export default function AdminDashboard() {
                     type={type}
                     value={rrFormData[field]}
                     onChange={e => setRRFormData(d => ({ ...d, [field]: e.target.value }))}
-                    className="w-full rounded-md px-3 py-2 text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   />
                 </div>
               ))}
@@ -764,7 +764,7 @@ export default function AdminDashboard() {
                   data-testid="rr-form-sport"
                   value={rrFormData.sport}
                   onChange={e => setRRFormData(d => ({ ...d, sport: e.target.value }))}
-                  className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                  className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                 >
                   <option value="tennis">Tennis</option>
                   <option value="pickleball">Pickleball</option>
@@ -780,7 +780,7 @@ export default function AdminDashboard() {
                     format: e.target.value,
                     rr_config: { ...d.rr_config, division_type: e.target.value }
                   }))}
-                  className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                  className="w-full rounded-md px-3 py-2 text-sm bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                 >
                   <option value="singles">Singles</option>
                   <option value="doubles">Fixed-Partner Doubles</option>
@@ -801,7 +801,7 @@ export default function AdminDashboard() {
                       ...d,
                       rr_config: { ...d.rr_config, [field]: parseInt(e.target.value) || 0 }
                     }))}
-                    className="w-full rounded-md px-3 py-2 text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                    className="w-full rounded-md px-3 py-2 text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
                   />
                 </div>
               ))}
@@ -893,13 +893,13 @@ function SeasonsTab() {
           <input
             type="text" required value={form.name} placeholder="e.g. Summer 2026"
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             aria-label="Season name"
             data-testid="season-name-input"
           />
           <select
             value={form.sport} onChange={(e) => setForm((f) => ({ ...f, sport: e.target.value }))}
-            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="season-sport-select"
           >
             {activeSportIds.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
@@ -908,14 +908,14 @@ function SeasonsTab() {
             <input
               type="date" required value={form.start_date}
               onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
-              className="px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+              className="px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
               aria-label="Season start date"
               data-testid="season-start-input"
             />
             <input
               type="date" required value={form.end_date}
               onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))}
-              className="px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+              className="px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
               aria-label="Season end date"
               data-testid="season-end-input"
             />
@@ -939,7 +939,7 @@ function SeasonsTab() {
             {seasons.map((s) => (
               <div key={s.id} className="rounded-xl p-4 flex items-center justify-between gap-3" style={{ border: "1px solid #F3F4F6" }} data-testid={`season-row-${s.id}`}>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{s.name} <span className="text-xs text-gray-400 font-normal capitalize ml-1">({s.sport})</span></p>
+                  <p className="text-sm font-semibold text-heading-dark truncate">{s.name} <span className="text-xs text-gray-400 font-normal capitalize ml-1">({s.sport})</span></p>
                   <p className="text-xs text-gray-500 mt-0.5">{s.start_date} → {s.end_date}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1009,7 +1009,7 @@ function PlayoffsTab({ leagues }) {
         <form onSubmit={handleGenerate} className="space-y-3">
           <select
             required value={leagueId} onChange={(e) => setLeagueId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="playoff-league-select"
           >
             <option value="">Choose a league...</option>
@@ -1017,7 +1017,7 @@ function PlayoffsTab({ leagues }) {
           </select>
           <select
             value={topN} onChange={(e) => setTopN(Number(e.target.value))}
-            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="playoff-top-n"
           >
             <option value={2}>Top 2 — Final only</option>
@@ -1027,7 +1027,7 @@ function PlayoffsTab({ leagues }) {
           </select>
           <input
             type="date" required value={date} onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+            className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
             data-testid="playoff-date-input"
           />
           {msg && (
@@ -1135,7 +1135,7 @@ function AutoGenerateTab({ onSuccess }) {
           <p className="text-sm text-gray-500">Run the generator to see what was created.</p>
         ) : (
           <div data-testid="auto-result">
-            <p className="text-sm font-medium text-gray-900 mb-3">{result.message}</p>
+            <p className="text-sm font-medium text-heading-dark mb-3">{result.message}</p>
             {result.created?.length > 0 && (
               <div className="space-y-1.5 max-h-64 overflow-y-auto">
                 {result.created.map((c) => (
@@ -1232,10 +1232,10 @@ function ZelleQueueTab() {
               {queue.map((txn) => (
                 <tr key={txn.session_id} className="hover:bg-gray-50" data-testid={`zelle-row-${txn.session_id}`}>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{txn.user_email}</div>
+                    <div className="font-medium text-heading-dark">{txn.user_email}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-700">{txn.league_name}</td>
-                  <td className="px-4 py-3 font-semibold text-gray-900">${Number(txn.amount).toFixed(2)}</td>
+                  <td className="px-4 py-3 font-semibold text-heading-dark">${Number(txn.amount).toFixed(2)}</td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-600">{txn.memo || "—"}</td>
                   <td className="px-4 py-3 font-mono text-xs text-purple-700 font-semibold">{txn.reference_number || "—"}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs">{txn.updated_at ? new Date(txn.updated_at).toLocaleDateString() : new Date(txn.created_at).toLocaleDateString()}</td>
@@ -1325,7 +1325,7 @@ function WaitlistTab() {
     <div className="space-y-6" data-testid="waitlist-tab">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
-          <div className="text-3xl font-bold text-gray-900">{data.total}</div>
+          <div className="text-3xl font-bold text-heading-dark">{data.total}</div>
           <div className="text-xs text-gray-500 mt-1">Total signups</div>
         </div>
         {data.by_sport.tennis !== undefined && (
@@ -1354,7 +1354,7 @@ function WaitlistTab() {
           <div className="flex flex-wrap gap-2">
             {data.by_city.map(([city, count]) => (
               <span key={city} className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
-                {city} <span className="font-semibold text-gray-900">{count}</span>
+                {city} <span className="font-semibold text-heading-dark">{count}</span>
               </span>
             ))}
           </div>
@@ -1403,7 +1403,7 @@ function WaitlistTab() {
                 filtered.map((e, i) => (
                   <tr key={e.email} className="hover:bg-gray-50">
                     <td className="px-3 sm:px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
-                    <td className="px-3 sm:px-4 py-3 font-medium text-gray-900 text-xs sm:text-sm max-w-[150px] sm:max-w-none truncate">{e.email}</td>
+                    <td className="px-3 sm:px-4 py-3 font-medium text-heading-dark text-xs sm:text-sm max-w-[150px] sm:max-w-none truncate">{e.email}</td>
                     <td className="hidden sm:table-cell px-3 sm:px-4 py-3 text-gray-600 text-sm">{e.city}</td>
                     <td className="px-3 sm:px-4 py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${

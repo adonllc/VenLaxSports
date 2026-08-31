@@ -55,7 +55,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Rating History</p>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="font-heading font-black text-2xl text-gray-900" data-testid="rating-current">
+            <span className="font-heading font-black text-2xl text-heading-dark" data-testid="rating-current">
               {currentRating?.toFixed(2)}
             </span>
             {chartData.length > 0 && (
@@ -80,7 +80,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
               type="button"
               onClick={() => setSport(s)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                sport === s ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"
+                sport === s ? "bg-white shadow text-heading-dark" : "text-gray-500 hover:text-gray-700"
               }`}
               data-testid={`rating-sport-tab-${s}`}
             >
@@ -115,7 +115,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
           {chartData.map((d) => (
             <div key={d.idx} className="text-xs p-2 border border-gray-100 rounded-md hover:bg-gray-50">
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-900">Match #{d.idx}</span>
+                <span className="font-semibold text-heading-dark">Match #{d.idx}</span>
                 <span className={`font-bold ${d.delta > 0 ? "text-emerald-600" : d.delta < 0 ? "text-red-500" : "text-gray-400"}`}>
                   {d.delta > 0 ? "+" : ""}{d.delta?.toFixed(2)}
                 </span>

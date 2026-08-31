@@ -67,7 +67,7 @@ export default function RoundRobinInvite() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <AlertCircle size={40} className="text-red-400 mx-auto mb-4" />
-          <h1 className="font-bold text-gray-900 text-lg mb-2">Invite Unavailable</h1>
+          <h1 className="font-bold text-heading-dark text-lg mb-2">Invite Unavailable</h1>
           <p className="text-gray-500 text-sm mb-6">{error}</p>
           <p className="text-xs text-gray-400">Contact your inviter to send a new invite link.</p>
         </div>
@@ -80,7 +80,7 @@ export default function RoundRobinInvite() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <Trophy size={40} className="text-emerald-500 mx-auto mb-4" />
-          <h1 className="font-bold text-gray-900 text-lg mb-2">You're in!</h1>
+          <h1 className="font-bold text-heading-dark text-lg mb-2">You're in!</h1>
           <p className="text-gray-500 text-sm">Redirecting to league...</p>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function RoundRobinInvite() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
       <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
         <div className="text-3xl mb-4">{invite?.sport === "tennis" ? "🎾" : "🏓"}</div>
-        <h1 className="font-black text-gray-900 text-xl mb-1">You're invited!</h1>
+        <h1 className="font-black text-heading-dark text-xl mb-1">You're invited!</h1>
         <p className="text-gray-500 text-sm mb-6">
           <strong>{invite?.inviter_name}</strong> wants you as their doubles partner
         </p>
@@ -99,11 +99,11 @@ export default function RoundRobinInvite() {
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-left mb-6 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">League</span>
-            <span className="font-medium text-gray-900">{invite?.league_name}</span>
+            <span className="font-medium text-heading-dark">{invite?.league_name}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Sport</span>
-            <span className="font-medium text-gray-900">{invite?.sport?.toUpperCase()}</span>
+            <span className="font-medium text-heading-dark">{invite?.sport?.toUpperCase()}</span>
           </div>
         </div>
 

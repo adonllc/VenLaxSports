@@ -239,11 +239,11 @@ export default function ScoreReport() {
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${config.accentClass}`}>
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h2 className="font-heading font-black text-2xl text-gray-900 mb-1">Results Recorded</h2>
+              <h2 className="font-heading font-black text-2xl text-heading-dark mb-1">Results Recorded</h2>
               <p className={`text-sm font-medium ${config.textClass} mb-6`}>{config.label} Match</p>
               <div className="bg-gray-50 rounded-xl p-4 mb-5 text-left">
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Winner</p>
-                <p className="font-heading font-bold text-xl text-gray-900">{submittedResult.winnerName}</p>
+                <p className="font-heading font-bold text-xl text-heading-dark">{submittedResult.winnerName}</p>
                 {submittedResult.summary && (
                   <p className="text-sm text-gray-500 mt-1 font-mono">{submittedResult.summary}</p>
                 )}
@@ -256,7 +256,7 @@ export default function ScoreReport() {
           <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-center" data-testid="share-card">
             <p className="text-gray-500 text-xs uppercase tracking-widest mb-3">Share your result</p>
             <div className="text-4xl mb-2">{sportEmoji}</div>
-            <p className="text-gray-900 font-heading font-black text-xl mb-1">
+            <p className="text-heading-dark font-heading font-black text-xl mb-1">
               {submittedResult.winnerName} won
             </p>
             <p className="text-gray-500 text-sm mb-5">
@@ -309,13 +309,13 @@ export default function ScoreReport() {
                   <Trophy className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="font-heading font-bold text-xl text-gray-900">Match Scored</h1>
+                  <h1 className="font-heading font-bold text-xl text-heading-dark">Match Scored</h1>
                   <p className={`text-sm ${config.textClass}`}>{config.label}</p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <p className="text-xs text-gray-500 mb-1">Winner</p>
-                <p className="font-heading font-bold text-lg text-gray-900">{match.winner_name}</p>
+                <p className="font-heading font-bold text-lg text-heading-dark">{match.winner_name}</p>
               </div>
             </div>
           </div>
@@ -347,7 +347,7 @@ export default function ScoreReport() {
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-heading font-bold text-xl text-gray-900">Report Match Score</h1>
+                <h1 className="font-heading font-bold text-xl text-heading-dark">Report Match Score</h1>
                 <p className={`text-sm ${config.textClass}`}>{config.label} Match</p>
               </div>
             </div>
@@ -356,12 +356,12 @@ export default function ScoreReport() {
             <div className="bg-gray-50 rounded-xl p-4 mb-6">
               <div className="flex items-center justify-between">
                 <div className="text-center flex-1 min-w-0 px-2">
-                  <p className="font-heading font-bold text-base text-gray-900 truncate">{match.player1_name}</p>
+                  <p className="font-heading font-bold text-base text-heading-dark truncate">{match.player1_name}</p>
                   <p className="text-xs text-gray-500">Player 1</p>
                 </div>
                 <div className="text-gray-400 font-bold text-sm px-2 shrink-0">VS</div>
                 <div className="text-center flex-1 min-w-0 px-2">
-                  <p className="font-heading font-bold text-base text-gray-900 truncate">{match.player2_name}</p>
+                  <p className="font-heading font-bold text-base text-heading-dark truncate">{match.player2_name}</p>
                   <p className="text-xs text-gray-500">Player 2</p>
                 </div>
               </div>
@@ -650,27 +650,27 @@ export default function ScoreReport() {
               <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-6 space-y-4">
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Confirm Score</h2>
+                    <h2 className="text-lg font-bold text-heading-dark dark:text-gray-100">Confirm Score</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Review before submitting</p>
                   </div>
 
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Winner:</span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                      <span className="text-sm font-bold text-heading-dark dark:text-gray-100">
                         {winnerId === match.player1_id ? match.player1_name : match.player2_name}
                       </span>
                     </div>
                     {!retired && scoreSummary && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Score:</span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{scoreSummary.scoreStr}</span>
+                        <span className="text-sm font-bold text-heading-dark dark:text-gray-100">{scoreSummary.scoreStr}</span>
                       </div>
                     )}
                     {retired && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Result:</span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">Retired / Walkover</span>
+                        <span className="text-sm font-bold text-heading-dark dark:text-gray-100">Retired / Walkover</span>
                       </div>
                     )}
                   </div>

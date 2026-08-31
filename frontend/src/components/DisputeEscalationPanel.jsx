@@ -81,7 +81,7 @@ export default function DisputeEscalationPanel({ leagueId, isOrganizerView = fal
 
   return (
     <div className="space-y-4">
-      <h3 className="font-heading font-bold text-lg text-gray-900">
+      <h3 className="font-heading font-bold text-lg text-heading-dark">
         {isOrganizerView ? "Dispute Escalation Queue" : "My Disputes"}
       </h3>
 
@@ -96,7 +96,7 @@ export default function DisputeEscalationPanel({ leagueId, isOrganizerView = fal
             >
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <p className="font-semibold text-sm text-gray-900">{d.dispute_type}</p>
+                  <p className="font-semibold text-sm text-heading-dark">{d.dispute_type}</p>
                   <p className="text-xs text-gray-500 mt-1">{d.description}</p>
                 </div>
                 <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${statusColor[d.status]}`}>

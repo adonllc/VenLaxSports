@@ -143,7 +143,7 @@ export default function Handbook() {
             <section key={section.id} id={section.id} className="scroll-mt-20">
               <div className="flex items-center gap-3 mb-6">
                 <Icon className={`w-6 h-6 ${section.color}`} />
-                <h2 className="font-heading font-black text-2xl text-gray-900">{section.title}</h2>
+                <h2 className="font-heading font-black text-2xl text-heading-dark">{section.title}</h2>
               </div>
 
               {section.items && (

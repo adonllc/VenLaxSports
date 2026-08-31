@@ -81,7 +81,7 @@ export default function RewardsCredits() {
       <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">
+          <h1 className="text-4xl font-bold text-heading-dark dark:text-white mb-3">
             Your Rewards & Credits
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
@@ -97,7 +97,7 @@ export default function RewardsCredits() {
               <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-heading-dark dark:text-white">
                 Available Credits
               </h2>
             </div>
@@ -125,7 +125,7 @@ export default function RewardsCredits() {
               <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-heading-dark dark:text-white">
                 Referral Stats
               </h2>
             </div>
@@ -133,7 +133,7 @@ export default function RewardsCredits() {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Friends Referred</p>
-                <p className="text-4xl font-bold text-gray-900 dark:text-white">
+                <p className="text-4xl font-bold text-heading-dark dark:text-white">
                   {credits?.total_referrals || 0}
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function RewardsCredits() {
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
               <Gift className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-heading-dark dark:text-white">
               Share Your Referral Code
             </h2>
           </div>
@@ -181,7 +181,7 @@ export default function RewardsCredits() {
               <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Your Referral Code</p>
                 <div className="flex items-center justify-between gap-4">
-                  <code className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
+                  <code className="text-2xl font-mono font-bold text-heading-dark dark:text-white">
                     {referralCode.referral_code}
                   </code>
                   <button
@@ -202,7 +202,7 @@ export default function RewardsCredits() {
                     type="text"
                     readOnly
                     value={referralCode.referral_link}
-                    className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-200"
+                    className="flex-1 bg-transparent text-sm text-heading-dark dark:text-gray-200"
                   />
                   <button
                     onClick={handleCopyLink}
@@ -229,12 +229,12 @@ export default function RewardsCredits() {
 
         {/* How It Works */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h3>
+          <h3 className="text-xl font-bold text-heading-dark dark:text-white mb-4">How It Works</h3>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">1</div>
-              <p className="font-semibold text-gray-900 dark:text-white mb-2">Share Your Code</p>
+              <p className="font-semibold text-heading-dark dark:text-white mb-2">Share Your Code</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Send your referral code to friends via text, email, or social media
               </p>
@@ -242,7 +242,7 @@ export default function RewardsCredits() {
 
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">2</div>
-              <p className="font-semibold text-gray-900 dark:text-white mb-2">They Sign Up</p>
+              <p className="font-semibold text-heading-dark dark:text-white mb-2">They Sign Up</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 They register using your code and get $5 off their first league
               </p>
@@ -250,7 +250,7 @@ export default function RewardsCredits() {
 
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">3</div>
-              <p className="font-semibold text-gray-900 dark:text-white mb-2">You Earn $5</p>
+              <p className="font-semibold text-heading-dark dark:text-white mb-2">You Earn $5</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Get $5 credit instantly when they sign up
               </p>

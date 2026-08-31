@@ -75,7 +75,7 @@ export default function LadderDetail() {
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
             <button onClick={() => navigate("/ladders")} className="hover:text-gray-700">← Ladders</button>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-heading-dark">
             {ladder.city} · {ladder.division_label} {ladder.sport.charAt(0).toUpperCase() + ladder.sport.slice(1)} Ladder
           </h1>
           <p className="text-gray-500 mt-1">Singles · {ladder.entry_count} players · Always open</p>
@@ -132,7 +132,7 @@ export default function LadderDetail() {
                 >
                   <span className="w-8 text-sm font-bold text-gray-400">#{entry.rank}</span>
                   <div className="flex-1">
-                    <p className={`text-sm font-medium ${isMe ? "text-indigo-900" : "text-gray-900"}`}>
+                    <p className={`text-sm font-medium ${isMe ? "text-indigo-900" : "text-heading-dark"}`}>
                       {entry.name} {isMe && <span className="text-xs text-indigo-500">(you)</span>}
                     </p>
                   </div>

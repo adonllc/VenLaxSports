@@ -44,7 +44,7 @@ export default function CityLeaderboard() {
           </p>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="font-heading font-black text-3xl text-gray-900 mb-1">
+              <h1 className="font-heading font-black text-3xl text-heading-dark mb-1">
                 {city} Leaderboard
               </h1>
               <p className="text-gray-500 text-sm">
@@ -69,7 +69,7 @@ export default function CityLeaderboard() {
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <h2 className="font-heading font-bold text-gray-900">Top Players</h2>
+            <h2 className="font-heading font-bold text-heading-dark">Top Players</h2>
           </div>
           {!data || (data.leaders?.length ?? 0) === 0 ? (
             <div className="py-14 text-center">
@@ -99,7 +99,7 @@ export default function CityLeaderboard() {
                     {player.profile_public ? (
                       <Link
                         to={`/players/${player.id}`}
-                        className="font-medium text-gray-900 hover:underline truncate block"
+                        className="font-medium text-heading-dark hover:underline truncate block"
                       >
                         {player.name}
                       </Link>
@@ -128,7 +128,7 @@ export default function CityLeaderboard() {
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Users className="w-4 h-4 text-gray-400" />
-            <h2 className="font-heading font-bold text-gray-900">
+            <h2 className="font-heading font-bold text-heading-dark">
               Active Leagues in {city}
             </h2>
           </div>
@@ -148,7 +148,7 @@ export default function CityLeaderboard() {
                     data-testid={`city-league-${league.id}`}
                   >
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">{league.name}</p>
+                      <p className="font-medium text-heading-dark text-sm">{league.name}</p>
                       <p className="text-xs text-gray-500">
                         {league.current_players}/{league.max_players} players
                       </p>
@@ -174,7 +174,7 @@ export default function CityLeaderboard() {
                   data-testid={`city-league-${league.id}`}
                 >
                   <div>
-                    <p className="font-medium text-gray-900 text-sm">{league.name}</p>
+                    <p className="font-medium text-heading-dark text-sm">{league.name}</p>
                     <p className="text-xs text-gray-500">
                       {league.current_players}/{league.max_players} players
                     </p>

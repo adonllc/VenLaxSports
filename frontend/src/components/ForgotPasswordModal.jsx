@@ -60,7 +60,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
             <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-6 h-6 text-emerald-600" />
             </div>
-            <h2 id="forgot-pwd-title" className="font-heading font-black text-xl text-gray-900 mb-2">Check your inbox</h2>
+            <h2 id="forgot-pwd-title" className="font-heading font-black text-xl text-heading-dark mb-2">Check your inbox</h2>
             <p className="text-sm text-gray-500">
               If an account exists for <span className="font-semibold text-gray-700">{email}</span>,
               we've sent a password reset link. The link expires in 30 minutes.
@@ -77,7 +77,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
             <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center mb-4">
               <Mail className="w-5 h-5 text-white" />
             </div>
-            <h2 id="forgot-pwd-title" className="font-heading font-black text-xl text-gray-900 mb-2">Reset your password</h2>
+            <h2 id="forgot-pwd-title" className="font-heading font-black text-xl text-heading-dark mb-2">Reset your password</h2>
             <p className="text-sm text-gray-500 mb-5">
               Enter your email and we'll send you a link to choose a new password.
             </p>

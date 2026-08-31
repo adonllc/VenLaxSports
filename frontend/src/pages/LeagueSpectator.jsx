@@ -64,7 +64,7 @@ export default function LeagueSpectator() {
               <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${sportColor}`}>
                 {data.sport} · {data.city}
               </p>
-              <h1 className="font-heading font-black text-2xl text-gray-900 mb-2 truncate">
+              <h1 className="font-heading font-black text-2xl text-heading-dark mb-2 truncate">
                 {data.name}
               </h1>
               <div className="flex flex-wrap gap-3 text-sm text-gray-500">
@@ -105,7 +105,7 @@ export default function LeagueSpectator() {
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <h2 className="font-heading font-bold text-gray-900">Standings</h2>
+            <h2 className="font-heading font-bold text-heading-dark">Standings</h2>
           </div>
           {(data.standings?.length ?? 0) === 0 ? (
             <div className="py-12 text-center text-gray-400 text-sm">
@@ -130,14 +130,14 @@ export default function LeagueSpectator() {
                       <td className="px-4 py-3">
                         <Link
                           to={`/players/${s.player_id}`}
-                          className="font-medium text-gray-900 hover:underline"
+                          className="font-medium text-heading-dark hover:underline"
                         >
                           {s.player_name}
                         </Link>
                       </td>
                       <td className="px-3 py-3 text-center text-emerald-600 font-medium">{s.wins}</td>
                       <td className="px-3 py-3 text-center text-red-400">{s.losses}</td>
-                      <td className="px-3 py-3 text-center font-bold text-gray-900">
+                      <td className="px-3 py-3 text-center font-bold text-heading-dark">
                         {s.points?.toFixed(1)}
                       </td>
                     </tr>
@@ -153,7 +153,7 @@ export default function LeagueSpectator() {
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-gray-400" />
-              <h2 className="font-heading font-bold text-gray-900">Recent Results</h2>
+              <h2 className="font-heading font-bold text-heading-dark">Recent Results</h2>
             </div>
             <div className="divide-y divide-gray-50">
               {data.recent_matches.map((m, i) => (

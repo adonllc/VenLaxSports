@@ -35,12 +35,12 @@ export default function RRBracketView({ matches = [], generated = false }) {
                 className="border border-gray-200 rounded-xl overflow-hidden"
               >
                 <div className={`px-4 py-3 flex justify-between items-center ${m.winner_id === m.player1_id ? "bg-emerald-50" : "bg-white"}`}>
-                  <span className="font-medium text-gray-900">{m.player1_name}</span>
+                  <span className="font-medium text-heading-dark">{m.player1_name}</span>
                   {m.winner_id === m.player1_id && <Trophy size={14} className="text-emerald-600" />}
                 </div>
                 <div className="h-px bg-gray-100" />
                 <div className={`px-4 py-3 flex justify-between items-center ${m.winner_id === m.player2_id ? "bg-emerald-50" : "bg-white"}`}>
-                  <span className="font-medium text-gray-900">{m.player2_name}</span>
+                  <span className="font-medium text-heading-dark">{m.player2_name}</span>
                   {m.winner_id === m.player2_id && <Trophy size={14} className="text-emerald-600" />}
                 </div>
                 {m.status === "scheduled" && (

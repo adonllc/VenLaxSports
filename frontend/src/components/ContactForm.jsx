@@ -50,7 +50,7 @@ export default function ContactForm({ isOpen, onClose }) {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-lg font-bold text-gray-900">Contact Us</h2>
+          <h2 className="text-lg font-bold text-heading-dark">Contact Us</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={20} />
           </button>
@@ -65,7 +65,7 @@ export default function ContactForm({ isOpen, onClose }) {
                   <Send className="text-green-600" size={24} />
                 </div>
               </div>
-              <p className="text-gray-900 font-semibold">Message Sent!</p>
+              <p className="text-heading-dark font-semibold">Message Sent!</p>
               <p className="text-sm text-gray-600 mt-2">Thanks for reaching out. We'll get back to you soon.</p>
             </div>
           ) : (
@@ -73,40 +73,40 @@ export default function ContactForm({ isOpen, onClose }) {
               {error && <div className="p-3 bg-red-100 text-red-700 text-sm rounded-md">{error}</div>}
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">Name</label>
+                <label className="block text-sm font-medium text-heading-dark mb-1">Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Your name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-heading-dark placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                   disabled={submitting}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">Email</label>
+                <label className="block text-sm font-medium text-heading-dark mb-1">Email</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your@email.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-heading-dark placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                   disabled={submitting}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">Message</label>
+                <label className="block text-sm font-medium text-heading-dark mb-1">Message</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   placeholder="Tell us your feedback or question..."
                   rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-heading-dark placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                   disabled={submitting}
                 />
               </div>

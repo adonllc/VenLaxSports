@@ -102,7 +102,7 @@ export default function JoinFlow() {
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-1">Find your league</p>
-          <h1 className="font-heading font-black text-3xl text-gray-900">Let's get you competing</h1>
+          <h1 className="font-heading font-black text-3xl text-heading-dark">Let's get you competing</h1>
         </div>
 
         <ProgressBar step={step} />
@@ -111,7 +111,7 @@ export default function JoinFlow() {
           {/* Step 0 — Sport */}
           {step === 0 && (
             <>
-              <h2 className="font-heading font-bold text-xl text-gray-900 mb-6">Which sport?</h2>
+              <h2 className="font-heading font-bold text-xl text-heading-dark mb-6">Which sport?</h2>
               <div className="space-y-3 mb-8">
                 {activeSports.map((s) => (
                   <button
@@ -121,7 +121,7 @@ export default function JoinFlow() {
                     data-testid={`pick-sport-${s.id}`}
                   >
                     <span className="text-3xl">{s.icon}</span>
-                    <span className={`font-semibold ${sport === s.id ? "" : "text-gray-900"}`}>{s.label}</span>
+                    <span className={`font-semibold ${sport === s.id ? "" : "text-heading-dark"}`}>{s.label}</span>
                     <ChevronRight className={`w-4 h-4 ml-auto ${sport === s.id ? "opacity-60" : "text-gray-400"}`} />
                   </button>
                 ))}
@@ -132,7 +132,7 @@ export default function JoinFlow() {
           {/* Step 1 — League Type */}
           {step === 1 && (
             <>
-              <h2 className="font-heading font-bold text-xl text-gray-900 mb-6">What format?</h2>
+              <h2 className="font-heading font-bold text-xl text-heading-dark mb-6">What format?</h2>
               <div className="space-y-3 mb-8">
                 {LEAGUE_TYPES.map((lt) => (
                   <button
@@ -143,7 +143,7 @@ export default function JoinFlow() {
                   >
                     <span className="text-2xl mt-0.5">{lt.icon}</span>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">{lt.label}</p>
+                      <p className="font-semibold text-heading-dark text-sm">{lt.label}</p>
                       <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{lt.desc}</p>
                     </div>
                   </button>
@@ -158,7 +158,7 @@ export default function JoinFlow() {
           {/* Step 2 — Division */}
           {step === 2 && (
             <>
-              <h2 className="font-heading font-bold text-xl text-gray-900 mb-6">Singles or Doubles?</h2>
+              <h2 className="font-heading font-bold text-xl text-heading-dark mb-6">Singles or Doubles?</h2>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {DIVISIONS.map((d) => (
                   <button
@@ -168,7 +168,7 @@ export default function JoinFlow() {
                     data-testid={`pick-division-${d.id}`}
                   >
                     <span className="text-3xl">{d.icon}</span>
-                    <p className="font-semibold text-gray-900 text-sm">{d.label}</p>
+                    <p className="font-semibold text-heading-dark text-sm">{d.label}</p>
                     <p className="text-xs text-gray-400">{d.desc}</p>
                   </button>
                 ))}
@@ -183,7 +183,7 @@ export default function JoinFlow() {
           {step === 3 && (
             <>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-heading font-bold text-xl text-gray-900">Choose a league</h2>
+                <h2 className="font-heading font-bold text-xl text-heading-dark">Choose a league</h2>
                 <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-black transition-colors">
                   <ChevronLeft className="w-4 h-4" /> Back
                 </button>
@@ -219,7 +219,7 @@ export default function JoinFlow() {
                         data-testid={`league-option-${lg.id}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold text-gray-900 text-sm">{lg.name}</p>
+                          <p className="font-semibold text-heading-dark text-sm">{lg.name}</p>
                           {alreadyIn && (
                             <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full" data-testid={`registered-badge-${lg.id}`}>
                               <CheckCircle className="w-3 h-3" /> Registered

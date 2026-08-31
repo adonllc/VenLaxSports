@@ -44,7 +44,7 @@ export default function NotifyMeModal({ isOpen, onClose, city, sport }) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Bell className="w-4 h-4 text-emerald-600" />
-            <h2 className="font-heading font-bold text-gray-900">Notify me</h2>
+            <h2 className="font-heading font-bold text-heading-dark">Notify me</h2>
           </div>
           <button
             onClick={onClose}
@@ -58,7 +58,7 @@ export default function NotifyMeModal({ isOpen, onClose, city, sport }) {
         {done ? (
           <div className="text-center py-4" data-testid="notify-modal-success">
             <p className="text-2xl mb-2">🎾</p>
-            <p className="font-semibold text-gray-900 mb-1">You're on the list!</p>
+            <p className="font-semibold text-heading-dark mb-1">You're on the list!</p>
             <p className="text-sm text-gray-500">
               We'll email you when {city} {sport} opens.
             </p>
