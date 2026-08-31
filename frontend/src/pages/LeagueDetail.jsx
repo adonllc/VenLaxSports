@@ -302,8 +302,8 @@ export default function LeagueDetail() {
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
           </button>
 
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
-            <div className="flex-1">
+          <div className="flex flex-col gap-6 items-start">
+            <div className="w-full">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className={`px-3 py-1 text-sm font-semibold rounded-full ${config.badge}`}>
                   {config.icon} {config.label}
@@ -344,7 +344,7 @@ export default function LeagueDetail() {
             </div>
 
             {/* Join Card */}
-            <div className="bg-white rounded-2xl p-5 w-full lg:w-auto lg:min-w-[240px]" style={{ border: "1px solid #E5E7EB" }}>
+            <div className="bg-white rounded-2xl p-5 w-full" style={{ border: "1px solid #E5E7EB" }}>
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-4">
                   <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: "#E5E7EB" }} />
