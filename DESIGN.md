@@ -15,30 +15,30 @@
 
 ## Typography
 
-### Font Stack
-- **Display/Hero:** [Geist](https://vercel.com/font) (900 weight)
-  - Modern, technical but approachable. Signals precision + confidence. Replaces overused Inter.
-  - Use for: Main headline (h1), section titles (h2), CTA buttons, leaderboard ranks
+### Font Stack (Luxury Corporate Edition)
+- **Display/Hero:** [Sora](https://fonts.google.com/specimen/Sora) (400-800 weights)
+  - Premium, geometric, modern. High sophistication. Signals luxury + precision. Perfect for headings.
+  - Use for: Main headline (h1), section titles (h2), CTA buttons, leaderboard ranks, feature titles
   
-- **Body:** [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) (400, 500, 600 weights)
-  - Friendly, highly legible on mobile. Approachable competitive vibe.
-  - Use for: Paragraph text, descriptions, league card labels, navigation
+- **Body:** [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans) (400, 500, 600, 700 weights)
+  - Corporate standard, highly legible, warm professional tone. Excellent on mobile & desktop.
+  - Use for: Paragraph text, descriptions, league card labels, navigation, form text
   
-- **Data/Tables:** [DM Sans](https://fonts.google.com/specimen/DM+Sans) (500, 700 weights) with `font-variant-numeric: tabular-nums`
-  - Monospaced-feeling clarity. Tabular-nums ensure numbers align in leaderboards/rating displays.
-  - Use for: Ratings (1847), ranks (#1), scores, match results, any numeric data
+- **Data/Tables:** [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono) (500, 600, 700 weights) with `font-variant-numeric: tabular-nums`
+  - Luxury monospace. High precision. Tabular-nums ensure numbers align in leaderboards/ratings.
+  - Use for: Ratings (1847), ranks (#1), scores, match results, timestamps, any numeric data
   
-- **Code (if needed):** Fira Code or JetBrains Mono
+- **Code (if needed):** IBM Plex Mono or JetBrains Mono
 
 ### Loading Strategy
 - **Google Fonts CDN** (production):
   ```
-  https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap
+  https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap
   ```
 - **Fallback stack:** 
-  - Geist → system-ui (not fallback-friendly; always load from CDN)
-  - Plus Jakarta Sans → -apple-system, BlinkMacSystemFont, "Segoe UI"
-  - DM Sans → monospace
+  - Sora → system-ui, -apple-system (modern system default)
+  - IBM Plex Sans → -apple-system, BlinkMacSystemFont, "Segoe UI" (corporate fallback)
+  - IBM Plex Mono → monospace (standard monospace fallback)
 
 ### Scale
 | Level | Size | Weight | Line Height | Use Case |
@@ -204,12 +204,13 @@
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-08-30 | Upgrade to Sora + IBM Plex Sans + IBM Plex Mono | Luxury corporate refresh. Sora = premium geometric clarity. IBM Plex Sans = corporate standard, warm legibility. IBM Plex Mono = luxe monospace. Together signal sophistication + professionalism. |
 | 2026-06-02 | Lead with personal rating in hero | Category convention is to show browse/tournaments. VENLAX is player-progression-first, so hero should be YOUR rating, not "explore leagues." This creates immediate personalization. |
-| 2026-06-02 | Geist for display, not Inter | Overused across AI-generated designs. Geist signals precision + modernity without the "I gave up on typography" vibe. |
+| 2026-06-02 | Geist for display, not Inter | Overused across AI-generated designs. Geist signals precision + modernity without the "I gave up on typography" vibe. *(Superseded by Sora 2026-08-30)* |
 | 2026-06-02 | #10B981 primary (emerald) + #F97316 accent | Already in use. Emerald = victory. Orange = next action. High contrast on light bg, maintain in dark mode. |
 | 2026-06-02 | Comfortable spacing density | Not cramped (tight would lose breathing room on cards), not wasteful (loose would make pages endless). 16px padding in cards, 24px section gaps. |
 | 2026-06-02 | Minimal animation approach | Motion serves comprehension (scroll reveal, state transition) not decoration. Matches the "serious competitor" vibe. |
-| 2026-06-02 | Tabular-nums in leaderboards | Ensure rating numbers (1,847 vs 1,623) align vertically. Crucial for leaderboard scannability. Use DM Sans only for numeric content. |
+| 2026-06-02 | Tabular-nums in leaderboards | Ensure rating numbers (1,847 vs 1,623) align vertically. Crucial for leaderboard scannability. Use IBM Plex Mono for numeric content. |
 | 2026-06-02 | Grid-break hero + disciplined sections | Hero asymmetry creates visual surprise (stat card overlaps grid). Sections snap to grid for predictability. Balances visual interest + usability. |
 
 ## Anti-patterns (DO NOT DO)
@@ -248,9 +249,9 @@ module.exports = {
       },
     },
     fontFamily: {
-      geist: ['Geist', 'system-ui'],
-      jakarta: ['Plus Jakarta Sans', 'sans-serif'],
-      dm: ['DM Sans', 'monospace'],
+      sora: ['Sora', 'system-ui', 'sans-serif'],
+      plex: ['IBM Plex Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      mono: ['IBM Plex Mono', 'monospace'],
     },
     spacing: {
       '2xs': '2px',

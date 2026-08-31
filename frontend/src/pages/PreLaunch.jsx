@@ -288,7 +288,7 @@ export default function PreLaunch() {
 
           <motion.h1
             className="font-black leading-tight mb-6"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}
+            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -398,7 +398,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-12"
-            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -429,7 +429,7 @@ export default function PreLaunch() {
               >
                 <div className="text-3xl flex-shrink-0">{item.icon}</div>
                 <div>
-                  <p className="font-semibold mb-1" style={{ color: DARK, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.1rem" }}>
+                  <p className="font-semibold mb-1" style={{ color: DARK, fontFamily: "'Sora', sans-serif", fontSize: "1.1rem" }}>
                     {item.title}
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{item.body}</p>
@@ -526,7 +526,7 @@ export default function PreLaunch() {
                   <div className="text-5xl mb-4">{feat.icon}</div>
                   <h3
                     className="font-black mb-4"
-                    style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}
+                    style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
                   >
                     {feat.title}
                   </h3>
@@ -557,7 +557,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-16"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -587,14 +587,14 @@ export default function PreLaunch() {
               >
                 <motion.div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6"
-                  style={{ background: PRIMARY, color: "white", fontFamily: "'Barlow Condensed', sans-serif" }}
+                  style={{ background: PRIMARY, color: "white", fontFamily: "'Sora', sans-serif" }}
                   whileHover={{ scale: 1.15 }}
                   animate={{ scale: [1, 1.02, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
                 >
                   {s.step}
                 </motion.div>
-                <h3 className="font-bold mb-3" style={{ fontSize: "1.25rem", color: DARK, fontFamily: "'Barlow Condensed', sans-serif" }}>
+                <h3 className="font-bold mb-3" style={{ fontSize: "1.25rem", color: DARK, fontFamily: "'Sora', sans-serif" }}>
                   {s.title}
                 </h3>
                 <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{s.body}</p>
@@ -620,7 +620,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-16"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -679,7 +679,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-12"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -751,7 +751,7 @@ export default function PreLaunch() {
         <div className="max-w-xl mx-auto text-center">
           <motion.h2
             className="font-black mb-4"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)" }}
+            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)" }}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -777,7 +777,7 @@ export default function PreLaunch() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="rounded-lg p-8 text-center" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                <p className="font-bold text-2xl mb-3" style={{ color: "#FED7AA", fontFamily: "'Barlow Condensed', sans-serif" }}>
+                <p className="font-bold text-2xl mb-3" style={{ color: "#FED7AA", fontFamily: "'Sora', sans-serif" }}>
                   🏆 You're a Founding Member.
                 </p>
                 <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.9)" }}>
