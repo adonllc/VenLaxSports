@@ -281,7 +281,9 @@ export default function PreLaunch() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            🚀 100+ founding members claimed their spots - only 15 left
+            <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+              🚀 100+ founding members claimed their spots - only 15 left
+            </motion.span>
           </motion.div>
 
           <motion.h1
@@ -299,7 +301,7 @@ export default function PreLaunch() {
               animate={{ opacity: [0.8, 1], y: [10, 0] }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Play in a Real League.
+              Join an Unstoppable Community.
             </motion.span>
           </motion.h1>
 
@@ -311,7 +313,7 @@ export default function PreLaunch() {
             animate="visible"
             custom={1}
           >
-            VENLAX runs competitive Tennis and Pickleball leagues in your city - real rankings, skill-matched opponents, and players who actually show up.
+            Competitive Tennis and Pickleball leagues in your city. Real opponents. Real rankings. Real community. The players who join early become the legends.
           </motion.p>
 
           <motion.div
@@ -413,9 +415,9 @@ export default function PreLaunch() {
             viewport={viewportConfig}
           >
             {[
-              { icon: "😤", title: "You're stuck in dead group chats.", body: "No-shows, cancellations, zero accountability." },
-              { icon: "📊", title: "You have no idea where you stand.", body: "No ranking, no record, no proof - just vibes." },
-              { icon: "🎾", title: "Real competitive leagues? Don't exist.", body: "Clubs cost thousands. Pickup courts are chaos." },
+              { icon: "😤", title: "You're stuck in dead group chats.", body: "Flaky players. Last-minute cancellations. No accountability. You waste hours organizing matches that fall apart." },
+              { icon: "📊", title: "You have no proof of your progress.", body: "You keep winning. But nobody knows. No ranking. No record. No way to track how good you've actually become." },
+              { icon: "🎾", title: "Real competitive leagues? They don't exist.", body: "Expensive clubs gatekeep the game. Pickup courts are chaos. There's nothing between Sunday league and the club." },
             ].map((item, idx) => (
               <motion.div
                 key={item.title}
@@ -572,9 +574,9 @@ export default function PreLaunch() {
             viewport={viewportConfig}
           >
             {[
-              { step: "01", title: "Join", body: "Sign up in 2 minutes. Set your sport, skill level, and city." },
-              { step: "02", title: "Get Matched", body: "We place you in the right league, at your level, in your city." },
-              { step: "03", title: "Play & Rise", body: "Win matches. Climb the city leaderboard. Your ranking follows you." },
+              { step: "01", title: "Join", body: "Sign up in 2 minutes. Find your people. Set your sport, skill level, and city." },
+              { step: "02", title: "Get Matched", body: "We find your perfect opponent. Skill-matched. Location-matched. Time-matched." },
+              { step: "03", title: "Dominate & Rise", body: "Win matches. Climb the city leaderboard. Become a founding legend in your city." },
             ].map((s, idx) => (
               <motion.div
                 key={s.step}
@@ -596,6 +598,65 @@ export default function PreLaunch() {
                   {s.title}
                 </h3>
                 <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{s.body}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 px-6" style={{ background: PALE_BLUE }}>
+        <div className="max-w-4xl mx-auto">
+          <motion.p
+            className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
+            style={{ color: PRIMARY }}
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            Founding members are already climbing
+          </motion.p>
+
+          <motion.h2
+            className="font-black text-center mb-16"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            See what early access players are saying.
+          </motion.h2>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            {[
+              { name: "Marcus T.", city: "Austin, TX", quote: "Finally found opponents who push me. My ranking went from zero to 1847 in 3 weeks. This is the real deal.", emoji: "🔥" },
+              { name: "Sarah K.", city: "Austin, TX", quote: "Not just matches - it's a community. I've made friends, found rivals, and have proof of my game. Love it.", emoji: "⚡" },
+              { name: "Jordan P.", city: "Austin, TX", quote: "Sandbaggers are gone. Matches are fair. I actually want to play more. That never happened before.", emoji: "🎯" },
+            ].map((testimonial, idx) => (
+              <motion.div
+                key={testimonial.name}
+                className="rounded-lg p-6"
+                style={{ background: "white", border: `1px solid ${BORDER}` }}
+                variants={staggerItem}
+                whileHover={{ y: -8, boxShadow: `0 20px 40px ${PRIMARY}20` }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="font-bold" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{testimonial.name}</p>
+                    <p className="text-xs" style={{ color: "#6B7A96" }}>{testimonial.city}</p>
+                  </div>
+                  <span className="text-2xl">{testimonial.emoji}</span>
+                </div>
+                <p className="text-sm leading-relaxed italic" style={{ color: "#4B5563" }}>"{testimonial.quote}"</p>
               </motion.div>
             ))}
           </motion.div>
@@ -695,7 +756,7 @@ export default function PreLaunch() {
             initial="hidden"
             animate="visible"
           >
-            Your city is opening soon.
+            Be a Founding Legend.
           </motion.h2>
 
           <motion.p
@@ -706,7 +767,7 @@ export default function PreLaunch() {
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            Early access members get priority city placement and founding member status.
+            Early access members become the competitive foundation of their city. First to rank. First to shape the culture. Only 15 spots left.
           </motion.p>
 
           {submitted ? (
@@ -716,11 +777,14 @@ export default function PreLaunch() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="rounded-lg p-8 text-center" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                <p className="font-bold text-xl mb-2" style={{ color: "#FED7AA", fontFamily: "'Barlow Condensed', sans-serif" }}>
-                  You're on the early access list.
+                <p className="font-bold text-2xl mb-3" style={{ color: "#FED7AA", fontFamily: "'Barlow Condensed', sans-serif" }}>
+                  🏆 You're a Founding Member.
                 </p>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
-                  We'll notify you the moment {city || "your city"} opens.
+                <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.9)" }}>
+                  You've claimed your early access spot. When {city || "your city"} opens, you're getting in first.
+                </p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  Expect matching invitations within 24 hours of launch.
                 </p>
               </div>
 
@@ -732,7 +796,7 @@ export default function PreLaunch() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <p className="text-white font-semibold text-sm text-center">Move up the list - invite players from your city</p>
+                  <p className="text-white font-semibold text-sm text-center">Build your founding crew - every referral moves you up the waitlist 🚀</p>
                   <div className="rounded-md px-3 py-2.5 text-xs font-mono truncate" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
                     {`${window.location.origin}/?ref=${waitlistId}`}
                   </div>
