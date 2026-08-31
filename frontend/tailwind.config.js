@@ -8,9 +8,10 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                heading: ["Barlow Condensed", "sans-serif"],
-                body: ["Inter", "Barlow", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-                sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                heading: ["Sora", "system-ui", "-apple-system", "sans-serif"],
+                body: ["IBM Plex Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+                sans: ["IBM Plex Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+                mono: ["IBM Plex Mono", "monospace"],
             },
             colors: {
                 espresso: {
