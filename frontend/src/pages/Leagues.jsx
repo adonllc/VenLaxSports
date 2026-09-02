@@ -341,34 +341,34 @@ function LeagueCard({ league, onClick }) {
           ) : null}
         </div>
 
-        <h3 className="font-heading font-bold mb-1 line-clamp-2 leading-tight" style={{ color: "#065F46" }}>{league.name}</h3>
+        <h3 className="font-heading font-bold mb-3 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#065F46" }}>{league.name}</h3>
 
-        <div className="flex items-center gap-1 text-xs mb-1" style={{ color: "#6B7280" }}>
-          <MapPin className="w-3 h-3 flex-shrink-0" /> {league.city}
+        <div className="flex items-center gap-1.5 text-xs mb-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /> <span className="font-medium">{league.city}</span>
         </div>
 
-        <div className="flex items-center gap-3 text-xs mb-3">
-          <span className="px-2 py-0.5 rounded-full font-medium" style={{ background: "#F3F4F6", color: "#374151" }}>
+        <div className="flex items-center gap-2 text-xs mb-3">
+          <span className="px-2.5 py-1 rounded-md font-medium" style={{ background: "#F3F4F6", color: "#065F46", fontFamily: "'IBM Plex Sans', sans-serif" }}>
             {league.format === "mixed_doubles" ? "Mixed Doubles" : league.format ? league.format.charAt(0).toUpperCase() + league.format.slice(1) : ""}
           </span>
           <span style={{ color: "#E5E7EB" }}>•</span>
-          <span className="flex items-center gap-1" style={{ color: "#6B7280" }}><Calendar className="w-3 h-3" /> {fmtDate(league.start_date)}</span>
+          <span className="flex items-center gap-1 font-medium" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}><Calendar className="w-3.5 h-3.5" /> {fmtDate(league.start_date)}</span>
         </div>
 
         {/* Division badge */}
         <div className="mb-4">
           {league.division_label ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#F3F4F6", color: "#C24A1D", border: "1px solid #E5E7EB" }}>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold" style={{ background: "#F0F7FF", color: "#065F46", border: "1px solid #DBEAFE", fontFamily: "'IBM Plex Sans', sans-serif" }}>
               {league.division_label}
               {league.division_ntrp_min && (
-                <span className="ml-1" style={{ color: "#6B7280" }}>
+                <span className="ml-1.5 font-medium" style={{ color: "#6B7280" }}>
                   ({league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
                   {league.sport === "pickleball" ? "DUPR" : "NTRP"})
                 </span>
               )}
             </span>
           ) : (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB" }}>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold" style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }}>
               Open Division
             </span>
           )}
@@ -390,14 +390,14 @@ function LeagueCard({ league, onClick }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${STATUS_COLORS[league.status] || "bg-gray-50 text-gray-500"}`}>
+        <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: "#F3F4F6" }}>
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS_COLORS[league.status] || "bg-gray-50 text-gray-500"}`} style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
             {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
           </span>
           {league.entry_fee && league.entry_fee > 0 ? (
-            <span className="text-xs font-bold" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
+            <span className="text-sm font-bold font-heading" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
           ) : (
-            <span className="text-xs font-bold" style={{ color: "#0B6E4F" }}>Free</span>
+            <span className="text-sm font-bold font-heading" style={{ color: "#10B981" }}>Free</span>
           )}
         </div>
       </div>
