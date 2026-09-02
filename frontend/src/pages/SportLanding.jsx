@@ -191,31 +191,27 @@ export default function SportLanding() {
                 <div
                   key={l.id}
                   onClick={() => navigate(`/leagues/${l.id}`)}
-                  className="rounded-2xl p-5 cursor-pointer transition-all duration-200"
+                  className="rounded-2xl p-6 cursor-pointer transition-all duration-200"
                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                   data-testid={`sport-league-${l.id}`}
                 >
                   <div className="flex justify-between mb-3">
-                    <span className="text-xs px-2 py-1 rounded-full font-semibold"
-                          style={{ background: meta.palePill, color: meta.pillText }}>
+                    <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: meta.palePill, color: meta.pillText }}>
                       {meta.icon} {meta.label}
                     </span>
-                    <span className="text-xs font-semibold px-2 py-1 rounded-full"
-                          style={l.status === "registration"
-                            ? { background: "#D1FAE5", color: "#065F46" }
-                            : { background: "#F3F4F6", color: TEXT_MUTED }}>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#065F46" : TEXT_MUTED }}>
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-sm mb-1 line-clamp-2" style={{ color: TEXT_PRI }}>{l.name}</h3>
-                  <p className="text-xs flex items-center gap-1" style={{ color: TEXT_MUTED }}>
-                    <MapPin className="w-3 h-3" style={{ color: meta.color }} />{l.city}
+                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#065F46" }}>{l.name}</h3>
+                  <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /><span className="font-medium">{l.city}</span>
                   </p>
-                  <div className="flex justify-between mt-3 text-xs" style={{ color: TEXT_MUTED }}>
-                    <span>{l.max_players - (l.current_players || 0)} spots left</span>
-                    <span>{l.format}</span>
+                  <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                    <span className="font-medium">{l.max_players - (l.current_players || 0)} spots left</span>
+                    <span className="font-medium">{l.format}</span>
                   </div>
                 </div>
               ))}
