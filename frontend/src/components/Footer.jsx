@@ -18,36 +18,36 @@ export default function Footer() {
     <>
     <ContactForm isOpen={contactOpen} onClose={() => setContactOpen(false)} />
     <footer
-      className="bg-white dark:bg-gray-950 border-t-[3px] transition-colors duration-200"
-      style={{ borderTopColor: "#C9572A" }}
+      className="bg-gray-900 dark:bg-gray-950 border-t-2 transition-colors duration-200"
+      style={{ borderTopColor: "#10B981" }}
       data-testid="footer"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="mb-3">
+            <div className="mb-6">
               <Logo size="md" variant="default" testId="footer-logo" />
             </div>
-            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-500">
+            <p className="text-sm leading-relaxed text-gray-300" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-xs mt-2 text-gray-600 dark:text-gray-600">
+            <p className="text-xs mt-3 text-gray-400" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
               {platformConfig.footerTagline}
             </p>
           </div>
 
           {/* Sports */}
           <div>
-            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-4 text-gray-700 dark:text-gray-600">
+            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-6 text-white" style={{ letterSpacing: "0.12em", fontSize: "11px" }}>
               Sports
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {activeSports.map((s) => (
                 <li key={s.id}>
                   <Link
                     to={`/sport/${s.id}`}
-                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-300 hover:text-white transition-colors" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                   >
                     {s.label}
                   </Link>
@@ -58,10 +58,10 @@ export default function Footer() {
 
           {/* Platform */}
           <div>
-            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-4 text-gray-700 dark:text-gray-600">
+            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-6 text-white" style={{ letterSpacing: "0.12em", fontSize: "11px" }}>
               Platform
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {[
                 { to: "/leagues",   label: "Browse Leagues" },
                 { to: "/rules",     label: "Rules & Conduct" },
@@ -75,7 +75,7 @@ export default function Footer() {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-300 hover:text-white transition-colors" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                   >
                     {label}
                   </Link>
@@ -86,15 +86,15 @@ export default function Footer() {
 
           {/* Cities */}
           <div>
-            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-4 text-gray-700 dark:text-gray-600">
+            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-6 text-white" style={{ letterSpacing: "0.12em", fontSize: "11px" }}>
               Cities
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {platformConfig.featuredCities.slice(0, 4).map((city) => (
                 <li key={city.name}>
                   <Link
                     to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                    className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm text-gray-300 hover:text-white transition-colors" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                   >
                     {city.icon} {city.name}
                   </Link>
@@ -103,16 +103,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Support */}
           <div>
-            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-4 text-gray-700 dark:text-gray-600">
+            <h3 className="font-heading font-bold text-xs uppercase tracking-widest mb-6 text-white" style={{ letterSpacing: "0.12em", fontSize: "11px" }}>
               Support
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               <li>
                 <button
                   onClick={() => setContactOpen(true)}
-                  className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+                  className="text-sm text-gray-300 hover:text-white transition-colors cursor-pointer" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                   data-testid="footer-contact-us"
                 >
                   Contact Us
@@ -121,7 +121,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:feedback@venlaxsports.com"
-                  className="text-sm text-gray-600 hover:text-heading-dark dark:text-gray-400 dark:hover:text-white transition-colors"
+                  className="text-sm text-gray-300 hover:text-white transition-colors" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                 >
                   Feedback
                 </a>
@@ -130,16 +130,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-gray-400" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
             © {new Date().getFullYear()} VENLAX Sports. All rights reserved. Owned and operated by Cloudy Labs LLC.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             {activeSports.map((s) => (
-              <span key={s.id} className="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+              <span key={s.id} className="inline-flex items-center gap-1.5 text-xs text-gray-400" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
                 <span
                   className="w-2 h-2 rounded-full inline-block"
-                  style={{ background: SPORT_DOT[s.id] || "#C9572A" }}
+                  style={{ background: SPORT_DOT[s.id] || "#10B981" }}
                 />
                 {s.label}
               </span>
