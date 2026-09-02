@@ -115,20 +115,23 @@ async def create_challenge(data: LadderChallengeCreate, request: Request):
     challenge_doc.pop("_id", None)
 
     # Notify challenged player
-    import email_service
-    challenged_user = await db.users.find_one(
-        {"_id": ObjectId(data.challenged_player_id)},
-        {"email": 1, "name": 1, "email_notifications": 1}
-    )
-    challenger_name = user.get("name", "A player")
-    ladder_name = f"{ladder['city']} {ladder['division_label']} {ladder['sport'].title()} Ladder"
-    if challenged_user and challenged_user.get("email") and challenged_user.get("email_notifications", True):
-        expires_display = (now + timedelta(hours=72)).strftime("%b %d at %I:%M %p UTC")
-        await email_service.send_email(
-            to=challenged_user["email"],
-            subject=f"{challenger_name} has challenged you on the VENLAX Ladder",
-            body=f"You've been challenged on the {ladder_name}. Accept by {expires_display}.",
+    try:
+        import email_service
+        challenged_user = await db.users.find_one(
+            {"_id": ObjectId(data.challenged_player_id)},
+            {"email": 1, "name": 1, "email_notifications": 1}
         )
+        challenger_name = user.get("name", "A player")
+        ladder_name = f"{ladder['city']} {ladder['division_label']} {ladder['sport'].title()} Ladder"
+        if challenged_user and challenged_user.get("email") and challenged_user.get("email_notifications", True):
+            expires_display = (now + timedelta(hours=72)).strftime("%b %d at %I:%M %p UTC")
+            await email_service.send_email(
+                to=challenged_user["email"],
+                subject=f"{challenger_name} has challenged you on the VENLAX Ladder",
+                body=f"You've been challenged on the {ladder_name}. Accept by {expires_display}.",
+            )
+    except Exception as e:
+        print(f"Warning: Failed to send challenge notification email: {e}")
 
     return challenge_doc
 
