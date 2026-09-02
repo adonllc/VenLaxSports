@@ -16,6 +16,16 @@ module.exports = {
             textColor: {
                 heading: "#065F46",
             },
+            spacing: {
+                '2xs': '2px',
+                'xs': '4px',
+                'sm': '8px',
+                'md': '16px',
+                'lg': '24px',
+                'xl': '32px',
+                '2xl': '48px',
+                '3xl': '64px',
+            },
             colors: {
                 espresso: {
                     DEFAULT: "#1F0A03",
@@ -70,6 +80,17 @@ module.exports = {
                     green: "#0B6E4F",
                     "green-dark": "#095C41",
                     "green-pale": "#EDF7F3",
+                },
+                'design-system': {
+                    'primary': '#10B981',
+                    'accent': '#F97316',
+                    'dark': '#1F2937',
+                    'light': '#F9FAFB',
+                    'gray-100': '#F3F4F6',
+                    'gray-300': '#D1D5DB',
+                    'gray-600': '#4B5563',
+                    'success': '#10B981',
+                    'danger': '#EF4444',
                 },
                 navy: {
                     DEFAULT: "#1B2A4A",
