@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "../components/Logo";
@@ -188,11 +188,11 @@ export default function Auth() {
             <Logo size="md" variant="hero" testId="auth-hero-logo" />
           </div>
 
-          <h1 className="font-heading font-black text-6xl leading-tight mb-4 tracking-tight" style={{ color: "white", letterSpacing: "-0.02em" }}>
+          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "white", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#C9572A" }}>COMPETE.</span>
           </h1>
 
-          <p className="text-xl font-medium mb-10 max-w-md mx-auto leading-relaxed" style={{ color: "rgba(250,240,230,0.85)" }}>
+          <p className="text-xl font-medium mb-10 max-w-md mx-auto leading-relaxed" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "rgba(250,240,230,0.85)" }}>
             Your sport. Your stats. Your legacy.
           </p>
 
@@ -227,10 +227,10 @@ export default function Auth() {
             </button>
           </div>
 
-          <h1 className="font-heading font-black text-3xl mb-2" style={{ color: "#065F46" }}>
+          <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#065F46" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
-          <p className="text-sm mb-8" style={{ color: "#6B7280" }}>
+          <p className="text-sm mb-8" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#6B7280" }}>
             {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
 
@@ -269,13 +269,22 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Full Name *</label>
+                <label htmlFor="input-name" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Full Name *</label>
                 <input
+                  id="input-name"
                   type="text"
                   value={form.name}
                   onChange={update("name")}
-                  placeholder="John Smith"
-                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                  placeholder=""
+                  className="w-full px-4 py-3 rounded-lg text-sm transition-colors"
+                  style={{
+                    border: "1px solid #E5E7EB",
+                    color: "#065F46",
+                    background: "white",
+                    fontFamily: "'IBM Plex Sans', sans-serif"
+                  }}
+                  onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
+                  onBlur={e => e.currentTarget.style.outline = "none"}
                   data-testid="input-name"
                   autoComplete="name"
                   required
@@ -284,16 +293,22 @@ export default function Auth() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Email Address *</label>
+              <label htmlFor="input-email" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Email Address *</label>
               <input
+                id="input-email"
                 type="email"
                 value={form.email}
                 onChange={(e) => { update("email")(e); setEmailExists(null); }}
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                style={{ border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB", background: mode === "register" && emailExists ? "#FFFBEB" : "white", color: "#065F46" }}
-                onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
-                onBlur={e => e.currentTarget.style.boxShadow="none"}
+                placeholder=""
+                className="w-full px-4 py-3 rounded-lg text-sm transition-colors"
+                style={{
+                  border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB",
+                  background: mode === "register" && emailExists ? "#FFFBEB" : "white",
+                  color: "#065F46",
+                  fontFamily: "'IBM Plex Sans', sans-serif"
+                }}
+                onFocus={e => e.currentTarget.style.outline = mode === "register" && emailExists ? "2px solid #F59E0B" : "2px solid #10B981"}
+                onBlur={e => e.currentTarget.style.outline = "none"}
                 data-testid="input-email"
                 autoComplete="email"
                 required
@@ -314,17 +329,23 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>Password *</label>
+              <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Password *</label>
               <div className="relative">
                 <input
+                  id="input-password"
                   type={showPwd ? "text" : "password"}
                   value={form.password}
                   onChange={update("password")}
-                  placeholder={mode === "register" ? "At least 6 characters" : "Your password"}
-                  className="w-full px-4 py-3 pr-12 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
-                  onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
-                  onBlur={e => e.currentTarget.style.boxShadow="none"}
+                  placeholder=""
+                  className="w-full px-4 py-3 pr-12 rounded-lg text-sm transition-colors"
+                  style={{
+                    border: "1px solid #E5E7EB",
+                    color: "#065F46",
+                    background: "white",
+                    fontFamily: "'IBM Plex Sans', sans-serif"
+                  }}
+                  onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
+                  onBlur={e => e.currentTarget.style.outline = "none"}
                   data-testid="input-password"
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   required
