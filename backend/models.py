@@ -450,3 +450,17 @@ class ReferralCredit(BaseDocument):
     applied_at: Optional[str] = None
     expires_at: str  # 12 months from creation
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+# ─── Match Card (Shareable Post-Match Achievement) ──
+class MatchCard(BaseDocument):
+    match_id: str
+    winner_id: str
+    opponent_id: str
+    sport: str  # tennis, pickleball, cricket
+    score: str  # e.g., "6-4, 4-6, 6-4" or "6-4"
+    rating_delta: float  # e.g., +47
+    card_image_url: Optional[str] = None  # og:image URL (hosted on CDN or server)
+    shareable_url: Optional[str] = None  # short URL like venlax.app/c/abc123
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    expires_at: Optional[str] = None  # 30 days from creation (TTL index)
