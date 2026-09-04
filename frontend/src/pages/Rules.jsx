@@ -10,7 +10,7 @@ const TENNIS_DIVISIONS = [
 
 const VENLAX_RULES = [
   {
-    title: "VENLAX-Specific Match Format",
+    title: "Match Format",
     items: [
       "Best of 3 sets. Sets to 6 games, win by 2.",
       "6–6 in any set: 7-point tiebreak (win by 2).",
@@ -72,7 +72,7 @@ const VENLAX_RULES = [
       "Evening matches need functioning lights.",
       "Unsafe court on match day → home player reschedules within 7 days or opponent gets walkover.",
       "Heat policy: >95°F → organizer must offer hydration breaks.",
-      "VENLAX provides no facility insurance. Home player liable.",
+      "No facility insurance provided. Home player liable.",
     ],
   },
   {
@@ -134,7 +134,7 @@ export default function Rules() {
       <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#C24A1D" }}>Rules & Formats</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#065F46" }}>VENLAX Rules</h1>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#065F46" }}>Rules</h1>
           <p className="max-w-lg" style={{ color: "#6B7280" }}>
             Quick & clear. We keep only VENLAX-specific rules here. For standard tennis rules & scoring,
             see <a href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#065F46" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
@@ -175,9 +175,9 @@ export default function Rules() {
           </div>
         </section>
 
-        {/* VENLAX-Specific Rules */}
+        {/* Platform Rules */}
         <section className="mb-20">
-          <h2 className="font-heading font-black text-2xl sm:text-3xl mb-8" style={{ color: "#065F46" }}>VENLAX-Specific Rules</h2>
+          <h2 className="font-heading font-black text-2xl sm:text-3xl mb-8" style={{ color: "#065F46" }}>Platform Rules</h2>
           <div className="space-y-10">
             {VENLAX_RULES.map((section, i) => (
               <div key={i}>
