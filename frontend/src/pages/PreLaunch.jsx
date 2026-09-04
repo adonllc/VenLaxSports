@@ -6,12 +6,15 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsport
 
 const PRIMARY = "#10B981";
 const ACCENT = "#F97316";
-const DARK = "#004D40";
-const LIGHT = "#FAF6F1";
-const CREAM = "#F9F7F4";
+const DARK = "#1F2937";
+const LIGHT = "#F9FAFB";
+const CREAM = "#F9FAFB";
 const PALE_BLUE = "#F0F7FF";
 const PALE_AMBER = "#FFFAF0";
-const BORDER = "#E8E3DE";
+const BORDER = "#D1D5DB";
+const TENNIS = "#10B981";
+const PICKLEBALL = "#F97316";
+const CRICKET = "#2563EB";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -156,7 +159,7 @@ export default function PreLaunch() {
                   {player.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{player.name}</p>
+                  <p className="text-sm font-medium" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{player.name}</p>
                   <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{player.record}</p>
                 </div>
               </div>
@@ -189,7 +192,7 @@ export default function PreLaunch() {
                 whileHover={{ x: 2 }}
               >
                 <span className="text-xs font-bold w-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rank}</span>
-                <span className="text-sm font-medium flex-1" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{row.name}</span>
+                <span className="text-sm font-medium flex-1" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{row.name}</span>
                 <span className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rating}</span>
                 <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? PRIMARY : "#EF4444", fontFamily: "'DM Sans', monospace" }}>{row.delta}</span>
               </motion.div>
@@ -211,7 +214,7 @@ export default function PreLaunch() {
           ].map((fmt) => (
             <motion.div key={fmt.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }} whileHover={{ y: -2 }}>
               <div>
-                <p className="text-sm font-semibold" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{fmt.name}</p>
+                <p className="text-sm font-semibold" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{fmt.name}</p>
                 <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{fmt.sub}</p>
               </div>
               <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ background: fmt.badgeBg, color: fmt.badgeColor, fontFamily: "'DM Sans', monospace" }}>{fmt.badge}</span>
@@ -223,9 +226,9 @@ export default function PreLaunch() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: LIGHT }}>
+    <div className="min-h-screen" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: LIGHT }}>
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b" style={{ background: CREAM, borderColor: BORDER }}>
+      <nav className="sticky top-0 z-50 border-b" style={{ background: "white", borderColor: BORDER, borderBottomWidth: "2px", borderBottomColor: PRIMARY }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <div className="hidden sm:block">
             <Logo size="md" />
@@ -235,10 +238,11 @@ export default function PreLaunch() {
           </div>
           <motion.a
             href="#early-access"
-            className="text-sm font-bold px-4 py-2 rounded-md transition-colors"
+            className="text-sm font-bold px-6 py-2.5 rounded-lg transition-all"
             style={{ background: PRIMARY, color: "white" }}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2, boxShadow: `0 8px 16px ${PRIMARY}30` }}
             whileTap={{ scale: 0.95 }}
+            data-testid="nav-cta"
           >
             Get Early Access
           </motion.a>
@@ -246,16 +250,18 @@ export default function PreLaunch() {
       </nav>
 
       {/* Hero */}
-      <section style={{ background: `linear-gradient(135deg, ${PALE_BLUE} 0%, ${PALE_AMBER} 100%)` }} className="py-28 px-6 relative overflow-hidden">
+      <section style={{ background: LIGHT, borderBottomWidth: "1px", borderBottomColor: BORDER }} className="py-28 px-6 relative overflow-hidden">
         <motion.div
           className="absolute top-10 right-10 w-40 h-40 rounded-full"
-          style={{ background: `${PRIMARY}15`, filter: "blur(60px)" }}
-          {...floatingBlob(8)}
+          style={{ background: `${PRIMARY}08`, filter: "blur(60px)" }}
+          animate={{ opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 6, repeat: Infinity }}
         />
         <motion.div
           className="absolute bottom-20 left-5 w-56 h-56 rounded-full"
-          style={{ background: `${ACCENT}12`, filter: "blur(80px)" }}
-          {...floatingBlob(10)}
+          style={{ background: `${ACCENT}06`, filter: "blur(80px)" }}
+          animate={{ opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 8, repeat: Infinity }}
         />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
@@ -287,8 +293,8 @@ export default function PreLaunch() {
           </motion.div>
 
           <motion.h1
-            className="font-black leading-tight mb-6"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
+            className="leading-tight mb-6"
+            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Sora', sans-serif", fontWeight: 700 }}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -361,7 +367,7 @@ export default function PreLaunch() {
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm"
-            style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -456,7 +462,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-14"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -487,7 +493,7 @@ export default function PreLaunch() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="text-sm line-through mb-2" style={{ color: "#8B8B8B" }}>{item.before}</p>
-                <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>
                   <span className="mt-0.5 flex-shrink-0" style={{ color: PRIMARY }}>→</span>
                   {item.after}
                 </p>
@@ -651,7 +657,7 @@ export default function PreLaunch() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="font-bold" style={{ color: DARK, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{testimonial.name}</p>
+                    <p className="font-bold" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{testimonial.name}</p>
                     <p className="text-xs" style={{ color: "#6B7A96" }}>{testimonial.city}</p>
                   </div>
                   <span className="text-2xl">{testimonial.emoji}</span>
@@ -709,7 +715,7 @@ export default function PreLaunch() {
                 <motion.button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-all cursor-pointer"
-                  style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'IBM Plex Sans', sans-serif" }}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   whileHover={{ background: openFaq === i ? LIGHT : PALE_AMBER }}
                   whileTap={{ scale: 0.98 }}
@@ -734,12 +740,91 @@ export default function PreLaunch() {
                       transition={{ duration: 0.3 }}
                       style={{ overflow: "hidden" }}
                     >
-                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563", fontFamily: "'IBM Plex Sans', sans-serif" }}>
                         {item.a}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Referral Program */}
+      <section className="py-20 px-6" style={{ background: LIGHT }}>
+        <div className="max-w-4xl mx-auto">
+          <motion.p
+            className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
+            style={{ color: PRIMARY, fontFamily: "'IBM Plex Mono', monospace" }}
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            Grow faster together
+          </motion.p>
+
+          <motion.h2
+            className="text-center mb-16"
+            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontWeight: 700 }}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            Invite friends, climb the ranks.
+          </motion.h2>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+          >
+            {[
+              { tier: "Free", invites: "0", perks: ["Early access signup", "City matchmaking"] },
+              { tier: "Tier 1", invites: "3+", perks: ["Free first match", "Priority matchmaking", "Founding badge"] },
+              { tier: "Tier 2", invites: "10+", perks: ["3 months free", "Premium stats", "VIP support", "Founder status"] },
+            ].map((t, idx) => (
+              <motion.div
+                key={t.tier}
+                className="rounded-lg p-8 border-2 text-center relative overflow-hidden"
+                style={{
+                  borderColor: idx === 1 ? PRIMARY : BORDER,
+                  background: idx === 1 ? `${PRIMARY}08` : "white",
+                  boxShadow: idx === 1 ? `0 12px 32px ${PRIMARY}15` : "none"
+                }}
+                variants={staggerItem}
+                whileHover={{ y: -4, boxShadow: `0 16px 40px ${PRIMARY}15` }}
+              >
+                {idx === 1 && (
+                  <div
+                    className="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full"
+                    style={{ background: PRIMARY, color: "white" }}
+                  >
+                    POPULAR
+                  </div>
+                )}
+                <p className="text-sm uppercase tracking-wider mb-1" style={{ color: PRIMARY, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600 }}>
+                  {t.tier}
+                </p>
+                <p className="text-4xl font-bold mb-1" style={{ color: DARK, fontFamily: "'Sora', sans-serif" }}>
+                  {t.invites}
+                </p>
+                <p className="text-xs mb-6" style={{ color: "#4B5563" }}>
+                  referrals
+                </p>
+                <ul className="space-y-3 text-sm" style={{ color: "#4B5563", textAlign: "left" }}>
+                  {t.perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2">
+                      <span style={{ color: PRIMARY }}>✓</span>
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </motion.div>
@@ -919,7 +1004,7 @@ export default function PreLaunch() {
           transition={{ duration: 0.5 }}
         >
           <Logo size="md" />
-          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'IBM Plex Sans', sans-serif" }}>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </motion.div>
