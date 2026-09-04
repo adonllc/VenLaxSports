@@ -212,6 +212,11 @@
 | 2026-06-02 | Minimal animation approach | Motion serves comprehension (scroll reveal, state transition) not decoration. Matches the "serious competitor" vibe. |
 | 2026-06-02 | Tabular-nums in leaderboards | Ensure rating numbers (1,847 vs 1,623) align vertically. Crucial for leaderboard scannability. Use IBM Plex Mono for numeric content. |
 | 2026-06-02 | Grid-break hero + disciplined sections | Hero asymmetry creates visual surprise (stat card overlaps grid). Sections snap to grid for predictability. Balances visual interest + usability. |
+| 2026-09-03 | Typography production pass | Applied Sora (headings: font-black, text-3xl–6xl) + IBM Plex Sans (body) throughout all redesigned pages. Removed Outfit + mixed fonts. Consistent `fontFamily` style props on all text elements. |
+| 2026-09-03 | Color strategy: restrained + sport-specific | Primary emerald (#10B981) + orange accent (#F97316) as main palette. Sport-specific colors (tennis=emerald, cricket=blue, pickleball=orange) used strategically on top bars, badges, buttons, CTAs. Emerald for success states, orange for secondary actions. |
+| 2026-09-03 | Spacing rhythm via varied gaps | Implemented 16–20px section gaps, 8–12px internal grouping, 24–32px between major blocks. Removed uniform padding everywhere. Rhythm created through proximity: tight grouping (related items), generous separation (distinct sections). |
+| 2026-09-03 | Scroll-triggered animations | Implemented fade-in + slide-up animations on cards/sections (whileInView, once:true). 600ms for cards, 500ms for headers. Staggered entrance (100ms delays) on grid items. Ease-out curves. Respects prefers-reduced-motion. |
+| 2026-09-03 | Minimal design across key pages | Home: orange full-bleed hero, minimal CTAs. Leagues: search + sport filter (primary), division/format toggles (secondary), streamlined cards. SportLanding: animated sections, sport-specific info cards. LeagueDetail: improved header hierarchy, sport-colored tab accents + CTAs. |
 
 ## Anti-patterns (DO NOT DO)
 
@@ -273,8 +278,36 @@ module.exports = {
 - Verify leaderboard numbers align (tabular-nums)
 - Check contrast ratios (WCAG AA minimum 4.5:1 for text)
 
+## Implementation Status (2026-09-03)
+
+### Redesigned Pages (Production Quality)
+✅ **Home** — Orange full-bleed hero, Sora headings, minimal CTAs, footer section  
+✅ **Leagues** — Minimal filters (search + sport), sport-color progress bars, streamlined cards  
+✅ **SportLanding** (all sports) — Scroll-triggered animations, staggered card entrance, sport-specific info cards  
+✅ **LeagueDetail** (Phase 1–2) — Improved header hierarchy (Sora h1), sport-colored tab underlines + CTAs, better join card spacing  
+✅ **Footer** — Asymmetric layout (brand prominent left, links compact right), improved spacing rhythm, Sora section headings  
+✅ **Rules** — Removed redundant VENLAX branding (kept only "We keep only VENLAX-specific rules here")  
+✅ **Auth** (prior session) — Visible labels, Sora headings, IBM Plex Sans body, proper focus states  
+
+### Not Yet Redesigned (Lower Priority)
+🔲 **Standings** — Data-dense table, needs responsive scrolling + sport-color highlights  
+🔲 **PlayerDashboard** — Complex multi-tab interface, modal flows  
+🔲 **AdminDashboard** — Admin-specific, lower user-facing priority  
+🔲 **ResetPassword** — Edge case flow  
+🔲 **Handbook** — Informational, less critical  
+🔲 **ScoreReport** — Specific use case, not primary path  
+
+### Key Achievements
+- **Typography system** fully deployed (Sora + IBM Plex Sans on 6 major pages)
+- **Color strategy** applied (restrained: emerald + orange, sport-specific accents on sport pages)
+- **Spacing rhythm** improved (varied gaps, better hierarchy, no monotone padding)
+- **Animation** implemented (scroll-triggered, staggered, 150–600ms timing, prefers-reduced-motion safe)
+- **Mobile-first** responsive design across all redesigned pages
+- **Brand consistency** across components (buttons, cards, badges use sport colors)
+
 ---
 
 **Created:** 2026-06-02  
-**By:** /design-consultation skill  
-**Status:** Approved, ready for implementation  
+**Last Updated:** 2026-09-03  
+**By:** /design-consultation skill (2026-06-02) + design-system-overhaul (2026-09-03)  
+**Status:** Implementation in progress; 6 core pages complete, production-ready  
