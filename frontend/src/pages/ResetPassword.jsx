@@ -48,12 +48,12 @@ export default function ResetPassword() {
         {done ? (
           <div className="text-center py-6" data-testid="reset-success">
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <h1 className="font-heading font-black text-2xl text-heading-dark mb-2">Password updated</h1>
+            <h1 className="font-heading font-black text-3xl text-heading-dark mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#047857" }}>Password updated</h1>
             <p className="text-gray-500 text-sm">Redirecting you to log in...</p>
           </div>
         ) : (
           <>
-            <h1 className="font-heading font-black text-2xl text-heading-dark mb-2">Choose a new password</h1>
+            <h1 className="font-heading font-black text-3xl text-heading-dark mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Choose a new password</h1>
             <p className="text-gray-500 text-sm mb-6">Pick a strong password you haven't used before.</p>
 
             {error && (
@@ -99,8 +99,9 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading || !token}
-                className="w-full py-3.5 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#047857] text-white font-bold rounded-lg hover:bg-[#065F46] transition-all hover:shadow-lg disabled:opacity-60 text-sm"
                 data-testid="reset-submit-btn"
+                aria-label="Reset password and log in"
               >
                 {loading ? "Updating..." : "Update Password"}
               </button>

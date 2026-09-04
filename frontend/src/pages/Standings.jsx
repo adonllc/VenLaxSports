@@ -28,15 +28,15 @@ export default function Standings() {
   const accentClass = sport === "tennis" ? "text-tennis" : sport === "cricket" ? "text-cricket" : "text-pickleball";
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="standings-page">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <button onClick={() => navigate(`/leagues/${leagueId}`)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6" data-testid="back-to-league">
+    <div className="min-h-screen bg-white" data-testid="standings-page">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button onClick={() => navigate(`/leagues/${leagueId}`)} className="flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-900 mb-8" data-testid="back-to-league" aria-label="Back to league details">
           <ArrowLeft className="w-4 h-4" /> Back to League
         </button>
 
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h1 className="font-heading font-black text-2xl text-heading-dark">Standings</h1>
+          <div className="p-8 border-b border-gray-100">
+            <h1 className="font-heading font-black text-4xl text-heading-dark" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Standings</h1>
             {league && <p className={`text-sm font-medium mt-1 ${accentClass}`}>{league.name}</p>}
           </div>
 
@@ -78,7 +78,7 @@ export default function Standings() {
                       <td className="px-4 py-4 text-center text-red-500">{s.losses}</td>
                       <td className="px-4 py-4 text-center text-gray-500">{s.draws || 0}</td>
                       <td className="px-4 py-4 text-center text-gray-600">{s.matches_played}</td>
-                      <td className="px-4 py-4 text-center font-heading font-black text-heading-dark text-lg">{s.points}</td>
+                      <td className="px-4 py-4 text-center font-heading font-black text-heading-dark text-xl">{s.points}</td>
                     </tr>
                   ))}
                 </tbody>

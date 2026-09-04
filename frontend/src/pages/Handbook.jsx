@@ -106,14 +106,14 @@ export default function Handbook() {
   return (
     <div style={{ background: "#FFFFFF" }} data-testid="handbook-page">
       {/* Hero */}
-      <section className="py-16 sm:py-20 px-6" style={{ background: "#C24A1D" }}>
+      <section className="py-20 sm:py-28 px-6" style={{ background: "#EA580C" }}>
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
             <Shield className="w-3.5 h-3.5" />
             Player Handbook v1.0
           </div>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white">
+          <h1 className="font-heading font-black text-5xl sm:text-6xl mb-4 leading-tight text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>
             League Rules &<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>Player Handbook</span>
           </h1>
           <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
@@ -136,14 +136,14 @@ export default function Handbook() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 space-y-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 space-y-16">
         {HANDBOOK_SECTIONS.map((section) => {
           const Icon = section.icon;
           return (
             <section key={section.id} id={section.id} className="scroll-mt-20">
               <div className="flex items-center gap-3 mb-6">
                 <Icon className={`w-6 h-6 ${section.color}`} />
-                <h2 className="font-heading font-black text-2xl text-heading-dark">{section.title}</h2>
+                <h2 className="font-heading font-black text-3xl text-heading-dark" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>{section.title}</h2>
               </div>
 
               {section.items && (
@@ -190,8 +190,9 @@ export default function Handbook() {
           </p>
           <Link
             to="/leagues"
-            className="inline-flex items-center gap-2 text-sm font-semibold bg-emerald-500 text-white px-6 py-3 rounded-xl hover:bg-emerald-600 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-bold bg-emerald-700 text-white px-8 py-3 rounded-lg hover:bg-emerald-800 transition-all hover:scale-105 hover:shadow-lg"
             data-testid="handbook-cta-leagues"
+            aria-label="Browse available leagues"
           >
             <Shield className="w-4 h-4" /> Find a league to join
           </Link>
