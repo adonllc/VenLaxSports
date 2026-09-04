@@ -179,16 +179,24 @@ export default function Auth() {
     <div className="min-h-[calc(100vh-64px)] flex" data-testid="auth-page">
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1B2B4B 0%, #3D1A09 100%)" }}>
+        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#C24A1D" }} />
         <div className="absolute inset-0 opacity-25" style={{
           backgroundImage: "radial-gradient(circle at 30% 50%, #C24A1D 0%, transparent 60%), radial-gradient(circle at 70% 30%, #8B2E0D 0%, transparent 60%), radial-gradient(circle at 50% 80%, #C9572A 0%, transparent 50%)"
         }} />
         <div className="relative z-10 text-center text-white">
           <div className="flex items-center justify-center mb-8">
-            <Logo size="hero" variant="hero" testId="auth-hero-logo" />
+            <Logo size="md" variant="hero" testId="auth-hero-logo" />
           </div>
-          <h2 className="font-heading font-black text-4xl leading-tight mb-3">Your rank.<br />Your record.<br /><span style={{ color: "#C9572A" }}>Your league.</span></h2>
-          <p className="text-base max-w-xs mx-auto" style={{ color: "rgba(250,240,230,0.55)" }}>{BRAND.story_short}</p>
-          <div className="flex justify-center gap-6 mt-10">
+
+          <h1 className="font-heading font-black text-6xl leading-tight mb-4 tracking-tight" style={{ color: "white", letterSpacing: "-0.02em" }}>
+            TRACK.<br />RANK.<br /><span style={{ color: "#C9572A" }}>COMPETE.</span>
+          </h1>
+
+          <p className="text-xl font-medium mb-10 max-w-md mx-auto leading-relaxed" style={{ color: "rgba(250,240,230,0.85)" }}>
+            Your sport. Your stats. Your legacy.
+          </p>
+
+          <div className="flex justify-center gap-6">
             {activeSports.map((s) => (
               <div key={s.id} className="text-sm font-medium" style={{ color: "rgba(250,240,230,0.70)" }}>{s.icon} {s.label}</div>
             ))}
