@@ -100,30 +100,30 @@ const FORMAT_CARDS = [
   {
     id: "flex",
     label: "Flex League",
-    tagline: "Self-scheduled matches over 6–8 weeks.",
+    tagline: "You arrange match timing. 5–7 matches, 6–8 weeks.",
     color: "bg-orange-500",
-    highlights: ["5–7 matches", "You arrange timing", "Top 4–8 → playoffs"],
+    highlights: ["Self-scheduled", "You book courts & opponents", "Top 4–8 qualify for playoffs"],
   },
   {
     id: "rr",
     label: "Round Robin",
-    tagline: "Pre-scheduled: everyone plays everyone once.",
+    tagline: "Fixed schedule: everyone plays everyone once.",
     color: "bg-blue-600",
-    highlights: ["Fixed schedule", "Group phase", "Top players → playoffs"],
+    highlights: ["Organizer books courts", "Group phase calendar set upfront", "Top players advance to playoffs"],
   },
   {
     id: "box",
     label: "Box League",
-    tagline: "6-player boxes with promotion/relegation.",
+    tagline: "Small groups (6 players) competing within boxes.",
     color: "bg-violet-600",
-    highlights: ["~6 per box", "Top 2 promote, bottom 2 relegate", "No playoffs"],
+    highlights: ["Tight-knit groups", "Top 2 promote, bottom 2 relegate each cycle", "No season-end playoffs"],
   },
   {
     id: "ladder",
     label: "Challenge Ladder",
-    tagline: "Always-on: challenge anyone above you.",
+    tagline: "Ongoing ranked ladder. Challenge anyone above you.",
     color: "bg-amber-500",
-    highlights: ["Permanent ranked list", "Join anytime", "Win = rank swap"],
+    highlights: ["Permanent ranked list", "Join anytime, climb year-round", "Win = swap ranks with opponent"],
   },
 ];
 
@@ -159,7 +159,8 @@ export default function Rules() {
 
         {/* Format Cards */}
         <section className="mb-28">
-          <h2 className="font-heading font-black text-4xl sm:text-5xl mb-8" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Match Formats</h2>
+          <h2 className="font-heading font-black text-4xl sm:text-5xl mb-3" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>League Structures</h2>
+          <p className="text-lg mb-8" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>How a season runs. Combined with match formats (Singles/Doubles/Mixed) at registration.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {FORMAT_CARDS.map((card) => (
               <div key={card.id} className={`${card.color} text-white rounded-lg p-6`}>
