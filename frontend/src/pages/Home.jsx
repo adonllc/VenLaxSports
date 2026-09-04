@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* HERO SECTION — Orange full-bleed */}
-      <section className="flex-1 flex items-center justify-center px-6 py-20" style={{ backgroundColor: "#F97316" }}>
+      <section className="flex-1 flex items-center justify-center px-6 py-20" style={{ backgroundColor: "#EA580C" }}>
         <div className="max-w-2xl text-center">
           {/* Logo */}
           <motion.div
@@ -22,11 +22,11 @@ export default function Home() {
 
           {/* Headline */}
           <motion.h1
-            className="font-black text-5xl md:text-6xl leading-tight mb-6 text-white"
+            className="font-black text-6xl md:text-7xl leading-tight mb-6 text-white"
             style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.05, type: "spring", stiffness: 80 }}
           >
             Find Your<br />
             <span style={{ color: "white" }}>Bracket</span>
@@ -54,7 +54,7 @@ export default function Home() {
               onClick={() => navigate("/leagues")}
               className="px-8 py-4 bg-white text-orange-600 rounded-lg font-semibold transition-all"
               style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
-              whileHover={{ scale: 1.05, y: -3, boxShadow: "0 12px 32px rgba(0,0,0,0.2)" }}
+              whileHover={{ scale: 1.10, y: -5, boxShadow: "0 20px 48px rgba(0,0,0,0.3)" }}
               whileTap={{ scale: 0.95 }}
             >
               ▶ Find Your Bracket
@@ -63,7 +63,7 @@ export default function Home() {
               onClick={() => navigate("/auth")}
               className="px-8 py-4 rounded-lg font-semibold transition-all text-white border-2 border-white"
               style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
-              whileHover={{ scale: 1.05, y: -3, backgroundColor: "rgba(255,255,255,0.1)" }}
+              whileHover={{ scale: 1.10, y: -5, backgroundColor: "rgba(255,255,255,0.15)" }}
               whileTap={{ scale: 0.95 }}
             >
               Register a Team →
@@ -80,8 +80,8 @@ export default function Home() {
         viewport={{ once: true }}
       >
         <motion.h2
-          className="text-4xl font-black mb-4 text-gray-900"
-          style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+          className="text-5xl font-black mb-4 text-gray-900"
+          style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#10B981" }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -101,8 +101,8 @@ export default function Home() {
         <motion.button
           onClick={() => navigate("/auth")}
           className="px-8 py-4 rounded-lg font-semibold transition-all text-white"
-          style={{ backgroundColor: "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
-          whileHover={{ scale: 1.08, y: -4, boxShadow: "0 20px 40px rgba(16,185,129,0.3)" }}
+          style={{ backgroundColor: "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }}
+          whileHover={{ scale: 1.12, y: -6, boxShadow: "0 24px 56px rgba(4,120,87,0.35)" }}
           whileTap={{ scale: 0.95 }}
         >
           Get Started Now →

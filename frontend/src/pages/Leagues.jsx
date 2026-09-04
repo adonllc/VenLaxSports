@@ -86,13 +86,13 @@ export default function Leagues() {
       {/* Header */}
       <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="font-black text-5xl sm:text-6xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Browse Leagues</h1>
+          <h1 className="font-black text-6xl sm:text-7xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Browse Leagues</h1>
           <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Find competitive leagues across all sports and cities</p>
         </div>
       </div>
 
       {/* Promo Banner */}
-      <div className="sticky top-0 z-10 border-b" style={{ background: "#F97316", borderColor: "#EA580C" }}>
+      <div className="sticky top-0 z-10 border-b" style={{ background: "#EA580C", borderColor: "#C24A1D" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <p className="text-sm font-semibold text-white" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
             First league free! Use code <code className="bg-orange-600 px-2 py-0.5 rounded font-mono text-white text-xs">PLAY1FREE</code>
@@ -231,7 +231,7 @@ function LeagueCard({ league, onClick }) {
 
   return (
     <div
-      className="bg-white rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md overflow-hidden flex flex-col"
+      className="bg-white rounded-lg border cursor-pointer transition-all duration-300 hover:shadow-2xl overflow-hidden flex flex-col hover:scale-105"
       style={{ borderColor: "#E5E7EB" }}
       data-testid={`league-card-${league.id}`}
     >
@@ -274,7 +274,7 @@ function LeagueCard({ league, onClick }) {
 
         {/* League name */}
         <h3
-          className="font-black text-lg mb-3 line-clamp-2 leading-snug text-gray-900"
+          className="font-black text-xl mb-3 line-clamp-2 leading-snug text-gray-900"
           style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
         >
           {league.name}
@@ -323,9 +323,9 @@ function LeagueCard({ league, onClick }) {
           </span>
           <button
             onClick={onClick}
-            className="text-sm font-semibold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50"
+            className="text-sm font-bold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 hover:scale-110"
             style={{
-              background: isFull ? "#E5E7EB" : "#10B981",
+              background: isFull ? "#E5E7EB" : "#047857",
               color: isFull ? "#6B7280" : "white",
               fontFamily: "'IBM Plex Sans', sans-serif",
             }}

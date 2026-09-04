@@ -318,7 +318,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>{league.name}</h1>
+              <h1 className="font-black text-5xl sm:text-6xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
               <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
@@ -518,8 +518,8 @@ export default function LeagueDetail() {
                           <button
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                            className="w-full py-3 text-white font-semibold rounded-lg transition-all text-sm disabled:opacity-60 hover:shadow-md"
-                            style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                            className="w-full py-3 text-white font-bold rounded-lg transition-all text-sm disabled:opacity-60 hover:shadow-xl hover:scale-105 hover:-translate-y-1"
+                            style={{ background: config.accent === "#F97316" ? "#EA580C" : config.accent === "#2563EB" ? "#1D4ED8" : "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -551,8 +551,8 @@ export default function LeagueDetail() {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className="px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap"
-                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                className="px-5 py-4 text-sm font-bold border-b-3 transition-all whitespace-nowrap hover:bg-gray-50"
+                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
                 data-testid={`tab-${t.id}`}
               >
                 {t.label}

@@ -114,7 +114,7 @@ export default function SportLanding() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
             >
               <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
                 {item.title}
@@ -136,7 +136,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-bold text-2xl mb-3" style={{ color: TEXT_PRI }}>
+          <h2 className="font-heading font-black text-4xl mb-3" style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}>
             About {meta.label} on VENLAX
           </h2>
           <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
@@ -145,12 +145,12 @@ export default function SportLanding() {
         {/* Features */}
         <div className="mb-12">
           <motion.h2
-            className="font-heading font-bold text-2xl mb-6"
-            style={{ color: TEXT_PRI }}
+            className="font-heading font-black text-4xl mb-6"
+            style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
           >
             What You Get
           </motion.h2>
@@ -178,7 +178,7 @@ export default function SportLanding() {
         {/* Leagues */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading font-bold text-2xl" style={{ color: TEXT_PRI }}>
+            <h2 className="font-heading font-black text-4xl" style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}>
               Open {meta.label} Leagues
             </h2>
             <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export default function SportLanding() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  transition={{ duration: 0.4, delay: i * 0.15 }}
                   data-testid={`sport-league-${l.id}`}
                 >
                   <div className="flex justify-between mb-3">

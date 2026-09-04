@@ -133,8 +133,8 @@ export default function Rules() {
       {/* Header */}
       <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#C24A1D" }}>Rules & Formats</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#065F46" }}>Rules</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#EA580C", fontFamily: "'Sora', system-ui, sans-serif" }}>Rules & Formats</p>
+          <h1 className="font-heading font-black text-6xl sm:text-7xl mb-2" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Rules</h1>
           <p className="max-w-lg" style={{ color: "#6B7280" }}>
             Quick & clear. We keep only VENLAX-specific rules here. For standard tennis rules & scoring,
             see <a href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#065F46" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
@@ -142,10 +142,10 @@ export default function Rules() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Divisions */}
-        <section className="mb-20">
-          <h2 className="font-heading font-black text-2xl sm:text-3xl mb-8" style={{ color: "#065F46" }}>Skill Divisions</h2>
+        <section className="mb-28">
+          <h2 className="font-heading font-black text-4xl sm:text-5xl mb-8" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Skill Divisions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {TENNIS_DIVISIONS.map((div, i) => (
               <div key={i} className="rounded-lg p-5" style={{ border: "1px solid #E5E7EB", background: "white" }}>
@@ -158,8 +158,8 @@ export default function Rules() {
         </section>
 
         {/* Format Cards */}
-        <section className="mb-20">
-          <h2 className="font-heading font-black text-2xl sm:text-3xl mb-8" style={{ color: "#065F46" }}>Match Formats</h2>
+        <section className="mb-28">
+          <h2 className="font-heading font-black text-4xl sm:text-5xl mb-8" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Match Formats</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {FORMAT_CARDS.map((card) => (
               <div key={card.id} className={`${card.color} text-white rounded-lg p-6`}>
@@ -176,8 +176,8 @@ export default function Rules() {
         </section>
 
         {/* Platform Rules */}
-        <section className="mb-20">
-          <h2 className="font-heading font-black text-2xl sm:text-3xl mb-8" style={{ color: "#065F46" }}>Platform Rules</h2>
+        <section className="mb-28">
+          <h2 className="font-heading font-black text-4xl sm:text-5xl mb-8" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Platform Rules</h2>
           <div className="space-y-10">
             {VENLAX_RULES.map((section, i) => (
               <div key={i}>
@@ -199,8 +199,8 @@ export default function Rules() {
         </section>
 
         {/* Points Formula */}
-        <section className="mb-20 rounded-lg p-8" style={{ background: "#F8F9FA", border: "1px solid #E5E7EB" }}>
-          <h2 className="font-heading font-black text-xl sm:text-2xl mb-6 flex items-center gap-2" style={{ color: "#065F46" }}>
+        <section className="mb-28 rounded-lg p-8" style={{ background: "#F8F9FA", border: "1px solid #E5E7EB" }}>
+          <h2 className="font-heading font-black text-3xl sm:text-4xl mb-6 flex items-center gap-2" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>
             <TrendingUp size={24} style={{ color: "#065F46" }} />
             Ranking Formula
           </h2>
@@ -218,8 +218,8 @@ export default function Rules() {
         </section>
 
         {/* Back to Leagues */}
-        <div className="text-center pt-8" style={{ borderTop: "1px solid #E5E7EB" }}>
-          <Link to="/leagues" style={{ color: "#065F46" }} className="hover:underline text-lg font-semibold font-heading">
+        <div className="text-center pt-12" style={{ borderTop: "1px solid #E5E7EB" }}>
+          <Link to="/leagues" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }} className="hover:underline text-xl font-black">
             ← Back to Leagues
           </Link>
         </div>

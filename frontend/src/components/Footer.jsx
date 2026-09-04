@@ -22,25 +22,25 @@ export default function Footer() {
       style={{ borderTopColor: "#10B981" }}
       data-testid="footer"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28">
         {/* Main grid: Brand (left, wider) + Links (right, compact) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-24 mb-28">
           {/* Brand Section — Prominent, larger space */}
           <div className="md:col-span-1">
             <div className="mb-8">
-              <Logo size="lg" variant="default" testId="footer-logo" />
+              <Logo size="xl" variant="default" testId="footer-logo" />
             </div>
-            <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300 mb-3" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <p className="text-base font-semibold leading-relaxed text-gray-900 dark:text-white mb-3" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "18px" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <p className="text-base text-gray-600 dark:text-gray-300" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
               {platformConfig.footerTagline}
             </p>
           </div>
 
           {/* Links Groups — Compact, 2-column on desktop */}
           <div className="md:col-span-2">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
               {/* Sports */}
               <div>
                 <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
@@ -124,7 +124,7 @@ export default function Footer() {
         </div>
 
         {/* Featured Cities — Full width, below main content */}
-        <div className="pb-16 border-b border-gray-200 dark:border-gray-800">
+        <div className="pb-20 border-b border-gray-200 dark:border-gray-800">
           <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
             Find Leagues
           </h3>
@@ -143,7 +143,7 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom — Copyright + Sport indicators */}
-        <div className="pt-16 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="pt-20 flex flex-col sm:flex-row items-center justify-between gap-6">
           <p className="text-xs text-gray-500 dark:text-gray-400" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
             © {new Date().getFullYear()} VENLAX Sports. Owned by Cloudy Labs LLC.
           </p>

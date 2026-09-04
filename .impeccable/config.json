@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/LeagueDetail.jsx"
+        ],
+        "createdAt": "2026-09-04T02:33:54.989Z",
+        "reason": "rounded card borders standard; 1px all-around ok"
+      }
+    ]
+  }
+}
