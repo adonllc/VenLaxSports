@@ -23,6 +23,7 @@ export default function Leagues() {
   const { user } = useAuth();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     sport: searchParams.get("sport") || "",
     country: searchParams.get("country") || "",
@@ -49,6 +50,7 @@ export default function Leagues() {
 
   const fetchLeagues = async () => {
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
       if (filters.sport) params.set("sport", filters.sport);
@@ -63,6 +65,8 @@ export default function Leagues() {
       setLeagues(data);
     } catch (e) {
       console.error(e);
+      setError("Unable to load leagues. Please try again.");
+      setLeagues([]);
     } finally {
       setLoading(false);
     }
@@ -124,6 +128,7 @@ export default function Leagues() {
             className="px-4 py-3 rounded-lg text-sm bg-white border focus:outline-none"
             style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "'IBM Plex Sans', sans-serif", minWidth: "160px" }}
             data-testid="filter-sport"
+            aria-label="Filter leagues by sport"
           >
             <option value="">All Sports</option>
             {activeSports.map((s) => (
@@ -145,6 +150,8 @@ export default function Leagues() {
                 style={filters.division === div
                   ? { background: "#10B981", borderColor: "#10B981", color: "white" }
                   : { background: "white", borderColor: "#E5E7EB", color: "#6B7280" }}
+                aria-label={`Filter by skill level: ${div || "All"}`}
+                aria-pressed={filters.division === div}
               >
                 {div || "All Levels"}
               </button>
@@ -167,6 +174,8 @@ export default function Leagues() {
                 style={filters.format === value
                   ? { background: "#F97316", borderColor: "#F97316", color: "white" }
                   : { background: "white", borderColor: "#E5E7EB", color: "#6B7280" }}
+                aria-label={`Filter by match type: ${label}`}
+                aria-pressed={filters.format === value}
               >
                 {label}
               </button>
@@ -189,6 +198,13 @@ export default function Leagues() {
             </button>
           )}
         </div>
+
+        {/* Error state */}
+        {error && (
+          <div className="px-4 py-4 rounded-lg text-sm" style={{ background: "#FEE2E2", border: "1px solid #FECACA", color: "#DC2626" }} role="alert" data-testid="leagues-error">
+            ⚠ {error}
+          </div>
+        )}
 
         {/* League Grid */}
         {loading ? (

@@ -56,6 +56,8 @@ export default function Home() {
               style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
               whileHover={{ scale: 1.10, y: -5, boxShadow: "0 20px 48px rgba(0,0,0,0.3)" }}
               whileTap={{ scale: 0.95 }}
+              aria-label="Browse available tennis and pickleball leagues"
+              data-testid="hero-find-bracket"
             >
               ▶ Find Your Bracket
             </motion.button>
@@ -65,6 +67,8 @@ export default function Home() {
               style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
               whileHover={{ scale: 1.10, y: -5, backgroundColor: "rgba(255,255,255,0.15)" }}
               whileTap={{ scale: 0.95 }}
+              aria-label="Register or sign in to join a league"
+              data-testid="hero-join-league"
             >
               Join a League →
             </motion.button>
@@ -104,6 +108,8 @@ export default function Home() {
           style={{ backgroundColor: "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }}
           whileHover={{ scale: 1.12, y: -6, boxShadow: "0 24px 56px rgba(4,120,87,0.35)" }}
           whileTap={{ scale: 0.95 }}
+          aria-label="Start playing competitive tennis and pickleball today"
+          data-testid="cta-get-started"
         >
           Get Started Now →
         </motion.button>

@@ -64,6 +64,7 @@ export default function SportLanding() {
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [bellOpen, setBellOpen] = useState(false);
   const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
 
@@ -72,14 +73,19 @@ export default function SportLanding() {
   useEffect(() => {
     if (!meta || !isSportActive(sport)) { navigate("/leagues"); return; }
     fetchLeagues();
-    axios.get(`${API}/founding-members`).then(r => setFoundingStats(r.data)).catch(() => {});
+    axios.get(`${API}/founding-members`).then(r => setFoundingStats(r.data)).catch(e => { console.error("Failed to load founding stats:", e); });
   }, [sport]);
 
   const fetchLeagues = async () => {
+    setError(null);
     try {
       const { data } = await axios.get(`${API}/leagues?sport=${sport}&limit=6`);
       setLeagues(data);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      setError("Unable to load leagues. Please try again.");
+      setLeagues([]);
+    }
     finally { setLoading(false); }
   };
 
@@ -189,6 +195,7 @@ Features
                 onMouseEnter={e => { e.currentTarget.style.color = meta.color; e.currentTarget.style.background = meta.palePill; }}
                 onMouseLeave={e => { e.currentTarget.style.color = TEXT_MUTED; e.currentTarget.style.background = "transparent"; }}
                 data-testid="sport-notify-bell"
+                aria-label={`Notify me when a ${meta?.label} league opens`}
                 title={`Notify me when a ${meta?.label} league opens`}
               >
                 <Bell className="w-4 h-4" />
@@ -204,6 +211,12 @@ Features
               </Link>
             </div>
           </div>
+
+          {error && (
+            <div className="px-4 py-4 rounded-lg text-sm" style={{ background: "#FEE2E2", border: "1px solid #FECACA", color: "#DC2626" }} role="alert">
+              ⚠ {error}
+            </div>
+          )}
 
           {loading ? (
             <div className="grid md:grid-cols-3 gap-4">

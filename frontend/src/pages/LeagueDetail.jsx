@@ -48,6 +48,7 @@ export default function LeagueDetail() {
   const [inviteToken, setInviteToken] = useState(null);
   const [boxStandings, setBoxStandings] = useState(null);
   const [activeBox, setActiveBox] = useState("A");
+  const [networkError, setNetworkError] = useState(null);
 
   // Check for payment session return
   const sessionId = searchParams.get("session_id");
@@ -79,11 +80,11 @@ export default function LeagueDetail() {
             setBoxStandings(boxData);
             if (boxData.boxes?.length > 0) setActiveBox(boxData.boxes[0].box_id);
           })
-          .catch(() => {});
+          .catch(e => { console.error("Failed to load box standings:", e); });
       }
-    } catch {
-      navigate("/leagues");
-    } finally {
+    } catch (e) {
+      console.error(e);
+      setNetworkError("Unable to load league. Please check your connection and try again.");
       setLoading(false);
     }
   };
@@ -273,6 +274,21 @@ export default function LeagueDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+      </div>
+    );
+  }
+
+  if (networkError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <div className="text-6xl mb-4">⚠</div>
+          <h1 className="font-black text-2xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
+          <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>{networkError}</p>
+          <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="error-back-to-leagues">
+            Back to Leagues
+          </button>
+        </div>
       </div>
     );
   }
@@ -554,6 +570,9 @@ export default function LeagueDetail() {
                 className="px-5 py-4 text-sm font-bold border-b-3 transition-all whitespace-nowrap hover:bg-gray-50"
                 style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
                 data-testid={`tab-${t.id}`}
+                aria-label={`View ${t.label}`}
+                aria-selected={tab === t.id}
+                role="tab"
               >
                 {t.label}
               </button>

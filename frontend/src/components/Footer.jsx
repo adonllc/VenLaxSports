@@ -42,7 +42,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
               {/* Sports */}
-              <div>
+              <div aria-label="Sports navigation">
                 <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Sports
                 </h3>
@@ -62,7 +62,7 @@ export default function Footer() {
               </div>
 
               {/* Platform */}
-              <div>
+              <div aria-label="Platform navigation">
                 <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Platform
                 </h3>
@@ -87,7 +87,7 @@ export default function Footer() {
               </div>
 
               {/* Legal + Support */}
-              <div>
+              <div aria-label="Legal and support navigation">
                 <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Legal
                 </h3>
