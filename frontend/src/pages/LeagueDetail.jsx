@@ -423,8 +423,8 @@ export default function LeagueDetail() {
                               <button
                                 onClick={handleDoublesJoin}
                                 disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
-                                className="w-full text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 transition-colors"
-                                style={{ background: "#1B2B4B" }}
+                                className="w-full text-white rounded-lg py-3 text-sm font-medium disabled:opacity-50 transition-all hover:shadow-md"
+                                style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
@@ -498,7 +498,8 @@ export default function LeagueDetail() {
                                 <button
                                   onClick={validatePromo}
                                   disabled={promoLoading || !promoCode.trim()}
-                                  className="px-3 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50" style={{ background: "#1B2B4B" }}
+                                  className="px-4 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50 transition-colors"
+                                  style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
                                   data-testid="apply-promo-btn"
                                 >
                                   {promoLoading ? "..." : "Apply"}
@@ -517,7 +518,8 @@ export default function LeagueDetail() {
                           <button
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
-                            className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#1B2B4B" }}
+                            className="w-full py-3 text-white font-semibold rounded-lg transition-all text-sm disabled:opacity-60 hover:shadow-md"
+                            style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -542,7 +544,7 @@ export default function LeagueDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white" style={{ borderBottom: "1px solid #E5E7EB" }}>
+      <div className="bg-white border-b" style={{ borderBottomColor: "#E5E7EB" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-0 overflow-x-auto">
             {TABS.map((t) => (
@@ -550,7 +552,7 @@ export default function LeagueDetail() {
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className="px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap"
-                style={tab === t.id ? { borderColor: "#C24A1D", color: "#C24A1D" } : { borderColor: "transparent", color: "#6B7280" }}
+                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
                 data-testid={`tab-${t.id}`}
               >
                 {t.label}
