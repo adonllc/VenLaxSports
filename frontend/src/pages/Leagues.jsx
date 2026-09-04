@@ -1,20 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Search, MapPin, Users, Calendar, Trophy } from "lucide-react";
+import { Search, MapPin, Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import { useAuth } from "../contexts/AuthContext";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
-const fmtDate = (iso) => {
-  if (!iso) return "";
-  const d = new Date(iso.includes("T") ? iso : iso + "T00:00:00");
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-};
-
-// PHASE-DRIVEN: only active sports appear in the filter dropdown.
-// PHASE 2 unlocks Cricket automatically via REACT_APP_PHASE=2.
 const ALL_SPORT_CONFIG = {
   tennis: { badge: "sport-badge-tennis", color: "text-tennis", icon: "🎾", label: "Tennis" },
   cricket: { badge: "sport-badge-cricket", color: "text-cricket", icon: "🏏", label: "Cricket" },
@@ -25,41 +17,11 @@ const SPORT_CONFIG = Object.fromEntries(
   activeSports.map((s) => [s.id, ALL_SPORT_CONFIG[s.id]]).filter(([, v]) => v)
 );
 
-const STATUS_COLORS = {
-  registration: "bg-green-50 text-green-700",
-  active: "bg-blue-50 text-blue-700",
-  completed: "bg-gray-100 text-gray-600",
-  cancelled: "bg-red-100 text-red-600",
-};
-
-const FORMAT_COLORS = {
-  singles: "bg-gray-100 text-gray-600",
-  doubles: "bg-blue-50 text-blue-700",
-  mixed_doubles: "bg-gray-100 text-gray-600",
-};
-
-// DUPR → division mapping for pickleball league join pre-selection.
-// When the join flow gains a division selection step (modal or page),
-// use this to pre-select the matching division based on user.dupr_rating:
-//
-//   const suggestedDivision = league.sport === "pickleball" && user?.dupr_rating
-//     ? DUPR_TO_DIVISION[user.dupr_rating]
-//     : null;
-//
-// Then pass `suggestedDivision` as the default value for the division picker.
-const DUPR_TO_DIVISION = {
-  "2.0-3.0": "Beginner",
-  "3.0-3.5": "Intermediate",
-  "3.5-4.5": "Advanced",
-  "4.5+": "Competitive",
-};
-
 export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [leagues, setLeagues] = useState([]);
-  const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     sport: searchParams.get("sport") || "",
@@ -72,7 +34,6 @@ export default function Leagues() {
     search: "",
   });
 
-  // Once user loads, default sport + city from profile if not set via URL params
   useEffect(() => {
     if (!user) return;
     setFilters(prev => ({
@@ -85,13 +46,6 @@ export default function Leagues() {
   useEffect(() => {
     fetchLeagues();
   }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id, filters.division, filters.format]);
-
-  useEffect(() => {
-    // Seasons endpoint requires auth, so degrade gracefully if logged out
-    axios.get(`${API}/seasons`, { withCredentials: true })
-      .then(({ data }) => setSeasons(data))
-      .catch(() => setSeasons([]));
-  }, []);
 
   const fetchLeagues = async () => {
     setLoading(true);
@@ -128,39 +82,37 @@ export default function Leagues() {
   });
 
   return (
-    <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="leagues-page">
+    <div className="min-h-screen bg-white" data-testid="leagues-page">
       {/* Header */}
-      <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#C24A1D" }}>All Leagues</p>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#065F46" }}>Browse Leagues</h1>
-          <p className="max-w-lg" style={{ color: "#6B7280" }}>Find and join competitive leagues across all sports and cities</p>
+      <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="font-black text-5xl sm:text-6xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Browse Leagues</h1>
+          <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Find competitive leagues across all sports and cities</p>
         </div>
       </div>
 
       {/* Promo Banner */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-bold text-orange-900">
-              First league free! Use code <code className="bg-orange-200 px-2 py-1 rounded font-mono text-orange-900">PLAY1FREE</code>
-            </p>
-          </div>
+      <div className="sticky top-0 z-10 border-b" style={{ background: "#F97316", borderColor: "#EA580C" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <p className="text-sm font-semibold text-white" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            First league free! Use code <code className="bg-orange-600 px-2 py-0.5 rounded font-mono text-white text-xs">PLAY1FREE</code>
+          </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters */}
-        <div className="rounded-2xl p-4 mb-8 flex flex-wrap gap-3" style={{ background: "white", border: "1px solid #E5E7EB" }}>
+        {/* Primary Filters — Search + Sport only */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-8">
           {/* Search */}
-          <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search leagues..."
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
+              className="w-full pl-10 pr-4 py-3 rounded-lg text-sm border"
+              style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "'IBM Plex Sans', sans-serif" }}
               data-testid="filter-search"
             />
           </div>
@@ -169,7 +121,8 @@ export default function Leagues() {
           <select
             value={filters.sport}
             onChange={(e) => updateFilter("sport", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
+            className="px-4 py-3 rounded-lg text-sm bg-white border focus:outline-none"
+            style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "'IBM Plex Sans', sans-serif", minWidth: "160px" }}
             data-testid="filter-sport"
           >
             <option value="">All Sports</option>
@@ -177,81 +130,29 @@ export default function Leagues() {
               <option key={s.id} value={s.id}>{s.icon} {s.label}</option>
             ))}
           </select>
+        </div>
 
-          {seasons.length > 0 && (
-            <select
-              value={filters.season_id}
-              onChange={(e) => updateFilter("season_id", e.target.value)}
-              className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
-              data-testid="filter-season"
-            >
-              <option value="">All Seasons</option>
-              {seasons
-                .filter((s) => !filters.sport || s.sport === filters.sport)
-                .map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-            </select>
-          )}
-
-          {/* City Filter — free text, with seeded suggestions */}
-          <input
-            type="text"
-            value={filters.city}
-            onChange={(e) => updateFilter("city", e.target.value)}
-            placeholder="Filter by city"
-            list="leagues-city-list"
-            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black w-44"
-            data-testid="filter-city"
-          />
-          <datalist id="leagues-city-list">
-            <option value="All Cities" />
-            {platformConfig.featuredCities.map((c) => (
-              <option key={c.name} value={c.name} />
-            ))}
-          </datalist>
-
-          {/* Status Filter */}
-          <select
-            value={filters.status}
-            onChange={(e) => updateFilter("status", e.target.value)}
-            className="px-4 py-2.5 rounded-xl text-sm bg-white focus:outline-none" style={{ border: "1px solid #E5E7EB", color: "#065F46" }}
-            data-testid="filter-status"
-          >
-            <option value="">Any Status</option>
-            <option value="registration">Open Registration</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
-
-          {(filters.sport || filters.city || filters.status || filters.division || filters.format) && (
-            <button
-              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
-              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border border-gray-200 rounded-xl"
-              data-testid="clear-filters"
-            >
-              Clear Filters
-            </button>)}
-
-          {/* Division filter */}
-          <div className="w-full flex flex-wrap gap-2 mt-1">
+        {/* Secondary Filters — Division + Format toggles */}
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Filter by level</p>
+          <div className="flex flex-wrap gap-2 mb-6">
             {["", "Beginner", "Intermediate", "Advanced", "Competitive"].map((div) => (
               <button
                 key={div || "all"}
                 data-testid={`division-filter-${div || "all"}`}
                 onClick={() => setFilters((f) => ({ ...f, division: div }))}
-                className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
+                className="px-4 py-2 rounded-md text-sm font-medium border transition-all duration-200"
                 style={filters.division === div
-                  ? { background: "#1B2B4B", borderColor: "#1B2B4B", color: "white" }
-                  : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
+                  ? { background: "#10B981", borderColor: "#10B981", color: "white" }
+                  : { background: "white", borderColor: "#E5E7EB", color: "#6B7280" }}
               >
                 {div || "All Levels"}
               </button>
             ))}
           </div>
 
-          {/* Format filter */}
-          <div className="w-full flex flex-wrap gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Filter by format</p>
+          <div className="flex flex-wrap gap-2">
             {[
               { value: "", label: "All Formats", testId: "format-filter-all" },
               { value: "singles", label: "Singles", testId: "format-filter-singles" },
@@ -262,10 +163,10 @@ export default function Leagues() {
                 key={value || "all-fmt"}
                 data-testid={testId}
                 onClick={() => setFilters((f) => ({ ...f, format: f.format === value ? "" : value }))}
-                className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
+                className="px-4 py-2 rounded-md text-sm font-medium border transition-all duration-200"
                 style={filters.format === value
-                  ? { background: "#C24A1D", borderColor: "#C24A1D", color: "white" }
-                  : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
+                  ? { background: "#F97316", borderColor: "#F97316", color: "white" }
+                  : { background: "white", borderColor: "#E5E7EB", color: "#6B7280" }}
               >
                 {label}
               </button>
@@ -273,18 +174,27 @@ export default function Leagues() {
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm" style={{ color: "#6B7280" }} data-testid="leagues-count">
+        {/* Results count + Clear */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm font-medium" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="leagues-count">
             {loading ? "Loading..." : `${filteredLeagues.length} league${filteredLeagues.length !== 1 ? "s" : ""} found`}
           </p>
+          {(filters.sport || filters.city || filters.status || filters.division || filters.format || filters.search) && (
+            <button
+              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 underline"
+              data-testid="clear-filters"
+            >
+              Clear all
+            </button>
+          )}
         </div>
 
         {/* League Grid */}
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-56 bg-white rounded-2xl animate-pulse" style={{ border: "1px solid #E5E7EB" }} />
+              <div key={i} className="h-64 bg-white rounded-lg animate-pulse border" style={{ borderColor: "#E5E7EB" }} />
             ))}
           </div>
         ) : filteredLeagues.length > 0 ? (
@@ -295,9 +205,16 @@ export default function Leagues() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <Trophy className="w-12 h-12 mx-auto mb-4" style={{ color: "#E5E7EB" }} />
-            <h3 className="font-heading font-bold text-xl mb-2" style={{ color: "#065F46" }}>No leagues found</h3>
-            <p className="text-sm mb-4" style={{ color: "#6B7280" }}>No leagues match your current filters. Clear them to see all open leagues.</p>
+            <Trophy className="w-16 h-16 mx-auto mb-6 opacity-30" />
+            <h3 className="font-black text-2xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>No leagues found</h3>
+            <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif", maxWidth: "400px", margin: "0 auto" }}>No leagues match your current filters. Try clearing them to see all open leagues.</p>
+            <button
+              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
+              className="px-6 py-3 rounded-lg font-semibold transition-all"
+              style={{ background: "#10B981", color: "white", fontFamily: "'IBM Plex Sans', sans-serif" }}
+            >
+              Clear Filters
+            </button>
           </div>
         )}
       </div>
@@ -310,95 +227,113 @@ function LeagueCard({ league, onClick }) {
   const spotsLeft = league.max_players - (league.current_players || 0);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const isEnded = league.status === "completed" || league.status === "cancelled";
-  const isAlmostFull = league.status === "registration" && spotsLeft <= 3 && spotsLeft > 0;
   const isFull = league.status === "registration" && spotsLeft <= 0;
 
   return (
     <div
-      onClick={onClick}
-      className={`bg-white rounded-2xl overflow-hidden cursor-pointer ${isEnded ? "opacity-60" : "league-card-hover"}`}
-      style={{ border: `1px solid ${isAlmostFull ? "#C9572A" : "#E5E7EB"}` }}
+      className="bg-white rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md overflow-hidden flex flex-col"
+      style={{ borderColor: "#E5E7EB" }}
       data-testid={`league-card-${league.id}`}
     >
-      <div className={`h-1.5 ${league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`} />
-      <div className="p-5">
+      {/* Sport top bar */}
+      <div
+        className="h-1.5 w-full"
+        style={{
+          backgroundColor:
+            league.sport === "tennis" ? "#10B981" : league.sport === "cricket" ? "#2563EB" : "#F97316",
+        }}
+      />
+
+      <div className="p-6 flex-1 flex flex-col">
+        {/* Sport badge + status */}
         <div className="flex items-start justify-between mb-3">
-          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${config.badge}`}>
+          <span
+            className="text-xs font-semibold px-3 py-1.5 rounded-md"
+            style={{
+              background:
+                league.sport === "tennis"
+                  ? "#D1FAE5"
+                  : league.sport === "cricket"
+                    ? "#DBEAFE"
+                    : "#FED7AA",
+              color: league.sport === "tennis" ? "#065F46" : league.sport === "cricket" ? "#1E40AF" : "#92400E",
+              fontFamily: "'IBM Plex Sans', sans-serif",
+            }}
+          >
             {config.icon} {config.label}
           </span>
-          {isEnded ? (
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#F3F4F6", color: "#6B7280" }}>
-              Season Ended
-            </span>
-          ) : isFull ? (
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-600" data-testid="badge-full">
-              Full
-            </span>
-          ) : isAlmostFull ? (
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-600 animate-pulse" data-testid="badge-almost-full">
-              🔥 {spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} left
-            </span>
-          ) : null}
-        </div>
-
-        <h3 className="font-heading font-bold mb-3 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#065F46" }}>{league.name}</h3>
-
-        <div className="flex items-center gap-1.5 text-xs mb-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
-          <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /> <span className="font-medium">{league.city}</span>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs mb-3">
-          <span className="px-2.5 py-1 rounded-md font-medium" style={{ background: "#F3F4F6", color: "#065F46", fontFamily: "'IBM Plex Sans', sans-serif" }}>
-            {league.format === "mixed_doubles" ? "Mixed Doubles" : league.format ? league.format.charAt(0).toUpperCase() + league.format.slice(1) : ""}
-          </span>
-          <span style={{ color: "#E5E7EB" }}>•</span>
-          <span className="flex items-center gap-1 font-medium" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}><Calendar className="w-3.5 h-3.5" /> {fmtDate(league.start_date)}</span>
-        </div>
-
-        {/* Division badge */}
-        <div className="mb-4">
-          {league.division_label ? (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold" style={{ background: "#F0F7FF", color: "#065F46", border: "1px solid #DBEAFE", fontFamily: "'IBM Plex Sans', sans-serif" }}>
-              {league.division_label}
-              {league.division_ntrp_min && (
-                <span className="ml-1.5 font-medium" style={{ color: "#6B7280" }}>
-                  ({league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
-                  {league.sport === "pickleball" ? "DUPR" : "NTRP"})
-                </span>
-              )}
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold" style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }}>
-              Open Division
+          {isEnded && (
+            <span
+              className="text-xs font-semibold px-2 py-1 rounded-md"
+              style={{ background: "#F3F4F6", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
+            >
+              Ended
             </span>
           )}
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-3">
-          <div className="flex justify-between text-xs mb-1.5">
-            <span style={{ color: "#6B7280" }}>{league.current_players || 0} joined</span>
-            <span style={{ color: isAlmostFull ? "#C9572A" : isFull ? "#DC2626" : "#6B7280", fontWeight: (isAlmostFull || isFull) ? 600 : 400 }}>
-              {isFull ? "League full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
+        {/* League name */}
+        <h3
+          className="font-black text-lg mb-3 line-clamp-2 leading-snug text-gray-900"
+          style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+        >
+          {league.name}
+        </h3>
+
+        {/* City + Format */}
+        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <div className="flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} />
+            <span className="font-medium">{league.city}</span>
+          </div>
+          {league.format && (
+            <>
+              <span>•</span>
+              <span className="font-medium">{league.format === "mixed_doubles" ? "Mixed" : league.format.charAt(0).toUpperCase() + league.format.slice(1)}</span>
+            </>
+          )}
+        </div>
+
+        {/* Spots available */}
+        <div className="mb-4">
+          <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <span>{league.current_players || 0} joined</span>
+            <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>
+              {isFull ? "Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""}`}
             </span>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
             <div
-              className={`h-full rounded-full transition-[width] ${isFull ? "bg-red-500" : isAlmostFull ? "bg-orange-400" : league.sport === "tennis" ? "bg-tennis" : league.sport === "cricket" ? "bg-cricket" : "bg-pickleball"}`}
-              style={{ width: `${fillPct}%` }}
+              className="h-full rounded-full transition-[width] duration-300"
+              style={{
+                width: `${fillPct}%`,
+                backgroundColor: isFull ? "#DC2626" : league.sport === "tennis" ? "#10B981" : league.sport === "cricket" ? "#2563EB" : "#F97316",
+              }}
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: "#F3F4F6" }}>
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS_COLORS[league.status] || "bg-gray-50 text-gray-500"}`} style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
-            {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Footer: Entry fee + Join button */}
+        <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "#F3F4F6" }}>
+          <span className="text-sm font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? "#F97316" : "#10B981", fontFamily: "'Sora', system-ui, sans-serif" }}>
+            {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
           </span>
-          {league.entry_fee && league.entry_fee > 0 ? (
-            <span className="text-sm font-bold font-heading" style={{ color: "#C24A1D" }}>${league.entry_fee}</span>
-          ) : (
-            <span className="text-sm font-bold font-heading" style={{ color: "#10B981" }}>Free</span>
-          )}
+          <button
+            onClick={onClick}
+            className="text-sm font-semibold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50"
+            style={{
+              background: isFull ? "#E5E7EB" : "#10B981",
+              color: isFull ? "#6B7280" : "white",
+              fontFamily: "'IBM Plex Sans', sans-serif",
+            }}
+            disabled={isFull}
+            data-testid={`league-join-${league.id}`}
+          >
+            {isFull ? "Full" : "Join"}
+          </button>
         </div>
       </div>
     </div>
