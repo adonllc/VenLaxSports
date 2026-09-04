@@ -39,7 +39,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.05, type: "spring", stiffness: 80 }}
           >
             Find Your<br />
-            <span style={{ color: "white" }}>Bracket</span>
+            <span style={{ color: "white" }}>League</span>
           </motion.h1>
 
           {/* Subheading */}
@@ -67,9 +67,9 @@ export default function Home() {
               whileHover={{ scale: 1.10, y: -5, boxShadow: "0 20px 48px rgba(0,0,0,0.3)" }}
               whileTap={{ scale: 0.95 }}
               aria-label="Browse available tennis and pickleball leagues"
-              data-testid="hero-find-bracket"
+              data-testid="hero-browse-leagues"
             >
-              ▶ Find Your Bracket
+              ▶ Browse Leagues
             </motion.button>
             <motion.button
               onClick={() => navigate("/auth")}
