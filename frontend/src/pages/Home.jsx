@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import Logo from "../components/Logo";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -10,14 +9,25 @@ export default function Home() {
       {/* HERO SECTION — Orange full-bleed */}
       <section className="flex-1 flex items-center justify-center px-6 py-20" style={{ backgroundColor: "#EA580C" }}>
         <div className="max-w-2xl text-center">
-          {/* Logo */}
+          {/* Nexus icon only (three sport rings) */}
           <motion.div
             className="mb-8 flex justify-center"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Logo size="lg" variant="light" />
+            <svg
+              width={80}
+              height={74}
+              viewBox="0 0 52 48"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ display: "block" }}
+              aria-hidden="true"
+            >
+              <circle cx="26" cy="13" r="12" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
+              <circle cx="14" cy="34" r="12" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
+              <circle cx="38" cy="34" r="12" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
+            </svg>
           </motion.div>
 
           {/* Headline */}
