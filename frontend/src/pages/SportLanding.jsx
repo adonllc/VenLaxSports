@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 import { ArrowRight, MapPin, CheckCircle, Bell } from "lucide-react";
 import { isSportActive } from "../config/platformConfig";
 import NotifyMeBanner from "../components/NotifyMeBanner";
@@ -98,30 +99,39 @@ export default function SportLanding() {
 
         {/* Info Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="rounded-2xl p-6" style={{ background: meta.palePill, border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
-              Formats
-            </h3>
-            <div className="space-y-1.5">
-              {meta.formats.map((f) => (
-                <div key={f} className="flex items-center gap-2 text-sm" style={{ color: TEXT_PRI }}>
-                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: meta.color }} /> {f}
+          {[
+            { title: "Formats", content: meta.formats, isPill: true },
+            { title: "Scoring", content: meta.scoring, isPill: false },
+            { title: "Rating System", content: meta.rating, isPill: false },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              className="rounded-2xl p-6"
+              style={{
+                background: item.isPill ? meta.palePill : "#ffffff",
+                border: `1px solid ${BORDER}`,
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+            >
+              <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
+                {item.title}
+              </h3>
+              {item.isPill ? (
+                <div className="space-y-1.5">
+                  {item.content.map((f) => (
+                    <div key={f} className="flex items-center gap-2 text-sm" style={{ color: TEXT_PRI }}>
+                      <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: meta.color }} /> {f}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-2xl p-6" style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
-              Scoring
-            </h3>
-            <p className="text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.scoring}</p>
-          </div>
-          <div className="rounded-2xl p-6" style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}>
-            <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
-              Rating System
-            </h3>
-            <p className="text-sm" style={{ color: TEXT_MUTED }}>{meta.rating}</p>
-          </div>
+              ) : (
+                <p className="text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>{item.content}</p>
+              )}
+            </motion.div>
+          ))}
         </div>
 
         {/* Description */}
@@ -134,17 +144,33 @@ export default function SportLanding() {
 
         {/* Features */}
         <div className="mb-12">
-          <h2 className="font-heading font-bold text-2xl mb-6" style={{ color: TEXT_PRI }}>What You Get</h2>
+          <motion.h2
+            className="font-heading font-bold text-2xl mb-6"
+            style={{ color: TEXT_PRI }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            What You Get
+          </motion.h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {meta.features.map((f) => (
-              <div key={f} className="flex items-center gap-3 rounded-xl p-4"
-                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}>
+            {meta.features.map((f, i) => (
+              <motion.div
+                key={f}
+                className="flex items-center gap-3 rounded-xl p-4"
+                style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
+              >
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                      style={{ backgroundColor: meta.color + "20" }}>
                   <CheckCircle className="w-4 h-4" style={{ color: meta.color }} />
                 </div>
                 <span className="text-sm font-medium" style={{ color: TEXT_PRI }}>{f}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -187,14 +213,18 @@ export default function SportLanding() {
             </div>
           ) : leagues.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-4">
-              {leagues.map((l) => (
-                <div
+              {leagues.map((l, i) => (
+                <motion.div
                   key={l.id}
                   onClick={() => navigate(`/leagues/${l.id}`)}
                   className="rounded-2xl p-6 cursor-pointer transition-all duration-200"
                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
                   data-testid={`sport-league-${l.id}`}
                 >
                   <div className="flex justify-between mb-3">
@@ -213,13 +243,19 @@ export default function SportLanding() {
                     <span className="font-medium">{l.max_players - (l.current_players || 0)} spots left</span>
                     <span className="font-medium">{l.format}</span>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="px-2 py-2">
+            <motion.div
+              className="px-2 py-2"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <NotifyMeBanner city="" sport={sport} />
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
