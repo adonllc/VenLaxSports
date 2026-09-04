@@ -330,7 +330,7 @@ export default function LeagueDetail() {
             {(league.division_label || league.format === "mixed_doubles") && (
               <div className="flex flex-wrap items-center gap-3">
                 {league.division_label && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#065F46", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="league-division-badge">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#065F46", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
                     {league.division_label}
                     {league.division_ntrp_min && (
                       <span className="ml-1.5 font-normal" style={{ color: "#6B7280" }}>
@@ -352,8 +352,8 @@ export default function LeagueDetail() {
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Sora', system-ui, sans-serif" }}>Season Ended</p>
-                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>This league is no longer active.</p>
+                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Sora', system-ui, sans-serif" }}>Season Completed</p>
+                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
                 </div>
               ) : (
                 <>

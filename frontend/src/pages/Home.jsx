@@ -66,7 +66,7 @@ export default function Home() {
               whileHover={{ scale: 1.10, y: -5, backgroundColor: "rgba(255,255,255,0.15)" }}
               whileTap={{ scale: 0.95 }}
             >
-              Register a Team →
+              Join a League →
             </motion.button>
           </motion.div>
         </div>
@@ -96,7 +96,7 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
         >
-          Join thousands of players building their legacy on the court.
+          Join 2,000+ players in ranked leagues. Compete fairly. Track your progress.
         </motion.p>
         <motion.button
           onClick={() => navigate("/auth")}

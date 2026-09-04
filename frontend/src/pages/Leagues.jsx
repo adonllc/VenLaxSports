@@ -134,7 +134,7 @@ export default function Leagues() {
 
         {/* Secondary Filters — Division + Format toggles */}
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Filter by level</p>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Skill Level</p>
           <div className="flex flex-wrap gap-2 mb-6">
             {["", "Beginner", "Intermediate", "Advanced", "Competitive"].map((div) => (
               <button
@@ -151,7 +151,7 @@ export default function Leagues() {
             ))}
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Filter by format</p>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Match Type</p>
           <div className="flex flex-wrap gap-2">
             {[
               { value: "", label: "All Formats", testId: "format-filter-all" },
@@ -297,9 +297,9 @@ function LeagueCard({ league, onClick }) {
         {/* Spots available */}
         <div className="mb-4">
           <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
-            <span>{league.current_players || 0} joined</span>
+            <span>{league.current_players || 0}/{league.max_players} players</span>
             <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>
-              {isFull ? "Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""}`}
+              {isFull ? "League Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
             </span>
           </div>
           <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>

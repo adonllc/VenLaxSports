@@ -126,7 +126,7 @@ export default function Footer() {
         {/* Featured Cities — Full width, below main content */}
         <div className="pb-20 border-b border-gray-200 dark:border-gray-800">
           <h3 className="font-black text-xs uppercase tracking-widest mb-6 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
-            Find Leagues
+            Browse by City
           </h3>
           <div className="flex flex-wrap gap-8">
             {platformConfig.featuredCities.slice(0, 6).map((city) => (
