@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle, Clock, TrendingUp } from "lucide-react";
+import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
 
@@ -297,70 +297,74 @@ export default function LeagueDetail() {
     <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="league-detail-page">
       {/* Header Banner */}
       <div className={`${headerBg}`} style={{ borderBottom: "1px solid #E5E7EB" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-5 transition-colors" style={{ color: "#6B7280" }} data-testid="back-to-leagues">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-6 transition-colors font-medium" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="back-to-leagues">
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
           </button>
 
-          <div className="flex flex-col gap-6 items-start">
-            <div className="w-full">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className={`px-3 py-1 text-sm font-semibold rounded-full ${config.badge}`}>
+          <div className="flex flex-col gap-6">
+            {/* Title section */}
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
                   {config.icon} {config.label}
                 </span>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={league.status === "registration" ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#F3F4F6", color: "#6B7280" }}>
+                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#065F46", fontFamily: "'IBM Plex Sans', sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
-                {league.format === "mixed_doubles" && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium" style={{ background: "#EDF7F3", color: "#065F46", border: "1px solid #0B6E4F" }}>
-                    Mixed Doubles
-                  </span>
-                )}
                 {isRegistered && (
-                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#C24A1D", color: "white" }} data-testid="registered-pill">
-                    <CheckCircle className="w-3 h-3" /> Registered
+                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#10B981", color: "white", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="registered-pill">
+                    <CheckCircle className="w-3.5 h-3.5" /> Registered
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-3 mb-3">
-                <h1 className="font-heading font-semibold text-lg" style={{ color: "#065F46" }}>{league.name}</h1>
+              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>{league.name}</h1>
+              <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} /> {league.city}</span>
+                <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
+                <span className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /> {league.current_players || 0}/{league.max_players} players</span>
+              </div>
+            </div>
+
+            {/* Division + format info */}
+            {(league.division_label || league.format === "mixed_doubles") && (
+              <div className="flex flex-wrap items-center gap-3">
                 {league.division_label && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium" style={{ background: "#F3F4F6", color: "#C24A1D", border: "1px solid #E5E7EB" }} data-testid="league-division-badge">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#065F46", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="league-division-badge">
                     {league.division_label}
                     {league.division_ntrp_min && (
-                      <span className="ml-1 font-normal" style={{ color: "#6B7280" }}>
-                        {league.division_ntrp_min}–{league.division_ntrp_max || "+"}{" "}
-                        {league.sport === "pickleball" ? "DUPR" : "NTRP"}
+                      <span className="ml-1.5 font-normal" style={{ color: "#6B7280" }}>
+                        {league.division_ntrp_min}–{league.division_ntrp_max || "+"} {league.sport === "pickleball" ? "DUPR" : "NTRP"}
                       </span>
                     )}
                   </span>
                 )}
+                {league.format === "mixed_doubles" && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#065F46", border: "1px solid #D1F5EC", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                    Mixed Doubles
+                  </span>
+                )}
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: "#6B7280" }}>
-                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {league.city}</span>
-                <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(league.start_date)} to {formatDate(league.end_date)}</span>
-                <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {league.current_players || 0}/{league.max_players} players</span>
-              </div>
-            </div>
+            )}
 
             {/* Join Card */}
-            <div className="bg-white rounded-2xl p-5 w-full" style={{ border: "1px solid #E5E7EB" }}>
+            <div className="bg-white rounded-lg p-6 w-full" style={{ border: "1px solid #E5E7EB" }}>
               {(league.status === "completed" || league.status === "cancelled") ? (
-                <div className="text-center py-4">
-                  <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: "#E5E7EB" }} />
-                  <p className="font-semibold text-sm" style={{ color: "#374151" }}>Season Ended</p>
-                  <p className="text-xs mt-1" style={{ color: "#6B7280" }}>This league is no longer active.</p>
+                <div className="text-center py-6">
+                  <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Sora', system-ui, sans-serif" }}>Season Ended</p>
+                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>This league is no longer active.</p>
                 </div>
               ) : (
                 <>
                   {/* Spots bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs mb-1" style={{ color: "#6B7280" }}>
-                      <span>{spotsLeft} spots remaining</span>
-                      <span>{fillPct}% filled</span>
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                      <span style={{ color: "#374151", fontWeight: 500 }}>{spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} remaining</span>
+                      <span style={{ color: "#6B7280" }}>{fillPct}% full</span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
-                      <div className="h-full rounded-full transition-[width]" style={{ width: `${fillPct}%`, background: "#C24A1D" }} />
+                      <div className="h-full rounded-full transition-[width]" style={{ width: `${fillPct}%`, background: config.accent || "#10B981" }} />
                     </div>
                   </div>
 
