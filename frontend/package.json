@@ -57,7 +57,11 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "echo \"No tests configured\""
+    "test": "echo \"No tests configured\"",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:ui": "playwright test --ui"
   },
   "browserslist": {
     "production": [
@@ -73,6 +77,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.23.0",
+    "@playwright/test": "^1.63.0",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.20",
     "eslint": "9.23.0",
