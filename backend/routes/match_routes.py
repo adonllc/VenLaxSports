@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, Request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from bson import ObjectId
-from models import Match, MatchCreate, MatchScore
+from models import Match, MatchCreate, MatchScore, MatchCard
 from auth_utils import get_current_user
 from rating_utils import delta_for, rating_field_for, clamp, k_factor_for
 import email_service
+from card_generation import generate_match_card, save_card_image
+import os
 
 router = APIRouter(redirect_slashes=False)
 
@@ -530,3 +532,134 @@ async def _maybe_advance_playoffs(db, league_id: str, round_num: int):
         pass
 
     return {"round": next_round, "match_ids": created_ids, "label": round_label}
+
+
+# ─── Match→Story: Card Generation & Sharing ──────────
+@router.post("/{match_id}/share")
+async def share_match(match_id: str, request: Request):
+    """Trigger card generation for a completed match."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    try:
+        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="Match not found")
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    # Only winner can share
+    if str(user["_id"]) != str(match.get("winner_id")):
+        raise HTTPException(status_code=403, detail="Only the winner can share this match")
+
+    # Check if card already exists
+    existing_card = await db.match_cards.find_one({"match_id": match_id})
+    if existing_card:
+        return {
+            "card_id": str(existing_card["_id"]),
+            "shareable_url": existing_card.get("shareable_url"),
+            "status": "ready",
+        }
+
+    # Generate card asynchronously (trigger)
+    try:
+        winner = await db.users.find_one({"_id": ObjectId(match["winner_id"])})
+        opponent_id = match["player1_id"] if str(match["winner_id"]) == str(match["player2_id"]) else match["player2_id"]
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+
+        score = match.get("score_data", "TBD")
+        sport = match.get("sport", "tennis")
+        timestamp = datetime.now(timezone.utc)
+
+        # Generate image
+        rating_delta = match.get("rating_delta", 0)
+        img = generate_match_card(
+            winner_name=winner["name"],
+            opponent_name=opponent["name"],
+            score=score,
+            rating_delta=rating_delta,
+            sport=sport,
+            timestamp=timestamp,
+        )
+
+        # Save to disk (simple: use match_id as filename)
+        card_dir = "cards"
+        card_filename = f"{match_id}.png"
+        card_path = os.path.join(card_dir, card_filename)
+        save_card_image(img, card_path)
+
+        # Create short URL (simple: use card_id as slug)
+        card_doc = MatchCard(
+            match_id=match_id,
+            winner_id=str(match["winner_id"]),
+            opponent_id=str(opponent_id),
+            sport=sport,
+            score=score,
+            rating_delta=rating_delta,
+            card_image_url=f"/api/card/image/{match_id}",  # serve from backend
+            shareable_url=f"https://venlax.app/c/{match_id}",
+            expires_at=(timestamp + timedelta(days=30)).isoformat(),
+        )
+        result = await db.match_cards.insert_one(card_doc.to_mongo())
+        card_id = str(result.inserted_id)
+
+        return {
+            "card_id": card_id,
+            "shareable_url": card_doc.shareable_url,
+            "status": "ready",
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Card generation failed: {str(e)}")
+
+
+@router.get("/{match_id}/card")
+async def get_card(match_id: str, request: Request):
+    """Fetch card metadata for a match (polling endpoint)."""
+    db = request.app.state.db
+
+    card = await db.match_cards.find_one({"match_id": match_id})
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+    return {
+        "card_id": str(card["_id"]),
+        "match_id": card["match_id"],
+        "shareable_url": card.get("shareable_url"),
+        "card_image_url": card.get("card_image_url"),
+        "rating_delta": card.get("rating_delta"),
+    }
+
+
+@router.get("/card/image/{match_id}")
+async def get_card_image(match_id: str, request: Request):
+    """Serve card image (PNG) for og:image meta tag."""
+    from fastapi.responses import FileResponse
+    card_path = os.path.join("cards", f"{match_id}.png")
+    if not os.path.exists(card_path):
+        raise HTTPException(status_code=404, detail="Card image not found")
+    return FileResponse(card_path, media_type="image/png")
+
+
+@router.get("/card/{card_id}")
+async def get_public_card(card_id: str, request: Request):
+    """Public endpoint for social preview (no auth required)."""
+    db = request.app.state.db
+
+    try:
+        card = await db.match_cards.find_one({"_id": ObjectId(card_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="Card not found")
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+    return {
+        "card_id": str(card["_id"]),
+        "winner_name": card.get("winner_name", "Player"),
+        "opponent_name": card.get("opponent_name", "Opponent"),
+        "score": card.get("score", "TBD"),
+        "rating_delta": card.get("rating_delta", 0),
+        "sport": card.get("sport", "tennis"),
+        "og_image": card.get("card_image_url"),
+        "og_title": f"Winner: {card.get('winner_name', 'Player')} beat {card.get('opponent_name', 'Opponent')}",
+        "og_description": f"Check out this ranked {card.get('sport', 'tennis')} match on VENLAX Sports!",
+    }
