@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import MatchCard from "../components/MatchCard";
 import { ArrowLeft, CheckCircle, AlertCircle, Trophy, Clock } from "lucide-react";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -101,6 +102,8 @@ export default function ScoreReport() {
   const [submitted, setSubmitted] = useState(false);
   const [submittedResult, setSubmittedResult] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [card, setCard] = useState(null);
+  const [cardLoading, setCardLoading] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -184,7 +187,40 @@ export default function ScoreReport() {
         : "";
       setSubmittedResult({ winnerName, summary });
       setSubmitted(true);
-      setTimeout(() => navigate("/dashboard"), 4000);
+
+      // Trigger card generation
+      setCardLoading(true);
+      try {
+        await axios.post(`${API}/matches/${matchId}/share`, {}, { withCredentials: true });
+        // Poll for card (max 10s)
+        let attempts = 0;
+        const pollCard = setInterval(async () => {
+          attempts++;
+          try {
+            const { data } = await axios.get(`${API}/matches/${matchId}/card`, { withCredentials: true });
+            setCard({
+              winnerName,
+              opponentName: winnerId === match.player1_id ? match.player2_name : match.player1_name,
+              score: summary,
+              ratingDelta: data.rating_delta || 0,
+              shareableUrl: data.shareable_url,
+              timestamp: new Date().toISOString(),
+            });
+            clearInterval(pollCard);
+            setCardLoading(false);
+          } catch {
+            if (attempts >= 10) {
+              clearInterval(pollCard);
+              setCardLoading(false);
+            }
+          }
+        }, 500);
+      } catch (err) {
+        console.error("Card generation failed:", err);
+        setCardLoading(false);
+      }
+
+      setTimeout(() => navigate("/dashboard"), 6000);
     } catch (err) {
       const d = err.response?.data?.detail;
       setMsg(typeof d === "string" ? d : "Failed to report score");
@@ -248,9 +284,24 @@ export default function ScoreReport() {
                   <p className="text-sm text-gray-500 mt-1 font-mono">{submittedResult.summary}</p>
                 )}
               </div>
-              <p className="text-xs text-gray-400">Redirecting to dashboard in a few seconds...</p>
+              {card ? (
+                <p className="text-xs text-green-600 font-medium">Card ready to share!</p>
+              ) : cardLoading ? (
+                <p className="text-xs text-gray-400">Generating shareable card...</p>
+              ) : (
+                <p className="text-xs text-gray-400">Redirecting to dashboard in a few seconds...</p>
+              )}
             </div>
           </div>
+
+          {/* Match card display */}
+          {card && (
+            <MatchCard
+              match={card}
+              sport={sport}
+              onShare={() => setCard(null)}
+            />
+          )}
 
           {/* Share card */}
           <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-center" data-testid="share-card">
