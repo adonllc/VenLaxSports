@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 ROOT_DIR = Path(__file__).parent
 
-mongo_url = os.environ["MONGO_URL"]
+mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ["DB_NAME"]]
 
@@ -135,10 +135,11 @@ async def stripe_webhook(request: Request):
 
 app.include_router(api_router)
 
+cors_origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -184,20 +185,21 @@ async def seed_demo_wrapper():
 
 @app.on_event("startup")
 async def startup_event():
-    await seed_admin_wrapper()
-    await create_indexes_wrapper()
-    await seed_leagues_wrapper()
-    await seed_cities_wrapper()
-    await normalize_pricing_wrapper()
-    await seed_promo_codes_wrapper()
-    await seed_demo_wrapper()
-    import scheduler as _sched
-    _sched.start_scheduler()
+    # Temporarily disabled for debugging
+    # await seed_admin_wrapper()
+    # await create_indexes_wrapper()
+    # await seed_leagues_wrapper()
+    # await seed_cities_wrapper()
+    # await normalize_pricing_wrapper()
+    # await seed_promo_codes_wrapper()
+    # await seed_demo_wrapper()
+    # import scheduler as _sched
+    # _sched.start_scheduler()
     logger.info("Application startup complete")
 
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    import scheduler as _sched
-    _sched.stop_scheduler()
+    # import scheduler as _sched
+    # _sched.stop_scheduler()
     client.close()
