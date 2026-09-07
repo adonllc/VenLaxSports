@@ -224,6 +224,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     "initiator_name": initiator_name,
                     "partner_email": partner.get("email", ""),
                     "partner_user_id": str(partner["_id"]),
+                    "partner_added_by_initiator": True,
                     "token": token,
                     "status": "pending",
                     "waiver_p1_at": now.isoformat(),
@@ -252,8 +253,10 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     user["email"], initiator_name, league_name, sport, league_id, False
                 ))
                 if partner.get("email"):
-                    email_service.schedule(email_service.send_registration_confirmed(
-                        partner["email"], p2_name, league_name, sport, league_id, False
+                    email_service.schedule(email_service.send_partner_registered(
+                        partner["email"], p2_name, initiator_name, league_name, sport, league_id,
+                        city=league.get("city", ""), venue=league.get("venue"), start_date=league.get("start_date", ""),
+                        paid=False,
                     ))
                 return {"registered": True, "message": "Team registered successfully!"}
 
@@ -301,6 +304,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "initiator_name": initiator_name,
                 "partner_email": partner_email,
                 "partner_user_id": None,
+                "partner_added_by_initiator": False,
                 "token": token,
                 "status": "pending",
                 "waiver_p1_at": now.isoformat(),

@@ -310,11 +310,16 @@ async def my_doubles_invites(request: Request):
 
 # ── Shared helper ─────────────────────────────────────────────────────────────
 
-async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dict):
+async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dict,
+                                notify_partner_as_added: bool = False):
     """Create PlayerLeague records for both P1 and P2.
 
     Idempotent — duplicate key errors (from the unique index) are silently swallowed.
     Called for free leagues (here) and paid leagues (from payment_routes after Stripe confirms).
+
+    notify_partner_as_added: True when P2 was directly selected by P1 and never took
+    an accept action themselves (direct partner-select flow) — P2 gets a "you were
+    added as a partner" notification instead of the standard confirmation email.
     """
     from datetime import datetime, timezone
 
@@ -380,11 +385,22 @@ async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dic
     p1_email = p1.get("email", "") if p1 else ""
     p2_email = partner_user.get("email", "")
 
+    entry_fee = float(league.get("entry_fee", 0))
+
     if p1_email:
         email_service.schedule(email_service.send_registration_confirmed(
-            p1_email, p1_name, league_name, sport, league_id, paid=(payment_status == "paid")
+            p1_email, p1_name, league_name, sport, league_id,
+            paid=(payment_status == "paid"), amount=entry_fee, currency=league.get("currency", "USD"),
         ))
     if p2_email:
-        email_service.schedule(email_service.send_registration_confirmed(
-            p2_email, p2_name, league_name, sport, league_id, paid=(payment_status == "paid")
-        ))
+        if notify_partner_as_added:
+            email_service.schedule(email_service.send_partner_registered(
+                p2_email, p2_name, p1_name, league_name, sport, league_id,
+                city=league.get("city", ""), venue=league.get("venue"), start_date=league.get("start_date", ""),
+                paid=(payment_status == "paid"), amount=entry_fee, currency=league.get("currency", "USD"),
+            ))
+        else:
+            email_service.schedule(email_service.send_registration_confirmed(
+                p2_email, p2_name, league_name, sport, league_id,
+                paid=(payment_status == "paid"), amount=entry_fee, currency=league.get("currency", "USD"),
+            ))

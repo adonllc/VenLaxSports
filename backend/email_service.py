@@ -174,6 +174,33 @@ async def send_registration_confirmed(to: str, player_name: str, league_name: st
     await send_email(to, subject, _wrap("Registration confirmed", body, "Open league", url))
 
 
+async def send_partner_registered(to: str, partner_name: str, initiator_name: str, league_name: str,
+                                   sport: str, league_id: str, city: str = "", venue: Optional[str] = None,
+                                   start_date: str = "", paid: bool = False, amount: float = 0.0,
+                                   currency: str = "USD") -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}" if _get_frontend_url() else f"/leagues/{league_id}"
+    sym = "₹" if currency == "INR" else "$"
+    fee_line = f"<li><strong>Entry fee:</strong> {sym}{amount:.2f} (paid by {initiator_name})</li>" if paid and amount > 0 else ""
+    city_line = f"<li><strong>City:</strong> {city}</li>" if city else ""
+    venue_line = f"<li><strong>Venue:</strong> {venue}</li>" if venue else ""
+    date_line = f"<li><strong>Start date:</strong> {start_date}</li>" if start_date else ""
+    body = f"""
+      <p>Hi {partner_name},</p>
+      <p><strong>{initiator_name}</strong> has registered you as their doubles partner for <strong>{league_name}</strong>. You're all set — no further action needed.</p>
+      <ul style="padding-left:18px;margin:0">
+        <li><strong>League:</strong> {league_name}</li>
+        <li><strong>Sport:</strong> {sport.title()}</li>
+        {city_line}
+        {date_line}
+        {venue_line}
+        {fee_line}
+      </ul>
+      <p>Head to your dashboard to see your schedule and coordinate with {initiator_name}.</p>
+    """
+    subject = f"{initiator_name} added you as their doubles partner — {league_name}"
+    await send_email(to, subject, _wrap("You've been added as a partner", body, "View league", url))
+
+
 async def send_password_reset(to: str, player_name: str, reset_url: str) -> None:
     body = f"""
       <p>Hi {player_name},</p>
