@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./App.css";
 import ConsentBanner from "./components/ConsentBanner";
+import RouteErrorBoundary from "./components/RouteErrorBoundary";
 
 // Eagerly loaded — always needed on first paint
 import Home from "./pages/Home";
@@ -55,40 +56,42 @@ function PageFallback() {
 
 function AppRouter() {
   return (
-    <Suspense fallback={<PageFallback />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/sport/:sport" element={<SportLanding />} />
-        <Route path="/leagues" element={<Leagues />} />
-        <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
-        <Route path="/leagues/:id" element={<LeagueDetail />} />
-        <Route path="/rules" element={<Rules />} />
-        <Route path="/handbook" element={<Handbook />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/waiver" element={<Waiver />} />
-        <Route path="/dashboard" element={<PlayerDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/matches/:id/score" element={<ScoreReport />} />
-        <Route path="/leagues/:id/standings" element={<Standings />} />
-        <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
-        <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
-        <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
-        <Route path="/players/:id" element={<PublicProfile />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="/join" element={<JoinFlow />} />
-        <Route path="/auth/callback" element={<OAuthCallback />} />
-        <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
-        <Route path="/ladders" element={<Ladders />} />
-        <Route path="/ladders/:id" element={<LadderDetail />} />
-        <Route path="/rewards" element={<RewardsCredits />} />
-        <Route path="/logo-demo" element={<LogoDemo />} />
-      </Routes>
-    </Suspense>
+    <RouteErrorBoundary>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/sport/:sport" element={<SportLanding />} />
+          <Route path="/leagues" element={<Leagues />} />
+          <Route path="/leagues/round-robin" element={<RoundRobinLeagues />} />
+          <Route path="/leagues/:id" element={<LeagueDetail />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/handbook" element={<Handbook />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/waiver" element={<Waiver />} />
+          <Route path="/dashboard" element={<PlayerDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/matches/:id/score" element={<ScoreReport />} />
+          <Route path="/leagues/:id/standings" element={<Standings />} />
+          <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
+          <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/leagues/:id/public" element={<LeagueSpectator />} />
+          <Route path="/city/:city/sport/:sport" element={<CityLeaderboard />} />
+          <Route path="/players/:id" element={<PublicProfile />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
+          <Route path="/join" element={<JoinFlow />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
+          <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
+          <Route path="/ladders" element={<Ladders />} />
+          <Route path="/ladders/:id" element={<LadderDetail />} />
+          <Route path="/rewards" element={<RewardsCredits />} />
+          <Route path="/logo-demo" element={<LogoDemo />} />
+        </Routes>
+      </Suspense>
+    </RouteErrorBoundary>
   );
 }
 
