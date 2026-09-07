@@ -85,6 +85,7 @@ export default function LeagueDetail() {
     } catch (e) {
       console.error(e);
       setNetworkError("Unable to load league. Please check your connection and try again.");
+    } finally {
       setLoading(false);
     }
   };
