@@ -4,7 +4,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 import platformConfig, { activeSports, activeCountry } from "../config/platformConfig";
 import BRAND from "../config/brandConfig";
-import Logo from "../components/Logo";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 import WaiverModal from "../components/WaiverModal";
 import ParentalConsentModal from "../components/ParentalConsentModal";
@@ -185,10 +184,6 @@ export default function Auth() {
           backgroundImage: "radial-gradient(circle at 30% 50%, #C24A1D 0%, transparent 60%), radial-gradient(circle at 70% 30%, #8B2E0D 0%, transparent 60%), radial-gradient(circle at 50% 80%, #C9572A 0%, transparent 50%)"
         }} />
         <div className="relative z-10 text-center text-white">
-          <div className="flex items-center justify-center mb-8">
-            <Logo size="md" variant="hero" testId="auth-hero-logo" />
-          </div>
-
           <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "white", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#C9572A" }}>COMPETE.</span>
           </h1>
