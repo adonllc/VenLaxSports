@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-09-04T02:33:54.989Z",
         "reason": "rounded card borders standard; 1px all-around ok"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/ScoreReport.jsx"
+        ],
+        "createdAt": "2026-09-08T00:03:52.433Z",
+        "reason": "loading spinner (animate-spin rounded-full border-b-2), not a card border-accent clash — pre-existing pattern reused across pages"
       }
     ]
   }

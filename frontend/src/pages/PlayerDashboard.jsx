@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff, Share2 } from "lucide-react";
 import OpponentSearch from "../components/OpponentSearch";
 import RatingHistoryChart from "../components/RatingHistoryChart";
+import { buildScoreSummary } from "../utils/scoreSummary";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -28,6 +29,8 @@ export default function PlayerDashboard() {
   const [togglingNotif, setTogglingNotif] = useState(false);
   const [togglingPrivacy, setTogglingPrivacy] = useState(false);
   const [interests, setInterests] = useState([]);
+  const [shareOpenId, setShareOpenId] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
   const [removingInterest, setRemovingInterest] = useState(null);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [boxStatuses, setBoxStatuses] = useState({});
@@ -200,6 +203,31 @@ export default function PlayerDashboard() {
     return null;
   })();
   const recent = matches.filter((m) => m.status === "completed").slice(0, 5);
+
+  const buildShareLinks = (m) => {
+    const sportEmoji = m.sport === "tennis" ? "🎾" : m.sport === "pickleball" ? "🏓" : "🏏";
+    const loserName = m.winner_name === m.player1_name ? m.player2_name : m.player1_name;
+    const summary = buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name);
+    const summaryStr = summary?.scoreStr || (m.score_data?.retired ? "Retired / Walkover" : "");
+    const spectatorUrl = `https://venlaxsports.com/leagues/${m.league_id}/public?utm_source=venlax&utm_medium=share_card`;
+    const shareText = encodeURIComponent(
+      `${sportEmoji} ${m.winner_name} defeated ${loserName}${summaryStr ? ` ${summaryStr}` : ""}\n` +
+      `📍 VenLax Sports · ${m.sport}\n` +
+      `👉 ${spectatorUrl}`
+    );
+    return { waUrl: `https://wa.me/?text=${shareText}`, spectatorUrl };
+  };
+
+  const handleCopyLink = async (m) => {
+    const { spectatorUrl } = buildShareLinks(m);
+    try {
+      await navigator.clipboard.writeText(spectatorUrl);
+      setCopiedId(m.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // clipboard unavailable — silently ignore
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="player-dashboard">
@@ -580,16 +608,52 @@ export default function PlayerDashboard() {
               <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                 {recent.map((m) => {
                   const isWin = m.winner_id === user.id || m.winner_id === user._id;
+                  const isShareOpen = shareOpenId === m.id;
+                  const { waUrl } = m.winner_name ? buildShareLinks(m) : {};
                   return (
-                    <div key={m.id} className="flex items-center gap-3 px-5 py-3.5">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                        style={isWin ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }}>
-                        {isWin ? "W" : "L"}
+                    <div key={m.id}>
+                      <div className="flex items-center gap-3 px-5 py-3.5">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                          style={isWin ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }}>
+                          {isWin ? "W" : "L"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate" style={{ color: "#065F46" }}>{m.player1_name} vs {m.player2_name}</p>
+                          {m.winner_name && <p className="text-xs" style={{ color: "#6B7280" }}>{m.winner_name} won</p>}
+                        </div>
+                        {m.winner_name && (
+                          <button
+                            onClick={() => setShareOpenId(isShareOpen ? null : m.id)}
+                            className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex-shrink-0"
+                            style={{ color: "#065F46", background: "#EDF7F3" }}
+                            data-testid={`share-match-${m.id}`}
+                          >
+                            <Share2 className="w-3.5 h-3.5" /> Share
+                          </button>
+                        )}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate" style={{ color: "#065F46" }}>{m.player1_name} vs {m.player2_name}</p>
-                        {m.winner_name && <p className="text-xs" style={{ color: "#6B7280" }}>{m.winner_name} won</p>}
-                      </div>
+                      {isShareOpen && (
+                        <div className="px-5 pb-3.5 flex gap-2" data-testid={`share-panel-${m.id}`}>
+                          <a
+                            href={waUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 text-center text-xs font-bold text-white rounded-lg py-2 transition hover:opacity-90"
+                            style={{ background: "#0B6E4F" }}
+                            data-testid={`share-wa-${m.id}`}
+                          >
+                            Share on WhatsApp
+                          </a>
+                          <button
+                            onClick={() => handleCopyLink(m)}
+                            className="flex-1 text-xs font-medium rounded-lg py-2 transition"
+                            style={{ background: "#F3F4F6", color: "#374151" }}
+                            data-testid={`share-copy-${m.id}`}
+                          >
+                            {copiedId === m.id ? "Copied!" : "Copy link"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
