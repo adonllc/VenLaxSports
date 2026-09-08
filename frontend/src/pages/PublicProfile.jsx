@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { Trophy, Share2, Swords, MapPin } from "lucide-react";
+import { Trophy, Share2, Swords, MapPin, UserPlus, UserCheck } from "lucide-react";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -25,6 +25,8 @@ export default function PublicProfile() {
   const [challenging, setChallenging] = useState(false);
   const [challengeSent, setChallengeSent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const [followBusy, setFollowBusy] = useState(false);
 
   useEffect(() => {
     axios.get(`${API}/public/player/${playerId}`)
@@ -32,6 +34,34 @@ export default function PublicProfile() {
       .catch(() => setError("Player not found or profile is private."))
       .finally(() => setLoading(false));
   }, [playerId]);
+
+  useEffect(() => {
+    if (!user) return;
+    axios.get(`${API}/users/me/following`, { withCredentials: true })
+      .then(r => setFollowing(r.data.some(p => p.id === playerId)))
+      .catch(() => {});
+  }, [user, playerId]);
+
+  const handleFollow = async () => {
+    if (!user) {
+      navigate(`/auth?next=/players/${playerId}`);
+      return;
+    }
+    setFollowBusy(true);
+    const next = !following;
+    setFollowing(next); // optimistic
+    try {
+      if (next) {
+        await axios.post(`${API}/users/${playerId}/follow`, {}, { withCredentials: true });
+      } else {
+        await axios.delete(`${API}/users/${playerId}/follow`, { withCredentials: true });
+      }
+    } catch {
+      setFollowing(!next); // revert on failure
+    } finally {
+      setFollowBusy(false);
+    }
+  };
 
   const handleChallenge = async () => {
     if (!user) {
@@ -152,21 +182,36 @@ export default function PublicProfile() {
             </div>
           </div>
 
-          {/* Challenge button — hidden for own profile */}
+          {/* Follow + Challenge — hidden for own profile */}
           {!isOwnProfile && (
-            <button
-              onClick={handleChallenge}
-              disabled={challenging || challengeSent}
-              className="mt-5 w-full flex items-center justify-center gap-2 bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
-              data-testid="challenge-btn"
-            >
-              <Swords className="w-4 h-4" />
-              {challengeSent
-                ? "Challenge Sent!"
-                : challenging
-                ? "Sending..."
-                : `Challenge ${profile.name}`}
-            </button>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={handleFollow}
+                disabled={followBusy}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold transition disabled:opacity-50 ${
+                  following
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                    : "bg-white text-[#1B2B4B] border border-gray-200 hover:bg-gray-50"
+                }`}
+                data-testid="follow-btn"
+              >
+                {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                {following ? "Following" : "Follow"}
+              </button>
+              <button
+                onClick={handleChallenge}
+                disabled={challenging || challengeSent}
+                className="flex-1 flex items-center justify-center gap-2 bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
+                data-testid="challenge-btn"
+              >
+                <Swords className="w-4 h-4" />
+                {challengeSent
+                  ? "Sent!"
+                  : challenging
+                  ? "Sending..."
+                  : "Challenge"}
+              </button>
+            </div>
           )}
         </div>
 

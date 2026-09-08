@@ -62,3 +62,6 @@ async def create_indexes(db) -> None:
     await db.appeals.create_index([("status", 1), ("created_at", -1)])
     # Token Blacklist — auto-cleanup expired tokens
     await db.token_blacklist.create_index("expires_at", expireAfterSeconds=0)
+    # Player follow graph
+    await db.user_follows.create_index([("follower_id", 1), ("followee_id", 1)], unique=True)
+    await db.user_follows.create_index([("followee_id", 1)])

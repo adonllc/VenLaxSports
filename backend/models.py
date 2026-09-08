@@ -323,6 +323,12 @@ class PaymentTransaction(BaseDocument):
 
 
 # ─── Challenge ───────────────────────────────────────
+class UserFollow(BaseDocument):
+    follower_id: str
+    followee_id: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
 class Challenge(BaseDocument):
     challenger_id: str
     challenger_name: str

@@ -37,6 +37,7 @@ export default function PlayerDashboard() {
   const [pendingInvites, setPendingInvites] = useState([]);
   const [boxStatuses, setBoxStatuses] = useState({});
   const [ladderEntries, setLadderEntries] = useState([]);
+  const [followFeed, setFollowFeed] = useState([]);
 
   useEffect(() => {
     if (loading) return;
@@ -74,6 +75,9 @@ export default function PlayerDashboard() {
     } catch (e) { console.error(e); }
     axios.get(`${API}/notifications/interests`, { withCredentials: true })
       .then(r => setInterests(r.data))
+      .catch(() => {});
+    axios.get(`${API}/users/me/feed`, { withCredentials: true })
+      .then(r => setFollowFeed(r.data))
       .catch(() => {});
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/my-invites`, { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
@@ -599,6 +603,31 @@ export default function PlayerDashboard() {
               </div>
             )}
           </div>
+
+          {/* People You Follow — recent activity feed */}
+          {followFeed.length > 0 && (
+            <div className="bg-white rounded-2xl overflow-hidden mb-6" style={{ border: "1px solid #E5E7EB" }}>
+              <div className="p-5 flex items-center gap-2" style={{ borderBottom: "1px solid #F3F4F6" }}>
+                <Users className="w-4 h-4" style={{ color: "#065F46" }} />
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>People You Follow</h2>
+              </div>
+              <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
+                {followFeed.map((m, i) => {
+                  const summary = buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name);
+                  const loserName = m.winner_name === m.player1_name ? m.player2_name : m.player1_name;
+                  return (
+                    <div key={i} className="px-5 py-3.5">
+                      <p className="text-sm" style={{ color: "#374151" }}>
+                        <span className="font-semibold">{m.winner_name}</span> beat {loserName}
+                        {summary?.scoreStr ? ` ${summary.scoreStr}` : ""}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{m.sport}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Recent Results */}
           <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
