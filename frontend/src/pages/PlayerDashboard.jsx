@@ -364,14 +364,25 @@ export default function PlayerDashboard() {
               <p className="font-heading font-bold text-sm" style={{ color: "#065F46" }}>{nextStep.title}</p>
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{nextStep.body}</p>
             </div>
-            <Link
-              to={nextStep.href}
-              className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap"
-              style={{ background: nextStep.accent }}
-              data-testid="next-step-btn"
-            >
-              {nextStep.cta}
-            </Link>
+            {nextStep.href.startsWith("#") ? (
+              <button
+                onClick={() => document.getElementById(nextStep.href.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap"
+                style={{ background: nextStep.accent }}
+                data-testid="next-step-btn"
+              >
+                {nextStep.cta}
+              </button>
+            ) : (
+              <Link
+                to={nextStep.href}
+                className="flex-shrink-0 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap"
+                style={{ background: nextStep.accent }}
+                data-testid="next-step-btn"
+              >
+                {nextStep.cta}
+              </Link>
+            )}
           </div>
         )}
 
@@ -419,7 +430,7 @@ export default function PlayerDashboard() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}
-          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+          <div id="leagues" className="bg-white rounded-2xl overflow-hidden scroll-mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F3F4F6" }}>
               <h2 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>My Leagues</h2>
               <Link to="/join" className="text-xs font-semibold" style={{ color: "#C24A1D" }}>Find a League</Link>
