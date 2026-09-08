@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import MatchCard from "../components/MatchCard";
 import { buildScoreSummary } from "../utils/scoreSummary";
+import useReferralCode from "../hooks/useReferralCode";
 import { ArrowLeft, CheckCircle, AlertCircle, Trophy, Clock } from "lucide-react";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -33,6 +34,7 @@ export default function ScoreReport() {
   const { id: matchId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const referralCode = useReferralCode();
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [scoreData, setScoreData] = useState({});
@@ -198,13 +200,14 @@ export default function ScoreReport() {
         ? match.player2_name
         : match.player1_name;
     const sportEmoji = match.sport === "tennis" ? "🎾" : match.sport === "pickleball" ? "🏓" : "🏏";
+    const refParam = referralCode ? `&ref=${referralCode}` : "";
+    const spectatorUrl = `https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
     const shareText = encodeURIComponent(
       `${sportEmoji} ${submittedResult.winnerName} defeated ${loserName}${submittedResult.summary ? ` ${submittedResult.summary}` : ""}\n` +
       `📍 VenLax Sports · ${match.sport}\n` +
-      `👉 https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card`
+      `👉 ${spectatorUrl}`
     );
     const waUrl = `https://wa.me/?text=${shareText}`;
-    const spectatorUrl = `https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card`;
 
     return (
       <div className="min-h-screen bg-gray-50" data-testid="score-report-page">

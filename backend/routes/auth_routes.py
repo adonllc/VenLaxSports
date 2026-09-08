@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
-from models import User, UserCreate, UserLogin
+from models import User, UserCreate, UserLogin, ReferralCredit
 from auth_utils import (
     hash_password, verify_password,
     create_access_token, create_refresh_token,
@@ -21,6 +21,47 @@ import base64
 router = APIRouter()
 
 _SECURE_COOKIES = os.environ.get("ENV", "development").lower() == "production"
+
+REFERRAL_CREDIT_AMOUNT = 5.0
+
+
+async def _apply_referral_credit(db, referral_code: str, referee_id: str):
+    """Best-effort: credit both referrer and referee $5 when a valid code is used at signup."""
+    try:
+        code = referral_code.strip().upper()
+        referrer = await db.users.find_one({"referral_code": code})
+        if not referrer or str(referrer["_id"]) == referee_id:
+            return
+        now = datetime.now(timezone.utc)
+        expires_at = (now + timedelta(days=365)).isoformat()
+
+        credit = ReferralCredit(
+            referrer_id=str(referrer["_id"]),
+            referee_id=referee_id,
+            referral_code=code,
+            credit_amount=REFERRAL_CREDIT_AMOUNT,
+            status="applied",
+            applied_at=now.isoformat(),
+            expires_at=expires_at,
+        )
+        await db.referral_credits.insert_one(credit.to_mongo())
+
+        await db.users.update_one(
+            {"_id": referrer["_id"]},
+            {
+                "$inc": {"credits_balance": REFERRAL_CREDIT_AMOUNT},
+                "$set": {"credits_expiry": expires_at},
+            },
+        )
+        await db.users.update_one(
+            {"_id": ObjectId(referee_id)},
+            {
+                "$inc": {"credits_balance": REFERRAL_CREDIT_AMOUNT},
+                "$set": {"credits_expiry": expires_at},
+            },
+        )
+    except Exception:
+        pass  # bad/unknown code should never block registration
 
 
 def _set_tokens(response: Response, user_id: str, email: str, role: str):
@@ -78,6 +119,9 @@ async def register(user_data: UserCreate, response: Response, request: Request):
     result = await db.users.insert_one(user.to_mongo())
     user_id = str(result.inserted_id)
     _set_tokens(response, user_id, user.email, user.role)
+
+    if user_data.referral_code:
+        await _apply_referral_credit(db, user_data.referral_code, user_id)
 
     # Send OTP verification email (best-effort, non-blocking)
     otp = "".join(random.choices(string.digits, k=6))

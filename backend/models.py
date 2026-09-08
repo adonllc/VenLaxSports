@@ -95,6 +95,7 @@ class UserCreate(BaseModel):
     terms_accepted: bool = False
     parental_consent: bool = False
     parental_consent_guardian_name: Optional[str] = None
+    referral_code: Optional[str] = None
 
 
 class UserLogin(BaseModel):

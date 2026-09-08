@@ -33,6 +33,7 @@ export default function Auth() {
     terms_accepted: false,
     parental_consent: false,
     parental_consent_guardian_name: "",
+    referral_code: params.get("ref") || "",
   });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
@@ -233,6 +234,12 @@ export default function Auth() {
           <p className="text-sm mb-8" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#6B7280" }}>
             {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
+
+          {mode === "register" && form.referral_code && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-xl mb-6" data-testid="referral-banner">
+              You've got a $5 credit waiting — sign up to claim it.
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-6" data-testid="auth-error">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Trophy, Users, Calendar, Share2, AlertCircle } from "lucide-react";
 
@@ -13,6 +13,9 @@ const SPORT_COLORS = {
 
 export default function LeagueSpectator() {
   const { id: leagueId } = useParams();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get("ref");
+  const authUrl = refCode ? `/auth?ref=${refCode}` : "/auth";
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -176,7 +179,7 @@ export default function LeagueSpectator() {
         <div className="text-center py-2">
           <p className="text-gray-500 text-sm mb-3">Want to compete? No club required.</p>
           <Link
-            to="/auth"
+            to={authUrl}
             className="inline-block bg-[#1B2B4B] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#142040] transition"
             data-testid="spectator-signup-cta"
           >

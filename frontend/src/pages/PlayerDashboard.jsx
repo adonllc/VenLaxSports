@@ -6,6 +6,7 @@ import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, 
 import OpponentSearch from "../components/OpponentSearch";
 import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
+import useReferralCode from "../hooks/useReferralCode";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -18,6 +19,7 @@ const SPORT_COLORS = {
 export default function PlayerDashboard() {
   const { user, loading, fetchMe } = useAuth();
   const navigate = useNavigate();
+  const referralCode = useReferralCode();
   const [leagues, setLeagues] = useState([]);
   const [matches, setMatches] = useState([]);
   const [scheduleLeagueId, setScheduleLeagueId] = useState("");
@@ -209,7 +211,8 @@ export default function PlayerDashboard() {
     const loserName = m.winner_name === m.player1_name ? m.player2_name : m.player1_name;
     const summary = buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name);
     const summaryStr = summary?.scoreStr || (m.score_data?.retired ? "Retired / Walkover" : "");
-    const spectatorUrl = `https://venlaxsports.com/leagues/${m.league_id}/public?utm_source=venlax&utm_medium=share_card`;
+    const refParam = referralCode ? `&ref=${referralCode}` : "";
+    const spectatorUrl = `https://venlaxsports.com/leagues/${m.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
     const shareText = encodeURIComponent(
       `${sportEmoji} ${m.winner_name} defeated ${loserName}${summaryStr ? ` ${summaryStr}` : ""}\n` +
       `📍 VenLax Sports · ${m.sport}\n` +
