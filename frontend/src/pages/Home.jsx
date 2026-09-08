@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { activeSports } from "../config/platformConfig";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -32,15 +33,25 @@ export default function Home() {
 
           {/* Headline */}
           <motion.h1
-            className="font-black text-6xl md:text-7xl leading-tight mb-6 text-white"
+            className="font-black text-5xl md:text-6xl leading-tight mb-4 text-white"
             style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05, type: "spring", stiffness: 80 }}
           >
-            Find Your<br />
-            <span style={{ color: "white" }}>League</span>
+            Sports just got<br />a new home.
           </motion.h1>
+
+          {/* Pillars tagline */}
+          <motion.p
+            className="text-xl md:text-2xl font-bold mb-6"
+            style={{ color: "#065F46", fontFamily: "'Sora', system-ui, sans-serif" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
+            Play. Connect. Compete. Share.
+          </motion.p>
 
           {/* Subheading */}
           <motion.p
@@ -50,79 +61,70 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Join ranked tennis & pickleball leagues in your city. Compete against skill-matched opponents. Track your rating. Rise the leaderboard.
+            Everything you love about Tennis &amp; Pickleball — in one place.
           </motion.p>
 
-          {/* CTAs */}
+          {/* Primary CTA */}
           <motion.div
-            className="flex flex-col md:flex-row gap-4 justify-center"
+            className="flex justify-center mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <motion.button
-              onClick={() => navigate("/leagues")}
-              className="px-8 py-4 bg-white text-orange-600 rounded-lg font-semibold transition-all"
+              onClick={() => navigate("/auth")}
+              className="px-10 py-4 bg-white text-orange-600 rounded-lg font-semibold transition-all"
               style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
               whileHover={{ scale: 1.10, y: -5, boxShadow: "0 20px 48px rgba(0,0,0,0.3)" }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Browse available tennis and pickleball leagues"
-              data-testid="hero-browse-leagues"
+              aria-label="Sign up for VenLax Sports"
+              data-testid="hero-join-venlax"
             >
-              ▶ Browse Leagues
+              Join VenLax →
             </motion.button>
-            <motion.button
-              onClick={() => navigate("/auth")}
-              className="px-8 py-4 rounded-lg font-semibold transition-all text-white border-2 border-white"
-              style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
-              whileHover={{ scale: 1.10, y: -5, backgroundColor: "rgba(255,255,255,0.15)" }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Register or sign in to join a league"
-              data-testid="hero-join-league"
-            >
-              Join a League →
-            </motion.button>
+          </motion.div>
+
+          {/* Explore-by-sport secondary CTAs */}
+          <motion.div
+            className="flex flex-col md:flex-row gap-4 justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            {activeSports.map((s) => (
+              <motion.button
+                key={s.id}
+                onClick={() => navigate(`/sport/${s.id}`)}
+                className="px-8 py-3.5 rounded-lg font-semibold transition-all text-white border-2 border-white"
+                style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+                whileHover={{ scale: 1.08, y: -4, backgroundColor: "rgba(255,255,255,0.15)" }}
+                whileTap={{ scale: 0.95 }}
+                aria-label={`Explore ${s.label} leagues`}
+                data-testid={`hero-explore-${s.id}`}
+              >
+                {s.icon} Explore {s.label}
+              </motion.button>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* FOOTER CTA — Neutral background */}
+      {/* PROOF STATEMENT — quiet close, no competing CTA */}
       <motion.section
         className="py-20 px-6 bg-white text-center border-t border-gray-200"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
       >
-        <motion.h2
-          className="text-5xl font-black mb-4 text-gray-900"
+        <motion.p
+          className="text-3xl md:text-4xl font-black max-w-2xl mx-auto"
           style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#10B981" }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          Ready to Compete?
-        </motion.h2>
-        <motion.p
-          className="text-lg mb-8 text-gray-600 max-w-md mx-auto"
-          style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-        >
-          Join 2,000+ players in ranked leagues. Compete fairly. Track your progress.
+          Your game doesn't end when the match ends.
         </motion.p>
-        <motion.button
-          onClick={() => navigate("/auth")}
-          className="px-8 py-4 rounded-lg font-semibold transition-all text-white"
-          style={{ backgroundColor: "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }}
-          whileHover={{ scale: 1.12, y: -6, boxShadow: "0 24px 56px rgba(4,120,87,0.35)" }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Start playing competitive tennis and pickleball today"
-          data-testid="cta-get-started"
-        >
-          Get Started Now →
-        </motion.button>
       </motion.section>
     </div>
   );
