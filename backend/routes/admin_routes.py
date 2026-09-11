@@ -57,6 +57,69 @@ async def get_users(request: Request, skip: int = 0, limit: int = 50):
     return result
 
 
+@router.get("/referrals")
+async def get_referrals(request: Request, skip: int = 0, limit: int = 100):
+    """Referral activity — who referred whom, by which code, and credit status."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    total = await db.referral_credits.count_documents({})
+    total_credited = await db.referral_credits.count_documents({"status": "applied"})
+
+    top_referrers_agg = await db.referral_credits.aggregate([
+        {"$match": {"status": "applied"}},
+        {"$group": {"_id": "$referrer_id", "referrals": {"$sum": 1}}},
+        {"$sort": {"referrals": -1}},
+        {"$limit": 10},
+    ]).to_list(10)
+    referrer_ids = [ObjectId(r["_id"]) for r in top_referrers_agg if ObjectId.is_valid(r["_id"])]
+    referrer_docs = await db.users.find({"_id": {"$in": referrer_ids}}, {"name": 1, "email": 1}).to_list(len(referrer_ids))
+    referrer_map = {str(u["_id"]): u for u in referrer_docs}
+    top_referrers = [
+        {
+            "referrer_id": r["_id"],
+            "referrer_name": referrer_map.get(r["_id"], {}).get("name", "Unknown"),
+            "referrer_email": referrer_map.get(r["_id"], {}).get("email", ""),
+            "referrals": r["referrals"],
+        }
+        for r in top_referrers_agg
+    ]
+
+    credits = await db.referral_credits.find({}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    all_ids = set()
+    for c in credits:
+        if ObjectId.is_valid(c.get("referrer_id", "")):
+            all_ids.add(c["referrer_id"])
+        if c.get("referee_id") and ObjectId.is_valid(c["referee_id"]):
+            all_ids.add(c["referee_id"])
+    user_docs = await db.users.find({"_id": {"$in": [ObjectId(i) for i in all_ids]}}, {"name": 1, "email": 1}).to_list(len(all_ids))
+    user_map = {str(u["_id"]): u for u in user_docs}
+
+    entries = []
+    for c in credits:
+        referrer = user_map.get(c.get("referrer_id"), {})
+        referee = user_map.get(c.get("referee_id"), {}) if c.get("referee_id") else {}
+        entries.append({
+            "id": str(c["_id"]),
+            "referral_code": c.get("referral_code"),
+            "referrer_name": referrer.get("name", "Unknown"),
+            "referrer_email": referrer.get("email", ""),
+            "referee_name": referee.get("name", "Pending"),
+            "referee_email": referee.get("email", ""),
+            "credit_amount": c.get("credit_amount", 0),
+            "status": c.get("status", "pending"),
+            "created_at": c.get("created_at"),
+            "applied_at": c.get("applied_at"),
+        })
+
+    return {
+        "total_referrals": total,
+        "total_credited": total_credited,
+        "top_referrers": top_referrers,
+        "entries": entries,
+    }
+
+
 @router.get("/leagues")
 async def get_all_leagues(request: Request, skip: int = 0, limit: int = 50):
     db = request.app.state.db

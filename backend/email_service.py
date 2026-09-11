@@ -328,6 +328,53 @@ async def send_partner_declined(initiator_email: str, initiator_name: str, leagu
     )
 
 
+async def send_weekly_referral_nudge(to: str, player_name: str, referral_code: str) -> None:
+    frontend_url = _get_frontend_url() or "https://venlaxsports.com"
+    referral_link = f"{frontend_url}/auth?ref={referral_code}"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>A quick reminder of what's waiting for you on VENLAX Sports:</p>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li>🎾 Ranked Tennis &amp; Pickleball leagues, matched to your skill level</li>
+        <li>📈 A rating that tracks your progress every match</li>
+        <li>🤝 Doubles partner registration built in</li>
+        <li>📸 Shareable match cards for your wins</li>
+      </ul>
+      <p>Know a friend, family member, or regular playing partner who'd love this?
+         Send them your code — <strong>you both get $5 credit</strong> when they join.</p>
+      <p style="font-size:24px;font-weight:900;letter-spacing:4px;text-align:center;
+                background:#f3f4f6;border-radius:12px;padding:14px 0;margin:20px 0">
+        {referral_code}
+      </p>
+    """
+    await send_email(
+        to,
+        "Refer a friend, you both get $5 — VENLAX Sports",
+        _wrap("Share the game", body, "Share your link", referral_link),
+    )
+
+
+async def send_weekly_waitlist_nudge(to: str) -> None:
+    frontend_url = _get_frontend_url() or "https://venlaxsports.com"
+    signup_url = f"{frontend_url}/auth?mode=register"
+    body = """
+      <p>Still on the waitlist? Here's what's live right now on VENLAX Sports:</p>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li>🎾 Ranked Tennis &amp; Pickleball leagues, matched to your skill level</li>
+        <li>📈 A rating that tracks your progress every match</li>
+        <li>🤝 Doubles partner registration built in</li>
+        <li>📸 Shareable match cards for your wins</li>
+      </ul>
+      <p>Join now — once you're in, you'll get your own referral code and start
+         earning $5 credit for every friend or playing partner you bring along.</p>
+    """
+    await send_email(
+        to,
+        "Your spot on VENLAX Sports is ready",
+        _wrap("Ready when you are", body, "Join VENLAX Sports", signup_url),
+    )
+
+
 async def send_early_access_confirmed(to: str) -> None:
     body = """
       <p>Welcome to VENLAX Sports! 🎉</p>

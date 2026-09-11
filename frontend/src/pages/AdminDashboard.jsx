@@ -248,6 +248,7 @@ export default function AdminDashboard() {
     { id: "disputes", label: "Disputes" },
     { id: "zelle", label: "Zelle Queue" },
     { id: "waitlist", label: "Waitlist" },
+    { id: "referrals", label: "Referrals" },
   ];
 
   return (
@@ -727,6 +728,7 @@ export default function AdminDashboard() {
         )}
         {tab === "zelle" && <ZelleQueueTab />}
         {tab === "waitlist" && <WaitlistTab />}
+        {tab === "referrals" && <ReferralsTab />}
       </div>
 
       {showRRForm && (
@@ -1426,6 +1428,120 @@ function WaitlistTab() {
                       >
                         {deleting === e.email ? "Deleting..." : "Delete"}
                       </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function ReferralsTab() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    axios.get(`${API}/admin/referrals`, { withCredentials: true })
+      .then((res) => setData(res.data))
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>;
+  if (!data) return <div className="text-sm text-red-500 py-8 text-center">Failed to load referrals.</div>;
+
+  const filtered = data.entries.filter(
+    (e) =>
+      !search ||
+      e.referrer_email.toLowerCase().includes(search.toLowerCase()) ||
+      e.referee_email.toLowerCase().includes(search.toLowerCase()) ||
+      (e.referral_code || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6" data-testid="referrals-tab">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold text-heading-dark">{data.total_referrals}</div>
+          <div className="text-xs text-gray-500 mt-1">Total referrals</div>
+        </div>
+        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold text-emerald-700">{data.total_credited}</div>
+          <div className="text-xs text-gray-500 mt-1">Credited (both sides earned $5)</div>
+        </div>
+        <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold text-orange-600">${(data.total_credited * 10).toFixed(0)}</div>
+          <div className="text-xs text-gray-500 mt-1">Total credit paid out</div>
+        </div>
+      </div>
+
+      {data.top_referrers.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-heading-dark mb-3">Top Referrers</h3>
+          <div className="flex flex-wrap gap-2">
+            {data.top_referrers.map((r) => (
+              <span key={r.referrer_id} className="inline-flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
+                <span className="font-semibold text-heading-dark">{r.referrer_name}</span>
+                <span className="text-gray-400">·</span>
+                <span className="text-gray-600">{r.referrals} referral{r.referrals !== 1 ? "s" : ""}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <input
+        type="text"
+        placeholder="Search by email or referral code..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full sm:w-80 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        data-testid="referrals-search"
+      />
+
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Referrer</th>
+                <th className="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Referred</th>
+                <th className="hidden sm:table-cell text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Code</th>
+                <th className="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Status</th>
+                <th className="hidden md:table-cell text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.length === 0 ? (
+                <tr><td colSpan={5} className="text-center py-8 text-gray-400">No referrals yet.</td></tr>
+              ) : (
+                filtered.map((e) => (
+                  <tr key={e.id} data-testid={`referral-row-${e.id}`}>
+                    <td className="px-3 sm:px-4 py-3">
+                      <div className="font-medium text-heading-dark">{e.referrer_name}</div>
+                      <div className="text-xs text-gray-400">{e.referrer_email}</div>
+                    </td>
+                    <td className="px-3 sm:px-4 py-3">
+                      <div className="font-medium text-heading-dark">{e.referee_name}</div>
+                      <div className="text-xs text-gray-400">{e.referee_email}</div>
+                    </td>
+                    <td className="hidden sm:table-cell px-3 sm:px-4 py-3 font-mono text-xs text-gray-500">{e.referral_code}</td>
+                    <td className="px-3 sm:px-4 py-3">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        e.status === "applied" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+                      }`}>
+                        {e.status}
+                      </span>
+                    </td>
+                    <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-gray-400 text-xs">
+                      {e.created_at ? new Date(e.created_at).toLocaleDateString() : "—"}
                     </td>
                   </tr>
                 ))

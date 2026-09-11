@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-09-08T00:03:52.433Z",
         "reason": "loading spinner (animate-spin rounded-full border-b-2), not a card border-accent clash — pre-existing pattern reused across pages"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/AdminDashboard.jsx"
+        ],
+        "createdAt": "2026-09-11T01:34:47.723Z",
+        "reason": "Neutral bg-gray-100/text-gray-600 pending-status badge, same pairing already used for other status badges throughout this file - gray-100 is a neutral surface, not a colored background the rule targets"
       }
     ]
   }

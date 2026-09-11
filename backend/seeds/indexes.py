@@ -65,3 +65,6 @@ async def create_indexes(db) -> None:
     # Player follow graph
     await db.user_follows.create_index([("follower_id", 1), ("followee_id", 1)], unique=True)
     await db.user_follows.create_index([("followee_id", 1)])
+    # Weekly referral campaign idempotency lookups
+    await db.email_campaigns.create_index([("user_id", 1), ("campaign", 1), ("sent_at", 1)])
+    await db.referral_credits.create_index([("referrer_id", 1), ("status", 1)])
