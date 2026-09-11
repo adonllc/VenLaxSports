@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Copy, Share2, DollarSign, TrendingUp, Gift } from 'lucide-react';
+import { Copy, Share2, DollarSign, TrendingUp, Gift, Trophy } from 'lucide-react';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8001';
 
 export default function RewardsCredits() {
   const [credits, setCredits] = useState(null);
   const [referralCode, setReferralCode] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +34,10 @@ export default function RewardsCredits() {
     } finally {
       setLoading(false);
     }
+
+    axios.get(`${BACKEND_URL}/api/referrals/leaderboard`, { withCredentials: true })
+      .then((res) => setLeaderboard(res.data))
+      .catch(() => {});
   };
 
   const handleCopyCode = () => {
@@ -160,7 +165,8 @@ export default function RewardsCredits() {
           </div>
 
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Share your code with friends. They get $5 off their first league, you get $5 credit.
+            Share your code with friends. They get $5 off their first league, you get $5 credit —
+            plus a $10 bonus every 3rd friend you bring in.
           </p>
 
           {error && (
@@ -226,6 +232,37 @@ export default function RewardsCredits() {
             </div>
           )}
         </div>
+
+        {/* Referral Leaderboard */}
+        {leaderboard.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-heading-dark dark:text-white">
+                Top Referrers
+              </h2>
+            </div>
+            <div className="space-y-2">
+              {leaderboard.map((entry, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700"
+                  data-testid={`leaderboard-row-${i}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-bold text-gray-400 w-5">{i + 1}</span>
+                    <span className="font-medium text-heading-dark dark:text-white">{entry.name}</span>
+                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {entry.referrals} referral{entry.referrals !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* How It Works */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">

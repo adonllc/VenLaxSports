@@ -68,3 +68,4 @@ async def create_indexes(db) -> None:
     # Weekly referral campaign idempotency lookups
     await db.email_campaigns.create_index([("user_id", 1), ("campaign", 1), ("sent_at", 1)])
     await db.referral_credits.create_index([("referrer_id", 1), ("status", 1)])
+    await db.users.create_index([("credits_balance", 1), ("credits_expiry", 1)])

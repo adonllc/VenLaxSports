@@ -63,11 +63,12 @@ async def get_referrals(request: Request, skip: int = 0, limit: int = 100):
     db = request.app.state.db
     await require_admin(request, db)
 
-    total = await db.referral_credits.count_documents({})
-    total_credited = await db.referral_credits.count_documents({"status": "applied"})
+    total = await db.referral_credits.count_documents({"type": "referral"})
+    total_credited = await db.referral_credits.count_documents({"status": "applied", "type": "referral"})
+    total_bonus_paid = await db.referral_credits.count_documents({"type": "tier_bonus"})
 
     top_referrers_agg = await db.referral_credits.aggregate([
-        {"$match": {"status": "applied"}},
+        {"$match": {"status": "applied", "type": "referral"}},
         {"$group": {"_id": "$referrer_id", "referrals": {"$sum": 1}}},
         {"$sort": {"referrals": -1}},
         {"$limit": 10},
@@ -99,15 +100,17 @@ async def get_referrals(request: Request, skip: int = 0, limit: int = 100):
     for c in credits:
         referrer = user_map.get(c.get("referrer_id"), {})
         referee = user_map.get(c.get("referee_id"), {}) if c.get("referee_id") else {}
+        is_bonus = c.get("type") == "tier_bonus"
         entries.append({
             "id": str(c["_id"]),
             "referral_code": c.get("referral_code"),
             "referrer_name": referrer.get("name", "Unknown"),
             "referrer_email": referrer.get("email", ""),
-            "referee_name": referee.get("name", "Pending"),
-            "referee_email": referee.get("email", ""),
+            "referee_name": "— Tier Bonus —" if is_bonus else referee.get("name", "Pending"),
+            "referee_email": "" if is_bonus else referee.get("email", ""),
             "credit_amount": c.get("credit_amount", 0),
             "status": c.get("status", "pending"),
+            "type": c.get("type", "referral"),
             "created_at": c.get("created_at"),
             "applied_at": c.get("applied_at"),
         })
@@ -115,6 +118,7 @@ async def get_referrals(request: Request, skip: int = 0, limit: int = 100):
     return {
         "total_referrals": total,
         "total_credited": total_credited,
+        "total_bonus_paid": total_bonus_paid,
         "top_referrers": top_referrers,
         "entries": entries,
     }

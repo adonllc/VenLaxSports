@@ -1467,7 +1467,7 @@ function ReferralsTab() {
 
   return (
     <div className="space-y-6" data-testid="referrals-tab">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
           <div className="text-3xl font-bold text-heading-dark">{data.total_referrals}</div>
           <div className="text-xs text-gray-500 mt-1">Total referrals</div>
@@ -1476,8 +1476,12 @@ function ReferralsTab() {
           <div className="text-3xl font-bold text-emerald-700">{data.total_credited}</div>
           <div className="text-xs text-gray-500 mt-1">Credited (both sides earned $5)</div>
         </div>
+        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold text-amber-700">{data.total_bonus_paid || 0}</div>
+          <div className="text-xs text-gray-500 mt-1">Tier bonuses paid ($10 each)</div>
+        </div>
         <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
-          <div className="text-3xl font-bold text-orange-600">${(data.total_credited * 10).toFixed(0)}</div>
+          <div className="text-3xl font-bold text-orange-600">${(data.total_credited * 10 + (data.total_bonus_paid || 0) * 10).toFixed(0)}</div>
           <div className="text-xs text-gray-500 mt-1">Total credit paid out</div>
         </div>
       </div>

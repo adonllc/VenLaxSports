@@ -354,24 +354,65 @@ async def send_weekly_referral_nudge(to: str, player_name: str, referral_code: s
     )
 
 
-async def send_weekly_waitlist_nudge(to: str) -> None:
+async def send_weekly_waitlist_nudge(to: str, position: int, referral_count: int, share_link: str) -> None:
     frontend_url = _get_frontend_url() or "https://venlaxsports.com"
     signup_url = f"{frontend_url}/auth?mode=register"
-    body = """
-      <p>Still on the waitlist? Here's what's live right now on VENLAX Sports:</p>
+    referral_line = (
+        f"<p>You've brought <strong>{referral_count}</strong> friend{'s' if referral_count != 1 else ''} along so far — "
+        f"keep sharing your link and you'll move up faster.</p>"
+        if referral_count > 0 else
+        "<p>Refer 2 friends with your link below and jump ahead in line.</p>"
+    )
+    body = f"""
+      <p>You're <strong>#{position}</strong> on the VENLAX Sports waitlist. Here's what's waiting for you:</p>
       <ul style="padding-left:18px;margin:0 0 16px">
         <li>🎾 Ranked Tennis &amp; Pickleball leagues, matched to your skill level</li>
         <li>📈 A rating that tracks your progress every match</li>
         <li>🤝 Doubles partner registration built in</li>
         <li>📸 Shareable match cards for your wins</li>
       </ul>
-      <p>Join now — once you're in, you'll get your own referral code and start
+      {referral_line}
+      <p style="font-size:13px;color:#6b7280;word-break:break-all">{share_link}</p>
+      <p>Or join now — once you're in, you'll get your own referral code and start
          earning $5 credit for every friend or playing partner you bring along.</p>
     """
     await send_email(
         to,
-        "Your spot on VENLAX Sports is ready",
-        _wrap("Ready when you are", body, "Join VENLAX Sports", signup_url),
+        f"You're #{position} on the VENLAX Sports waitlist",
+        _wrap("Move up the list", body, "Join VENLAX Sports", signup_url),
+    )
+
+
+async def send_referral_tier_bonus(to: str, player_name: str, referral_count: int, bonus_amount: float, tier_every: int = 3) -> None:
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>You've now referred <strong>{referral_count}</strong> friends to VENLAX Sports — nice work.</p>
+      <p>As a thank-you, we've added a <strong>${bonus_amount:.0f} bonus credit</strong> to your account
+         on top of your regular $5-per-referral earnings.</p>
+      <p>Keep sharing your code — every {tier_every} referrals earns another bonus.</p>
+    """
+    await send_email(
+        to,
+        f"You earned a ${bonus_amount:.0f} referral bonus!",
+        _wrap("Referral bonus unlocked", body, "View your rewards", f"{_get_frontend_url() or 'https://venlaxsports.com'}/rewards"),
+    )
+
+
+async def send_credit_expiry_reminder(to: str, player_name: str, balance: float, expiry_date: str) -> None:
+    frontend_url = _get_frontend_url() or "https://venlaxsports.com"
+    try:
+        expiry_label = expiry_date.split("T")[0]
+    except Exception:
+        expiry_label = expiry_date
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>You have <strong>${balance:.2f}</strong> in credits set to expire on <strong>{expiry_label}</strong>.</p>
+      <p>Apply it toward your next league entry fee before it's gone.</p>
+    """
+    await send_email(
+        to,
+        f"Your ${balance:.2f} credit expires {expiry_label}",
+        _wrap("Credit expiring soon", body, "Browse leagues", f"{frontend_url}/leagues"),
     )
 
 

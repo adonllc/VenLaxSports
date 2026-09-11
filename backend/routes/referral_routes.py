@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Body
+from bson import ObjectId
 from models import User, ReferralCredit
 from auth_utils import get_current_user
 from datetime import datetime, timezone, timedelta
@@ -102,14 +103,44 @@ async def get_my_credits(request: Request):
     current_user = await get_current_user(request, db)
 
     # Get referral earnings history
-    referrals = await db.referral_credits.find({"referrer_id": current_user.get("_id")}).to_list(None)
+    referrals = await db.referral_credits.find({"referrer_id": str(current_user["_id"])}).to_list(None)
 
     return {
         "credits_balance": current_user.get("credits_balance", 0.0),
         "credits_expiry": current_user.get("credits_expiry"),
-        "total_referrals": len(referrals),
-        "earned_referrals": sum(r.get("credit_amount", 0) for r in referrals if r.get("referee_id"))
+        "total_referrals": len([r for r in referrals if r.get("type", "referral") == "referral"]),
+        "earned_referrals": sum(r.get("credit_amount", 0) for r in referrals if r.get("status") == "applied"),
     }
+
+
+@router.get("/leaderboard")
+async def referral_leaderboard(request: Request):
+    """Top referrers, first-name + last-initial only (no admin auth required)."""
+    db = request.app.state.db
+    await get_current_user(request, db)
+
+    top_agg = await db.referral_credits.aggregate([
+        {"$match": {"status": "applied", "type": "referral"}},
+        {"$group": {"_id": "$referrer_id", "referrals": {"$sum": 1}}},
+        {"$sort": {"referrals": -1}},
+        {"$limit": 10},
+    ]).to_list(10)
+
+    ids = [ObjectId(r["_id"]) for r in top_agg if ObjectId.is_valid(r["_id"])]
+    users = await db.users.find({"_id": {"$in": ids}}, {"name": 1}).to_list(len(ids))
+    name_map = {str(u["_id"]): u.get("name", "Player") for u in users}
+
+    def _display_name(full_name: str) -> str:
+        parts = (full_name or "Player").split()
+        if len(parts) < 2:
+            return parts[0] if parts else "Player"
+        return f"{parts[0]} {parts[-1][0]}."
+
+    return [
+        {"name": _display_name(name_map.get(r["_id"], "Player")), "referrals": r["referrals"]}
+        for r in top_agg
+    ]
+
 
 @router.post("/me/credits/apply")
 async def apply_credit_to_league(

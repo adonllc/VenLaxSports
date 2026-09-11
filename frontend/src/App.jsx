@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -97,6 +97,14 @@ function AppRouter() {
 
 function AppShell() {
   const location = useLocation();
+
+  // Capture ?ref= from any page so a referral (registered-user code or
+  // waitlist share link) survives until the visitor actually registers.
+  useEffect(() => {
+    const ref = new URLSearchParams(location.search).get("ref");
+    if (ref) localStorage.setItem("pending_ref", ref);
+  }, [location.search]);
+
   if (IS_PRELAUNCH && !IS_LAUNCH_LIVE && location.pathname === "/") {
     return <PreLaunch />;
   }

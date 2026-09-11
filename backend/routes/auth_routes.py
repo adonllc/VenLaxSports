@@ -23,15 +23,32 @@ router = APIRouter()
 _SECURE_COOKIES = os.environ.get("ENV", "development").lower() == "production"
 
 REFERRAL_CREDIT_AMOUNT = 5.0
+TIER_BONUS_EVERY = 3
+TIER_BONUS_AMOUNT = 10.0
 
 
 async def _apply_referral_credit(db, referral_code: str, referee_id: str):
-    """Best-effort: credit both referrer and referee $5 when a valid code is used at signup."""
+    """Best-effort: credit both referrer and referee $5 when a valid code is used at signup.
+
+    Falls back to matching a waitlist entry's own id (its share code, per the
+    prelaunch referral-link convention) — a waitlist entry has no account to
+    credit, so that case just tracks a queue_referrals counter instead.
+    """
     try:
         code = referral_code.strip().upper()
         referrer = await db.users.find_one({"referral_code": code})
-        if not referrer or str(referrer["_id"]) == referee_id:
+
+        if not referrer:
+            if ObjectId.is_valid(referral_code.strip()):
+                await db.waitlist.update_one(
+                    {"_id": ObjectId(referral_code.strip())},
+                    {"$inc": {"queue_referrals": 1}},
+                )
             return
+
+        if str(referrer["_id"]) == referee_id:
+            return
+
         now = datetime.now(timezone.utc)
         expires_at = (now + timedelta(days=365)).isoformat()
 
@@ -60,6 +77,33 @@ async def _apply_referral_credit(db, referral_code: str, referee_id: str):
                 "$set": {"credits_expiry": expires_at},
             },
         )
+
+        # Tiered bonus: every Nth applied referral earns the referrer an extra bonus.
+        applied_count = await db.referral_credits.count_documents({
+            "referrer_id": str(referrer["_id"]),
+            "status": "applied",
+            "type": "referral",
+        })
+        if applied_count % TIER_BONUS_EVERY == 0:
+            bonus = ReferralCredit(
+                referrer_id=str(referrer["_id"]),
+                referee_id=None,
+                referral_code=code,
+                credit_amount=TIER_BONUS_AMOUNT,
+                type="tier_bonus",
+                status="applied",
+                applied_at=now.isoformat(),
+                expires_at=expires_at,
+            )
+            await db.referral_credits.insert_one(bonus.to_mongo())
+            await db.users.update_one(
+                {"_id": referrer["_id"]},
+                {"$inc": {"credits_balance": TIER_BONUS_AMOUNT}},
+            )
+            if referrer.get("email"):
+                email_service.schedule(email_service.send_referral_tier_bonus(
+                    referrer["email"], referrer.get("name", "Player"), applied_count, TIER_BONUS_AMOUNT, TIER_BONUS_EVERY
+                ))
     except Exception:
         pass  # bad/unknown code should never block registration
 

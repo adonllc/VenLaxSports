@@ -1,9 +1,10 @@
 """Background scheduler jobs for VENLAX Sports.
 
-Three jobs registered in scheduler.py:
-  - auto_status_transitions  daily 00:05 UTC
-  - send_match_reminders     every hour
+Jobs registered in scheduler.py:
+  - auto_status_transitions    daily 00:05 UTC
+  - send_match_reminders       every hour
   - auto_forfeit_stale_matches daily 01:00 UTC
+  - send_credit_expiry_reminders daily 10:00 UTC
 """
 from __future__ import annotations
 import logging
@@ -138,3 +139,56 @@ async def auto_forfeit_stale_matches(db) -> None:
 
     if forfeited:
         logger.info("auto_forfeit_stale_matches: marked %d matches as walkover", forfeited)
+
+
+async def send_credit_expiry_reminders(db) -> None:
+    """Remind users with a credit balance whose credits expire within 30 days.
+
+    One reminder per user per expiry cycle — guarded via email_campaigns so a
+    daily run doesn't re-notify the same person every day for a month straight.
+    """
+    import email_service
+
+    now = datetime.now(timezone.utc)
+    window_end = (now + timedelta(days=30)).isoformat()
+
+    users = await db.users.find(
+        {
+            "credits_balance": {"$gt": 0},
+            "credits_expiry": {"$ne": None, "$lte": window_end, "$gte": now.isoformat()},
+        },
+        {"email": 1, "name": 1, "credits_balance": 1, "credits_expiry": 1},
+    ).to_list(None)
+
+    reminded = 0
+    for user in users:
+        email = user.get("email")
+        if not email:
+            continue
+        user_id = str(user["_id"])
+
+        already_sent = await db.email_campaigns.find_one({
+            "user_id": user_id,
+            "campaign": "credit_expiry",
+            "expiry": user["credits_expiry"],
+        })
+        if already_sent:
+            continue
+
+        try:
+            await email_service.send_credit_expiry_reminder(
+                email, user.get("name", "Player"), user["credits_balance"], user["credits_expiry"]
+            )
+            await db.email_campaigns.insert_one({
+                "user_id": user_id,
+                "user_email": email,
+                "campaign": "credit_expiry",
+                "expiry": user["credits_expiry"],
+                "sent_at": now.isoformat(),
+            })
+            reminded += 1
+        except Exception as exc:
+            logger.warning("Credit expiry reminder failed for %s: %s", email, exc)
+
+    if reminded:
+        logger.info("send_credit_expiry_reminders: reminded %d users", reminded)

@@ -453,6 +453,7 @@ class ReferralCredit(BaseDocument):
     referral_code: str
     credit_amount: float
     league_id: Optional[str] = None  # which league triggered the credit
+    type: str = "referral"  # "referral" | "tier_bonus"
     status: str = "pending"  # "pending" | "applied"
     applied_at: Optional[str] = None
     expires_at: str  # 12 months from creation

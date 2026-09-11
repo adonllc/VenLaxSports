@@ -58,10 +58,17 @@ async def send_weekly_campaign(db) -> None:
             logger.exception("[CAMPAIGN] failed sending weekly referral nudge to %s", email)
 
     # ── Waitlist ─────────────────────────────────────────────────────────
-    waitlist_entries = await db.waitlist.find({}, {"email": 1}).to_list(None)
+    # Sorted by join order so we can report each entry's queue position;
+    # queue_referrals (incremented in auth_routes._apply_referral_credit when
+    # someone registers using this entry's own id as their ?ref= code) moves
+    # them up 2 spots per referral, floored at #1.
+    frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
+    waitlist_entries = await db.waitlist.find(
+        {}, {"email": 1, "queue_referrals": 1}
+    ).sort("created_at", 1).to_list(None)
 
     sent_waitlist = 0
-    for entry in waitlist_entries:
+    for idx, entry in enumerate(waitlist_entries):
         email = entry.get("email")
         if not email:
             continue
@@ -75,8 +82,12 @@ async def send_weekly_campaign(db) -> None:
         if already_sent:
             continue
 
+        referral_count = entry.get("queue_referrals", 0)
+        position = max(1, (idx + 1) - referral_count * 2)
+        share_link = f"{frontend_url}/?ref={entry_id}"
+
         try:
-            await email_service.send_weekly_waitlist_nudge(email)
+            await email_service.send_weekly_waitlist_nudge(email, position, referral_count, share_link)
             await db.email_campaigns.insert_one({
                 "user_id": entry_id,
                 "user_email": email,

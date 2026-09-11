@@ -32,7 +32,7 @@ export default function Auth() {
     terms_accepted: false,
     parental_consent: false,
     parental_consent_guardian_name: "",
-    referral_code: params.get("ref") || "",
+    referral_code: params.get("ref") || localStorage.getItem("pending_ref") || "",
   });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
@@ -117,6 +117,7 @@ export default function Auth() {
       } else {
         if (!form.name.trim()) { setError("Name is required"); setLoading(false); return; }
         await register(form);
+        localStorage.removeItem("pending_ref");
         const pendingToken = localStorage.getItem("doubles_invite_token");
         if (pendingToken) {
           localStorage.removeItem("doubles_invite_token");
