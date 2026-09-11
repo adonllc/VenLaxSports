@@ -13,8 +13,16 @@ from datetime import datetime, timezone, timedelta
 logger = logging.getLogger(__name__)
 
 
+async def is_job_enabled(db, job_id: str) -> bool:
+    """Admin-toggleable switch for a background job. Defaults to enabled if never set."""
+    flag = await db.feature_flags.find_one({"_id": job_id})
+    return flag.get("enabled", True) if flag else True
+
+
 async def auto_status_transitions(db) -> None:
     """Flip league status: upcoming→active on start_date, active→completed on end_date."""
+    if not await is_job_enabled(db, "auto_status_transitions"):
+        return
     now = datetime.now(timezone.utc)
     today = now.date().isoformat()
 
@@ -38,6 +46,8 @@ async def send_match_reminders(db) -> None:
 
     Sets reminder_sent=True on each match so the job is idempotent across hourly runs.
     """
+    if not await is_job_enabled(db, "send_match_reminders"):
+        return
     import email_service
 
     now = datetime.now(timezone.utc)
@@ -108,6 +118,8 @@ async def auto_forfeit_stale_matches(db) -> None:
 
     Runs daily. If the match is part of a round-robin, also checks for playoff triggers.
     """
+    if not await is_job_enabled(db, "auto_forfeit_stale_matches"):
+        return
     STALE_DAYS = 7
     cutoff = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat()
     now_iso = datetime.now(timezone.utc).isoformat()
@@ -147,6 +159,8 @@ async def send_credit_expiry_reminders(db) -> None:
     One reminder per user per expiry cycle — guarded via email_campaigns so a
     daily run doesn't re-notify the same person every day for a month straight.
     """
+    if not await is_job_enabled(db, "send_credit_expiry_reminders"):
+        return
     import email_service
 
     now = datetime.now(timezone.utc)

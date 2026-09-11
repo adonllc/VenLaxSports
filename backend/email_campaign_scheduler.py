@@ -10,11 +10,14 @@ import logging
 
 import email_service
 from routes.referral_routes import generate_referral_code
+from scheduler_jobs import is_job_enabled
 
 logger = logging.getLogger(__name__)
 
 
 async def send_weekly_campaign(db) -> None:
+    if not await is_job_enabled(db, "weekly_referral_campaign"):
+        return
     now = datetime.now(timezone.utc)
     week_ago = (now - timedelta(days=7)).isoformat()
 

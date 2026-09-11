@@ -1,11 +1,91 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Body
 from datetime import datetime, timezone
 from bson import ObjectId
+import os
 from auth_utils import require_admin
 from models import LeagueUpdate, PlayerLeague, Standing
 import email_service
 
 router = APIRouter()
+
+
+# Background jobs that can be individually enabled/disabled at runtime (no redeploy).
+# Anything not listed here is a build-time env var — see /admin/flags's env_flags.
+JOB_FLAGS = {
+    "weekly_referral_campaign": {
+        "label": "Weekly Referral Campaign",
+        "description": "Emails all users + waitlist every Monday to refer friends for $5/$5 credit.",
+    },
+    "auto_status_transitions": {
+        "label": "League Auto Status Transitions",
+        "description": "Flips league status upcoming→active→completed based on start/end dates. Daily 00:05 UTC.",
+    },
+    "send_match_reminders": {
+        "label": "Match Reminders",
+        "description": "Email + WhatsApp reminder ~24h before a scheduled match. Hourly.",
+    },
+    "auto_forfeit_stale_matches": {
+        "label": "Auto-Forfeit Stale Matches",
+        "description": "Marks matches unscored 7+ days past their date as a walkover. Daily 01:00 UTC.",
+    },
+    "send_credit_expiry_reminders": {
+        "label": "Credit Expiry Reminders",
+        "description": "Nudges users whose credit balance expires within 30 days. Daily 10:00 UTC.",
+    },
+}
+
+
+@router.get("/flags")
+async def get_flags(request: Request):
+    """Runtime-toggleable job flags + a read-only view of build-time env flags."""
+    db = request.app.state.db
+    await require_admin(request, db)
+
+    docs = await db.feature_flags.find({"_id": {"$in": list(JOB_FLAGS.keys())}}).to_list(len(JOB_FLAGS))
+    state = {d["_id"]: d for d in docs}
+
+    jobs = [
+        {
+            "id": flag_id,
+            "label": meta["label"],
+            "description": meta["description"],
+            "enabled": state.get(flag_id, {}).get("enabled", True),
+            "updated_at": state.get(flag_id, {}).get("updated_at"),
+        }
+        for flag_id, meta in JOB_FLAGS.items()
+    ]
+
+    env_flags = [
+        {"name": "PHASE", "value": os.environ.get("PHASE", "1"), "controls": "Active sports/country/currency"},
+        {"name": "ENV", "value": os.environ.get("ENV", "development"), "controls": "Secure cookies (production only)"},
+        {"name": "CRICKET_ENABLED", "value": os.environ.get("CRICKET_ENABLED", "false"), "controls": "Adds Cricket regardless of phase"},
+        {"name": "SMTP_HOST", "value": "configured" if os.environ.get("SMTP_HOST") else "not set (console fallback)", "controls": "Real email delivery vs. console logging"},
+        {"name": "WHATSAPP_API_TOKEN", "value": "configured" if os.environ.get("WHATSAPP_API_TOKEN") else "not set", "controls": "WhatsApp notifications on/off"},
+        {"name": "STRIPE_API_KEY", "value": "configured" if os.environ.get("STRIPE_API_KEY") else "not set", "controls": "Payment processing"},
+    ]
+
+    return {"jobs": jobs, "env_flags": env_flags}
+
+
+@router.patch("/flags/{flag_id}")
+async def set_flag(flag_id: str, request: Request, body: dict = Body(...)):
+    db = request.app.state.db
+    admin = await require_admin(request, db)
+
+    if flag_id not in JOB_FLAGS:
+        raise HTTPException(status_code=404, detail="Unknown flag")
+    enabled = bool(body.get("enabled"))
+
+    await db.feature_flags.update_one(
+        {"_id": flag_id},
+        {"$set": {
+            "enabled": enabled,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": str(admin.get("_id", "")),
+        }},
+        upsert=True,
+    )
+    return {"id": flag_id, "enabled": enabled}
 
 
 @router.get("/stats")

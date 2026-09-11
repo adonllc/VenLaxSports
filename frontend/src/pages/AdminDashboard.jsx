@@ -249,6 +249,7 @@ export default function AdminDashboard() {
     { id: "zelle", label: "Zelle Queue" },
     { id: "waitlist", label: "Waitlist" },
     { id: "referrals", label: "Referrals" },
+    { id: "flags", label: "Feature Flags" },
   ];
 
   return (
@@ -729,6 +730,7 @@ export default function AdminDashboard() {
         {tab === "zelle" && <ZelleQueueTab />}
         {tab === "waitlist" && <WaitlistTab />}
         {tab === "referrals" && <ReferralsTab />}
+        {tab === "flags" && <FlagsTab />}
       </div>
 
       {showRRForm && (
@@ -1552,6 +1554,111 @@ function ReferralsTab() {
               )}
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// Frontend build-time env flags — read directly from this bundle's own
+// import.meta.env, since that's the exact build currently deployed.
+const FRONTEND_ENV_FLAGS = [
+  { name: "VITE_PRELAUNCH", value: String(import.meta.env.VITE_PRELAUNCH ?? "false"), controls: "Shows waitlist landing page instead of Home at /" },
+  { name: "VITE_LAUNCH_LIVE", value: String(import.meta.env.VITE_LAUNCH_LIVE ?? "false"), controls: "Forces real Home even if VITE_PRELAUNCH is true" },
+  { name: "VITE_PHASE", value: String(import.meta.env.VITE_PHASE ?? "1"), controls: "Active sports/country/pricing shown in the UI" },
+  { name: "VITE_CRICKET_ENABLED", value: String(import.meta.env.VITE_CRICKET_ENABLED ?? "false"), controls: "Adds Cricket regardless of phase" },
+  { name: "VITE_VAPID_PUBLIC_KEY", value: import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "not set", controls: "Push notification opt-in UI" },
+];
+
+function FlagsTab() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [jobs, setJobs] = useState([]);
+  const [envFlags, setEnvFlags] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState(null);
+
+  const fetchFlags = () => {
+    axios.get(`${API}/admin/flags`, { withCredentials: true })
+      .then((res) => {
+        setJobs(res.data.jobs);
+        setEnvFlags(res.data.env_flags);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchFlags();
+  }, []);
+
+  const toggle = async (job) => {
+    setToggling(job.id);
+    const next = !job.enabled;
+    setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, enabled: next } : j))); // optimistic
+    try {
+      await axios.patch(`${API}/admin/flags/${job.id}`, { enabled: next }, { withCredentials: true });
+    } catch {
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, enabled: job.enabled } : j))); // revert
+    } finally {
+      setToggling(null);
+    }
+  };
+
+  if (loading) return <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>;
+
+  return (
+    <div className="space-y-6" data-testid="flags-tab">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-sm font-semibold text-heading-dark">Background Jobs</h3>
+          <p className="text-xs text-gray-500 mt-1">Toggle takes effect immediately, no redeploy needed.</p>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {jobs.map((job) => (
+            <div key={job.id} className="flex items-center justify-between gap-4 px-4 py-4" data-testid={`flag-row-${job.id}`}>
+              <div className="min-w-0">
+                <div className="font-medium text-heading-dark">{job.label}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{job.description}</div>
+              </div>
+              <button
+                onClick={() => toggle(job)}
+                disabled={toggling === job.id}
+                role="switch"
+                aria-checked={job.enabled}
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+                  job.enabled ? "bg-emerald-500" : "bg-gray-300"
+                }`}
+                data-testid={`flag-toggle-${job.id}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    job.enabled ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-sm font-semibold text-heading-dark">Environment Flags</h3>
+          <p className="text-xs text-gray-500 mt-1">Build-time config — changing these requires a redeploy, not a toggle here.</p>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {[...envFlags, ...FRONTEND_ENV_FLAGS].map((f) => (
+            <div key={f.name} className="flex items-center justify-between gap-4 px-4 py-3" data-testid={`env-flag-${f.name}`}>
+              <div className="min-w-0">
+                <div className="font-mono text-xs text-gray-700">{f.name}</div>
+                <div className="text-xs text-gray-400 mt-0.5">{f.controls}</div>
+              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-600 shrink-0">
+                {f.value}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
