@@ -267,7 +267,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-0 overflow-x-auto scrollbar-none">
+          <div className="flex flex-wrap gap-x-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
