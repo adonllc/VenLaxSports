@@ -113,7 +113,7 @@ export default function Handbook() {
             <Shield className="w-3.5 h-3.5" />
             Player Handbook v1.0
           </div>
-          <h1 className="font-heading font-black text-5xl sm:text-6xl mb-4 leading-tight text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>
             League Rules &<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>Player Handbook</span>
           </h1>
           <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>

@@ -335,7 +335,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <h1 className="font-black text-5xl sm:text-6xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
+              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
               <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>

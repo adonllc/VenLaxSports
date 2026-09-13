@@ -90,7 +90,7 @@ export default function Leagues() {
       {/* Header */}
       <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="font-black text-6xl sm:text-7xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Browse Leagues</h1>
+          <h1 className="font-black text-4xl sm:text-5xl mb-3 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Browse Leagues</h1>
           <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Find competitive leagues across all sports and cities</p>
         </div>
       </div>
