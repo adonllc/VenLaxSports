@@ -19,12 +19,16 @@ function NexusIcon({ size }) {
 
 // UFC-Style wordmark: VEN (green) + LAX (orange, bold) with SPORTS subtitle
 function VenlaxWordmark({ size = "md", variant = "default" }) {
+  // Subtitle tracking is positive and wide (classic small-caps luxury tagline
+  // treatment) even though the primary VEN/LAX mark stays tight and bold —
+  // that contrast between a dense wordmark and an airy tagline is what reads
+  // as considered rather than default.
   const sizeMap = {
-    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: -0.25, dashLen: "18px" },
-    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: -0.4, dashLen: "24px" },
-    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: -0.5, dashLen: "32px" },
-    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: -0.6, dashLen: "40px" },
-    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: -0.8, dashLen: "56px" },
+    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 0.5, dashLen: "20px" },
+    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 0.6, dashLen: "28px" },
+    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 0.8, dashLen: "36px" },
+    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 1.0, dashLen: "46px" },
+    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 1.4, dashLen: "64px" },
   };
 
   const { fontSize, letterSpacing, subtitleFz, subtitleLs, dashLen } = sizeMap[size] || sizeMap.md;
@@ -34,7 +38,7 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
   const laxColor = isLight ? "#FFFFFF" : "#F97316";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "8px", alignItems: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "10px", alignItems: "center" }}>
       <div style={{ display: "flex", lineHeight: 0.8 }}>
         <span
           style={{
@@ -60,7 +64,7 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
           LAX
         </span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "2px" }}>
         <div style={{ width: dashLen, height: "2px", background: "#004D40" }} />
         <span
           style={{
@@ -98,7 +102,7 @@ export default function Logo({
 
   return (
     <div
-      className={`flex items-center gap-1.5 ${className}`}
+      className={`flex items-center gap-2.5 ${className}`}
       data-testid={testId}
       style={{ flexShrink: 0, alignItems: "center" }}
     >
