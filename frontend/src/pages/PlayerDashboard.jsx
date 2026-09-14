@@ -216,7 +216,7 @@ export default function PlayerDashboard() {
     const summary = buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name);
     const summaryStr = summary?.scoreStr || (m.score_data?.retired ? "Retired / Walkover" : "");
     const refParam = referralCode ? `&ref=${referralCode}` : "";
-    const spectatorUrl = `https://venlaxsports.com/leagues/${m.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
+    const spectatorUrl = `${window.location.origin}/leagues/${m.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
     const shareText = encodeURIComponent(
       `${sportEmoji} ${m.winner_name} defeated ${loserName}${summaryStr ? ` ${summaryStr}` : ""}\n` +
       `📍 VenLax Sports · ${m.sport}\n` +

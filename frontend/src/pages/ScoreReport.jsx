@@ -201,7 +201,7 @@ export default function ScoreReport() {
         : match.player1_name;
     const sportEmoji = match.sport === "tennis" ? "🎾" : match.sport === "pickleball" ? "🏓" : "🏏";
     const refParam = referralCode ? `&ref=${referralCode}` : "";
-    const spectatorUrl = `https://venlaxsports.com/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
+    const spectatorUrl = `${window.location.origin}/leagues/${match.league_id}/public?utm_source=venlax&utm_medium=share_card${refParam}`;
     const shareText = encodeURIComponent(
       `${sportEmoji} ${submittedResult.winnerName} defeated ${loserName}${submittedResult.summary ? ` ${submittedResult.summary}` : ""}\n` +
       `📍 VenLax Sports · ${match.sport}\n` +

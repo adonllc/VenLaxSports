@@ -10,6 +10,7 @@ from auth_utils import (
     get_current_user, get_jwt_secret, JWT_ALGORITHM,
     check_rate_limit, record_attempt, clear_attempts,
     create_pending_2fa_token, verify_pending_2fa_token,
+    COOKIE_DOMAIN,
 )
 import jwt as pyjwt
 import email_service
@@ -116,7 +117,7 @@ async def _apply_referral_credit(db, referral_code: str, referee_id: str):
 def _set_tokens(response: Response, user_id: str, email: str, role: str):
     access = create_access_token(user_id, email, role)
     refresh = create_refresh_token(user_id)
-    cookie_domain = ".venlaxsports.com"
+    cookie_domain = COOKIE_DOMAIN
     response.set_cookie("access_token", access, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=86400, path="/", domain=cookie_domain)
     response.set_cookie("refresh_token", refresh, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=604800, path="/", domain=cookie_domain)
     return access, refresh
@@ -278,8 +279,8 @@ async def logout(response: Response, request: Request):
         except pyjwt.InvalidTokenError:
             pass
 
-    response.delete_cookie("access_token", domain=".venlaxsports.com", path="/")
-    response.delete_cookie("refresh_token", domain=".venlaxsports.com", path="/")
+    response.delete_cookie("access_token", domain=COOKIE_DOMAIN, path="/")
+    response.delete_cookie("refresh_token", domain=COOKIE_DOMAIN, path="/")
     return {"message": "Logged out"}
 
 
@@ -315,7 +316,7 @@ async def refresh(request: Request, response: Response):
             raise HTTPException(status_code=401, detail="User not found")
         user_id = str(user["_id"])
         new_access = create_access_token(user_id, user["email"], user.get("role", "player"))
-        response.set_cookie("access_token", new_access, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=86400, path="/", domain=".venlaxsports.com")
+        response.set_cookie("access_token", new_access, httponly=True, secure=_SECURE_COOKIES, samesite="lax", max_age=86400, path="/", domain=COOKIE_DOMAIN)
         return {"message": "Token refreshed"}
     except pyjwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")

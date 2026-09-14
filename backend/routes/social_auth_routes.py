@@ -7,7 +7,7 @@ from pydantic import BaseModel
 import httpx
 from bson import ObjectId
 from models import User
-from auth_utils import create_access_token, create_refresh_token
+from auth_utils import create_access_token, create_refresh_token, COOKIE_DOMAIN
 
 router = APIRouter()
 
@@ -31,8 +31,8 @@ def _set_auth_cookies(response: Response, user_id: str, email: str, role: str):
     access = create_access_token(user_id, email, role)
     refresh = create_refresh_token(user_id)
     is_secure = os.environ.get("FRONTEND_URL", "").startswith("https")
-    response.set_cookie("access_token", access, httponly=True, secure=is_secure, samesite="lax", max_age=86400, path="/", domain=".venlaxsports.com")
-    response.set_cookie("refresh_token", refresh, httponly=True, secure=is_secure, samesite="lax", max_age=604800, path="/", domain=".venlaxsports.com")
+    response.set_cookie("access_token", access, httponly=True, secure=is_secure, samesite="lax", max_age=86400, path="/", domain=COOKIE_DOMAIN)
+    response.set_cookie("refresh_token", refresh, httponly=True, secure=is_secure, samesite="lax", max_age=604800, path="/", domain=COOKIE_DOMAIN)
 
 
 @router.get("/google/url")

@@ -5,6 +5,7 @@ from auth_utils import get_current_user
 from datetime import datetime, timezone, timedelta
 import secrets
 import string
+import email_service
 
 router = APIRouter()
 
@@ -90,9 +91,10 @@ async def get_my_referral_code(request: Request):
     else:
         ref_code = current_user.get("referral_code")
 
+    frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
     return {
         "referral_code": ref_code,
-        "referral_link": f"https://venlaxsports.com/auth?ref={ref_code}",
+        "referral_link": f"{frontend_url}/auth?ref={ref_code}",
         "credits_balance": current_user.get("credits_balance", 0.0)
     }
 

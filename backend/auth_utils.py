@@ -7,6 +7,7 @@ from fastapi import HTTPException, Request
 from bson import ObjectId
 
 JWT_ALGORITHM = "HS256"
+COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN", ".venlaxsports.com")
 
 
 def get_jwt_secret() -> str:
