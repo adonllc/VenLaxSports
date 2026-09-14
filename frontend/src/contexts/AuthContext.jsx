@@ -59,6 +59,10 @@ export const AuthProvider = ({ children }) => {
         state,
       });
 
+      if (auth.requires_2fa || auth.requires_2fa_setup) {
+        return { requires2fa: !!auth.requires_2fa, requires2faSetup: !!auth.requires_2fa_setup, pendingToken: auth.pending_token };
+      }
+
       if (auth.state !== sessionStorage.getItem("_pkce_s")) {
         throw new Error("State mismatch — possible CSRF attack");
       }
@@ -74,6 +78,32 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem("_pkce_v");
       sessionStorage.removeItem("_pkce_s");
     }
+  };
+
+  // ── Admin 2FA (TOTP) — second step after login() returns requires2fa[Setup] ──
+  const twoFactorSetup = async (pendingToken) => {
+    const { data } = await axios.post(`${API}/auth/2fa/setup`, { pending_token: pendingToken });
+    return data; // { secret, otpauth_uri, qr_code_png_base64 }
+  };
+
+  const twoFactorEnable = async (pendingToken, code) => {
+    const { data } = await axios.post(
+      `${API}/auth/2fa/enable`,
+      { pending_token: pendingToken, code },
+      { withCredentials: true }
+    );
+    setUser(data);
+    return data; // includes one-time backup_codes
+  };
+
+  const twoFactorVerify = async (pendingToken, code) => {
+    const { data } = await axios.post(
+      `${API}/auth/2fa/verify`,
+      { pending_token: pendingToken, code },
+      { withCredentials: true }
+    );
+    setUser(data);
+    return data;
   };
 
   const register = async (formData) => {
@@ -96,7 +126,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, fetchMe, formatError }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, fetchMe, formatError, twoFactorSetup, twoFactorEnable, twoFactorVerify }}>
       {children}
     </AuthContext.Provider>
   );

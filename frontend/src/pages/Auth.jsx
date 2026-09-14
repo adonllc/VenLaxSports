@@ -42,7 +42,14 @@ export default function Auth() {
   const [waiverOpen, setWaiverOpen] = useState(false);
   const [waiverAgreed, setWaiverAgreed] = useState(false);
   const [parentalConsentOpen, setParentalConsentOpen] = useState(false);
-  const { login, register, user, formatError } = useAuth();
+  const [twoFA, setTwoFA] = useState(null); // { pendingToken, needsSetup } | null
+  const [qrData, setQrData] = useState(null); // { secret, qr_code_png_base64 }
+  const [otpCode, setOtpCode] = useState("");
+  const [backupCodes, setBackupCodes] = useState(null);
+  const [backupCodesSaved, setBackupCodesSaved] = useState(false);
+  const [twoFAError, setTwoFAError] = useState("");
+  const [twoFALoading, setTwoFALoading] = useState(false);
+  const { login, register, user, formatError, twoFactorSetup, twoFactorEnable, twoFactorVerify } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -106,7 +113,16 @@ export default function Auth() {
     setLoading(true);
     try {
       if (mode === "login") {
-        await login(form.email, form.password);
+        const result = await login(form.email, form.password);
+        if (result?.requires2fa || result?.requires2faSetup) {
+          setTwoFA({ pendingToken: result.pendingToken, needsSetup: result.requires2faSetup });
+          if (result.requires2faSetup) {
+            const qr = await twoFactorSetup(result.pendingToken);
+            setQrData(qr);
+          }
+          setLoading(false);
+          return;
+        }
         const pendingToken = localStorage.getItem("doubles_invite_token");
         if (pendingToken) {
           localStorage.removeItem("doubles_invite_token");
@@ -131,6 +147,35 @@ export default function Auth() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTwoFASubmit = async (e) => {
+    e.preventDefault();
+    setTwoFAError("");
+    setTwoFALoading(true);
+    try {
+      if (twoFA.needsSetup) {
+        const data = await twoFactorEnable(twoFA.pendingToken, otpCode);
+        setBackupCodes(data.backup_codes || []);
+      } else {
+        await twoFactorVerify(twoFA.pendingToken, otpCode);
+        finishTwoFALogin();
+      }
+    } catch (err) {
+      setTwoFAError(formatError(err));
+    } finally {
+      setTwoFALoading(false);
+    }
+  };
+
+  const finishTwoFALogin = () => {
+    const pendingToken = localStorage.getItem("doubles_invite_token");
+    if (pendingToken) {
+      localStorage.removeItem("doubles_invite_token");
+      navigate(`/doubles-invite/confirm?token=${pendingToken}`);
+      return;
+    }
+    navigate("/dashboard");
   };
 
   const handleWaiverAgree = (agreed) => {
@@ -204,6 +249,94 @@ export default function Auth() {
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
+        {twoFA ? (
+          <div data-testid="two-fa-panel">
+            <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#065F46" }}>
+              {backupCodes ? "Save your backup codes" : twoFA.needsSetup ? "Set up two-factor authentication" : "Enter your 2FA code"}
+            </h1>
+            <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+              {backupCodes
+                ? "Store these somewhere safe. Each code works once if you lose access to your authenticator app."
+                : twoFA.needsSetup
+                ? "Admin accounts require an authenticator app. Scan the QR code below with Google Authenticator, Authy, or similar."
+                : "Open your authenticator app and enter the current 6-digit code."}
+            </p>
+
+            {backupCodes ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-2 bg-gray-50 border border-gray-200 rounded-xl p-4 font-mono text-sm">
+                  {backupCodes.map((c) => (
+                    <div key={c} className="text-center py-1" style={{ color: "#065F46" }}>{c}</div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(backupCodes.join("\n"))}
+                  className="w-full py-2.5 border rounded-xl text-sm font-semibold"
+                  style={{ borderColor: "#E5E7EB", color: "#065F46" }}
+                  data-testid="copy-backup-codes-btn"
+                >
+                  Copy codes
+                </button>
+                <label className="flex items-center gap-2 text-sm" style={{ color: "#374151" }}>
+                  <input type="checkbox" checked={backupCodesSaved} onChange={(e) => setBackupCodesSaved(e.target.checked)} />
+                  I've saved these backup codes
+                </label>
+                <button
+                  onClick={finishTwoFALogin}
+                  disabled={!backupCodesSaved}
+                  className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl disabled:opacity-50"
+                  data-testid="two-fa-continue-btn"
+                >
+                  Continue to dashboard
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleTwoFASubmit} className="space-y-5">
+                {twoFA.needsSetup && qrData && (
+                  <div className="text-center space-y-3">
+                    <img
+                      src={`data:image/png;base64,${qrData.qr_code_png_base64}`}
+                      alt="2FA QR code"
+                      className="mx-auto rounded-lg border"
+                      style={{ borderColor: "#E5E7EB", width: 200, height: 200 }}
+                    />
+                    <p className="text-xs" style={{ color: "#9CA3AF" }}>
+                      Can't scan? Enter this key manually: <span className="font-mono">{qrData.secret}</span>
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: "#374151" }}>6-digit code</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                    className="w-full px-4 py-3 rounded-lg text-sm text-center tracking-[0.3em] font-mono"
+                    style={{ border: "1px solid #E5E7EB" }}
+                    autoFocus
+                    data-testid="two-fa-code-input"
+                  />
+                </div>
+                {twoFAError && (
+                  <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-700 border border-red-200" data-testid="two-fa-error">
+                    {twoFAError}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={twoFALoading || otpCode.length !== 6}
+                  className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl disabled:opacity-60"
+                  data-testid="two-fa-submit-btn"
+                >
+                  {twoFALoading ? "Verifying..." : twoFA.needsSetup ? "Enable 2FA" : "Verify"}
+                </button>
+              </form>
+            )}
+          </div>
+        ) : (
+          <>
           {/* Mode Toggle */}
           <div className="flex rounded-xl p-1 mb-8" style={{ background: "#F3F4F6" }}>
             <button
@@ -548,6 +681,8 @@ export default function Auth() {
               </>
             )}
           </p>
+          </>
+        )}
         </div>
       </div>
 

@@ -72,6 +72,30 @@ def create_refresh_token(user_id: str) -> str:
     return pyjwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
 
+def create_pending_2fa_token(user_id: str) -> str:
+    """Short-lived, scope-limited token issued after password check succeeds for an
+    admin account. Only usable against the /auth/2fa/* endpoints — never accepted
+    by get_current_user(), so it can't be used to call any other authenticated route.
+    """
+    payload = {
+        "sub": user_id,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=5),
+        "type": "pending_2fa",
+    }
+    return pyjwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
+
+
+def verify_pending_2fa_token(token: str) -> str:
+    """Return the user_id if valid, else raise 401."""
+    try:
+        payload = pyjwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+    except pyjwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired 2FA session — please log in again")
+    if payload.get("type") != "pending_2fa":
+        raise HTTPException(status_code=401, detail="Invalid token type")
+    return payload["sub"]
+
+
 async def _is_token_blacklisted(token: str, db) -> bool:
     """Check if token is in blacklist."""
     blacklisted = await db.token_blacklist.find_one({"token": token})

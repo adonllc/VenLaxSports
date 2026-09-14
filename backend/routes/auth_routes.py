@@ -9,15 +9,19 @@ from auth_utils import (
     create_access_token, create_refresh_token,
     get_current_user, get_jwt_secret, JWT_ALGORITHM,
     check_rate_limit, record_attempt, clear_attempts,
+    create_pending_2fa_token, verify_pending_2fa_token,
 )
 import jwt as pyjwt
 import email_service
 import os
+import io
 import random
 import string
 import secrets
 import hashlib
 import base64
+import pyotp
+import qrcode
 
 router = APIRouter()
 
@@ -218,6 +222,13 @@ async def login(credentials: UserLogin, response: Response, request: Request):
 
     user_id = str(user["_id"])
     role = user.get("role", "player")
+
+    if role in ("admin", "city_admin"):
+        pending_token = create_pending_2fa_token(user_id)
+        if user.get("totp_enabled"):
+            return {"requires_2fa": True, "pending_token": pending_token}
+        return {"requires_2fa_setup": True, "pending_token": pending_token}
+
     _set_tokens(response, user_id, user["email"], role)
 
     return {
@@ -355,6 +366,13 @@ async def authorize(body: AuthorizeRequest, request: Request):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     await clear_attempts(db, rate_key)
 
+    role = user.get("role", "player")
+    if role in ("admin", "city_admin"):
+        pending_token = create_pending_2fa_token(str(user["_id"]))
+        if user.get("totp_enabled"):
+            return {"requires_2fa": True, "pending_token": pending_token}
+        return {"requires_2fa_setup": True, "pending_token": pending_token}
+
     code = secrets.token_urlsafe(32)
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
     await db.auth_codes.insert_one({
@@ -407,6 +425,140 @@ async def token(body: TokenRequest, response: Response, request: Request):
         "email_notifications": user.get("email_notifications", True),
         "founding_member": user.get("founding_member", False),
     }
+
+
+# ── Admin Two-Factor Authentication (TOTP) ──────────────────────────────
+# Required for role in ("admin", "city_admin"). /authorize and /login both
+# withhold real session cookies for these roles and instead return a
+# short-lived pending_token — the token type ("pending_2fa") is rejected by
+# get_current_user(), so it can't be used to call any other authenticated
+# route. Completing setup or verify below is what actually issues cookies.
+
+class PendingTokenIn(BaseModel):
+    pending_token: str
+
+
+class TwoFACodeIn(BaseModel):
+    pending_token: str
+    code: str
+
+
+def _generate_backup_codes(n: int = 8) -> list[str]:
+    return [secrets.token_hex(4).upper() for _ in range(n)]
+
+
+def _final_login_response(response: Response, user: dict) -> dict:
+    user_id = str(user["_id"])
+    role = user.get("role", "player")
+    _set_tokens(response, user_id, user["email"], role)
+    return {
+        "id": user_id,
+        "email": user["email"],
+        "name": user.get("name"),
+        "role": role,
+        "country": user.get("country", "USA"),
+        "city": user.get("city"),
+        "sport_preferences": user.get("sport_preferences", []),
+        "tennis_rating": user.get("tennis_rating", 3.0),
+        "cricket_rating": user.get("cricket_rating", 50.0),
+        "pickleball_rating": user.get("pickleball_rating", 3.0),
+        "email_notifications": user.get("email_notifications", True),
+        "founding_member": user.get("founding_member", False),
+    }
+
+
+@router.post("/2fa/setup")
+async def two_fa_setup(body: PendingTokenIn, request: Request):
+    """Generate (or return the still-unconfirmed) TOTP secret + QR code.
+    Does not enable 2FA — call /2fa/enable with a code to confirm."""
+    db = request.app.state.db
+    user_id = verify_pending_2fa_token(body.pending_token)
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    if user.get("totp_enabled"):
+        raise HTTPException(status_code=400, detail="2FA already enabled")
+
+    secret = user.get("totp_secret")
+    if not secret:
+        secret = pyotp.random_base32()
+        await db.users.update_one({"_id": user["_id"]}, {"$set": {"totp_secret": secret}})
+
+    uri = pyotp.TOTP(secret).provisioning_uri(name=user["email"], issuer_name="VENLAX Sports")
+    img = qrcode.make(uri)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    qr_b64 = base64.b64encode(buf.getvalue()).decode()
+
+    return {"secret": secret, "otpauth_uri": uri, "qr_code_png_base64": qr_b64}
+
+
+@router.post("/2fa/enable")
+async def two_fa_enable(body: TwoFACodeIn, response: Response, request: Request):
+    """Confirm setup with a valid TOTP code: enables 2FA, issues one-time
+    backup codes (shown once, never retrievable again), and completes login."""
+    db = request.app.state.db
+    user_id = verify_pending_2fa_token(body.pending_token)
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    if user.get("totp_enabled"):
+        raise HTTPException(status_code=400, detail="2FA already enabled")
+    secret = user.get("totp_secret")
+    if not secret:
+        raise HTTPException(status_code=400, detail="Call /2fa/setup first")
+
+    rate_key = f"2fa:{user_id}"
+    await check_rate_limit(db, rate_key)
+    if not pyotp.TOTP(secret).verify(body.code.strip(), valid_window=1):
+        await record_attempt(db, rate_key)
+        raise HTTPException(status_code=400, detail="Invalid code")
+    await clear_attempts(db, rate_key)
+
+    backup_codes = _generate_backup_codes()
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {
+            "totp_enabled": True,
+            "totp_backup_codes": [hash_password(c) for c in backup_codes],
+        }},
+    )
+    user["totp_enabled"] = True
+
+    result = _final_login_response(response, user)
+    result["backup_codes"] = backup_codes
+    return result
+
+
+@router.post("/2fa/verify")
+async def two_fa_verify(body: TwoFACodeIn, response: Response, request: Request):
+    """Second login step for an admin who already has 2FA enabled. Accepts a
+    6-digit TOTP code or one of the one-time backup codes."""
+    db = request.app.state.db
+    user_id = verify_pending_2fa_token(body.pending_token)
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user or not user.get("totp_enabled"):
+        raise HTTPException(status_code=401, detail="2FA not enabled for this account")
+
+    rate_key = f"2fa:{user_id}"
+    await check_rate_limit(db, rate_key)
+
+    raw = body.code.strip()
+    if pyotp.TOTP(user["totp_secret"]).verify(raw, valid_window=1):
+        await clear_attempts(db, rate_key)
+        return _final_login_response(response, user)
+
+    backup_hashes = user.get("totp_backup_codes") or []
+    normalized = raw.upper().replace("-", "")
+    for h in backup_hashes:
+        if verify_password(normalized, h):
+            remaining = [x for x in backup_hashes if x != h]
+            await db.users.update_one({"_id": user["_id"]}, {"$set": {"totp_backup_codes": remaining}})
+            await clear_attempts(db, rate_key)
+            return _final_login_response(response, user)
+
+    await record_attempt(db, rate_key)
+    raise HTTPException(status_code=401, detail="Invalid code")
 
 
 # ── OTP Email Verification ──────────────────────────────────────────────

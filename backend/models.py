@@ -40,6 +40,9 @@ class User(BaseDocument):
     name: str
     password_hash: Optional[str] = None
     role: str = "player"  # player, admin, city_admin
+    totp_secret: Optional[str] = None
+    totp_enabled: bool = False
+    totp_backup_codes: Optional[List[str]] = None  # bcrypt hashes, consumed one-time
     country: str = "USA"
     city: Optional[str] = None
     sport_preferences: List[str] = []
