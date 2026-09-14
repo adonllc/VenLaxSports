@@ -8,7 +8,9 @@ logger = logging.getLogger(__name__)
 
 async def seed_admin(db) -> None:
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@venlaxsports.com")
-    admin_password = os.environ.get("ADMIN_PASSWORD", "Admin@123")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+    if not admin_password:
+        raise RuntimeError("ADMIN_PASSWORD not configured — refusing to seed admin with a default password")
     existing = await db.users.find_one({"email": admin_email})
     if existing is None:
         hashed = bcrypt.hashpw(admin_password.encode(), bcrypt.gensalt()).decode()

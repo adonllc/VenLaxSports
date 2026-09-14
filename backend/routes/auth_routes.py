@@ -8,6 +8,7 @@ from auth_utils import (
     hash_password, verify_password,
     create_access_token, create_refresh_token,
     get_current_user, get_jwt_secret, JWT_ALGORITHM,
+    check_rate_limit, record_attempt, clear_attempts,
 )
 import jwt as pyjwt
 import email_service
@@ -132,6 +133,11 @@ async def check_email(body: CheckEmailIn, request: Request):
 @router.post("/register")
 async def register(user_data: UserCreate, response: Response, request: Request):
     db = request.app.state.db
+    client_ip = request.client.host if request.client else "unknown"
+    register_key = f"register:{client_ip}"
+    await check_rate_limit(db, register_key, max_attempts=10, window_minutes=30)
+    await record_attempt(db, register_key, window_minutes=30)
+
     existing = await db.users.find_one({"email": user_data.email.lower()})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -197,11 +203,18 @@ async def register(user_data: UserCreate, response: Response, request: Request):
 @router.post("/login")
 async def login(credentials: UserLogin, response: Response, request: Request):
     db = request.app.state.db
-    user = await db.users.find_one({"email": credentials.email.lower()})
+    email = credentials.email.lower()
+    rate_key = f"login:{email}"
+    await check_rate_limit(db, rate_key)
+
+    user = await db.users.find_one({"email": email})
     if not user or not user.get("password_hash"):
+        await record_attempt(db, rate_key)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not verify_password(credentials.password, user["password_hash"]):
+        await record_attempt(db, rate_key)
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    await clear_attempts(db, rate_key)
 
     user_id = str(user["_id"])
     role = user.get("role", "player")
@@ -329,11 +342,18 @@ async def authorize(body: AuthorizeRequest, request: Request):
         raise HTTPException(status_code=400, detail="code_challenge too short — use S256 over 32-byte verifier")
 
     db = request.app.state.db
-    user = await db.users.find_one({"email": body.email.lower()})
+    email = body.email.lower()
+    rate_key = f"login:{email}"
+    await check_rate_limit(db, rate_key)
+
+    user = await db.users.find_one({"email": email})
     if not user or not user.get("password_hash"):
+        await record_attempt(db, rate_key)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not verify_password(body.password, user["password_hash"]):
+        await record_attempt(db, rate_key)
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    await clear_attempts(db, rate_key)
 
     code = secrets.token_urlsafe(32)
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
@@ -418,6 +438,10 @@ async def verify_otp(body: OTPVerifyIn, request: Request):
     user = await get_current_user(request, db)
     if user.get("email_verified"):
         return {"message": "Already verified", "email_verified": True}
+
+    rate_key = f"otp:{user['_id']}"
+    await check_rate_limit(db, rate_key, max_attempts=5, window_minutes=15)
+
     stored = user.get("otp_code")
     expires = user.get("otp_expires_at")
     if not stored or not expires:
@@ -425,7 +449,9 @@ async def verify_otp(body: OTPVerifyIn, request: Request):
     if datetime.fromisoformat(expires) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Code expired — request a new one")
     if not verify_password(body.otp.strip(), stored):
+        await record_attempt(db, rate_key)
         raise HTTPException(status_code=400, detail="Invalid code")
+    await clear_attempts(db, rate_key)
     await db.users.update_one(
         {"_id": ObjectId(user["_id"])},
         {"$set": {"email_verified": True}, "$unset": {"otp_code": "", "otp_expires_at": ""}},

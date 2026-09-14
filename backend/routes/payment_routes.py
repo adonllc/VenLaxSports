@@ -234,19 +234,17 @@ async def get_payment_status(session_id: str, request: Request):
     if txn.get("payment_status") == "paid":
         return {"status": "complete", "payment_status": "paid"}
 
-    try:
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout
-    except ImportError:
-        raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
+    import stripe
 
     api_key = os.environ.get("STRIPE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="Payment processing is not configured.")
-    host_url = str(request.base_url)
-    webhook_url = f"{host_url}api/webhook/stripe"
-    stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+    stripe.api_key = api_key
 
-    status = await stripe.get_checkout_status(session_id)
+    try:
+        status = stripe.checkout.Session.retrieve(session_id)
+    except Exception:
+        raise HTTPException(status_code=503, detail="Unable to reach Stripe")
     now = datetime.now(timezone.utc).isoformat()
 
     await db.payment_transactions.update_one(

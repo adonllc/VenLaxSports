@@ -299,33 +299,46 @@ async def join_rr_league(league_id: str, request: Request):
 
     entry_fee = league.get("entry_fee", 0)
     if entry_fee > 0:
-        try:
-            from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
-        except ImportError:
-            raise HTTPException(status_code=503, detail="Stripe not configured on this deployment")
-        import os as _os
+        import os
+        import stripe
         from models import PaymentTransaction
-        api_key = _os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
+
+        api_key = os.environ.get("STRIPE_API_KEY")
+        if not api_key:
+            raise HTTPException(status_code=503, detail="Payment processing is not configured.")
+        stripe.api_key = api_key
+
         host_url = str(request.base_url)
-        stripe_client = StripeCheckout(api_key=api_key, webhook_url=f"{host_url}api/webhook/stripe")
         origin = request.headers.get("origin", host_url.rstrip("/"))
-        checkout_req = CheckoutSessionRequest(
-            amount=float(entry_fee),
-            currency="usd",
-            success_url=f"{origin}/round-robin/{league_id}?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"{origin}/round-robin/{league_id}",
-            metadata={"league_id": league_id, "user_id": user["_id"], "user_email": user["email"]},
-        )
+        stripe_amount = int(float(entry_fee) * 100)
+
         try:
-            session = await stripe_client.create_checkout_session(checkout_req)
-        except Exception:
-            raise HTTPException(status_code=503, detail="Payment service unavailable")
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "product_data": {"name": league["name"]},
+                            "unit_amount": stripe_amount,
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                mode="payment",
+                success_url=f"{origin}/round-robin/{league_id}?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{origin}/round-robin/{league_id}",
+                metadata={"league_id": league_id, "user_id": user["_id"], "user_email": user["email"]},
+            )
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Failed to create checkout session: {str(e)}")
+
         txn = PaymentTransaction(
             user_id=user["_id"],
             user_email=user["email"],
             league_id=league_id,
             league_name=league["name"],
-            session_id=session.session_id,
+            session_id=session.id,
             amount=float(entry_fee),
             currency="USD",
             status="initiated",

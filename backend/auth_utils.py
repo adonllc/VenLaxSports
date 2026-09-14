@@ -16,6 +16,30 @@ def get_jwt_secret() -> str:
     return secret
 
 
+async def check_rate_limit(db, key: str, max_attempts: int = 5, window_minutes: int = 15) -> None:
+    """Raise 429 if `key` (e.g. "login:email@x.com") has hit max_attempts within
+    the current window. Call record_attempt() on failure to count it, and
+    clear_attempts() on success to reset. Window auto-expires via the
+    login_attempts TTL index (see seeds/indexes.py) — no manual cleanup needed.
+    """
+    doc = await db.login_attempts.find_one({"_id": key})
+    if doc and doc.get("count", 0) >= max_attempts:
+        raise HTTPException(status_code=429, detail="Too many attempts. Try again in a few minutes.")
+
+
+async def record_attempt(db, key: str, window_minutes: int = 15) -> None:
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=window_minutes)
+    await db.login_attempts.update_one(
+        {"_id": key},
+        {"$inc": {"count": 1}, "$setOnInsert": {"expires_at": expires_at}},
+        upsert=True,
+    )
+
+
+async def clear_attempts(db, key: str) -> None:
+    await db.login_attempts.delete_one({"_id": key})
+
+
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")

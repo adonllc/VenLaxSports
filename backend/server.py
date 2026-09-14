@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, APIRouter, Request
+from fastapi import FastAPI, APIRouter, Request, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -108,27 +108,33 @@ async def get_phase():
 
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
+    import stripe
+
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    if not webhook_secret:
+        logging.getLogger(__name__).warning("STRIPE_WEBHOOK_SECRET not configured — rejecting webhook")
+        raise HTTPException(status_code=503, detail="Webhook not configured")
+
     body = await request.body()
     signature = request.headers.get("Stripe-Signature", "")
-    api_key = os.environ.get("STRIPE_API_KEY", "sk_test_emergent")
-    host_url = str(request.base_url)
-    webhook_url = f"{host_url}api/webhook/stripe"
 
     try:
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout
-        stripe = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
-        event = await stripe.handle_webhook(body, signature)
-        if event.payment_status == "paid":
+        event = stripe.Webhook.construct_event(body, signature, webhook_secret)
+    except (stripe.error.SignatureVerificationError, ValueError) as e:
+        logging.getLogger(__name__).warning(f"Webhook signature verification failed: {e}")
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        if session.get("payment_status") == "paid":
             await db.payment_transactions.update_one(
-                {"session_id": event.session_id},
+                {"session_id": session["id"]},
                 {"$set": {
                     "payment_status": "paid",
                     "status": "complete",
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 }},
             )
-    except Exception as e:
-        logging.getLogger(__name__).warning(f"Webhook error: {e}")
 
     return {"received": True}
 
