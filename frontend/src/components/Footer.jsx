@@ -50,8 +50,8 @@ export default function Footer() {
           </div>
 
           {/* Links Groups — Compact, 2-column on desktop */}
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 flex md:justify-end">
+            <div className="grid grid-cols-2 md:inline-grid md:grid-cols-3 gap-8 md:gap-x-16">
               {/* Sports */}
               <div aria-label="Sports navigation">
                 <h3 className="font-black text-xs uppercase tracking-widest mb-4 text-gray-900 dark:text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
