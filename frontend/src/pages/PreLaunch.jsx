@@ -103,12 +103,23 @@ export default function PreLaunch() {
   const [waitlistId, setWaitlistId] = useState("");
   const [referredBy, setReferredBy] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
+  const [waitlistStats, setWaitlistStats] = useState(null);
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get("ref");
     if (ref) setReferredBy(ref);
   }, []);
+
+  React.useEffect(() => {
+    fetch(`${BACKEND_URL}/api/waitlist/count`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (data) setWaitlistStats(data); })
+      .catch(() => {});
+  }, []);
+
+  const spotsRemaining = waitlistStats ? waitlistStats.remaining : null;
+  const joinedCount = waitlistStats ? waitlistStats.count : null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -288,7 +299,11 @@ export default function PreLaunch() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-              🚀 100+ founding members claimed their spots - only 15 left
+              {spotsRemaining === null
+                ? "🚀 Founding members are claiming their spots"
+                : spotsRemaining > 0
+                  ? `🚀 ${joinedCount}+ founding members claimed their spots - only ${spotsRemaining} left`
+                  : "🚀 Founding cohort full - join the waitlist for the next wave"}
             </motion.span>
           </motion.div>
 
@@ -336,7 +351,7 @@ export default function PreLaunch() {
               whileTap={{ scale: 0.95 }}
               data-testid="hero-cta-primary"
             >
-              Secure My Spot - 15 Left
+              {spotsRemaining === null ? "Secure My Spot" : spotsRemaining > 0 ? `Secure My Spot - ${spotsRemaining} Left` : "Join the Waitlist"}
             </motion.a>
             <motion.a
               href="#early-access"
@@ -852,7 +867,8 @@ export default function PreLaunch() {
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            Early access members become the competitive foundation of their city. First to rank. First to shape the culture. Only 15 spots left.
+            Early access members become the competitive foundation of their city. First to rank. First to shape the culture.
+            {spotsRemaining !== null && spotsRemaining > 0 ? ` Only ${spotsRemaining} spots left.` : ""}
           </motion.p>
 
           {submitted ? (

@@ -6,6 +6,8 @@ from email_service import send_early_access_confirmed, schedule
 
 router = APIRouter()
 
+FOUNDING_MEMBER_LIMIT = 200
+
 
 class WaitlistEntry(BaseModel):
     email: str
@@ -53,7 +55,8 @@ async def join_waitlist(entry: WaitlistEntry, request: Request):
 async def waitlist_count(request: Request):
     db = request.app.state.db
     count = await db.waitlist.count_documents({})
-    return {"count": count}
+    remaining = max(FOUNDING_MEMBER_LIMIT - count, 0)
+    return {"count": count, "founding_limit": FOUNDING_MEMBER_LIMIT, "remaining": remaining}
 
 
 @router.get("/list")
