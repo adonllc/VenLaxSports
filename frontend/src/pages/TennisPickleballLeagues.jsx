@@ -72,7 +72,7 @@ export default function TennisPickleballLeagues() {
             Guide
           </p>
           <h1
-            className="font-black text-4xl sm:text-5xl mb-4"
+            className="font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-4"
             style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}
           >
             Tennis &amp; Pickleball Leagues Near You: How They Work, What They Cost, and How to Pick One
