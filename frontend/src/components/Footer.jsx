@@ -82,6 +82,7 @@ export default function Footer() {
                     { to: "/leagues",   label: "Browse Leagues" },
                     { to: "/rules",     label: "Rules & Conduct" },
                     { to: "/handbook",  label: "Player Handbook" },
+                    { to: "/tennis-pickleball-leagues", label: "League Guide" },
                     { to: "/auth",      label: "Sign Up" },
                   ].map(({ to, label }) => (
                     <li key={to}>

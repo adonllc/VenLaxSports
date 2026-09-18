@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /profile-setup
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /auth/callback
+Disallow: /doubles-invite/confirm
+Disallow: /round-robin/invite/
+
+Sitemap: https://venlaxsports.com/sitemap.xml
