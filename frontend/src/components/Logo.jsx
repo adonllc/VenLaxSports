@@ -24,12 +24,14 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
   // that contrast between a dense wordmark and an airy tagline is what reads
   // as considered rather than default.
   const sizeMap = {
-    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 0.5, dashLen: "20px" },
-    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 0.6, dashLen: "28px" },
-    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 0.8, dashLen: "36px" },
-    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 1.0, dashLen: "46px" },
-    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 1.4, dashLen: "64px" },
+    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 3, dashLen: "20px" },
+    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 3.5, dashLen: "28px" },
+    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 4.5, dashLen: "36px" },
+    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 6, dashLen: "46px" },
+    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 8, dashLen: "64px" },
   };
+
+  const GOLD = "#D4A017";
 
   const { fontSize, letterSpacing, subtitleFz, subtitleLs, dashLen } = sizeMap[size] || sizeMap.md;
 
@@ -65,19 +67,19 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "2px" }}>
-        <div style={{ width: dashLen, height: "2px", background: "#004D40" }} />
+        <div style={{ width: dashLen, height: "2px", background: GOLD }} />
         <span
           style={{
             fontSize: `${subtitleFz}px`,
-            fontWeight: 800,
+            fontWeight: 900,
             fontFamily: "'Outfit', sans-serif",
-            color: "#004D40",
+            color: GOLD,
             letterSpacing: `${subtitleLs}px`,
           }}
         >
           SPORTS
         </span>
-        <div style={{ width: dashLen, height: "2px", background: "#004D40" }} />
+        <div style={{ width: dashLen, height: "2px", background: GOLD }} />
       </div>
     </div>
   );
