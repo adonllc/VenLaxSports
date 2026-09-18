@@ -24,16 +24,24 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
   // that contrast between a dense wordmark and an airy tagline is what reads
   // as considered rather than default.
   const sizeMap = {
-    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 3, dashLen: "20px" },
-    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 3.5, dashLen: "28px" },
-    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 4.5, dashLen: "36px" },
-    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 6, dashLen: "46px" },
-    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 8, dashLen: "64px" },
+    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 3 },
+    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 3.5 },
+    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 4.5 },
+    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 6 },
+    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 8 },
   };
 
   const GOLD = "#D4A017";
 
-  const { fontSize, letterSpacing, subtitleFz, subtitleLs, dashLen } = sizeMap[size] || sizeMap.md;
+  const { fontSize, letterSpacing, subtitleFz, subtitleLs } = sizeMap[size] || sizeMap.md;
+
+  // Motion-tick scale: angled speed-line ticks flanking SPORTS, sized off
+  // the subtitle font so they stay proportional across all logo sizes.
+  const tickScale = subtitleFz / 12;
+  const tickH = Math.round(9 * tickScale);
+  const tickW = Math.max(2, Math.round(4 * tickScale));
+  const tickGap = Math.max(1, Math.round(2 * tickScale));
+  const tick = <div style={{ width: `${tickW}px`, height: `${tickH}px`, background: GOLD, transform: "skewX(-18deg)" }} />;
 
   const isLight = variant === "light" || variant === "hero";
   const venColor = isLight ? "#FFFFFF" : "#10B981";
@@ -66,8 +74,8 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
           LAX
         </span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "2px" }}>
-        <div style={{ width: dashLen, height: "2px", background: GOLD }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px" }}>
+        <div style={{ display: "flex", gap: `${tickGap}px` }}>{tick}{tick}{tick}</div>
         <span
           style={{
             fontSize: `${subtitleFz}px`,
@@ -79,7 +87,7 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
         >
           SPORTS
         </span>
-        <div style={{ width: dashLen, height: "2px", background: GOLD }} />
+        <div style={{ display: "flex", gap: `${tickGap}px` }}>{tick}{tick}{tick}</div>
       </div>
     </div>
   );
