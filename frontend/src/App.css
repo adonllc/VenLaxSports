@@ -14,6 +14,10 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
+.sport-card-hover:active {
+    transform: translateY(-4px) scale(0.98);
+}
+
 /* ─── League Card Hover ──────────────────────────────────────── */
 .league-card-hover {
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -22,6 +26,10 @@
 .league-card-hover:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.league-card-hover:active {
+    transform: translateY(-2px) scale(0.98);
 }
 
 /* ─── Stat Counter ───────────────────────────────────────────── */
@@ -76,6 +84,10 @@
 .card-glow-cricket:hover    { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(37, 99, 235, 0.20),  0 4px 12px rgba(0,0,0,0.04); }
 .card-glow-pickleball:hover { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(249, 115, 22, 0.20), 0 4px 12px rgba(0,0,0,0.04); }
 
+.card-glow-tennis:active,
+.card-glow-cricket:active,
+.card-glow-pickleball:active { transform: translateY(-4px) scale(0.98); }
+
 /* ─── CTA Decoration ─────────────────────────────────────────── */
 .cta-pattern {
     background-image:
@@ -113,6 +125,16 @@
     transform: none;
     box-shadow: none;
   }
+
+  .league-card-hover:active {
+    transform: scale(0.98);
+  }
+  .sport-card-hover:active,
+  .card-glow-tennis:active,
+  .card-glow-cricket:active,
+  .card-glow-pickleball:active {
+    transform: scale(0.98);
+  }
 }
 
 /* ─── Motion Accessibility ────────────────────────────────────── */
@@ -120,8 +142,13 @@
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Kill slides/scales/parallax, but keep a short opacity/color cross-fade for comprehension */
+  *, *::before, *::after {
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 200ms !important;
   }
 }
 
