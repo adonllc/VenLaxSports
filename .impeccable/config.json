@@ -29,6 +29,42 @@
         ],
         "createdAt": "2026-09-11T01:34:47.723Z",
         "reason": "Neutral bg-gray-100/text-gray-600 pending-status badge, same pairing already used for other status badges throughout this file - gray-100 is a neutral surface, not a colored background the rule targets"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/PublicProfile.jsx"
+        ],
+        "createdAt": "2026-09-22T03:51:52.820Z",
+        "reason": "L108 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored in CityLeaderboard.jsx"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/Standings.jsx"
+        ],
+        "createdAt": "2026-09-22T03:51:52.960Z",
+        "reason": "L32 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored in CityLeaderboard.jsx"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/LeagueSpectator.jsx"
+        ],
+        "createdAt": "2026-09-22T03:51:53.133Z",
+        "reason": "L48 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored in CityLeaderboard.jsx"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/CityLeaderboard.jsx"
+        ],
+        "createdAt": "2026-09-22T03:52:15.941Z",
+        "reason": "L40 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored for ScoreReport.jsx/LeagueDetail.jsx. Re-added here after a prior run mistakenly wrote to frontend/.impeccable/config.json instead of the repo-root shared config."
       }
     ]
   }
