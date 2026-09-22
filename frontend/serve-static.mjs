@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+// Minimal static file server for dist/, replacing `serve -s` (which always
+// rewrites to the root index.html and would silently defeat prerendering).
+// Behavior: serve a matching file or <path>/index.html when present (this is
+// what makes the prerendered snapshots from scripts/prerender.mjs actually
+// get served); for any other route-shaped request (no file extension), fall
+// back to the root index.html with a 200 so client-side routing still works
+// for routes that weren't prerendered (e.g. /dashboard, /leagues/:id).
+// Zero dependencies — plain Node http/fs.
+import { createServer } from "http";
+import { createReadStream, existsSync, statSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DIST = path.join(__dirname, "dist");
+const PORT = process.env.PORT || 3000;
+
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".ico": "image/x-icon",
+  ".webp": "image/webp",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".map": "application/json; charset=utf-8",
+};
+
+function send(res, status, filePath, extraHeaders = {}) {
+  const ext = path.extname(filePath);
+  res.writeHead(status, {
+    "Content-Type": MIME[ext] || "application/octet-stream",
+    ...extraHeaders,
+  });
+  createReadStream(filePath).pipe(res);
+}
+
+const server = createServer((req, res) => {
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+  } catch {
+    pathname = req.url;
+  }
+
+  // Prevent path traversal outside dist/.
+  const safeRel = path.normalize(pathname).replace(/^(\.\.[/\\])+/, "");
+  const candidate = path.join(DIST, safeRel);
+  if (!candidate.startsWith(DIST)) {
+    res.writeHead(400).end("Bad request");
+    return;
+  }
+
+  // 1. Exact file match (hashed assets, images, sitemap.xml, robots.txt, ...).
+  if (existsSync(candidate) && statSync(candidate).isFile()) {
+    const immutable = candidate.includes(`${path.sep}assets${path.sep}`);
+    send(res, 200, candidate, {
+      "Cache-Control": immutable ? "public, max-age=31536000, immutable" : "public, max-age=300",
+    });
+    return;
+  }
+
+  // 2. Directory with its own prerendered index.html (scripts/prerender.mjs output).
+  const dirIndex = path.join(candidate, "index.html");
+  if (existsSync(dirIndex) && statSync(dirIndex).isFile()) {
+    send(res, 200, dirIndex, { "Cache-Control": "no-cache" });
+    return;
+  }
+
+  // 3. Route-shaped request (no file extension) with no prerendered snapshot —
+  //    SPA fallback so client-side routing still renders it.
+  const hasExtension = path.extname(pathname) !== "";
+  if (!hasExtension) {
+    send(res, 200, path.join(DIST, "index.html"), { "Cache-Control": "no-cache" });
+    return;
+  }
+
+  // 4. A real static asset request that doesn't exist — genuine 404.
+  res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
+});
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`serve-static listening on 0.0.0.0:${PORT}, serving ${DIST}`);
+});
