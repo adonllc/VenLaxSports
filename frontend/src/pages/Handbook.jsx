@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Shield, AlertCircle, Users, CheckCircle, Heart, AlertTriangle, TrendingUp } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const HANDBOOK_SECTIONS = [
   {
@@ -103,6 +104,11 @@ const HANDBOOK_SECTIONS = [
 ];
 
 export default function Handbook() {
+  useDocumentMeta({
+    title: "Player Handbook | VENLAX Sports",
+    description: "Everything players need to know: safety, conduct, dispute resolution, and how VENLAX leagues are run — the official player handbook.",
+    canonicalPath: "/handbook",
+  });
   return (
     <div style={{ background: "#FFFFFF" }} data-testid="handbook-page">
       {/* Hero */}

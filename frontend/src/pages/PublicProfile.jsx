@@ -6,6 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { Trophy, Share2, Swords, MapPin, UserPlus, UserCheck } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -93,6 +94,14 @@ export default function PublicProfile() {
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
+  useDocumentMeta({
+    title: profile ? `${profile.name} — Player Profile | VENLAX Sports` : undefined,
+    description: profile
+      ? `${profile.name}'s VENLAX record${profile.city ? ` in ${profile.city}` : ""}: ${profile.wins ?? 0}W-${profile.losses ?? 0}L, Tennis rating ${profile.tennis_rating?.toFixed(2) ?? "—"}, Pickleball rating ${profile.pickleball_rating?.toFixed(2) ?? "—"}.`
+      : undefined,
+    canonicalPath: `/players/${playerId}`,
+  });
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">

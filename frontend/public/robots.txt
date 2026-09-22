@@ -8,5 +8,7 @@ Disallow: /verify-email
 Disallow: /auth/callback
 Disallow: /doubles-invite/confirm
 Disallow: /round-robin/invite/
+Disallow: /rewards
+Disallow: /logo-demo
 
 Sitemap: https://venlaxsports.com/sitemap.xml

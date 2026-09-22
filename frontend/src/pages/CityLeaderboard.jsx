@@ -4,6 +4,7 @@ import axios from "axios";
 import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -27,6 +28,12 @@ export default function CityLeaderboard() {
   }, [city, sport]);
 
   const cfg = SPORT_CONFIG[sport] || { label: sport, emoji: "🏆", color: "text-gray-700" };
+
+  useDocumentMeta({
+    title: `${city} ${cfg.label} Rankings & Leagues | VENLAX Sports`,
+    description: `See the top ranked ${cfg.label.toLowerCase()} players in ${city} and join a skill-matched VENLAX league in your city.`,
+    canonicalPath: `/city/${encodeURIComponent(city)}/sport/${sport}`,
+  });
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">

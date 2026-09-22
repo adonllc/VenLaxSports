@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Trophy, TrendingUp } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const TENNIS_DIVISIONS = [
   { level: "Beginner", range: "2.0 – 2.5", desc: "New to competitive play" },
@@ -128,6 +129,11 @@ const FORMAT_CARDS = [
 ];
 
 export default function Rules() {
+  useDocumentMeta({
+    title: "League Rules & Match Formats | VENLAX Sports",
+    description: "Official VENLAX rules for Tennis and Pickleball: match formats, scoring, season structure, scheduling windows, and skill divisions.",
+    canonicalPath: "/rules",
+  });
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}

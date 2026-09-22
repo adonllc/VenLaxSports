@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -270,6 +271,14 @@ export default function LeagueDetail() {
       setJoining(false);
     }
   };
+
+  useDocumentMeta({
+    title: league ? `${league.name} | VENLAX Sports` : undefined,
+    description: league
+      ? `Join ${league.name} in ${league.city} — a ranked VENLAX ${league.sport} league. See format, schedule, standings, and open spots.`
+      : undefined,
+    canonicalPath: `/leagues/${id}`,
+  });
 
   if (loading) {
     return (

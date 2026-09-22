@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { activeSports } from "../config/platformConfig";
 
@@ -125,6 +125,12 @@ export default function Home() {
         >
           Your game doesn't end when the match ends.
         </motion.p>
+        <p className="mt-4 text-sm" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#6B7280" }}>
+          New to leagues?{" "}
+          <Link to="/tennis-pickleball-leagues" className="underline hover:text-gray-900" data-testid="home-league-guide-link">
+            Read our Tennis &amp; Pickleball league guide
+          </Link>
+        </p>
       </motion.section>
     </div>
   );

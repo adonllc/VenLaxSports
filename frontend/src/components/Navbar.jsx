@@ -135,6 +135,17 @@ export default function Navbar() {
               Rules
             </Link>
 
+            <Link
+              to="/tennis-pickleball-leagues"
+              className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={isActive("/tennis-pickleball-leagues") ? { color: "#C9572A", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              onMouseEnter={e => { if (!isActive("/tennis-pickleball-leagues")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
+              onMouseLeave={e => { if (!isActive("/tennis-pickleball-leagues")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
+              data-testid="nav-league-guide"
+            >
+              League Guide
+            </Link>
+
             {user?.role === "admin" && (
               <Link
                 to="/admin"
@@ -293,6 +304,13 @@ export default function Navbar() {
             data-testid="nav-rules-mobile"
           >
             Rules
+          </Link>
+          <Link
+            to="/tennis-pickleball-leagues"
+            className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+            data-testid="nav-league-guide-mobile"
+          >
+            League Guide
           </Link>
 
           <div className="pt-2 mt-2 border-t border-gray-100 space-y-1">

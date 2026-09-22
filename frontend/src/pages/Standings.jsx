@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Trophy } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -21,6 +22,12 @@ export default function Standings() {
       setStandings(sRes.data);
     }).catch(() => navigate("/leagues")).finally(() => setLoading(false));
   }, [leagueId]);
+
+  useDocumentMeta({
+    title: league ? `${league.name} Standings | VENLAX Sports` : undefined,
+    description: league ? `Live standings for ${league.name} — wins, losses, and points for every player in this VENLAX league.` : undefined,
+    canonicalPath: `/leagues/${leagueId}/standings`,
+  });
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" /></div>;
 

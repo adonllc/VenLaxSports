@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { activeSports } from "../config/platformConfig";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 import { ChevronRight, ChevronLeft, Users, Calendar, MapPin, Trophy, CheckCircle } from "lucide-react";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -55,6 +56,11 @@ function ProgressBar({ step }) {
 }
 
 export default function JoinFlow() {
+  useDocumentMeta({
+    title: "Join a League | VENLAX Sports",
+    description: "Pick your sport, format, and division, then join a ranked VENLAX league in your city. Skill-matched Tennis and Pickleball leagues, open now.",
+    canonicalPath: "/join",
+  });
   const { user } = useAuth();
   const navigate = useNavigate();
 

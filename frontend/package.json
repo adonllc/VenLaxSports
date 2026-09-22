@@ -56,7 +56,8 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/prerender.mjs",
+    "prerender": "node scripts/prerender.mjs",
     "test": "echo \"No tests configured\"",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",

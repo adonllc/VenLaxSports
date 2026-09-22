@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -20,6 +21,11 @@ const SPORT_BADGE = {
 };
 
 export default function Ladders() {
+  useDocumentMeta({
+    title: "Tennis & Pickleball Ladders | VENLAX Sports",
+    description: "Climb the ladder. Challenge nearby players, defend your rank, and move up VENLAX's ongoing city ladders for Tennis and Pickleball.",
+    canonicalPath: "/ladders",
+  });
   const { user } = useAuth();
   const navigate = useNavigate();
   const [ladders, setLadders] = useState([]);

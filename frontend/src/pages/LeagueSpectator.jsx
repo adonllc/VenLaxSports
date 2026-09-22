@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Trophy, Users, Calendar, Share2, AlertCircle } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -35,6 +36,12 @@ export default function LeagueSpectator() {
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
+  useDocumentMeta({
+    title: data ? `${data.name} — Live Standings | VENLAX Sports` : undefined,
+    description: data ? `Follow ${data.name} in ${data.city}: live standings and recent match results for this ranked VENLAX ${data.sport} league.` : undefined,
+    canonicalPath: `/leagues/${leagueId}/public`,
+  });
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">

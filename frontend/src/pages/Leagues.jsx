@@ -4,6 +4,7 @@ import axios from "axios";
 import { Search, MapPin, Trophy } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import { useAuth } from "../contexts/AuthContext";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -18,6 +19,11 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 export default function Leagues() {
+  useDocumentMeta({
+    title: "Browse Tennis & Pickleball Leagues Near You | VENLAX Sports",
+    description: "Find ranked Tennis and Pickleball leagues by city, skill level, and format. Singles, doubles, and mixed doubles — new seasons open year-round.",
+    canonicalPath: "/leagues",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();

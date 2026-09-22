@@ -7,6 +7,7 @@ import { isSportActive } from "../config/platformConfig";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import VenLaxHero from "../components/VenLaxHero";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -69,6 +70,12 @@ export default function SportLanding() {
   const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
 
   const meta = SPORT_META[sport];
+
+  useDocumentMeta({
+    title: meta ? `${meta.label} Leagues Near You | VENLAX Sports` : undefined,
+    description: meta ? `${meta.description} ${meta.rankedPlayers} ranked players across ${meta.leaguesCount} leagues.` : undefined,
+    canonicalPath: sport ? `/sport/${sport}` : undefined,
+  });
 
   useEffect(() => {
     if (!meta || !isSportActive(sport)) { navigate("/leagues"); return; }
