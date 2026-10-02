@@ -108,14 +108,30 @@
                     }),
                     (e.__SV = 1));
             })(document, window.posthog || []);
-            posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
-                api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only",
-                disable_session_recording: true,
-            });
-            // Session recording enabled only after explicit user consent (see ConsentBanner component)
-            if (localStorage.getItem("venlax_analytics_consent") === "accepted") {
-                posthog.startSessionRecording();
+            // posthog.init() is what triggers loading array.js (and, from it,
+            // the surveys/dead-clicks-autocapture/web-vitals scripts) — none
+            // of that is needed for first paint, so defer the call itself
+            // until after window load + idle rather than running it inline.
+            // Calls made via the e._i queue above before init() runs are
+            // replayed automatically once it does, so nothing is lost.
+            function venlaxInitPostHog() {
+                posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
+                    api_host: "https://us.i.posthog.com",
+                    person_profiles: "identified_only",
+                    disable_session_recording: true,
+                });
+                // Session recording enabled only after explicit user consent (see ConsentBanner component)
+                if (localStorage.getItem("venlax_analytics_consent") === "accepted") {
+                    posthog.startSessionRecording();
+                }
+            }
+            function venlaxDeferredPostHogInit() {
+                (window.requestIdleCallback || window.setTimeout)(venlaxInitPostHog, 1);
+            }
+            if (document.readyState === "complete") {
+                venlaxDeferredPostHogInit();
+            } else {
+                window.addEventListener("load", venlaxDeferredPostHogInit);
             }
         </script>
         <script type="module" src="/src/index.jsx"></script>

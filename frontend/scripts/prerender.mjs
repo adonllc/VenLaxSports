@@ -13,7 +13,7 @@
 // To activate it in CI/deploy, run `npx playwright install --with-deps chromium`
 // as part of the build image before `yarn build`.
 import { preview } from "vite";
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -82,6 +82,19 @@ async function main() {
     );
     await server.httpServer.close();
     return;
+  }
+
+  // Save the plain CSR shell (bare <div id="root"></div>, no route content)
+  // before the loop below overwrites dist/index.html with the homepage's
+  // prerendered snapshot. serve-static.mjs's catch-all falls back to this
+  // shell for routes with no prerendered snapshot of their own (e.g.
+  // /leagues/:id) — serving the homepage's full prerendered markup there
+  // instead caused a real-content-swap layout shift (measured CLS 0.193) once
+  // React hydrated and replaced the homepage copy with actual league data.
+  try {
+    copyFileSync(path.join(ROOT, "dist", "index.html"), path.join(ROOT, "dist", "app-shell.html"));
+  } catch (err) {
+    console.warn(`[prerender] could not save app-shell.html: ${err.message}`);
   }
 
   const page = await browser.newPage();

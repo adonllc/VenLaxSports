@@ -77,10 +77,20 @@ const server = createServer((req, res) => {
   }
 
   // 3. Route-shaped request (no file extension) with no prerendered snapshot —
-  //    SPA fallback so client-side routing still renders it.
+  //    SPA fallback so client-side routing still renders it. Serve the bare
+  //    CSR shell (scripts/prerender.mjs writes it to app-shell.html) rather
+  //    than dist/index.html: index.html is the homepage's own prerendered
+  //    snapshot (full marketing copy baked in), and serving that for an
+  //    unrelated route like /leagues/:id meant React had to unmount a whole
+  //    homepage's worth of content and mount the real page on hydration —
+  //    a large, measured layout shift. Falls back to index.html if the shell
+  //    wasn't generated (prerender didn't run, e.g. no Chromium in the build
+  //    image) so this still works without it.
   const hasExtension = path.extname(pathname) !== "";
   if (!hasExtension) {
-    send(res, 200, path.join(DIST, "index.html"), { "Cache-Control": "no-cache" });
+    const shell = path.join(DIST, "app-shell.html");
+    const fallback = existsSync(shell) ? shell : path.join(DIST, "index.html");
+    send(res, 200, fallback, { "Cache-Control": "no-cache" });
     return;
   }
 
