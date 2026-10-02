@@ -272,12 +272,49 @@ export default function LeagueDetail() {
     }
   };
 
+  const leagueJsonLd = league ? {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SportsEvent",
+        "name": league.name,
+        "sport": league.sport,
+        "startDate": league.start_date,
+        "endDate": league.end_date,
+        "eventStatus": league.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "location": {
+          "@type": "Place",
+          "name": league.city,
+          "address": { "@type": "PostalAddress", "addressLocality": league.city, "addressCountry": "US" },
+        },
+        "organizer": { "@type": "SportsOrganization", "name": "VENLAX Sports", "url": "https://venlaxsports.com" },
+        "offers": {
+          "@type": "Offer",
+          "price": league.entry_fee || 0,
+          "priceCurrency": "USD",
+          "availability": (league.max_players - (league.current_players || 0)) > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+          "url": `https://venlaxsports.com/leagues/${id}`,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://venlaxsports.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Leagues", "item": "https://venlaxsports.com/leagues" },
+          { "@type": "ListItem", "position": 3, "name": league.name, "item": `https://venlaxsports.com/leagues/${id}` },
+        ],
+      },
+    ],
+  } : undefined;
+
   useDocumentMeta({
     title: league ? `${league.name} | VENLAX Sports` : undefined,
     description: league
       ? `Join ${league.name} in ${league.city} — a ranked VENLAX ${league.sport} league. See format, schedule, standings, and open spots.`
       : undefined,
     canonicalPath: `/leagues/${id}`,
+    jsonLd: leagueJsonLd,
   });
 
   if (loading) {

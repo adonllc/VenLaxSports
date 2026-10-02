@@ -42,10 +42,7 @@ export default function VenLaxHero({
     : 0;
 
   const marqueeItems = sportMeta
-    ? [
-        ...sportMeta.features.map((f) => ({ label: f, icon: "✓", sub: sportMeta.label })),
-        ...(sportMeta.features.map((f) => ({ label: f, icon: "✓", sub: sportMeta.label }))),
-      ]
+    ? sportMeta.features.map((f) => ({ label: f, icon: "✓", sub: sportMeta.label }))
     : [...CITY_MARQUEE, ...CITY_MARQUEE, ...CITY_MARQUEE];
 
   return (
@@ -110,9 +107,14 @@ export default function VenLaxHero({
               }}
             >
               {sportMeta ? (
+                // Block-level spans render on their own line with no CSS gap
+                // needed, but they also emit no whitespace between text nodes
+                // — a trailing literal space keeps "ELEVATE YOUR TENNIS."
+                // intact for extraction/accessibility instead of concatenating
+                // into "ELEVATEYOURTENNIS.".
                 <>
-                  <span className="block text-white">ELEVATE</span>
-                  <span className="block text-white">YOUR</span>
+                  <span className="block text-white">ELEVATE{" "}</span>
+                  <span className="block text-white">YOUR{" "}</span>
                   <span
                     className="block bg-clip-text text-transparent"
                     style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C9572A, #B04823)" }}
@@ -122,13 +124,13 @@ export default function VenLaxHero({
                 </>
               ) : (
                 <>
-                  <span className="block text-white">ONE</span>
-                  <span className="block text-white">PASSION.</span>
+                  <span className="block text-white">ONE{" "}</span>
+                  <span className="block text-white">PASSION.{" "}</span>
                   <span
                     className="block bg-clip-text text-transparent"
                     style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C9572A, #B04823)" }}
                   >
-                    THREE
+                    THREE{" "}
                   </span>
                   <span
                     className="block bg-clip-text text-transparent"
@@ -194,8 +196,8 @@ export default function VenLaxHero({
                     <Trophy className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold tracking-tight text-white">{sportMeta?.rankedPlayers ?? "1,200+"}</div>
-                    <div className="text-sm text-zinc-400">Ranked Players</div>
+                    <div className="text-3xl font-bold tracking-tight text-white">{foundingStats.count}</div>
+                    <div className="text-sm text-zinc-400">Founding Members</div>
                   </div>
                 </div>
 
@@ -221,9 +223,7 @@ export default function VenLaxHero({
                 <div className="h-px w-full bg-white/10 mb-6" />
 
                 {/* Grid stats */}
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <StatItem value={sportMeta?.leaguesCount ?? "80+"} label="Leagues" />
-                  <div className="w-px bg-white/10" />
+                <div className="grid grid-cols-2 gap-4 text-center">
                   <StatItem value={platformConfig.featuredCities.length + "+"} label="Cities" />
                   <div className="w-px bg-white/10" />
                   <StatItem value={activeSportIds.length.toString()} label="Sports" />
@@ -267,7 +267,12 @@ export default function VenLaxHero({
                 }}
               >
                 <div className="vl-marquee flex gap-10 whitespace-nowrap px-4">
-                  {[...marqueeItems, ...marqueeItems].map((item, i) => (
+                  {/* The loop is rendered twice back-to-back for a seamless CSS
+                      scroll — the second copy is purely visual, so it's marked
+                      aria-hidden to keep crawlers/screen readers from reading
+                      each feature name 2x (it was 4x before marqueeItems above
+                      also doubled itself). */}
+                  {marqueeItems.map((item, i) => (
                     <div
                       key={i}
                       className="flex items-center gap-2 opacity-50 transition-all hover:opacity-100 hover:scale-105 cursor-default"
@@ -281,6 +286,22 @@ export default function VenLaxHero({
                       </div>
                     </div>
                   ))}
+                  <div className="flex gap-10" aria-hidden="true">
+                    {marqueeItems.map((item, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2 opacity-50 transition-all hover:opacity-100 hover:scale-105 cursor-default"
+                      >
+                        <span className="text-lg leading-none">{item.icon}</span>
+                        <div>
+                          <span className="text-sm font-bold text-white tracking-tight">{item.label}</span>
+                          {item.sub && (
+                            <span className="ml-1.5 text-[10px] text-zinc-500 uppercase tracking-wider">{item.sub}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

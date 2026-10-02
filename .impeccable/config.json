@@ -10,7 +10,7 @@
           "frontend/src/pages/LeagueDetail.jsx"
         ],
         "createdAt": "2026-09-04T02:33:54.989Z",
-        "reason": "rounded card borders standard; 1px all-around ok"
+        "reason": "animate-spin rounded-full border-b-2 loading spinner — border is the spin mechanism itself, same pattern used unmodified across ~8 other pages (Leagues.jsx, JoinFlow.jsx, SportLanding.jsx, etc.)"
       },
       {
         "rule": "border-accent-on-rounded",
@@ -46,7 +46,7 @@
           "frontend/src/pages/Standings.jsx"
         ],
         "createdAt": "2026-09-22T03:51:52.960Z",
-        "reason": "L32 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored in CityLeaderboard.jsx"
+        "reason": "animate-spin rounded-full border-b-2 loading spinner — same standard spinner pattern as LeagueDetail.jsx"
       },
       {
         "rule": "border-accent-on-rounded",
@@ -64,7 +64,7 @@
           "frontend/src/pages/CityLeaderboard.jsx"
         ],
         "createdAt": "2026-09-22T03:52:15.941Z",
-        "reason": "L40 is a CSS-only loading spinner (animate-spin rounded-full border-b-2) not a card accent border; same idiom already ignored for ScoreReport.jsx/LeagueDetail.jsx. Re-added here after a prior run mistakenly wrote to frontend/.impeccable/config.json instead of the repo-root shared config."
+        "reason": "animate-spin rounded-full border-b-2 loading spinner — same standard spinner pattern as LeagueDetail.jsx"
       }
     ]
   }

@@ -315,7 +315,7 @@ export default function PreLaunch() {
             animate="visible"
             custom={0}
           >
-            Stop Hunting for Good Matches.
+            Stop Hunting for Good Matches.{" "}
             <br />
             <motion.span
               style={{ color: PRIMARY, display: "inline-block" }}
@@ -619,65 +619,6 @@ export default function PreLaunch() {
                   {s.title}
                 </h3>
                 <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{s.body}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-6" style={{ background: PALE_BLUE }}>
-        <div className="max-w-4xl mx-auto">
-          <motion.p
-            className="font-semibold text-sm uppercase tracking-widest mb-4 text-center"
-            style={{ color: PRIMARY }}
-            variants={fadeIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportConfig}
-          >
-            Founding members are already climbing
-          </motion.p>
-
-          <motion.h2
-            className="font-black text-center mb-16"
-            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportConfig}
-          >
-            See what early access players are saying.
-          </motion.h2>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-6"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportConfig}
-          >
-            {[
-              { name: "Marcus T.", city: "Austin, TX", quote: "Finally found opponents who push me. My ranking went from zero to 1847 in 3 weeks. This is the real deal.", emoji: "🔥" },
-              { name: "Sarah K.", city: "Austin, TX", quote: "Not just matches - it's a community. I've made friends, found rivals, and have proof of my game. Love it.", emoji: "⚡" },
-              { name: "Jordan P.", city: "Austin, TX", quote: "Sandbaggers are gone. Matches are fair. I actually want to play more. That never happened before.", emoji: "🎯" },
-            ].map((testimonial, idx) => (
-              <motion.div
-                key={testimonial.name}
-                className="rounded-lg p-6"
-                style={{ background: "white", border: `1px solid ${BORDER}` }}
-                variants={staggerItem}
-                whileHover={{ y: -8, boxShadow: `0 20px 40px ${PRIMARY}20` }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <p className="font-bold" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{testimonial.name}</p>
-                    <p className="text-xs" style={{ color: "#6B7A96" }}>{testimonial.city}</p>
-                  </div>
-                  <span className="text-2xl">{testimonial.emoji}</span>
-                </div>
-                <p className="text-sm leading-relaxed italic" style={{ color: "#4B5563" }}>"{testimonial.quote}"</p>
               </motion.div>
             ))}
           </motion.div>

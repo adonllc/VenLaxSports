@@ -19,11 +19,6 @@ const SPORT_CONFIG = Object.fromEntries(
 );
 
 export default function Leagues() {
-  useDocumentMeta({
-    title: "Browse Tennis & Pickleball Leagues Near You | VENLAX Sports",
-    description: "Find ranked Tennis and Pickleball leagues by city, skill level, and format. Singles, doubles, and mixed doubles — new seasons open year-round.",
-    canonicalPath: "/leagues",
-  });
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -89,6 +84,46 @@ export default function Leagues() {
     if (filters.search && !l.name.toLowerCase().includes(filters.search.toLowerCase()) && !l.city.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.format && l.format !== filters.format) return false;
     return true;
+  });
+
+  // Real ItemList of the leagues actually rendered below — only emitted once
+  // they've loaded, so we never ship a schema block with made-up entries.
+  const leaguesJsonLd = !loading && filteredLeagues.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": filteredLeagues.map((l, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "item": {
+        "@type": "SportsEvent",
+        "name": l.name,
+        "sport": l.sport,
+        "startDate": l.start_date,
+        "endDate": l.end_date,
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "location": {
+          "@type": "Place",
+          "name": l.city,
+          "address": { "@type": "PostalAddress", "addressLocality": l.city, "addressCountry": "US" },
+        },
+        "organizer": { "@type": "SportsOrganization", "name": "VENLAX Sports", "url": "https://venlaxsports.com" },
+        "offers": {
+          "@type": "Offer",
+          "price": l.entry_fee || 0,
+          "priceCurrency": "USD",
+          "availability": (l.max_players - (l.current_players || 0)) > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+          "url": `https://venlaxsports.com/leagues/${l.id}`,
+        },
+      },
+    })),
+  } : undefined;
+
+  useDocumentMeta({
+    title: "Browse Tennis & Pickleball Leagues Near You | VENLAX Sports",
+    description: "Find ranked Tennis and Pickleball leagues by city, skill level, and format. Singles, doubles, and mixed doubles — new seasons open year-round.",
+    canonicalPath: "/leagues",
+    jsonLd: leaguesJsonLd,
   });
 
   return (

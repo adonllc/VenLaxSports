@@ -16,43 +16,40 @@ const SITE = "https://venlaxsports.com";
 const ACTIVE_SPORTS = ["tennis", "pickleball"];
 const FEATURED_CITIES = ["New York", "Los Angeles", "Chicago", "San Francisco", "Atlanta", "Houston"];
 
+// /join is excluded: it's gated behind auth (redirects guests to /auth before
+// any content renders), so it has no unique indexable content and the prior
+// inclusion here caused it to self-canonicalize to the homepage.
 const STATIC_ROUTES = [
-  { loc: "/", changefreq: "weekly", priority: "1.0" },
-  { loc: "/tennis-pickleball-leagues", changefreq: "monthly", priority: "0.9" },
-  { loc: "/leagues", changefreq: "daily", priority: "0.9" },
-  { loc: "/ladders", changefreq: "weekly", priority: "0.7" },
-  { loc: "/join", changefreq: "monthly", priority: "0.7" },
-  { loc: "/rules", changefreq: "monthly", priority: "0.6" },
-  { loc: "/handbook", changefreq: "monthly", priority: "0.5" },
-  { loc: "/terms", changefreq: "yearly", priority: "0.3" },
-  { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
-  { loc: "/waiver", changefreq: "yearly", priority: "0.3" },
+  "/",
+  "/tennis-pickleball-leagues",
+  "/leagues",
+  "/ladders",
+  "/rules",
+  "/handbook",
+  "/terms",
+  "/privacy",
+  "/waiver",
 ];
 
-const sportRoutes = ACTIVE_SPORTS.map((sport) => ({
-  loc: `/sport/${sport}`,
-  changefreq: "weekly",
-  priority: "0.8",
-}));
+const sportRoutes = ACTIVE_SPORTS.map((sport) => `/sport/${sport}`);
 
 const cityRoutes = FEATURED_CITIES.flatMap((city) =>
-  ACTIVE_SPORTS.map((sport) => ({
-    loc: `/city/${encodeURIComponent(city)}/sport/${sport}`,
-    changefreq: "weekly",
-    priority: "0.6",
-  })),
+  ACTIVE_SPORTS.map((sport) => `/city/${encodeURIComponent(city)}/sport/${sport}`),
 );
 
 const routes = [...STATIC_ROUTES, ...sportRoutes, ...cityRoutes];
+
+// lastmod is the build date — Google ignores priority/changefreq, so we don't
+// emit them (they added noise with no ranking effect).
+const lastmod = new Date().toISOString().slice(0, 10);
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${routes
   .map(
-    (r) => `  <url>
-    <loc>${SITE}${r.loc}</loc>
-    <changefreq>${r.changefreq}</changefreq>
-    <priority>${r.priority}</priority>
+    (loc) => `  <url>
+    <loc>${SITE}${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
   </url>`,
   )
   .join("\n")}

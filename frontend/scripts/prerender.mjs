@@ -23,6 +23,9 @@ const ROOT = path.join(__dirname, "..");
 const ACTIVE_SPORTS = ["tennis", "pickleball"];
 const FEATURED_CITIES = ["New York", "Los Angeles", "Chicago", "San Francisco", "Atlanta", "Houston"];
 
+// /join excluded: it's gated behind auth (redirects guests to /auth on mount
+// before useDocumentMeta's cleanup ever settles), so prerendering it captured
+// a bad snapshot with the canonical/title reset to the homepage defaults.
 const STATIC_ROUTES = [
   "/",
   "/tennis-pickleball-leagues",
@@ -32,7 +35,6 @@ const STATIC_ROUTES = [
   "/ladders",
   "/rules",
   "/handbook",
-  "/join",
   "/terms",
   "/privacy",
   "/waiver",

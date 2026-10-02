@@ -27,6 +27,16 @@ export default function Standings() {
     title: league ? `${league.name} Standings | VENLAX Sports` : undefined,
     description: league ? `Live standings for ${league.name} — wins, losses, and points for every player in this VENLAX league.` : undefined,
     canonicalPath: `/leagues/${leagueId}/standings`,
+    jsonLd: league ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://venlaxsports.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Leagues", "item": "https://venlaxsports.com/leagues" },
+        { "@type": "ListItem", "position": 3, "name": league.name, "item": `https://venlaxsports.com/leagues/${leagueId}` },
+        { "@type": "ListItem", "position": 4, "name": "Standings", "item": `https://venlaxsports.com/leagues/${leagueId}/standings` },
+      ],
+    } : undefined,
   });
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" /></div>;

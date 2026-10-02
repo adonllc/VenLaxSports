@@ -158,3 +158,29 @@ Key routing rules:
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
+
+---
+
+## Deploy Configuration (configured by /setup-deploy)
+
+- **Platform:** Coolify (self-hosted)
+- **Production URL:** https://venlaxsports.com
+- **App name:** VenLax Sports
+- **Deployment structure:** frontend + backend together (unified stack)
+- **Deploy trigger:** Automatically on push to main (GitHub webhook)
+- **Merge method:** Squash (recommended for clean history)
+- **Project type:** Full-stack web app (React + FastAPI)
+
+### Deploy workflow
+- **Pre-merge:** `yarn build` (frontend) + `python -m pytest tests/ -v` (backend smoke tests)
+- **Trigger:** Coolify webhook on push to main — automatic redeploy
+- **Health check:** Poll `https://venlaxsports.com` (frontend) + `https://venlaxsports.com/api/health` (backend)
+- **Rollback:** Manual via Coolify UI (or restart the app)
+- **Logs:** Coolify dashboard or `mcp__coolify__logs`
+
+### Notes
+- Coolify MCP requires `COOLIFY_ACCESS_TOKEN` in environment (set via `/setup-deploy --auth` or `.claude/settings.local.json`)
+- Backend deployed on same domain (not separate port) — FastAPI serves at `/api/*` paths
+- Database: MongoDB Atlas (remote) — migrations run on deploy startup
+- Frontend: served by Coolify's reverse proxy on `/` routes
+- To reconfigure, edit this section or run `/setup-deploy` again

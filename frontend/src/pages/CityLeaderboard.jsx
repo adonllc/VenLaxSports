@@ -33,6 +33,15 @@ export default function CityLeaderboard() {
     title: `${city} ${cfg.label} Rankings & Leagues | VENLAX Sports`,
     description: `See the top ranked ${cfg.label.toLowerCase()} players in ${city} and join a skill-matched VENLAX league in your city.`,
     canonicalPath: `/city/${encodeURIComponent(city)}/sport/${sport}`,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://venlaxsports.com/" },
+        { "@type": "ListItem", "position": 2, "name": cfg.label, "item": `https://venlaxsports.com/sport/${sport}` },
+        { "@type": "ListItem", "position": 3, "name": city, "item": `https://venlaxsports.com/city/${encodeURIComponent(city)}/sport/${sport}` },
+      ],
+    },
   });
 
   if (loading) return (

@@ -128,11 +128,30 @@ const FORMAT_CARDS = [
   },
 ];
 
+// Q&A pairs quoting the rules content below verbatim — not a generic FAQ,
+// so there's nothing here that isn't already stated on the page.
+const RULES_FAQ = [
+  { q: "What is the match format?", a: "Best of 3 sets. Sets to 6 games, win by 2. At 6–6 in any set it's a 7-point tiebreak (win by 2)." },
+  { q: "How long does each match round last?", a: "Each match has a 7-day window, and you must contact your opponent within 48 hours to schedule it." },
+  { q: "What happens if my opponent doesn't respond?", a: "No response within 48 hours results in a walkover to the opponent." },
+  { q: "How are rankings calculated?", a: "Points = 3(Wins) + 1(Losses) + 0.5(Set Δ) + 0.1(Game Δ) + Bonus, with bonus points for playing every match and for straight-set wins or close 3-set losses." },
+  { q: "Who qualifies for playoffs?", a: "The top 4 players qualify in leagues with 12 or fewer players, or the top 8 in leagues with more than 12." },
+];
+
 export default function Rules() {
   useDocumentMeta({
     title: "League Rules & Match Formats | VENLAX Sports",
     description: "Official VENLAX rules for Tennis and Pickleball: match formats, scoring, season structure, scheduling windows, and skill divisions.",
     canonicalPath: "/rules",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": RULES_FAQ.map(({ q, a }) => ({
+        "@type": "Question",
+        "name": q,
+        "acceptedAnswer": { "@type": "Answer", "text": a },
+      })),
+    },
   });
   return (
     <div className="min-h-screen bg-white">
