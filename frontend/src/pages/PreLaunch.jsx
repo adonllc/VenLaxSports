@@ -170,7 +170,7 @@ export default function PreLaunch() {
                   {player.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{player.name}</p>
+                  <p className="text-sm font-medium" style={{ color: DARK, fontFamily: "'Hanken Grotesk', sans-serif" }}>{player.name}</p>
                   <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{player.record}</p>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function PreLaunch() {
                 whileHover={{ x: 2 }}
               >
                 <span className="text-xs font-bold w-4" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rank}</span>
-                <span className="text-sm font-medium flex-1" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{row.name}</span>
+                <span className="text-sm font-medium flex-1" style={{ color: DARK, fontFamily: "'Hanken Grotesk', sans-serif" }}>{row.name}</span>
                 <span className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{row.rating}</span>
                 <span className="text-xs font-medium" style={{ color: row.delta.startsWith("+") ? PRIMARY : "#EF4444", fontFamily: "'DM Sans', monospace" }}>{row.delta}</span>
               </motion.div>
@@ -225,7 +225,7 @@ export default function PreLaunch() {
           ].map((fmt) => (
             <motion.div key={fmt.name} className="bg-white rounded-lg px-4 py-3 flex items-center justify-between" style={{ border: `1px solid ${BORDER}` }} whileHover={{ y: -2 }}>
               <div>
-                <p className="text-sm font-semibold" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>{fmt.name}</p>
+                <p className="text-sm font-semibold" style={{ color: DARK, fontFamily: "'Hanken Grotesk', sans-serif" }}>{fmt.name}</p>
                 <p className="text-xs" style={{ color: "#6B7A96", fontFamily: "'DM Sans', monospace" }}>{fmt.sub}</p>
               </div>
               <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ background: fmt.badgeBg, color: fmt.badgeColor, fontFamily: "'DM Sans', monospace" }}>{fmt.badge}</span>
@@ -237,7 +237,7 @@ export default function PreLaunch() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: LIGHT }}>
+    <div className="min-h-screen" style={{ fontFamily: "'Hanken Grotesk', sans-serif", background: LIGHT }}>
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b" style={{ background: "white", borderColor: BORDER, borderBottomWidth: "2px", borderBottomColor: PRIMARY }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
@@ -309,7 +309,7 @@ export default function PreLaunch() {
 
           <motion.h1
             className="leading-tight mb-6"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Sora', sans-serif", fontWeight: 700 }}
+            style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)", color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 700 }}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -382,7 +382,7 @@ export default function PreLaunch() {
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm"
-            style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}
+            style={{ color: DARK, fontFamily: "'Hanken Grotesk', sans-serif" }}
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -419,7 +419,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-12"
-            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif" }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -450,7 +450,7 @@ export default function PreLaunch() {
               >
                 <div className="text-3xl flex-shrink-0">{item.icon}</div>
                 <div>
-                  <p className="font-semibold mb-1" style={{ color: DARK, fontFamily: "'Sora', sans-serif", fontSize: "1.1rem" }}>
+                  <p className="font-semibold mb-1" style={{ color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "1.1rem" }}>
                     {item.title}
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{item.body}</p>
@@ -477,7 +477,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-14"
-            style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Hanken Grotesk', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -508,7 +508,7 @@ export default function PreLaunch() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="text-sm line-through mb-2" style={{ color: "#8B8B8B" }}>{item.before}</p>
-                <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                <p className="font-medium flex items-start gap-2" style={{ color: DARK, fontFamily: "'Hanken Grotesk', sans-serif" }}>
                   <span className="mt-0.5 flex-shrink-0" style={{ color: PRIMARY }}>→</span>
                   {item.after}
                 </p>
@@ -547,7 +547,7 @@ export default function PreLaunch() {
                   <div className="text-5xl mb-4">{feat.icon}</div>
                   <h3
                     className="font-black mb-4"
-                    style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: DARK, fontFamily: "'Sora', sans-serif" }}
+                    style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif" }}
                   >
                     {feat.title}
                   </h3>
@@ -578,7 +578,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-16"
-            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -608,14 +608,14 @@ export default function PreLaunch() {
               >
                 <motion.div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-xl mb-6"
-                  style={{ background: PRIMARY, color: "white", fontFamily: "'Sora', sans-serif" }}
+                  style={{ background: PRIMARY, color: "white", fontFamily: "'Cabinet Grotesk', sans-serif" }}
                   whileHover={{ scale: 1.15 }}
                   animate={{ scale: [1, 1.02, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
                 >
                   {s.step}
                 </motion.div>
-                <h3 className="font-bold mb-3" style={{ fontSize: "1.25rem", color: DARK, fontFamily: "'Sora', sans-serif" }}>
+                <h3 className="font-bold mb-3" style={{ fontSize: "1.25rem", color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif" }}>
                   {s.title}
                 </h3>
                 <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>{s.body}</p>
@@ -641,7 +641,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="font-black text-center mb-12"
-            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
+            style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -671,7 +671,7 @@ export default function PreLaunch() {
                 <motion.button
                   type="button"
                   className="w-full text-left px-6 py-4 flex justify-between items-center transition-all cursor-pointer"
-                  style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'IBM Plex Sans', sans-serif" }}
+                  style={{ background: openFaq === i ? LIGHT : PALE_BLUE, fontFamily: "'Hanken Grotesk', sans-serif" }}
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   whileHover={{ background: openFaq === i ? LIGHT : PALE_AMBER }}
                   whileTap={{ scale: 0.98 }}
@@ -696,7 +696,7 @@ export default function PreLaunch() {
                       transition={{ duration: 0.3 }}
                       style={{ overflow: "hidden" }}
                     >
-                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                      <div className="px-6 pb-4 text-sm leading-relaxed pt-3" style={{ borderTop: `1px solid ${BORDER}`, color: "#4B5563", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                         {item.a}
                       </div>
                     </motion.div>
@@ -724,7 +724,7 @@ export default function PreLaunch() {
 
           <motion.h2
             className="text-center mb-16"
-            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontWeight: 700 }}
+            style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: DARK, fontWeight: 700 }}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -767,7 +767,7 @@ export default function PreLaunch() {
                 <p className="text-sm uppercase tracking-wider mb-1" style={{ color: PRIMARY, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600 }}>
                   {t.tier}
                 </p>
-                <p className="text-4xl font-bold mb-1" style={{ color: DARK, fontFamily: "'Sora', sans-serif" }}>
+                <p className="text-4xl font-bold mb-1" style={{ color: DARK, fontFamily: "'Cabinet Grotesk', sans-serif" }}>
                   {t.invites}
                 </p>
                 <p className="text-xs mb-6" style={{ color: "#4B5563" }}>
@@ -792,7 +792,7 @@ export default function PreLaunch() {
         <div className="max-w-xl mx-auto text-center">
           <motion.h2
             className="font-black mb-4"
-            style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)" }}
+            style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "clamp(2rem, 5vw, 3rem)" }}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -819,7 +819,7 @@ export default function PreLaunch() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="rounded-lg p-8 text-center" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                <p className="font-bold text-2xl mb-3" style={{ color: "#FED7AA", fontFamily: "'Sora', sans-serif" }}>
+                <p className="font-bold text-2xl mb-3" style={{ color: "#FED7AA", fontFamily: "'Cabinet Grotesk', sans-serif" }}>
                   🏆 You're a Founding Member.
                 </p>
                 <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.9)" }}>
@@ -961,7 +961,7 @@ export default function PreLaunch() {
           transition={{ duration: 0.5 }}
         >
           <Logo size="md" />
-          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <div className="flex gap-6 text-xs" style={{ color: "#6B7A96", fontFamily: "'Hanken Grotesk', sans-serif" }}>
             <span>© 2026 VENLAX Sports. All rights reserved.</span>
           </div>
         </motion.div>

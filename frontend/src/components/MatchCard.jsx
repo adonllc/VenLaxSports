@@ -57,7 +57,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Winner name */}
         <motion.h2
           className="text-4xl font-black"
-          style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+          style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -68,7 +68,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* vs opponent */}
         <motion.p
           className="text-lg font-medium text-gray-600"
-          style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+          style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -79,7 +79,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Score */}
         <motion.p
           className="text-5xl font-bold"
-          style={{ color: sportColor, fontFamily: "'Sora', system-ui, sans-serif" }}
+          style={{ color: sportColor, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
@@ -90,7 +90,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Rating delta */}
         <motion.p
           className="text-3xl font-bold"
-          style={{ color: sportColor, fontFamily: "'Sora', system-ui, sans-serif" }}
+          style={{ color: sportColor, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -101,7 +101,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Timestamp */}
         <motion.p
           className="text-xs text-gray-500"
-          style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+          style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

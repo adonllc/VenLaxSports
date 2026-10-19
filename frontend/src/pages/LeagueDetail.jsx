@@ -330,9 +330,9 @@ export default function LeagueDetail() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <div className="text-6xl mb-4">⚠</div>
-          <h1 className="font-black text-2xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
-          <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>{networkError}</p>
-          <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="error-back-to-leagues">
+          <h1 className="font-black text-2xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
+          <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>{networkError}</p>
+          <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#047857", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="error-back-to-leagues">
             Back to Leagues
           </button>
         </div>
@@ -361,7 +361,7 @@ export default function LeagueDetail() {
       {/* Header Banner */}
       <div className={`${headerBg}`} style={{ borderBottom: "1px solid #E5E7EB" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-6 transition-colors font-medium" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="back-to-leagues">
+          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-6 transition-colors font-medium" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="back-to-leagues">
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
           </button>
 
@@ -369,20 +369,20 @@ export default function LeagueDetail() {
             {/* Title section */}
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
                   {config.icon} {config.label}
                 </span>
-                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#065F46", fontFamily: "'IBM Plex Sans', sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#065F46", fontFamily: "'Hanken Grotesk', sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
                 {isRegistered && (
-                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#10B981", color: "white", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="registered-pill">
+                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#10B981", color: "white", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="registered-pill">
                     <CheckCircle className="w-3.5 h-3.5" /> Registered
                   </span>
                 )}
               </div>
-              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
-              <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
+              <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
                 <span className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /> {league.current_players || 0}/{league.max_players} players</span>
@@ -393,7 +393,7 @@ export default function LeagueDetail() {
             {(league.division_label || league.format === "mixed_doubles") && (
               <div className="flex flex-wrap items-center gap-3">
                 {league.division_label && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#065F46", border: "1px solid #E5E7EB", fontFamily: "'IBM Plex Sans', sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#065F46", border: "1px solid #E5E7EB", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
                     {league.division_label}
                     {league.division_ntrp_min && (
                       <span className="ml-1.5 font-normal" style={{ color: "#6B7280" }}>
@@ -403,7 +403,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
                 {league.format === "mixed_doubles" && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#065F46", border: "1px solid #D1F5EC", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#065F46", border: "1px solid #D1F5EC", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     Mixed Doubles
                   </span>
                 )}
@@ -415,14 +415,14 @@ export default function LeagueDetail() {
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Sora', system-ui, sans-serif" }}>Season Completed</p>
-                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
+                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Season Completed</p>
+                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
                 </div>
               ) : (
                 <>
                   {/* Spots bar */}
                   <div className="mb-6">
-                    <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                    <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
                       <span style={{ color: "#374151", fontWeight: 500 }}>{spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} remaining</span>
                       <span style={{ color: "#6B7280" }}>{fillPct}% full</span>
                     </div>
@@ -487,7 +487,7 @@ export default function LeagueDetail() {
                                 onClick={handleDoublesJoin}
                                 disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
                                 className="w-full text-white rounded-lg py-3 text-sm font-medium disabled:opacity-50 transition-all hover:shadow-md"
-                                style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                                style={{ background: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
@@ -562,7 +562,7 @@ export default function LeagueDetail() {
                                   onClick={validatePromo}
                                   disabled={promoLoading || !promoCode.trim()}
                                   className="px-4 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50 transition-colors"
-                                  style={{ background: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                                  style={{ background: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif" }}
                                   data-testid="apply-promo-btn"
                                 >
                                   {promoLoading ? "..." : "Apply"}
@@ -582,7 +582,7 @@ export default function LeagueDetail() {
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
                             className="w-full py-3 text-white font-bold rounded-lg transition-all text-sm disabled:opacity-60 hover:shadow-xl hover:scale-105 hover:-translate-y-1"
-                            style={{ background: config.accent === "#F97316" ? "#EA580C" : config.accent === "#2563EB" ? "#1D4ED8" : "#047857", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                            style={{ background: config.accent === "#F97316" ? "#EA580C" : config.accent === "#2563EB" ? "#1D4ED8" : "#047857", fontFamily: "'Hanken Grotesk', sans-serif" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -615,7 +615,7 @@ export default function LeagueDetail() {
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className="px-5 py-4 text-sm font-bold border-b-3 transition-all whitespace-nowrap hover:bg-gray-50"
-                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'IBM Plex Sans', sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}
+                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}
                 data-testid={`tab-${t.id}`}
                 aria-label={`View ${t.label}`}
                 aria-selected={tab === t.id}

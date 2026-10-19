@@ -227,11 +227,11 @@ export default function Auth() {
       <div className="hidden lg:flex lg:w-1/2 items-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
         <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#10B981" }} />
         <div className="max-w-md">
-          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
+          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#047857" }}>COMPETE.</span>
           </h1>
 
-          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#4B5563" }}>
+          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "'Hanken Grotesk', sans-serif", color: "#4B5563" }}>
             Your sport. Your stats. Your legacy.
           </p>
 
@@ -248,10 +248,10 @@ export default function Auth() {
         <div className="w-full max-w-md">
         {twoFA ? (
           <div data-testid="two-fa-panel">
-            <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#065F46" }}>
+            <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#065F46" }}>
               {backupCodes ? "Save your backup codes" : twoFA.needsSetup ? "Set up two-factor authentication" : "Enter your 2FA code"}
             </h1>
-            <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
               {backupCodes
                 ? "Store these somewhere safe. Each code works once if you lose access to your authenticator app."
                 : twoFA.needsSetup
@@ -354,10 +354,10 @@ export default function Auth() {
             </button>
           </div>
 
-          <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#065F46" }}>
+          <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#065F46" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
-          <p className="text-sm mb-8" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#6B7280" }}>
+          <p className="text-sm mb-8" style={{ fontFamily: "'Hanken Grotesk', sans-serif", color: "#6B7280" }}>
             {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
 
@@ -402,7 +402,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label htmlFor="input-name" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Full Name *</label>
+                <label htmlFor="input-name" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Full Name *</label>
                 <input
                   id="input-name"
                   type="text"
@@ -414,7 +414,7 @@ export default function Auth() {
                     border: "1px solid #E5E7EB",
                     color: "#065F46",
                     background: "white",
-                    fontFamily: "'IBM Plex Sans', sans-serif"
+                    fontFamily: "'Hanken Grotesk', sans-serif"
                   }}
                   onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
                   onBlur={e => e.currentTarget.style.outline = "none"}
@@ -426,7 +426,7 @@ export default function Auth() {
             )}
 
             <div>
-              <label htmlFor="input-email" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Email Address *</label>
+              <label htmlFor="input-email" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Email Address *</label>
               <input
                 id="input-email"
                 type="email"
@@ -438,7 +438,7 @@ export default function Auth() {
                   border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB",
                   background: mode === "register" && emailExists ? "#FFFBEB" : "white",
                   color: "#065F46",
-                  fontFamily: "'IBM Plex Sans', sans-serif"
+                  fontFamily: "'Hanken Grotesk', sans-serif"
                 }}
                 onFocus={e => e.currentTarget.style.outline = mode === "register" && emailExists ? "2px solid #F59E0B" : "2px solid #10B981"}
                 onBlur={e => e.currentTarget.style.outline = "none"}
@@ -462,7 +462,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'IBM Plex Sans', sans-serif" }}>Password *</label>
+              <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Password *</label>
               <div className="relative">
                 <input
                   id="input-password"
@@ -475,7 +475,7 @@ export default function Auth() {
                     border: "1px solid #E5E7EB",
                     color: "#065F46",
                     background: "white",
-                    fontFamily: "'IBM Plex Sans', sans-serif"
+                    fontFamily: "'Hanken Grotesk', sans-serif"
                   }}
                   onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
                   onBlur={e => e.currentTarget.style.outline = "none"}

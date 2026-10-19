@@ -342,7 +342,7 @@ export default function ScoreReport() {
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-heading font-black text-2xl text-heading-dark" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>Report Match Score</h1>
+                <h1 className="font-heading font-black text-2xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Report Match Score</h1>
                 <p className={`text-sm ${config.textClass}`}>{config.label} Match</p>
               </div>
             </div>

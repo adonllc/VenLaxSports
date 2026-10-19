@@ -119,7 +119,7 @@ export default function Handbook() {
             <Shield className="w-3.5 h-3.5" />
             Player Handbook v1.0
           </div>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>
+          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
             League Rules &<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>Player Handbook</span>
           </h1>
           <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
@@ -149,7 +149,7 @@ export default function Handbook() {
             <section key={section.id} id={section.id} className="scroll-mt-20">
               <div className="flex items-center gap-3 mb-6">
                 <Icon className={`w-6 h-6 ${section.color}`} />
-                <h2 className="font-heading font-black text-3xl text-heading-dark" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>{section.title}</h2>
+                <h2 className="font-heading font-black text-3xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>{section.title}</h2>
               </div>
 
               {section.items && (

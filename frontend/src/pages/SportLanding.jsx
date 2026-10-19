@@ -152,7 +152,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-black text-4xl mb-3" style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}>
+          <h2 className="font-heading font-black text-4xl mb-3" style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
             About {meta.label} on VENLAX
           </h2>
           <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
@@ -162,7 +162,7 @@ export default function SportLanding() {
         <div className="mb-12">
           <motion.h2
             className="font-heading font-black text-4xl mb-6"
-            style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}
+            style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -194,7 +194,7 @@ Features
         {/* Leagues */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading font-black text-4xl" style={{ color: meta.color, fontFamily: "'Sora', system-ui, sans-serif" }}>
+            <h2 className="font-heading font-black text-4xl" style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
               Open {meta.label} Leagues
             </h2>
             <div className="flex items-center gap-2">
@@ -251,18 +251,18 @@ Features
                   data-testid={`sport-league-${l.id}`}
                 >
                   <div className="flex justify-between mb-3">
-                    <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: meta.palePill, color: meta.pillText }}>
+                    <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'Hanken Grotesk', sans-serif", background: meta.palePill, color: meta.pillText }}>
                       {meta.icon} {meta.label}
                     </span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#065F46" : TEXT_MUTED }}>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "'Hanken Grotesk', sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#065F46" : TEXT_MUTED }}>
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
                   <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#065F46" }}>{l.name}</h3>
-                  <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                  <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /><span className="font-medium">{l.city}</span>
                   </p>
-                  <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                  <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     <span className="font-medium">{l.max_players - (l.current_players || 0)} spots left</span>
                     <span className="font-medium">{l.format}</span>
                   </div>

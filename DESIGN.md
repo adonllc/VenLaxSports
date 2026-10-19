@@ -15,13 +15,13 @@
 
 ## Typography
 
-### Font Stack (Luxury Corporate Edition)
-- **Display/Hero:** [Sora](https://fonts.google.com/specimen/Sora) (400-800 weights)
-  - Premium, geometric, modern. High sophistication. Signals luxury + precision. Perfect for headings.
+### Font Stack (Produck-inspired, 2026-10-19)
+- **Display/Hero:** [Cabinet Grotesk](https://www.fontshare.com/fonts/cabinet-grotesk) (Fontshare; 400, 500, 700, 800, 900)
+  - Confident, slightly condensed grotesk. Tight tracking (-0.02em) on large headings.
   - Use for: Main headline (h1), section titles (h2), CTA buttons, leaderboard ranks, feature titles
   
-- **Body:** [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans) (400, 500, 600, 700 weights)
-  - Corporate standard, highly legible, warm professional tone. Excellent on mobile & desktop.
+- **Body:** [Hanken Grotesk](https://fonts.google.com/specimen/Hanken+Grotesk) (400, 500, 600, 700)
+  - Clean, highly legible. Excellent on mobile & desktop.
   - Use for: Paragraph text, descriptions, league card labels, navigation, form text
   
 - **Data/Tables:** [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono) (500, 600, 700 weights) with `font-variant-numeric: tabular-nums`
@@ -33,7 +33,8 @@
 ### Loading Strategy
 - **Google Fonts CDN** (production):
   ```
-  https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap
+  https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap
+  https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800,900&display=swap
   ```
 - **Fallback stack:** 
   - Sora → system-ui, -apple-system (modern system default)
@@ -212,6 +213,7 @@
 | 2026-06-02 | Minimal animation approach | Motion serves comprehension (scroll reveal, state transition) not decoration. Matches the "serious competitor" vibe. |
 | 2026-06-02 | Tabular-nums in leaderboards | Ensure rating numbers (1,847 vs 1,623) align vertically. Crucial for leaderboard scannability. Use IBM Plex Mono for numeric content. |
 | 2026-06-02 | Grid-break hero + disciplined sections | Hero asymmetry creates visual surprise (stat card overlaps grid). Sections snap to grid for predictability. Balances visual interest + usability. |
+| 2026-10-19 | Produck-style redesign | User-supplied reference. Cabinet Grotesk + Hanken Grotesk replace Sora + IBM Plex Sans; Plex Mono kept for data. Dark footer, photo panels, 24px radius, pill CTAs. Emerald/orange kept. Overrides earlier light-only / no-gradient / no-photo rules (see Anti-patterns). |
 | 2026-09-03 | Typography production pass | Applied Sora (headings: font-black, text-3xl–6xl) + IBM Plex Sans (body) throughout all redesigned pages. Removed Outfit + mixed fonts. Consistent `fontFamily` style props on all text elements. |
 | 2026-09-03 | Color strategy: restrained + sport-specific | Primary emerald (#10B981) + orange accent (#F97316) as main palette. Sport-specific colors (tennis=emerald, cricket=blue, pickleball=orange) used strategically on top bars, badges, buttons, CTAs. Emerald for success states, orange for secondary actions. |
 | 2026-09-03 | Spacing rhythm via varied gaps | Implemented 16–20px section gaps, 8–12px internal grouping, 24–32px between major blocks. Removed uniform padding everywhere. Rhythm created through proximity: tight grouping (related items), generous separation (distinct sections). |
@@ -220,14 +222,22 @@
 
 ## Anti-patterns (DO NOT DO)
 
-❌ Purple/violet gradients  
-❌ 3-column icon grids with circles  
-❌ Centered everything  
-❌ Uniform bubbly border-radius on all elements  
-❌ Gradient buttons  
-❌ Stock photo hero images  
+❌ Purple/violet/indigo anywhere  
+❌ Gradient *buttons* (gradients allowed only as dark photo-readability overlays)  
+❌ Unlicensed or hotlinked photos (use `config/photos.js` + `public/photos/`)  
+❌ Fake stats, reviews or scarcity counters  
 ❌ system-ui font as primary body  
-❌ Over-animating (every interaction shouldn't move)  
+❌ Over-animating (every interaction shouldn't move; respect reduced motion)  
+
+## Produck-style Layout System (2026-10-19)
+Reference: https://produck.framer.website/ (premium product landing). Adopted pieces:
+- **Page background** `#FAFAFA`; white cards, 1px `#E5E7EB` border, **24px radius** (`rounded-3xl`) on large cards and photo blocks.
+- **Hero:** inset rounded photo panel (max 1320px), glass pill label, 72px display heading, pill CTAs.
+- **Glass pills:** `rgba(255,255,255,0.14)` + 1px `rgba(255,255,255,0.3)` border + `backdrop-filter: blur(12px)`, white text, only on photo/dark surfaces.
+- **Buttons:** primary = emerald `#047857` (hover `#065F46`), `rounded-full` on marketing pages; orange `#C2410C` is secondary/accent. 
+- **Photography:** full-bleed `PhotoSlot` blocks with a dark readability overlay; empty slot falls back to a branded colour block. Photos you own/license only.
+- **Dark surfaces allowed** for: footer (`#0B1210`), hero/closing CTA photo panels. App screens stay light.
+- **Sections:** bento feature grid, photo cards with glass label, numbered steps, FAQ accordion, closing CTA panel.
 
 ## Implementation Notes
 

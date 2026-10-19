@@ -105,19 +105,19 @@ export default function RoundRobinLeagues() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: "#F3F4F6", color: "#065F46" }}>{sc.icon} {sc.label}</span>
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'IBM Plex Sans', sans-serif", background: "#F0F7FF", color: "#065F46", border: "1px solid #DBEAFE" }}>Round Robin</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'Hanken Grotesk', sans-serif", background: "#F3F4F6", color: "#065F46" }}>{sc.icon} {sc.label}</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "'Hanken Grotesk', sans-serif", background: "#F0F7FF", color: "#065F46", border: "1px solid #DBEAFE" }}>Round Robin</span>
                     </div>
-                    <span className={`text-xs px-2.5 py-1 rounded-md font-semibold ${STATUS_COLORS[lg.status] || "bg-gray-100 text-gray-600"}`} style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                    <span className={`text-xs px-2.5 py-1 rounded-md font-semibold ${STATUS_COLORS[lg.status] || "bg-gray-100 text-gray-600"}`} style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
                       {lg.status?.charAt(0).toUpperCase() + lg.status?.slice(1)}
                     </span>
                   </div>
                   <h3 className="font-heading font-bold text-base mb-2 line-clamp-2 leading-snug tracking-[-0.5px]" style={{ color: "#065F46" }}>{lg.name}</h3>
-                  <p className="text-xs flex items-center gap-1.5 mb-4" style={{ color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                  <p className="text-xs flex items-center gap-1.5 mb-4" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     <span style={{ color: "#10B981" }}>📍</span>
                     <span className="font-medium">{lg.city}</span>
                   </p>
-                  <div className="flex items-center justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: "#6B7280", fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                  <div className="flex items-center justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     <span className="flex items-center gap-1 font-medium">
                       <Users size={14} />
                       {lg.current_players}/{rr.max_players || lg.max_players}
