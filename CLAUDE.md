@@ -109,16 +109,12 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 
 ---
 
-## Design System (`design_guidelines.json`)
+## Conventions
 
-- **Theme**: Light only — white (`#FFFFFF`) / light gray (`#F8F9FA`) backgrounds. No dark backgrounds.
-- **Fonts**: `Outfit` for headings, `DM Sans` for body. Never use Inter for headings.
-- **Sport colors**: Tennis=`#10B981` (emerald), Cricket=`#2563EB` (blue), Pickleball=`#F97316` (orange)
-- **Logo wordmark**: `VEN` (black) + `LAX` (emerald) + `SPORTS` — use `<Logo />` component everywhere, never hardcode.
-- **Cards**: flat bg, 1px border (`#E5E7EB`), no shadow at rest, `translate-y-1 shadow-lg` on hover.
-- **Buttons**: `rounded-md`, obsidian black primary; sport color in sport-specific contexts.
+- **Logo wordmark**: use `<Logo />` component everywhere, never hardcode.
 - **Sticky header**: `backdrop-blur-xl bg-white/70` glassmorphism.
 - **All interactive elements** must have a `data-testid` attribute in kebab-case.
+- Visual rules (fonts, colors, radius, buttons) live in DESIGN.md — see Design System below.
 
 ---
 
@@ -131,9 +127,9 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 **Read DESIGN.md before any UI/frontend work.** All typography, colors, spacing, border-radius, motion, and component patterns are defined there. Do not deviate without explicit user approval.
 
 **Key system:**
-- **Typography:** Geist (display), Plus Jakarta Sans (body), DM Sans (data)
-- **Colors:** #10B981 (primary/victory), #F97316 (accent/next action)
-- **Spacing:** 8px base unit. Cards: 16px padding, sections: 24px gaps
+- **Typography:** Cabinet Grotesk (headings), Hanken Grotesk (body), IBM Plex Mono (data)
+- **Colors:** emerald primary (buttons `#047857`, hover `#065F46`), orange accent `#C2410C`, page bg `#FAFAFA`, dark footer `#0B1210`
+- **Layout (Produck-style):** 24px card radius (`rounded-3xl`), pill buttons (`rounded-full`), glass pills on photo panels, photos via `PhotoSlot` / `config/photos.js` with dark gradient overlays only
 - **Motion:** Minimal. Fade-in on scroll, hover elevate, no playful bounces
 - **Philosophy:** Lead with player progression. Athletic competitive vibe. Serious, not trendy.
 
