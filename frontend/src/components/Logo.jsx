@@ -17,78 +17,51 @@ function NexusIcon({ size }) {
   );
 }
 
-// UFC-Style wordmark: VEN (green) + LAX (orange, bold) with SPORTS subtitle
+// Wordmark: VEN (lime) + LAX (orange) in Archivo expanded black, SPORTS wide-spaced beneath
 function VenlaxWordmark({ size = "md", variant = "default" }) {
-  // Subtitle tracking is positive and wide (classic small-caps luxury tagline
-  // treatment) even though the primary VEN/LAX mark stays tight and bold —
-  // that contrast between a dense wordmark and an airy tagline is what reads
-  // as considered rather than default.
   const sizeMap = {
-    sm: { fontSize: 28, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 3 },
-    md: { fontSize: 36, letterSpacing: -1.5, subtitleFz: 12, subtitleLs: 3.5 },
-    lg: { fontSize: 52, letterSpacing: -2, subtitleFz: 16, subtitleLs: 4.5 },
-    xl: { fontSize: 72, letterSpacing: -2.5, subtitleFz: 22, subtitleLs: 6 },
-    hero: { fontSize: 104, letterSpacing: -3.5, subtitleFz: 32, subtitleLs: 8 },
+    sm: { fontSize: 26, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 5 },
+    md: { fontSize: 34, letterSpacing: -1, subtitleFz: 12, subtitleLs: 7 },
+    lg: { fontSize: 50, letterSpacing: -1.5, subtitleFz: 17, subtitleLs: 10 },
+    xl: { fontSize: 70, letterSpacing: -2, subtitleFz: 24, subtitleLs: 14 },
+    hero: { fontSize: 104, letterSpacing: -3, subtitleFz: 36, subtitleLs: 22 },
   };
-
-  const GOLD = "#D4A017";
 
   const { fontSize, letterSpacing, subtitleFz, subtitleLs } = sizeMap[size] || sizeMap.md;
 
-  // Motion-tick scale: angled speed-line ticks flanking SPORTS, sized off
-  // the subtitle font so they stay proportional across all logo sizes.
-  const tickScale = subtitleFz / 12;
-  const tickH = Math.round(9 * tickScale);
-  const tickW = Math.max(2, Math.round(4 * tickScale));
-  const tickGap = Math.max(1, Math.round(2 * tickScale));
-  const tick = <div style={{ width: `${tickW}px`, height: `${tickH}px`, background: GOLD, transform: "skewX(-18deg)" }} />;
+  // "light"/"hero" = single white mark; "onDark" keeps lime/orange with a white subtitle.
+  const isWhite = variant === "light" || variant === "hero";
+  const venColor = isWhite ? "#FFFFFF" : "#84CC16";
+  const laxColor = isWhite ? "#FFFFFF" : "#EA580C";
+  const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#111827";
 
-  const isLight = variant === "light" || variant === "hero";
-  const venColor = isLight ? "#FFFFFF" : "#10B981";
-  const laxColor = isLight ? "#FFFFFF" : "#F97316";
+  const wordStyle = {
+    fontSize: `${fontSize}px`,
+    fontWeight: 900,
+    fontStretch: "112%",
+    fontFamily: "'Archivo', 'Cabinet Grotesk', sans-serif",
+    letterSpacing: `${letterSpacing}px`,
+    textTransform: "uppercase",
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "10px", alignItems: "center" }}>
-      <div style={{ display: "flex", lineHeight: 0.8 }}>
-        <span
-          style={{
-            fontSize: `${fontSize}px`,
-            fontWeight: 900,
-            fontFamily: "'Outfit', sans-serif",
-            color: venColor,
-            letterSpacing: `${letterSpacing}px`,
-          }}
-        >
-          VEN
-        </span>
-        <span
-          style={{
-            fontSize: `${fontSize}px`,
-            fontWeight: 900,
-            fontFamily: "'Outfit', sans-serif",
-            color: laxColor,
-            letterSpacing: `${letterSpacing}px`,
-            textTransform: "uppercase",
-          }}
-        >
-          LAX
-        </span>
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: "8px", alignItems: "center" }}>
+      <div style={{ display: "flex", lineHeight: 0.85 }}>
+        <span style={{ ...wordStyle, color: venColor }}>VEN</span>
+        <span style={{ ...wordStyle, color: laxColor }}>LAX</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px" }}>
-        <div style={{ display: "flex", gap: `${tickGap}px` }}>{tick}{tick}{tick}</div>
-        <span
-          style={{
-            fontSize: `${subtitleFz}px`,
-            fontWeight: 900,
-            fontFamily: "'Outfit', sans-serif",
-            color: GOLD,
-            letterSpacing: `${subtitleLs}px`,
-          }}
-        >
-          SPORTS
-        </span>
-        <div style={{ display: "flex", gap: `${tickGap}px` }}>{tick}{tick}{tick}</div>
-      </div>
+      <span
+        style={{
+          fontSize: `${subtitleFz}px`,
+          fontWeight: 800,
+          fontFamily: "'Montserrat', sans-serif",
+          color: subColor,
+          letterSpacing: `${subtitleLs}px`,
+          paddingLeft: `${subtitleLs}px`,
+        }}
+      >
+        SPORTS
+      </span>
     </div>
   );
 }
