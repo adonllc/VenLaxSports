@@ -25,7 +25,7 @@ const SPORT_META = {
     formats: ["Singles", "Doubles", "Mixed Doubles"],
     scoring: "Best-of-3 sets with match tiebreak at 6-6",
     rating: "Skill Rating (2.0 – 7.0 scale)",
-    image: "https://images.unsplash.com/photo-1696661115319-a9b6801e2571?w=1200&q=80",
+    image: "/photos/t1-hardcourt.webp",
     features: ["Skill Rating Tracking", "Best-of-3 Sets", "Match Tiebreak Rules", "Weekly Scheduling", "Online Score Reporting", "Live Standings"],
   },
   cricket: {
@@ -49,7 +49,7 @@ const SPORT_META = {
     formats: ["Singles", "Doubles", "Mixed Doubles"],
     scoring: "Rally scoring to 11, win by 2",
     rating: "Skill Rating System (1.0 – 7.0)",
-    image: "https://images.unsplash.com/photo-1777382141965-68d47862eaf9?w=1200&q=80",
+    image: "/photos/p1-park.webp",
     features: ["Rally Scoring", "Win-by-2 Rules", "Skill Ratings", "Flexible Scheduling", "Beginner Friendly", "Growing Community"],
   },
 };

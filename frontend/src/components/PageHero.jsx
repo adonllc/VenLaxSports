@@ -1,11 +1,12 @@
 import PhotoSlot from "./PhotoSlot";
+import { PHOTOS } from "../config/photos";
 
 /**
  * PageHero — dark photo header for content pages (legal, handbook, guides).
  * Italic bold title with a green skewed accent bar, amber eyebrow.
  * title: ReactNode (use <br /> for line breaks). icon: lucide component (optional).
  */
-export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src, tone = "ink", testId }) {
+export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src = PHOTOS.community, tone = "ink", testId }) {
   return (
     <section data-testid={testId}>
       <PhotoSlot src={src} tone={tone} overlay={false}>
