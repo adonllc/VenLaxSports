@@ -50,7 +50,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
   const trend = totalChange > 0 ? "up" : totalChange < 0 ? "down" : "flat";
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5" data-testid="rating-history-chart">
+    <div className="bg-white border border-gray-200 rounded-sm p-5" data-testid="rating-history-chart">
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Rating History</p>

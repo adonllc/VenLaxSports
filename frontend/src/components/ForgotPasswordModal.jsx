@@ -43,7 +43,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
       aria-labelledby="forgot-pwd-title"
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-md p-6 relative overscroll-contain"
+        className="bg-white rounded-sm w-full max-w-md p-6 relative overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -102,7 +102,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#008F70] text-white font-semibold rounded-full hover:bg-[#00765C] transition-colors disabled:opacity-60 text-sm"
                 data-testid="forgot-submit-btn"
               >
                 {loading ? "Sending..." : "Send reset link"}

@@ -43,7 +43,7 @@ export default function NotifyMeBanner({ city, sport }) {
   if (subscribed) {
     return (
       <div
-        className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3"
+        className="bg-emerald-50 border border-emerald-200 rounded-sm p-4 flex items-center gap-3"
         data-testid="notify-banner-success"
       >
         <Bell className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -57,7 +57,7 @@ export default function NotifyMeBanner({ city, sport }) {
   return (
     <>
       <div
-        className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between gap-4"
+        className="bg-emerald-50 border border-emerald-200 rounded-sm p-4 flex items-center justify-between gap-4"
         data-testid="notify-me-banner"
       >
         <div className="flex items-center gap-3">

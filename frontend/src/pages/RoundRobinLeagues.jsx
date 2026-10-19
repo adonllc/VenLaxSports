@@ -101,23 +101,23 @@ export default function RoundRobinLeagues() {
                   key={lg.id}
                   to={`/round-robin/${lg.id}`}
                   data-testid={`rr-league-card-${lg.id}`}
-                  className="bg-white border border-gray-300 rounded-3xl p-6 hover:-translate-y-2 hover:shadow-xl transition duration-200"
+                  className="bg-white border border-gray-300 rounded-none p-6 hover:-translate-y-2 hover:shadow-xl transition duration-200"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", background: "#F3F4F6", color: "#1D1D1F" }}>{sc.icon} {sc.label}</span>
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", background: "#F0F7FF", color: "#1D1D1F", border: "1px solid #DBEAFE" }}>Round Robin</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F3F4F6", color: "#1D1D1D" }}>{sc.icon} {sc.label}</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F0F7FF", color: "#1D1D1D", border: "1px solid #DBEAFE" }}>Round Robin</span>
                     </div>
-                    <span className={`text-xs px-2.5 py-1 rounded-md font-semibold ${STATUS_COLORS[lg.status] || "bg-gray-100 text-gray-600"}`} style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
+                    <span className={`text-xs px-2.5 py-1 rounded-md font-semibold ${STATUS_COLORS[lg.status] || "bg-gray-100 text-gray-600"}`} style={{ fontFamily: "Rubik, sans-serif" }}>
                       {lg.status?.charAt(0).toUpperCase() + lg.status?.slice(1)}
                     </span>
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-2 line-clamp-2 leading-snug tracking-[-0.5px]" style={{ color: "#1D1D1F" }}>{lg.name}</h3>
-                  <p className="text-xs flex items-center gap-1.5 mb-4" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
-                    <span style={{ color: "#10B981" }}>📍</span>
+                  <h3 className="font-heading font-bold text-base mb-2 line-clamp-2 leading-snug tracking-[-0.5px]" style={{ color: "#1D1D1D" }}>{lg.name}</h3>
+                  <p className="text-xs flex items-center gap-1.5 mb-4" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
+                    <span style={{ color: "#008F70" }}>📍</span>
                     <span className="font-medium">{lg.city}</span>
                   </p>
-                  <div className="flex items-center justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
+                  <div className="flex items-center justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                     <span className="flex items-center gap-1 font-medium">
                       <Users size={14} />
                       {lg.current_players}/{rr.max_players || lg.max_players}

@@ -31,9 +31,9 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
 
   // "light"/"hero" = single white mark; "onDark" keeps emerald/orange with a white subtitle.
   const isWhite = variant === "light" || variant === "hero";
-  const venColor = isWhite ? "#FFFFFF" : "#047857";
-  const laxColor = isWhite ? "#FFFFFF" : "#EA580C";
-  const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#111827";
+  const venColor = isWhite ? "#FFFFFF" : "#008F70";
+  const laxColor = isWhite ? "#FFFFFF" : "#F2A922";
+  const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#1D1D1D";
 
   const wordStyle = {
     fontSize: `${fontSize}px`,

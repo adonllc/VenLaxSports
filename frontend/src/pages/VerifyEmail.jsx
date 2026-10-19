@@ -75,9 +75,9 @@ export default function VerifyEmail() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-6 bg-gray-50" data-testid="verify-email-page">
-      <div className="w-full max-w-md bg-white rounded-3xl border border-gray-200 p-8">
+      <div className="w-full max-w-md bg-white rounded-none border border-gray-200 p-8">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 bg-emerald-50 rounded-none flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-7 h-7 text-emerald-500" />
           </div>
           <h1 className="font-heading font-bold text-2xl text-heading-dark mb-2">Verify your email</h1>
@@ -120,7 +120,7 @@ export default function VerifyEmail() {
         <button
           onClick={handleVerify}
           disabled={loading || digits.some((d) => !d)}
-          className="w-full py-3.5 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-50 text-sm mb-4"
+          className="w-full py-3.5 bg-[#008F70] text-white font-semibold rounded-full hover:bg-[#00765C] transition-colors disabled:opacity-50 text-sm mb-4"
           data-testid="verify-btn"
         >
           {loading ? "Verifying..." : "Verify Email"}

@@ -105,9 +105,9 @@ export default function Navbar() {
             <Link
               to="/join"
               className="px-3 py-2 text-sm font-semibold rounded-lg transition-colors"
-              style={isActive("/join") ? { color: "#C2410C", background: ORANGE_PALE } : { color: NAV_TEXT }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#C2410C"; e.currentTarget.style.background = ORANGE_PALE; }}
-              onMouseLeave={e => { e.currentTarget.style.color = isActive("/join") ? "#C2410C" : NAV_TEXT; e.currentTarget.style.background = isActive("/join") ? ORANGE_PALE : "transparent"; }}
+              style={isActive("/join") ? { color: "#B7791F", background: ORANGE_PALE } : { color: NAV_TEXT }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#F2A922"; e.currentTarget.style.background = ORANGE_PALE; }}
+              onMouseLeave={e => { e.currentTarget.style.color = isActive("/join") ? "#F2A922" : NAV_TEXT; e.currentTarget.style.background = isActive("/join") ? ORANGE_PALE : "transparent"; }}
               data-testid="nav-join"
             >
               Find a League
@@ -116,7 +116,7 @@ export default function Navbar() {
             <Link
               to="/ladders"
               className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={isActive("/ladders") ? { color: "#C2410C", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              style={isActive("/ladders") ? { color: "#B7791F", background: ORANGE_PALE } : { color: NAV_MUTED }}
               onMouseEnter={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
               onMouseLeave={e => { if (!isActive("/ladders")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-ladders"
@@ -127,7 +127,7 @@ export default function Navbar() {
             <Link
               to="/rules"
               className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={isActive("/rules") ? { color: "#C2410C", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              style={isActive("/rules") ? { color: "#B7791F", background: ORANGE_PALE } : { color: NAV_MUTED }}
               onMouseEnter={e => { if (!isActive("/rules")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
               onMouseLeave={e => { if (!isActive("/rules")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-rules"
@@ -138,7 +138,7 @@ export default function Navbar() {
             <Link
               to="/tennis-pickleball-leagues"
               className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={isActive("/tennis-pickleball-leagues") ? { color: "#C2410C", background: ORANGE_PALE } : { color: NAV_MUTED }}
+              style={isActive("/tennis-pickleball-leagues") ? { color: "#B7791F", background: ORANGE_PALE } : { color: NAV_MUTED }}
               onMouseEnter={e => { if (!isActive("/tennis-pickleball-leagues")) { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; } }}
               onMouseLeave={e => { if (!isActive("/tennis-pickleball-leagues")) { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; } }}
               data-testid="nav-league-guide"
@@ -168,7 +168,7 @@ export default function Navbar() {
                 >
                   <div
                     className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                    style={{ background: "#C2410C" }}
+                    style={{ background: "#F2A922" }}
                   >
                     {user.name?.[0]?.toUpperCase()}
                   </div>
@@ -248,9 +248,9 @@ export default function Navbar() {
                 <Link
                   to="/auth?mode=register"
                   className="px-4 py-2 text-sm font-bold rounded-lg text-white transition-colors"
-                  style={{ background: "#047857" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#065F46"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#047857"}
+                  style={{ background: "#008F70" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#00765C"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#008F70"}
                   data-testid="nav-register"
                 >
                   Sign Up Free
@@ -276,7 +276,7 @@ export default function Navbar() {
           <Link
             to="/join"
             className="block px-3 py-2.5 text-sm font-semibold rounded-lg"
-            style={{ color: "#C2410C", background: "#FFF7ED" }}
+            style={{ color: "#B7791F", background: "#FFF7ED" }}
             data-testid="nav-join-mobile"
           >
             Find a League
@@ -348,7 +348,7 @@ export default function Navbar() {
                 <Link
                   to="/auth?mode=register"
                   className="px-3 py-2.5 text-sm font-bold text-white text-center rounded-lg"
-                  style={{ background: "#047857" }}
+                  style={{ background: "#008F70" }}
                   data-testid="nav-register-mobile"
                 >
                   Sign Up Free

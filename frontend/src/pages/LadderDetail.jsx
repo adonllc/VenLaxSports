@@ -108,7 +108,7 @@ export default function LadderDetail() {
             <button
               data-testid="ladder-detail-join"
               onClick={handleJoin}
-              className="w-full py-3 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors"
+              className="w-full py-3 bg-[#008F70] text-white font-semibold rounded-full hover:bg-[#00765C] transition-colors"
             >
               Join this Ladder
             </button>
@@ -143,7 +143,7 @@ export default function LadderDetail() {
                       data-testid={`challenge-btn-${entry.player_id}`}
                       onClick={() => handleChallenge(entry.player_id)}
                       disabled={challengingId === entry.player_id}
-                      className="px-3 py-1 text-xs font-semibold bg-[#047857] text-white rounded-full hover:bg-[#065F46] disabled:opacity-50 transition-colors"
+                      className="px-3 py-1 text-xs font-semibold bg-[#008F70] text-white rounded-none hover:bg-[#00765C] disabled:opacity-50 transition-colors"
                     >
                       {challengingId === entry.player_id ? "..." : "Challenge"}
                     </button>

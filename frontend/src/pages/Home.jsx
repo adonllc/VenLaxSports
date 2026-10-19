@@ -1,14 +1,17 @@
 import { useNavigate, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
-import { Trophy, TrendingUp, Users, Share2, ChevronRight } from "lucide-react";
+import { Trophy, TrendingUp, Users, Share2, ArrowRight } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
+import Slant from "../components/Slant";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
-const INK = "#1D1D1F";
-const MUTED = "#6E6E73";
-const TILE = "#F5F5F7";
+const GREEN = "#008F70";
+const AMBER = "#F2A922";
+const INK = "#1D1D1D";
+const BODY = "#4C4C4C";
+const GREY = "#F1F1F1";
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -18,10 +21,10 @@ const fadeUp = {
 };
 
 const FEATURES = [
-  { icon: TrendingUp, title: "A rating that moves.", body: "Your skill rating rises and falls with every reported match, so your level is always current.", span: "md:col-span-2", tone: "#047857" },
-  { icon: Users, title: "Matched by skill.", body: "Divisions group you with players at your level. Singles, doubles and mixed formats.", span: "", tone: "#C2410C" },
-  { icon: Trophy, title: "Live standings.", body: "Wins, losses and rank update as scores come in, through to playoffs.", span: "", tone: "#C2410C" },
-  { icon: Share2, title: "Match cards you can share.", body: "Every result becomes a card with the score and your rating change, ready to post.", span: "md:col-span-2", tone: "#047857" },
+  { icon: TrendingUp, title: "A rating that moves", body: "Your skill rating rises and falls with every reported match, so your level is always current." },
+  { icon: Users, title: "Matched by skill", body: "Divisions group you with players at your level. Singles, doubles and mixed formats." },
+  { icon: Trophy, title: "Live standings", body: "Wins, losses and rank update as scores come in, through to playoffs." },
+  { icon: Share2, title: "Match cards you can share", body: "Every result becomes a card with the score and your rating change, ready to post." },
 ];
 
 const STEPS = [
@@ -38,138 +41,164 @@ const FAQ = [
   { q: "Where can I find the rules?", a: "The Rules page and Player Handbook cover formats, scheduling, conduct and playoffs." },
 ];
 
+// Amber square button, dark text for contrast (AA)
+function AmberButton({ children, onClick, testId, className = "" }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white ${className}`}
+      style={{ background: AMBER, color: INK }}
+      data-testid={testId}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-screen flex flex-col bg-white" style={{ color: BODY }}>
         {/* HERO */}
-        <section className="px-4 sm:px-6 pt-16 md:pt-24 text-center">
-          <motion.p
-            className="text-lg md:text-xl font-semibold mb-3"
-            style={{ color: "#C2410C" }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Ranked leagues for Tennis &amp; Pickleball
-          </motion.p>
-          <motion.h1
-            className="font-semibold text-5xl md:text-[88px] leading-[1.03] max-w-4xl mx-auto"
-            style={{ color: INK, letterSpacing: "-0.035em" }}
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.05, ease: "easeOut" }}
-          >
-            Play ranked.<br />Rise every match.
-          </motion.h1>
-          <motion.p
-            className="mt-6 text-xl md:text-2xl max-w-2xl mx-auto leading-snug"
-            style={{ color: MUTED }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-          >
-            Skill-matched leagues, live standings and a rating that follows you from match to match.
-          </motion.p>
-          <motion.div
-            className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-8 items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <button
-              onClick={() => navigate("/auth")}
-              className="px-7 py-3 rounded-full text-white font-medium text-lg transition-colors hover:bg-[#065F46]"
-              style={{ background: "#047857" }}
-              aria-label="Sign up for VenLax Sports"
-              data-testid="hero-join-venlax"
-            >
-              Join VenLax
-            </button>
-            {activeSports.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => navigate(`/sport/${s.id}`)}
-                className="inline-flex items-center gap-0.5 text-lg font-medium hover:underline"
-                style={{ color: "#047857" }}
-                aria-label={`Explore ${s.label} leagues`}
-                data-testid={`hero-explore-${s.id}`}
+        <section className="relative">
+          <PhotoSlot src={PHOTOS.hero} alt="Players competing in a league match" tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
+            <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.38)" }} />
+            <div className="relative flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
+              <motion.h1
+                className="font-bold italic text-6xl sm:text-8xl md:text-[144px] leading-[0.95] text-white"
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: "easeOut" }}
               >
-                Explore {s.label} <ChevronRight className="w-5 h-5" aria-hidden="true" />
-              </button>
-            ))}
-          </motion.div>
+                Play
+                <span className="block mt-2">
+                  <span className="inline-block px-5 md:px-8" style={{ background: GREEN, transform: "skewX(-8deg)" }}>
+                    <span className="inline-block" style={{ transform: "skewX(8deg)" }}>Ranked</span>
+                  </span>
+                </span>
+              </motion.h1>
+              <motion.p
+                className="mt-8 text-lg md:text-2xl font-medium text-white"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+              >
+                Ranked leagues for Tennis &amp; Pickleball
+              </motion.p>
+              <motion.div className="mt-8 flex flex-wrap gap-3 justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
+                <AmberButton onClick={() => navigate("/auth")} testId="hero-join-venlax">Join VenLax</AmberButton>
+                {activeSports.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => navigate(`/sport/${s.id}`)}
+                    className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#1D1D1D]"
+                    aria-label={`Explore ${s.label} leagues`}
+                    data-testid={`hero-explore-${s.id}`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </motion.div>
+            </div>
+          </PhotoSlot>
 
-          <motion.div
-            className="max-w-[1200px] mx-auto mt-14 md:mt-20"
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.35, ease: "easeOut" }}
-          >
-            <PhotoSlot src={PHOTOS.hero} alt="Players competing in a league match" tone="ink" overlay={false} className="rounded-[28px] aspect-[16/9] md:aspect-[21/9]" />
-          </motion.div>
+          {/* GREEN STANDARDS BAR */}
+          <div className="relative -mt-24 md:-mt-20 px-4 sm:px-6">
+            <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-6 justify-between" style={{ background: GREEN }}>
+              <div className="text-center md:text-left">
+                <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "#fff" }}>Skill-matched leagues</h2>
+                <p className="mt-1 text-white/90">Live standings and a rating that follows you from match to match.</p>
+              </div>
+              <AmberButton onClick={() => navigate("/leagues")}>Find a league</AmberButton>
+            </div>
+          </div>
         </section>
 
-        {/* FEATURE TILES */}
-        <section className="px-4 sm:px-6 py-24 md:py-32">
-          <div className="max-w-[1200px] mx-auto">
-            <motion.h2 {...fadeUp} className="font-semibold text-4xl md:text-6xl leading-[1.08] text-center max-w-3xl mx-auto mb-14" style={{ color: INK, letterSpacing: "-0.03em" }}>
-              Built around your progression.
-            </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {FEATURES.map((f, i) => (
-                <motion.div
-                  key={f.title}
-                  {...fadeUp}
-                  transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.08 }}
-                  className={`${f.span} rounded-[28px] p-8 md:p-10 min-h-[260px] flex flex-col`}
-                  style={{ background: TILE }}
-                >
-                  <f.icon className="w-8 h-8 mb-auto" style={{ color: f.tone }} aria-hidden="true" />
-                  <h3 className="font-semibold text-2xl md:text-3xl mt-10 mb-2" style={{ color: INK, letterSpacing: "-0.02em" }}>{f.title}</h3>
-                  <p className="text-lg leading-snug" style={{ color: MUTED }}>{f.body}</p>
+        {/* ABOUT */}
+        <section className="px-4 sm:px-6 py-24 md:py-32" style={{ background: GREY }}>
+          <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+            <motion.div {...fadeUp}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: GREEN }}>Why VenLax</p>
+              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05] mb-6" style={{ color: INK }}>
+                Built around your progression
+              </h2>
+              <p className="text-lg leading-relaxed mb-8">
+                Skill-matched divisions, a rating that moves with every result and standings that update as scores come in. Show up, play, and watch your level climb.
+              </p>
+              <AmberButton onClick={() => navigate("/rules")}>Read the rules</AmberButton>
+            </motion.div>
+            <motion.div {...fadeUp} className="relative">
+              <Slant src={PHOTOS.tennis} alt="Tennis league play" className="w-full aspect-[4/3]" />
+              <div className="absolute -bottom-6 left-4 md:-left-6 px-6 py-4 text-white" style={{ background: GREEN }}>
+                <div className="font-bold text-3xl leading-none">{activeSports.length}</div>
+                <div className="text-xs uppercase tracking-wider mt-1">Sports live</div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* FEATURES ACCORDION LIST */}
+        <section className="px-4 sm:px-6 py-24 md:py-32 bg-white">
+          <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+            <motion.div {...fadeUp}>
+              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05]" style={{ color: INK }}>
+                Everything a competitive league needs
+              </h2>
+            </motion.div>
+            <motion.div {...fadeUp} className="grid gap-px" style={{ background: "#E4E4E4" }}>
+              {FEATURES.map((f) => (
+                <div key={f.title} className="bg-white py-5 flex gap-5">
+                  <div className="w-12 h-12 shrink-0 flex items-center justify-center" style={{ background: GREEN }}>
+                    <f.icon className="w-6 h-6 text-white" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl" style={{ color: INK }}>{f.title}</h3>
+                    <p className="mt-1">{f.body}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* GREEN CTA BLOCK WITH SLANTED SPORT PHOTOS */}
+        <section className="px-4 sm:px-6 py-20 md:py-28 text-white" style={{ background: GREEN }}>
+          <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 items-center">
+            <motion.div {...fadeUp}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: AMBER }}>Choose your sport</p>
+              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05] mb-6" style={{ color: "#fff" }}>Start building your future today</h2>
+              <p className="text-lg text-white/90 mb-8">Join a league near you and start climbing the standings.</p>
+              <AmberButton onClick={() => navigate("/auth")} testId="home-closing-cta">Join VenLax <ArrowRight className="w-4 h-4" aria-hidden="true" /></AmberButton>
+            </motion.div>
+            <div className="grid grid-cols-2 gap-3">
+              {activeSports.map((s, i) => (
+                <motion.div key={s.id} {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.1 }}>
+                  <Link to={`/sport/${s.id}`} className="block group" data-testid={`home-sport-card-${s.id}`}>
+                    <Slant src={PHOTOS[s.id]} alt={`${s.label} league play`} dir={i % 2 ? "left" : "right"} className="aspect-[3/4] transition-transform group-hover:scale-[1.02]" />
+                    <p className="mt-3 font-bold text-lg flex items-center gap-1" style={{ color: "#fff" }}>
+                      {s.label} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                    </p>
+                  </Link>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* SPORT TILES */}
-        <section className="px-4 sm:px-6 pb-24 md:pb-32">
-          <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-            {activeSports.map((s, i) => (
-              <motion.div key={s.id} {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.1 }}>
-                <Link to={`/sport/${s.id}`} className="block group rounded-[28px] overflow-hidden text-center" style={{ background: TILE }} data-testid={`home-sport-card-${s.id}`}>
-                  <div className="px-8 pt-12 pb-8">
-                    <p className="text-base font-semibold mb-2" style={{ color: s.id === "pickleball" ? "#C2410C" : "#047857" }}>{s.label}</p>
-                    <h3 className="font-semibold text-3xl md:text-4xl leading-tight" style={{ color: INK, letterSpacing: "-0.025em" }}>
-                      {s.id === "tennis" ? "Climb the tennis ladder." : "Own the pickleball court."}
-                    </h3>
-                    <span className="mt-3 inline-flex items-center gap-0.5 text-lg font-medium group-hover:underline" style={{ color: "#047857" }}>
-                      Explore {s.label} <ChevronRight className="w-5 h-5" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <PhotoSlot src={PHOTOS[s.id]} alt={`${s.label} league play`} tone={s.id === "pickleball" ? "orange" : "emerald"} overlay={false} className="aspect-[16/10]" />
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
         {/* HOW IT WORKS */}
-        <section className="px-4 sm:px-6 py-24 md:py-32" style={{ background: TILE }}>
-          <div className="max-w-[980px] mx-auto">
-            <motion.h2 {...fadeUp} className="font-semibold text-4xl md:text-6xl leading-[1.08] text-center mb-14" style={{ color: INK, letterSpacing: "-0.03em" }}>
-              From signup to standings in three steps.
+        <section className="px-4 sm:px-6 py-24 md:py-32" style={{ background: GREY }}>
+          <div className="max-w-[1100px] mx-auto">
+            <motion.h2 {...fadeUp} className="font-bold text-4xl md:text-6xl leading-[1.05] text-center mb-14" style={{ color: INK }}>
+              From signup to standings in three steps
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {STEPS.map((s, i) => (
-                <motion.div key={s.n} {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.08 }} className="rounded-[28px] bg-white p-8">
-                  <span className="font-semibold text-sm" style={{ color: "#047857", fontFamily: "'IBM Plex Mono', monospace" }}>{s.n}</span>
-                  <h3 className="font-semibold text-2xl mt-4 mb-2" style={{ color: INK, letterSpacing: "-0.02em" }}>{s.title}</h3>
-                  <p className="text-base leading-snug" style={{ color: MUTED }}>{s.body}</p>
+                <motion.div key={s.n} {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.08 }} className="bg-white p-8 border-t-4" style={{ borderColor: AMBER }}>
+                  <span className="font-bold text-4xl" style={{ color: GREEN }}>{s.n}</span>
+                  <h3 className="font-bold text-2xl mt-3 mb-2" style={{ color: INK }}>{s.title}</h3>
+                  <p>{s.body}</p>
                 </motion.div>
               ))}
             </div>
@@ -177,14 +206,14 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
-        <section className="px-4 sm:px-6 py-24 md:py-32">
+        <section className="px-4 sm:px-6 py-24 md:py-32 bg-white">
           <div className="max-w-[820px] mx-auto">
-            <motion.h2 {...fadeUp} className="font-semibold text-4xl md:text-5xl leading-[1.1] text-center mb-4" style={{ color: INK, letterSpacing: "-0.03em" }}>
-              Everything you need to know.
+            <motion.h2 {...fadeUp} className="font-bold text-4xl md:text-5xl leading-[1.1] text-center mb-4" style={{ color: INK }}>
+              Everything you need to know
             </motion.h2>
-            <p className="text-center mb-10" style={{ color: MUTED }}>
+            <p className="text-center mb-10">
               New to leagues?{" "}
-              <Link to="/tennis-pickleball-leagues" className="font-medium hover:underline" style={{ color: "#047857" }} data-testid="home-league-guide-link">
+              <Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: GREEN }} data-testid="home-league-guide-link">
                 Read our Tennis &amp; Pickleball league guide
               </Link>
             </p>
@@ -192,8 +221,8 @@ export default function Home() {
               <Accordion type="single" collapsible className="w-full">
                 {FAQ.map((f, i) => (
                   <AccordionItem key={f.q} value={`faq-${i}`} data-testid={`home-faq-${i}`}>
-                    <AccordionTrigger className="text-left text-lg md:text-xl font-semibold" style={{ color: INK }}>{f.q}</AccordionTrigger>
-                    <AccordionContent className="text-base md:text-lg leading-relaxed" style={{ color: MUTED }}>{f.a}</AccordionContent>
+                    <AccordionTrigger className="text-left text-lg md:text-xl font-bold" style={{ color: INK }}>{f.q}</AccordionTrigger>
+                    <AccordionContent className="text-base md:text-lg leading-relaxed" style={{ color: BODY }}>{f.a}</AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
@@ -201,22 +230,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CLOSING CTA */}
-        <section className="px-4 sm:px-6 pb-24 md:pb-32 text-center">
-          <motion.div {...fadeUp}>
-            <h2 className="font-semibold text-4xl md:text-6xl leading-[1.08] max-w-3xl mx-auto" style={{ color: INK, letterSpacing: "-0.03em" }}>
-              Your game doesn't end when the match ends.
-            </h2>
-            <button
-              onClick={() => navigate("/auth")}
-              className="mt-10 px-8 py-3.5 rounded-full text-white font-medium text-lg transition-colors hover:bg-[#065F46]"
-              style={{ background: "#047857" }}
-              data-testid="home-closing-cta"
-            >
-              Join VenLax
-            </button>
-          </motion.div>
-        </section>
       </div>
     </MotionConfig>
   );

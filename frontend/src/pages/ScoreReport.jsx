@@ -213,7 +213,7 @@ export default function ScoreReport() {
       <div className="min-h-screen bg-gray-50" data-testid="score-report-page">
         <div className="max-w-xl mx-auto px-4 py-8 space-y-4">
           {/* Result confirmation */}
-          <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
             <div className={`h-1.5 w-full ${config.accentClass}`} />
             <div className="p-8 text-center">
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${config.accentClass}`}>
@@ -248,7 +248,7 @@ export default function ScoreReport() {
           )}
 
           {/* Share card */}
-          <div className="bg-gray-50 border border-gray-100 rounded-3xl p-6 text-center" data-testid="share-card">
+          <div className="bg-gray-50 border border-gray-100 rounded-none p-6 text-center" data-testid="share-card">
             <p className="text-gray-500 text-xs uppercase tracking-widest mb-3">Share your result</p>
             <div className="text-4xl mb-2">{sportEmoji}</div>
             <p className="text-heading-dark font-heading font-bold text-xl mb-1">
@@ -296,7 +296,7 @@ export default function ScoreReport() {
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
             <div className={`h-1.5 w-full ${config.accentClass}`} />
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -331,7 +331,7 @@ export default function ScoreReport() {
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
           {/* Sport accent bar — T5 */}
           <div className={`h-1.5 w-full ${config.accentClass}`} />
 
@@ -342,7 +342,7 @@ export default function ScoreReport() {
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-heading font-bold text-2xl text-heading-dark" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Report Match Score</h1>
+                <h1 className="font-heading font-bold text-2xl text-heading-dark" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>Report Match Score</h1>
                 <p className={`text-sm ${config.textClass}`}>{config.label} Match</p>
               </div>
             </div>
@@ -383,7 +383,7 @@ export default function ScoreReport() {
                       aria-label={`Select ${p.name} as winner`}
                       className={`py-3 px-4 rounded-xl border-2 text-sm font-semibold transition ring-offset-2 ${
                         winnerId === p.id
-                          ? `border-[#047857] bg-[#047857] text-white ring-2 ${config.ringClass}`
+                          ? `border-[#008F70] bg-[#008F70] text-white ring-2 ${config.ringClass}`
                           : "border-gray-200 text-gray-700 hover:border-gray-400"
                       }`}
                       data-testid={`winner-${p.id}`}
@@ -634,7 +634,7 @@ export default function ScoreReport() {
               <button
                 type="submit"
                 disabled={submitting || !winnerId}
-                className="w-full py-3 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#008F70] text-white font-semibold rounded-full hover:bg-[#00765C] transition-colors disabled:opacity-60 text-sm"
                 data-testid="submit-score-btn"
               >
                 {submitting ? "Submitting..." : "Submit Score"}
@@ -643,7 +643,7 @@ export default function ScoreReport() {
 
             {confirmModalOpen && (
               <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white dark:bg-gray-900 rounded-3xl max-w-md w-full p-6 space-y-4">
+                <div className="bg-white dark:bg-gray-900 rounded-none max-w-md w-full p-6 space-y-4">
                   <div>
                     <h2 className="text-lg font-bold text-heading-dark dark:text-gray-100">Confirm Score</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Review before submitting</p>
@@ -681,7 +681,7 @@ export default function ScoreReport() {
                     <button
                       onClick={handleConfirmSubmit}
                       disabled={submitting}
-                      className="flex-1 py-2 px-4 text-sm font-semibold bg-[#047857] text-white rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-60"
+                      className="flex-1 py-2 px-4 text-sm font-semibold bg-[#008F70] text-white rounded-none hover:bg-[#00765C] transition-colors disabled:opacity-60"
                       data-testid="confirm-submit-btn"
                     >
                       {submitting ? "Submitting..." : "Confirm"}

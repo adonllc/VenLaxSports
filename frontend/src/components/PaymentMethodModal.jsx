@@ -97,7 +97,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
       aria-labelledby="payment-modal-title"
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-md p-6 relative overscroll-contain"
+        className="bg-white rounded-sm w-full max-w-md p-6 relative overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -212,7 +212,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
               type="button"
               onClick={handleZelleConfirm}
               disabled={loading || zelleRef.length < 4}
-              className="w-full py-3 bg-[#047857] text-white text-sm font-semibold rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-60"
+              className="w-full py-3 bg-[#008F70] text-white text-sm font-semibold rounded-full hover:bg-[#00765C] transition-colors disabled:opacity-60"
               data-testid="zelle-confirm-btn"
             >
               {loading ? "Submitting..." : "Confirm payment"}

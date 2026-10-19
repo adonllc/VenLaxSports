@@ -11,8 +11,8 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const SPORT_COLORS = {
-  tennis: "#10B981",
-  pickleball: "#F97316",
+  tennis: "#008F70",
+  pickleball: "#F2A922",
   cricket: "#2563EB",
 };
 
@@ -129,14 +129,14 @@ export default function PublicProfile() {
   }));
 
   const lastSport = profile.rating_history?.[profile.rating_history.length - 1]?.sport || "tennis";
-  const chartColor = SPORT_COLORS[lastSport] || "#10B981";
+  const chartColor = SPORT_COLORS[lastSport] || "#008F70";
 
   return (
     <div className="min-h-screen bg-gray-50" data-testid="public-profile-page">
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
 
         {/* Player card */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6">
+        <div className="bg-white border border-gray-200 rounded-none p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -200,7 +200,7 @@ export default function PublicProfile() {
                 className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold transition disabled:opacity-50 ${
                   following
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                    : "bg-white text-[#047857] border border-gray-200 hover:bg-gray-50"
+                    : "bg-white text-[#008F70] border border-gray-200 hover:bg-gray-50"
                 }`}
                 data-testid="follow-btn"
               >
@@ -210,7 +210,7 @@ export default function PublicProfile() {
               <button
                 onClick={handleChallenge}
                 disabled={challenging || challengeSent}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#047857] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#008F70] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#00765C] transition disabled:opacity-50"
                 data-testid="challenge-btn"
               >
                 <Swords className="w-4 h-4" />
@@ -226,7 +226,7 @@ export default function PublicProfile() {
 
         {/* ELO chart */}
         {chartData.length > 1 && (
-          <div className="bg-white border border-gray-200 rounded-3xl p-6">
+          <div className="bg-white border border-gray-200 rounded-none p-6">
             <h2 className="font-heading font-bold text-heading-dark mb-5">Rating History</h2>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 16 }}>
@@ -255,7 +255,7 @@ export default function PublicProfile() {
 
         {/* Recent matches */}
         {(profile.recent_matches?.length ?? 0) > 0 && (
-          <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2">
               <Trophy className="w-4 h-4 text-yellow-500" />
               <h2 className="font-heading font-bold text-heading-dark">Recent Matches</h2>
@@ -286,7 +286,7 @@ export default function PublicProfile() {
             <p className="text-gray-500 text-sm mb-3">Play competitively. Track your rating.</p>
             <Link
               to="/auth"
-              className="inline-block bg-[#047857] text-white rounded-full px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
+              className="inline-block bg-[#008F70] text-white rounded-none px-8 py-3 text-sm font-bold hover:bg-[#00765C] transition"
               data-testid="profile-join-cta"
             >
               Join VenLax Sports Free

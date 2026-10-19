@@ -127,9 +127,9 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 **Read DESIGN.md before any UI/frontend work.** All typography, colors, spacing, border-radius, motion, and component patterns are defined there. Do not deviate without explicit user approval.
 
 **Key system:**
-- **Typography:** SF system stack (`-apple-system`, Inter fallback) at weight 600; IBM Plex Mono (data); logo wordmark Archivo/Montserrat
-- **Colors:** full white `#FFFFFF` + `#F5F5F7` tiles, ink `#1D1D1F`; emerald buttons `#047857` (hover `#065F46`), orange accent `#C2410C`
-- **Layout (Apple-style, full white):** 28px tile radius, pill buttons, centered giant headings, text links with chevrons, no dark surfaces, photos below text (`PhotoSlot`, `overlay={false}`)
+- **Typography:** Rubik (700 headings, italic heroes); IBM Plex Mono (data); logo wordmark Archivo/Montserrat
+- **Colors:** green `#008F70` (hover `#00765C`), amber `#F2A922`, ink `#1D1D1D`, body `#4C4C4C`, grey `#F1F1F1`, white
+- **Layout (tennis-club theme):** square corners, slanted photo frames (`Slant`), amber square buttons with dark text, green footer; see DESIGN.md
 - **Motion:** Minimal. Fade-in on scroll, hover elevate, no playful bounces
 - **Philosophy:** Lead with player progression. Athletic competitive vibe. Serious, not trendy.
 

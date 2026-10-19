@@ -134,7 +134,7 @@ export default function RoundRobinDetail() {
                     <button
                       data-testid="btn-register-team"
                       onClick={() => setShowInviteModal(true)}
-                      className="w-full bg-[#047857] text-white rounded-full py-2 text-sm font-bold hover:bg-[#065F46] transition"
+                      className="w-full bg-[#008F70] text-white rounded-full py-2 text-sm font-bold hover:bg-[#00765C] transition"
                     >
                       Register as Team
                     </button>
@@ -145,7 +145,7 @@ export default function RoundRobinDetail() {
                     data-testid="btn-join-league"
                     onClick={handleJoin}
                     disabled={joining}
-                    className="w-full bg-[#047857] text-white rounded-full py-2 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
+                    className="w-full bg-[#008F70] text-white rounded-full py-2 text-sm font-bold hover:bg-[#00765C] transition disabled:opacity-50"
                   >
                     {joining ? "Joining..." : "Join League"}
                   </button>
@@ -255,7 +255,7 @@ export default function RoundRobinDetail() {
 
       {showInviteModal && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-none p-6 max-w-sm w-full">
             <h2 className="font-bold text-heading-dark text-lg mb-1">Register as Team</h2>
             <p className="text-sm text-gray-500 mb-4">Find your partner by name or email. If they're not on VenLax yet, invite them.</p>
             <div className="mb-4">
@@ -269,7 +269,7 @@ export default function RoundRobinDetail() {
                 data-testid="btn-send-invite"
                 onClick={handleInvitePartner}
                 disabled={inviteLoading || (!selectedRRPartner && !inviteEmail)}
-                className="flex-1 bg-[#047857] text-white rounded-full py-2 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
+                className="flex-1 bg-[#008F70] text-white rounded-full py-2 text-sm font-bold hover:bg-[#00765C] transition disabled:opacity-50"
               >
                 {inviteLoading
                   ? "Processing..."

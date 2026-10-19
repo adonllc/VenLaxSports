@@ -215,6 +215,7 @@
 | 2026-06-02 | Grid-break hero + disciplined sections | Hero asymmetry creates visual surprise (stat card overlaps grid). Sections snap to grid for predictability. Balances visual interest + usability. |
 | 2026-10-19 | Produck-style redesign | User-supplied reference. Cabinet Grotesk + Hanken Grotesk replace Sora + IBM Plex Sans; Plex Mono kept for data. Dark footer, photo panels, 24px radius, pill CTAs. Emerald/orange kept. Overrides earlier light-only / no-gradient / no-photo rules (see Anti-patterns). |
 | 2026-10-19 | Logo wordmark refresh | `<Logo />` wordmark is Archivo expanded black (900, 112% width): VEN emerald #047857 (same as primary buttons), LAX orange #EA580C, SPORTS in Montserrat 800 wide-spaced beneath (near-black on light, white on dark via `variant="onDark"`). Gold ticks dropped. The three-ring Nexus icon is unchanged. Reference style supplied by user. |
+| 2026-10-19 | Tennis-club redesign | User asked to follow the nicdarkthemes tennis theme. Green/amber palette, Rubik, italic heroes, slanted photo frames, square buttons, green footer. Replaces the Apple look. Theme photos not copied (licensed); Unsplash only. |
 | 2026-10-19 | Apple-style, full-white redesign | User asked for apple.com as the reference for every page. Replaces the Produck look: white/`#F5F5F7` only, SF system type at weight 600, text-only hero headers, light footer, emerald pills + chevron text links. Cabinet Grotesk / Hanken removed. |
 | 2026-09-03 | Typography production pass | Applied Sora (headings: font-black, text-3xl–6xl) + IBM Plex Sans (body) throughout all redesigned pages. Removed Outfit + mixed fonts. Consistent `fontFamily` style props on all text elements. |
 | 2026-09-03 | Color strategy: restrained + sport-specific | Primary emerald (#10B981) + orange accent (#F97316) as main palette. Sport-specific colors (tennis=emerald, cricket=blue, pickleball=orange) used strategically on top bars, badges, buttons, CTAs. Emerald for success states, orange for secondary actions. |
@@ -231,7 +232,17 @@
 ❌ system-ui font as primary body  
 ❌ Over-animating (every interaction shouldn't move; respect reduced motion)  
 
-## Apple-style Layout System (2026-10-19) — CURRENT, supersedes Produck
+## Tennis-club Layout System (2026-10-19) — CURRENT, supersedes Apple and Produck
+Reference: https://www.nicdarkthemes.com/tennis/tennis-wordpress-theme/ (layout, colours and type only; its photos are licensed theme stock and are NOT used).
+- **Palette:** green `#008F70` (hover `#00765C`), teal `#1ABC9C` (rare), amber `#F2A922` (fills; text accents use `#B7791F`), ink `#1D1D1D`, body `#4C4C4C`, light grey `#F1F1F1`, white.
+- **Type:** Rubik. Headings 700, hero titles italic. IBM Plex Mono for data. Logo wordmark keeps Archivo/Montserrat.
+- **Shapes:** square corners (no pills), slanted parallelogram photo frames (`components/Slant.jsx`), skewed green block behind the hero keyword, 1px diagonal-free flat sections alternating white / `#F1F1F1` / green.
+- **Buttons:** amber square, uppercase, bold, **dark text** (the reference uses white-on-amber, which fails contrast); outline-white on photos; in-app primary stays green square.
+- **Hero:** full-bleed photo with 38% black overlay, giant italic title, green strip overlapping the bottom with an amber button. `PageHero`/`SportHero` follow the same pattern.
+- **Footer:** green `#008F70` with white text.
+- **Photos:** Unsplash images in `config/photos.js` only. No theme assets.
+
+## Apple-style Layout System (2026-10-19) — SUPERSEDED by Tennis-club above
 Reference: https://www.apple.com (full white). Direction from the user: "change entire all pages reference like apple.com, full white look".
 - **Backgrounds:** page `#FFFFFF`; alternating sections / tiles `#F5F5F7`. No dark surfaces (footer is light `#F5F5F7`). Modal scrims excepted.
 - **Type:** system SF stack (`-apple-system, 'SF Pro Display'/'SF Pro Text', Inter` fallback). Headings weight 600, tracking -0.025 to -0.035em, large and centered (marketing 56-88px). Body ink `#1D1D1F`, secondary `#6E6E73`. IBM Plex Mono stays for data. Logo wordmark keeps Archivo/Montserrat.

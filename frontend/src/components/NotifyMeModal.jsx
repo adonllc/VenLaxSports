@@ -38,7 +38,7 @@ export default function NotifyMeModal({ isOpen, onClose, city, sport }) {
       data-testid="notify-modal-overlay"
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+        className="bg-white rounded-sm shadow-2xl w-full max-w-sm p-6"
         data-testid="notify-modal"
       >
         <div className="flex items-center justify-between mb-4">

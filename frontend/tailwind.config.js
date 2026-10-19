@@ -8,13 +8,13 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                heading: ["-apple-system", "SF Pro Display", "Inter", "system-ui", "-apple-system", "sans-serif"],
-                body: ["-apple-system", "SF Pro Text", "Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-                sans: ["-apple-system", "SF Pro Text", "Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+                heading: ["Rubik", "system-ui", "-apple-system", "sans-serif"],
+                body: ["Rubik", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+                sans: ["Rubik", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
                 mono: ["IBM Plex Mono", "monospace"],
             },
             textColor: {
-                heading: "#1D1D1F",
+                heading: "#1D1D1D",
             },
             spacing: {
                 '2xs': '2px',
@@ -161,7 +161,7 @@ module.exports = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
-                "heading-dark": "#1D1D1F",
+                "heading-dark": "#1D1D1D",
             },
             borderRadius: {
                 lg: "var(--radius)",

@@ -68,7 +68,7 @@ export default function LeagueSpectator() {
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
         {/* Header card */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6">
+        <div className="bg-white border border-gray-200 rounded-none p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${sportColor}`}>
@@ -103,7 +103,7 @@ export default function LeagueSpectator() {
           <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
             <Link
               to={`/leagues/${leagueId}`}
-              className="flex-1 text-center bg-[#047857] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#065F46] transition"
+              className="flex-1 text-center bg-[#008F70] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#00765C] transition"
               data-testid="spectator-join-btn"
             >
               Join this league
@@ -112,7 +112,7 @@ export default function LeagueSpectator() {
         </div>
 
         {/* Standings */}
-        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
             <h2 className="font-heading font-bold text-heading-dark">Standings</h2>
@@ -160,7 +160,7 @@ export default function LeagueSpectator() {
 
         {/* Recent results */}
         {(data.recent_matches?.length ?? 0) > 0 && (
-          <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-gray-400" />
               <h2 className="font-heading font-bold text-heading-dark">Recent Results</h2>
@@ -187,7 +187,7 @@ export default function LeagueSpectator() {
           <p className="text-gray-500 text-sm mb-3">Want to compete? No club required.</p>
           <Link
             to={authUrl}
-            className="inline-block bg-[#047857] text-white rounded-full px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
+            className="inline-block bg-[#008F70] text-white rounded-none px-8 py-3 text-sm font-bold hover:bg-[#00765C] transition"
             data-testid="spectator-signup-cta"
           >
             Join VenLax Sports Free

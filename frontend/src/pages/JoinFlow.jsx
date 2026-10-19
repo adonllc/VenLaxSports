@@ -113,7 +113,7 @@ export default function JoinFlow() {
 
         <ProgressBar step={step} />
 
-        <div className="bg-white rounded-3xl border border-gray-200 p-8">
+        <div className="bg-white rounded-none border border-gray-200 p-8">
           {/* Step 0 — Sport */}
           {step === 0 && (
             <>

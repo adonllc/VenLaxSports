@@ -201,7 +201,7 @@ export default function PlayerDashboard() {
   });
   const nextStep = (() => {
     if (leagues.length === 0)
-      return { title: "Join your first league.", body: "Browse leagues in your city and sport. New seasons open year-round.", cta: "Find a League", href: "/join", accent: "#C2410C", bg: "#FFEDD5", border: "#E5A885" };
+      return { title: "Join your first league.", body: "Browse leagues in your city and sport. New seasons open year-round.", cta: "Find a League", href: "/join", accent: "#F2A922", bg: "#FFEDD5", border: "#E5A885" };
     if (scorePending.length > 0)
       return { title: `${scorePending.length} match${scorePending.length > 1 ? "es" : ""} need a score.`, body: "Submit your result to update your rating and standings.", cta: "Submit Score", href: `/matches/${scorePending[0].id}/score`, accent: "#0B6E4F", bg: "#EDF7F3", border: "#A7D7C5" };
     if (matches.length === 0)
@@ -240,14 +240,14 @@ export default function PlayerDashboard() {
     <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="player-dashboard">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
-        <div className="bg-white rounded-3xl p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
+        <div className="bg-white rounded-none p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="w-16 h-16 rounded-3xl flex items-center justify-center flex-shrink-0" style={{ background: "#C2410C" }}>
+            <div className="w-16 h-16 rounded-none flex items-center justify-center flex-shrink-0" style={{ background: "#F2A922" }}>
               <span className="text-2xl font-heading font-bold text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-heading font-bold text-2xl" style={{ color: "#1D1D1F" }}>{user.name}</h1>
+                <h1 className="font-heading font-bold text-2xl" style={{ color: "#1D1D1D" }}>{user.name}</h1>
                 {user.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge">
                     ★ Founding Member
@@ -263,7 +263,7 @@ export default function PlayerDashboard() {
                 disabled={togglingNotif}
                 className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-60"
                 style={user.email_notifications
-                  ? { background: "#F3F4F6", color: "#C2410C", border: "1px solid #E5E7EB" }
+                  ? { background: "#F3F4F6", color: "#B7791F", border: "1px solid #E5E7EB" }
                   : { background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB" }}
                 data-testid="toggle-email-notifications"
                 title="Email updates for match scheduling, scores, and league activity"
@@ -303,7 +303,7 @@ export default function PlayerDashboard() {
 
         {/* DUPR Rating */}
         {(user?.sport_preferences?.includes("pickleball") || true) && (
-          <div className="bg-white rounded-3xl p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
+          <div className="bg-white rounded-none p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "#374151" }}>
                 Pickleball Rating (DUPR)
@@ -344,12 +344,12 @@ export default function PlayerDashboard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#1D1D1F", bg: "#FFFFFF",   border: "#E5E7EB" },
+            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#1D1D1D", bg: "#FFFFFF",   border: "#E5E7EB" },
             { label: "Wins",          value: wins,           icon: Award,    color: "#7C2D12", bg: "#FFEDD5",   border: "#E5A885" },
             { label: "Losses",        value: losses,         icon: TrendingUp, color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
             { label: "Total Matches", value: matches.length, icon: Calendar, color: "#374151", bg: "#F3F4F6",   border: "#E5E7EB" },
           ].map((s) => (
-            <div key={s.label} className="rounded-3xl p-5" style={{ background: s.bg, border: `1px solid ${s.border}` }} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
+            <div key={s.label} className="rounded-none p-5" style={{ background: s.bg, border: `1px solid ${s.border}` }} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
               <s.icon className="w-5 h-5 mb-3" style={{ color: s.color }} />
               <p className="font-heading font-bold text-3xl" style={{ color: s.color }}>{s.value}</p>
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>{s.label}</p>
@@ -359,9 +359,9 @@ export default function PlayerDashboard() {
 
         {/* Your Next Step — contextual action card */}
         {nextStep && (
-          <div className="rounded-3xl p-5 mb-6 flex items-center justify-between gap-4" style={{ background: nextStep.bg, border: `1px solid ${nextStep.border}` }} data-testid="next-step-card">
+          <div className="rounded-none p-5 mb-6 flex items-center justify-between gap-4" style={{ background: nextStep.bg, border: `1px solid ${nextStep.border}` }} data-testid="next-step-card">
             <div>
-              <p className="font-heading font-bold text-sm" style={{ color: "#1D1D1F" }}>{nextStep.title}</p>
+              <p className="font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>{nextStep.title}</p>
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{nextStep.body}</p>
             </div>
             {nextStep.href.startsWith("#") ? (
@@ -389,12 +389,12 @@ export default function PlayerDashboard() {
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3" style={{ color: "#1D1D1F" }}>Pending Doubles Invites</h2>
+            <h2 className="text-lg font-semibold mb-3" style={{ color: "#1D1D1D" }}>Pending Doubles Invites</h2>
             <div className="space-y-2">
               {pendingInvites.map((invite) => (
                 <div key={invite.token} className="rounded-md p-4 bg-white flex items-center justify-between" style={{ border: "1px solid #E5E7EB" }}>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: "#1D1D1F" }}>{invite.league_name}</p>
+                    <p className="text-sm font-medium" style={{ color: "#1D1D1D" }}>{invite.league_name}</p>
                     <p className="text-xs" style={{ color: "#6B7280" }}>
                       Invited {invite.partner_email} · expires {new Date(invite.expires_at).toLocaleDateString()}
                     </p>
@@ -403,7 +403,7 @@ export default function PlayerDashboard() {
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
                     <button
                       onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${invite.token}`)}
-                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C2410C", border: "1px solid #E5A885" }}
+                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#B7791F", border: "1px solid #E5A885" }}
                       data-testid={`copy-invite-${invite.token}`}
                     >
                       Copy link
@@ -430,17 +430,17 @@ export default function PlayerDashboard() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}
-          <div id="leagues" className="bg-white rounded-3xl overflow-hidden scroll-mt-6" style={{ border: "1px solid #E5E7EB" }}>
+          <div id="leagues" className="bg-white rounded-none overflow-hidden scroll-mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>My Leagues</h2>
-              <Link to="/join" className="text-xs font-semibold" style={{ color: "#C2410C" }}>Find a League</Link>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>My Leagues</h2>
+              <Link to="/join" className="text-xs font-semibold" style={{ color: "#B7791F" }}>Find a League</Link>
             </div>
             {leagues.length === 0 ? (
               <div className="text-center py-10">
                 <Trophy className="w-8 h-8 mx-auto mb-3" style={{ color: "#E5E7EB" }} />
                 <p className="text-sm font-medium mb-1" style={{ color: "#374151" }}>No leagues yet</p>
                 <p className="text-xs mb-3" style={{ color: "#6B7280" }}>Join a league to start tracking matches and your rating.</p>
-                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#047857", border: "1px solid #047857" }} data-testid="browse-leagues-btn">
+                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#008F70", border: "1px solid #008F70" }} data-testid="browse-leagues-btn">
                   Browse Open Leagues
                 </Link>
               </div>
@@ -452,10 +452,10 @@ export default function PlayerDashboard() {
                     <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
                       <span className="text-lg">{sc.icon || "🏆"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1F" }}>
+                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1D" }}>
                           {l.name}
                           {l.division_label && (
-                            <span className="ml-2 text-xs font-medium" style={{ color: "#C2410C" }}>
+                            <span className="ml-2 text-xs font-medium" style={{ color: "#B7791F" }}>
                               {l.division_label}
                               {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
                             </span>
@@ -466,7 +466,7 @@ export default function PlayerDashboard() {
                           <div className="mt-1 text-sm" style={{ color: "#374151" }}>
                             Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
                             {boxStatuses[l.id].promotion_status === "promoted" && (
-                              <span className="ml-2 text-xs font-semibold" style={{ color: "#C2410C" }}>Promoted ↑</span>
+                              <span className="ml-2 text-xs font-semibold" style={{ color: "#B7791F" }}>Promoted ↑</span>
                             )}
                             {boxStatuses[l.id].promotion_status === "relegated" && (
                               <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
@@ -476,7 +476,7 @@ export default function PlayerDashboard() {
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded-full" style={
                         l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
-                        : l.status === "active" ? { background: "#EDF7F3", color: "#1D1D1F" }
+                        : l.status === "active" ? { background: "#EDF7F3", color: "#1D1D1D" }
                         : { background: "#F3F4F6", color: "#6B7280" }
                       }>
                         {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
@@ -493,9 +493,9 @@ export default function PlayerDashboard() {
 
           {/* Ladder Rankings */}
           {ladderEntries.length > 0 && (
-            <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+            <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
               <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Ladder Rankings</h2>
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>Ladder Rankings</h2>
               </div>
               <div className="p-5 space-y-3">
                 {ladderEntries.map((entry) => (
@@ -507,12 +507,12 @@ export default function PlayerDashboard() {
                     onClick={() => navigate(`/ladders/${entry.ladder_id}`)}
                   >
                     <div>
-                      <p className="font-semibold" style={{ color: "#1D1D1F" }}>
+                      <p className="font-semibold" style={{ color: "#1D1D1D" }}>
                         {entry.city} · {entry.division_label} {entry.sport.charAt(0).toUpperCase() + entry.sport.slice(1)}
                       </p>
                       <p className="text-sm" style={{ color: "#6B7280" }}>Rank #{entry.rank} of {entry.total}</p>
                     </div>
-                    <span className="text-2xl font-bold" style={{ color: "#C2410C" }}>#{entry.rank}</span>
+                    <span className="text-2xl font-bold" style={{ color: "#B7791F" }}>#{entry.rank}</span>
                   </div>
                 ))}
               </div>
@@ -523,9 +523,9 @@ export default function PlayerDashboard() {
           <RatingHistoryChart user={user} />
 
           {/* Schedule a Match */}
-          <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+          <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Schedule a Match</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>Schedule a Match</h2>
             </div>
             <div className="p-5">
               {leagues.length === 0 ? (
@@ -538,7 +538,7 @@ export default function PlayerDashboard() {
                       value={scheduleLeagueId}
                       onChange={(e) => { setScheduleLeagueId(e.target.value); fetchLeaguePlayers(e.target.value); }}
                       className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1F" }}
+                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1D" }}
                       required
                       data-testid="schedule-league-select"
                     >
@@ -562,7 +562,7 @@ export default function PlayerDashboard() {
                       value={schedDate}
                       onChange={(e) => setSchedDate(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1F" }}
+                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1D" }}
                       required
                       data-testid="schedule-date-input"
                     />
@@ -572,7 +572,7 @@ export default function PlayerDashboard() {
                       {schedMsg}
                     </p>
                   )}
-                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#047857" }} data-testid="schedule-submit-btn">
+                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#008F70" }} data-testid="schedule-submit-btn">
                     {scheduling ? "Scheduling..." : "Schedule Match"}
                   </button>
                 </form>
@@ -581,9 +581,9 @@ export default function PlayerDashboard() {
           </div>
 
           {/* Upcoming Matches */}
-          <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+          <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Upcoming Matches ({upcoming.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>Upcoming Matches ({upcoming.length})</h2>
             </div>
             {upcoming.length === 0 ? (
               <div className="text-center py-10">
@@ -595,7 +595,7 @@ export default function PlayerDashboard() {
                   <div key={m.id} className="px-5 py-4">
                     <div className="flex justify-between items-start gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1F" }}>{m.player1_name} vs {m.player2_name}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1D" }}>{m.player1_name} vs {m.player2_name}</p>
                         <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#6B7280" }}>
                           <Clock className="w-3 h-3" /> {new Date(m.scheduled_date).toLocaleString()}
                         </p>
@@ -603,7 +603,7 @@ export default function PlayerDashboard() {
                       <Link
                         to={`/matches/${m.id}/score`}
                         className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors"
-                        style={{ background: "#047857" }}
+                        style={{ background: "#008F70" }}
                         data-testid={`report-score-btn-${m.id}`}
                       >
                         Report
@@ -617,10 +617,10 @@ export default function PlayerDashboard() {
 
           {/* People You Follow — recent activity feed */}
           {followFeed.length > 0 && (
-            <div className="bg-white rounded-3xl overflow-hidden mb-6" style={{ border: "1px solid #E5E7EB" }}>
+            <div className="bg-white rounded-none overflow-hidden mb-6" style={{ border: "1px solid #E5E7EB" }}>
               <div className="p-5 flex items-center gap-2" style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <Users className="w-4 h-4" style={{ color: "#1D1D1F" }} />
-                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>People You Follow</h2>
+                <Users className="w-4 h-4" style={{ color: "#1D1D1D" }} />
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>People You Follow</h2>
               </div>
               <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                 {followFeed.map((m, i) => {
@@ -641,9 +641,9 @@ export default function PlayerDashboard() {
           )}
 
           {/* Recent Results */}
-          <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+          <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Recent Results ({recent.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>Recent Results ({recent.length})</h2>
             </div>
             {recent.length === 0 ? (
               <div className="text-center py-10 text-sm" style={{ color: "#6B7280" }}>No completed matches yet</div>
@@ -661,14 +661,14 @@ export default function PlayerDashboard() {
                           {isWin ? "W" : "L"}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate" style={{ color: "#1D1D1F" }}>{m.player1_name} vs {m.player2_name}</p>
+                          <p className="text-sm font-medium truncate" style={{ color: "#1D1D1D" }}>{m.player1_name} vs {m.player2_name}</p>
                           {m.winner_name && <p className="text-xs" style={{ color: "#6B7280" }}>{m.winner_name} won</p>}
                         </div>
                         {m.winner_name && (
                           <button
                             onClick={() => setShareOpenId(isShareOpen ? null : m.id)}
                             className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex-shrink-0"
-                            style={{ color: "#1D1D1F", background: "#EDF7F3" }}
+                            style={{ color: "#1D1D1D", background: "#EDF7F3" }}
                             data-testid={`share-match-${m.id}`}
                           >
                             <Share2 className="w-3.5 h-3.5" /> Share
@@ -707,9 +707,9 @@ export default function PlayerDashboard() {
 
         {/* Notification Subscriptions */}
         {interests.length > 0 && (
-          <div className="bg-white rounded-3xl overflow-hidden mt-6" style={{ border: "1px solid #E5E7EB" }}>
+          <div className="bg-white rounded-none overflow-hidden mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-4" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-sm" style={{ color: "#1D1D1F" }}>Notification Subscriptions</h2>
+              <h2 className="font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Notification Subscriptions</h2>
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>You'll be notified when these leagues open</p>
             </div>
             <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>

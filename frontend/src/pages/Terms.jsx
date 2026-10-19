@@ -22,7 +22,7 @@ export default function Terms() {
             <ShieldAlert className="w-6 h-6 text-red-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Waiver of Liability & Assumption of Risk</h2>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-3xl p-6 space-y-4">
+          <div className="bg-red-50 border border-red-200 rounded-none p-6 space-y-4">
             <p className="text-sm text-red-900 font-semibold">
               By registering and participating in VENLAX Sports leagues, you acknowledge and assume all risks.
             </p>
@@ -68,7 +68,7 @@ export default function Terms() {
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Emergency Contact & Medical Information</h2>
           </div>
           <div className="space-y-4">
-            <div className="bg-orange-50 border border-orange-200 rounded-3xl p-6">
+            <div className="bg-orange-50 border border-orange-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-orange-900 mb-3">Registration Requirements</h3>
               <ul className="space-y-2 text-sm text-orange-800">
                 <li className="flex gap-3">
@@ -86,7 +86,7 @@ export default function Terms() {
               </ul>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-heading-dark mb-3">Medical Emergency Protocol</h3>
               <ol className="space-y-2 text-sm text-gray-700 ml-4">
                 <li><strong>1. Immediate Response:</strong> If a player is injured or unresponsive, organizer immediately assesses situation.</li>
@@ -105,7 +105,7 @@ export default function Terms() {
             <FileText className="w-6 h-6 text-blue-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Age Requirements & Parental Consent</h2>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-3xl p-6 space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-none p-6 space-y-4">
             <div>
               <p className="text-sm font-semibold text-blue-900 mb-2">Minimum Age: 13 Years Old</p>
               <p className="text-sm text-blue-800">Players under 18 must have parental/legal guardian consent on registration.</p>
@@ -133,7 +133,7 @@ export default function Terms() {
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Refund Policy</h2>
           </div>
           <div className="space-y-4">
-            <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-6">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-emerald-900 mb-4">Standard Refund Rules</h3>
               <div className="space-y-3">
                 <div className="bg-white rounded-lg p-3 border border-emerald-100">
@@ -155,7 +155,7 @@ export default function Terms() {
               </div>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-heading-dark mb-3">Stripe Dispute Process</h3>
               <p className="text-sm text-gray-700 mb-3">
                 All refund disputes are adjudicated via Stripe. VENLAX responds with match evidence, league records, and refund policy documentation.
@@ -173,7 +173,7 @@ export default function Terms() {
             <AlertCircle className="w-6 h-6 text-orange-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Dispute Resolution & Escalation</h2>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-3xl p-6 space-y-4">
+          <div className="bg-orange-50 border border-orange-200 rounded-none p-6 space-y-4">
             <div>
               <h3 className="font-heading font-bold text-base text-orange-900 mb-2">Score Disputes</h3>
               <ol className="space-y-2 text-sm text-orange-800 ml-4">
@@ -211,7 +211,7 @@ export default function Terms() {
             <AlertCircle className="w-6 h-6 text-amber-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Facility Safety & Home Player Responsibility</h2>
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 space-y-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-none p-6 space-y-4">
             <p className="text-sm text-amber-900 font-semibold">
               Home player is responsible for venue selection and safety verification. VENLAX does not provide facility insurance or facility management.
             </p>
@@ -239,7 +239,7 @@ export default function Terms() {
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Photography & Video Recording</h2>
           </div>
           <div className="space-y-4">
-            <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Still Photography</h3>
               <p className="text-sm text-gray-800 mb-2">
                 Still photography by spectators, opponents, and organizers is permitted and encouraged.
@@ -249,7 +249,7 @@ export default function Terms() {
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
               <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Live Streaming & Video Recording</h3>
               <p className="text-sm text-gray-800 mb-2">
                 Recording and streaming requires written consent from BOTH players and the organizer.
@@ -269,7 +269,7 @@ export default function Terms() {
             <ShieldAlert className="w-6 h-6 text-red-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Indemnification & Insurance</h2>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-3xl p-6 space-y-4 text-sm text-red-900">
+          <div className="bg-red-50 border border-red-200 rounded-none p-6 space-y-4 text-sm text-red-900">
             <p className="font-semibold">
               You agree to indemnify, defend, and hold harmless VENLAX Sports, its owners, employees, agents, and successors from any claims, damages, liabilities, costs, or expenses (including legal fees) arising from your participation.
             </p>
@@ -288,7 +288,7 @@ export default function Terms() {
             <FileText className="w-6 h-6 text-gray-600" />
             <h2 className="font-heading font-bold text-2xl text-heading-dark">Governing Law & Jurisdiction</h2>
           </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm text-gray-700 space-y-3">
+          <div className="bg-gray-50 border border-gray-200 rounded-none p-6 text-sm text-gray-700 space-y-3">
             <p>
               These Terms are governed by the laws of the State of Delaware, without regard to conflict of law principles.
             </p>
@@ -313,7 +313,7 @@ export default function Terms() {
           </Link>
           <Link
             to="/leagues"
-            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#047857] text-white px-6 py-3 rounded-full hover:bg-[#065F46] transition-colors text-center"
+            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#008F70] text-white px-6 py-3 rounded-none hover:bg-[#00765C] transition-colors text-center"
             data-testid="terms-cta-leagues"
           >
             Browse Leagues →

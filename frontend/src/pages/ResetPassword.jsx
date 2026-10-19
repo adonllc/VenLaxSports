@@ -40,7 +40,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gray-50 px-4" data-testid="reset-password-page">
-      <div className="w-full max-w-md bg-white rounded-3xl border border-gray-200 p-8">
+      <div className="w-full max-w-md bg-white rounded-none border border-gray-200 p-8">
         <div className="mb-6">
           <Logo size="md" variant="default" testId="reset-logo" />
         </div>
@@ -48,12 +48,12 @@ export default function ResetPassword() {
         {done ? (
           <div className="text-center py-6" data-testid="reset-success">
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: "#1D1D1F" }}>Password updated</h1>
+            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1D1D1D" }}>Password updated</h1>
             <p className="text-gray-500 text-sm">Redirecting you to log in...</p>
           </div>
         ) : (
           <>
-            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Choose a new password</h1>
+            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>Choose a new password</h1>
             <p className="text-gray-500 text-sm mb-6">Pick a strong password you haven't used before.</p>
 
             {error && (
@@ -99,7 +99,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading || !token}
-                className="w-full py-3 bg-[#047857] text-white font-bold rounded-full hover:bg-[#065F46] transition-all hover:shadow-lg disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#008F70] text-white font-bold rounded-full hover:bg-[#00765C] transition-all hover:shadow-lg disabled:opacity-60 text-sm"
                 data-testid="reset-submit-btn"
                 aria-label="Reset password and log in"
               >

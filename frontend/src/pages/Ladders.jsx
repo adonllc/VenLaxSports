@@ -6,17 +6,17 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
-const ESPRESSO = "#047857";
-const RUST = "#C2410C";
+const ESPRESSO = "#008F70";
+const RUST = "#F2A922";
 const SAND_PALE = "#FFFFFF";
 const SAND_LIGHT = "#F3F4F6";
 const BORDER = "#E5E7EB";
-const COFFEE = "#1D1D1F";
+const COFFEE = "#1D1D1D";
 const MOCHA = "#374151";
 const SIENNA = "#6B7280";
 const SPORT_BADGE = {
-  tennis:     { bg: "#D1FAE5", color: "#1D1D1F", border: "#10B981" },
-  pickleball: { bg: "#FFEDD5", color: "#C2410C", border: "#F97316" },
+  tennis:     { bg: "#D1FAE5", color: "#1D1D1D", border: "#008F70" },
+  pickleball: { bg: "#FFEDD5", color: "#B7791F", border: "#F2A922" },
   cricket:    { bg: "#DBEAFE", color: "#1E40AF", border: "#2563EB" },
 };
 

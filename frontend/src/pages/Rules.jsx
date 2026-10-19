@@ -102,28 +102,28 @@ const FORMAT_CARDS = [
     id: "flex",
     label: "Flex League",
     tagline: "You arrange match timing. 5–7 matches, 6–8 weeks.",
-    color: "text-[#047857]",
+    color: "text-[#008F70]",
     highlights: ["Self-scheduled", "You book courts & opponents", "Top 4–8 qualify for playoffs"],
   },
   {
     id: "rr",
     label: "Round Robin",
     tagline: "Fixed schedule: everyone plays everyone once.",
-    color: "text-[#1D1D1F]",
+    color: "text-[#1D1D1D]",
     highlights: ["Organizer books courts", "Group phase calendar set upfront", "Top players advance to playoffs"],
   },
   {
     id: "box",
     label: "Box League",
     tagline: "Small groups (6 players) competing within boxes.",
-    color: "text-[#C2410C]",
+    color: "text-[#B7791F]",
     highlights: ["Tight-knit groups", "Top 2 promote, bottom 2 relegate each cycle", "No season-end playoffs"],
   },
   {
     id: "ladder",
     label: "Challenge Ladder",
     tagline: "Ongoing ranked ladder. Challenge anyone above you.",
-    color: "text-[#047857]",
+    color: "text-[#008F70]",
     highlights: ["Permanent ranked list", "Join anytime, climb year-round", "Win = swap ranks with opponent"],
   },
 ];
@@ -158,11 +158,11 @@ export default function Rules() {
       {/* Header */}
       <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#EA580C", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Rules & Formats</p>
-          <h1 className="font-heading font-bold text-4xl sm:text-5xl mb-2" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Rules</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#B7791F", fontFamily: "Rubik, system-ui, sans-serif" }}>Rules & Formats</p>
+          <h1 className="font-heading font-bold text-4xl sm:text-5xl mb-2" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>Rules</h1>
           <p className="max-w-lg" style={{ color: "#6B7280" }}>
             Quick & clear. We keep only VENLAX-specific rules here. For standard tennis rules & scoring,
-            see <a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#1D1D1F" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
+            see <a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#1D1D1D" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
           </p>
         </div>
       </div>
@@ -170,11 +170,11 @@ export default function Rules() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Divisions */}
         <section className="mb-28">
-          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-8" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Skill Divisions</h2>
+          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-8" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>Skill Divisions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {TENNIS_DIVISIONS.map((div, i) => (
               <div key={i} className="rounded-lg p-5" style={{ border: "1px solid #E5E7EB", background: "white" }}>
-                <div className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>{div.level}</div>
+                <div className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>{div.level}</div>
                 <div style={{ color: "#6B7280" }}>{div.range}</div>
                 <div className="text-sm mt-2" style={{ color: "#6B7280" }}>{div.desc}</div>
               </div>
@@ -184,14 +184,14 @@ export default function Rules() {
 
         {/* Format Cards */}
         <section className="mb-28">
-          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-3" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>League Structures</h2>
-          <p className="text-lg mb-8" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>How a season runs. Combined with match formats (Singles/Doubles/Mixed) at registration.</p>
+          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-3" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>League Structures</h2>
+          <p className="text-lg mb-8" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>How a season runs. Combined with match formats (Singles/Doubles/Mixed) at registration.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {FORMAT_CARDS.map((card) => (
-              <div key={card.id} className="rounded-[28px] p-8" style={{ background: "#F5F5F7" }}>
+              <div key={card.id} className="rounded-none p-8" style={{ background: "#F1F1F1" }}>
                 <div className={`text-2xl font-semibold mb-2 ${card.color}`}>{card.label}</div>
-                <div className="text-sm mb-4" style={{ color: "#6E6E73" }}>{card.tagline}</div>
-                <ul className="text-sm space-y-1" style={{ color: "#1D1D1F" }}>
+                <div className="text-sm mb-4" style={{ color: "#4C4C4C" }}>{card.tagline}</div>
+                <ul className="text-sm space-y-1" style={{ color: "#1D1D1D" }}>
                   {card.highlights.map((h, i) => (
                     <li key={i}>• {h}</li>
                   ))}
@@ -203,18 +203,18 @@ export default function Rules() {
 
         {/* Platform Rules */}
         <section className="mb-28">
-          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-8" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Platform Rules</h2>
+          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-8" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>Platform Rules</h2>
           <div className="space-y-10">
             {VENLAX_RULES.map((section, i) => (
               <div key={i}>
-                <h3 className="font-heading font-bold text-lg mb-4 flex items-center gap-2" style={{ color: "#1D1D1F" }}>
-                  <Trophy size={20} style={{ color: "#C2410C" }} />
+                <h3 className="font-heading font-bold text-lg mb-4 flex items-center gap-2" style={{ color: "#1D1D1D" }}>
+                  <Trophy size={20} style={{ color: "#B7791F" }} />
                   {section.title}
                 </h3>
                 <ul className="space-y-2 ml-8" style={{ color: "#374151" }}>
                   {section.items.map((item, j) => (
                     <li key={j} className="flex gap-3">
-                      <span className="font-bold mt-0.5" style={{ color: "#C2410C" }}>•</span>
+                      <span className="font-bold mt-0.5" style={{ color: "#B7791F" }}>•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -226,17 +226,17 @@ export default function Rules() {
 
         {/* Points Formula */}
         <section className="mb-28 rounded-lg p-8" style={{ background: "#F8F9FA", border: "1px solid #E5E7EB" }}>
-          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-6 flex items-center gap-2" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
-            <TrendingUp size={24} style={{ color: "#1D1D1F" }} />
+          <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-6 flex items-center gap-2" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
+            <TrendingUp size={24} style={{ color: "#1D1D1D" }} />
             Ranking Formula
           </h2>
-          <div className="mb-6 p-4 rounded font-mono" style={{ background: "#F5F5F7", color: "#1D1D1F" }}>
+          <div className="mb-6 p-4 rounded font-mono" style={{ background: "#F1F1F1", color: "#1D1D1D" }}>
             {POINTS_FORMULA.formula}
           </div>
           <div className="space-y-3">
             {POINTS_FORMULA.legend.map((item, i) => (
               <div key={i} className="flex gap-4">
-                <span className="font-bold min-w-fit" style={{ color: "#1D1D1F" }}>{item.sym}:</span>
+                <span className="font-bold min-w-fit" style={{ color: "#1D1D1D" }}>{item.sym}:</span>
                 <span style={{ color: "#374151" }}>{item.def}</span>
               </div>
             ))}
@@ -245,7 +245,7 @@ export default function Rules() {
 
         {/* Back to Leagues */}
         <div className="text-center pt-12" style={{ borderTop: "1px solid #E5E7EB" }}>
-          <Link data-testid="rules-leagues-link" to="/leagues" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }} className="hover:underline text-xl font-bold">
+          <Link data-testid="rules-leagues-link" to="/leagues" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }} className="hover:underline text-xl font-bold">
             ← Back to Leagues
           </Link>
         </div>

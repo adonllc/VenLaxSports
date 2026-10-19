@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Trophy, Check } from "lucide-react";
+import { Trophy, Check } from "lucide-react";
 import platformConfig, { activeSportIds } from "../config/platformConfig";
 import PhotoSlot from "./PhotoSlot";
 
-const INK = "#1D1D1F";
-const MUTED = "#6E6E73";
+const GREEN = "#008F70";
+const AMBER = "#F2A922";
+const INK = "#1D1D1D";
 
 /**
- * SportHero — Apple-style hero for the sport landing pages: centered headline,
- * photo, then a light founding-members tile.
+ * SportHero — tennis-club style hero for the sport landing pages: photo with
+ * overlay, italic title with a green skewed block, then a green founding-members bar.
  *
  * Props:
  *   sportMeta      — { id, label, image, tagline, features, rating }
@@ -28,67 +29,72 @@ export default function SportHero({
   const spotsPercent = foundingStats.limit > 0 ? Math.round((foundingStats.count / foundingStats.limit) * 100) : 0;
 
   return (
-    <section className="px-4 sm:px-6 pt-16 md:pt-24 text-center bg-white">
-      <p className="text-lg md:text-xl font-semibold mb-3" style={{ color: "#C2410C" }}>
-        {sportMeta.label} leagues, now open
-      </p>
-      <h1 className="font-semibold text-5xl md:text-[80px] leading-[1.04] max-w-4xl mx-auto" style={{ color: INK, letterSpacing: "-0.035em" }}>
-        Elevate your<br />{sportMeta.label}.
-      </h1>
-      <p className="mt-6 max-w-2xl mx-auto text-xl md:text-2xl leading-snug" style={{ color: MUTED }}>
-        {sportMeta.tagline}
-      </p>
-      <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-8 items-center justify-center">
-        <button
-          onClick={handlePrimary}
-          className="px-7 py-3 rounded-full text-white font-medium text-lg transition-colors hover:bg-[#065F46]"
-          style={{ background: "#047857" }}
-          data-testid="sport-hero-join"
-        >
-          Join {sportMeta.label}
-        </button>
-        <button
-          onClick={handleSecondary}
-          className="inline-flex items-center gap-0.5 text-lg font-medium hover:underline"
-          style={{ color: "#047857" }}
-          data-testid="sport-hero-learn-more"
-        >
-          Learn more <ChevronRight className="w-5 h-5" aria-hidden="true" />
-        </button>
-      </div>
+    <section>
+      <PhotoSlot src={sportMeta.image} alt={`${sportMeta.label} league play`} tone="ink" overlay={false}>
+        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.42)" }} />
+        <div className="relative text-center px-6 pt-24 pb-40 md:pt-32 md:pb-48">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] mb-5" style={{ color: AMBER }}>
+            {sportMeta.label} leagues, now open
+          </p>
+          <h1 className="font-bold italic text-5xl sm:text-7xl md:text-[110px] leading-[0.98] text-white">
+            Elevate your
+            <span className="block mt-2">
+              <span className="inline-block px-5 md:px-8" style={{ background: GREEN, transform: "skewX(-8deg)" }}>
+                <span className="inline-block" style={{ transform: "skewX(8deg)" }}>{sportMeta.label}</span>
+              </span>
+            </span>
+          </h1>
+          <p className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-white/90">{sportMeta.tagline}</p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={handlePrimary}
+              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white"
+              style={{ background: AMBER, color: INK }}
+              data-testid="sport-hero-join"
+            >
+              Join {sportMeta.label}
+            </button>
+            <button
+              onClick={handleSecondary}
+              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#1D1D1D]"
+              data-testid="sport-hero-learn-more"
+            >
+              Learn more
+            </button>
+          </div>
+        </div>
+      </PhotoSlot>
 
-      <div className="max-w-[1200px] mx-auto mt-14 md:mt-20">
-        <PhotoSlot src={sportMeta.image} alt={`${sportMeta.label} league play`} tone="ink" overlay={false} className="rounded-[28px] aspect-[16/9] md:aspect-[21/9]" />
-
-        <div className="mt-4 rounded-[28px] p-8 md:p-10 text-left grid grid-cols-1 md:grid-cols-3 gap-8 items-center" style={{ background: "#F5F5F7" }}>
+      <div className="relative -mt-20 px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-center" style={{ background: GREEN }}>
           <div className="flex items-center gap-4">
-            <Trophy className="h-8 w-8" style={{ color: "#047857" }} aria-hidden="true" />
+            <Trophy className="h-9 w-9" style={{ color: AMBER }} aria-hidden="true" />
             <div>
-              <div className="text-4xl font-semibold" style={{ color: INK, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{foundingStats.count}</div>
-              <div className="text-sm" style={{ color: MUTED }}>Founding members</div>
+              <div className="text-4xl font-bold leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>{foundingStats.count}</div>
+              <div className="text-sm text-white/90 mt-1">Founding members</div>
             </div>
           </div>
 
           {foundingStats.limit > 0 && (
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span style={{ color: MUTED }}>Founding spots claimed</span>
-                <span className="font-semibold" style={{ color: INK, fontFamily: "'IBM Plex Mono', monospace" }}>{foundingStats.count}/{foundingStats.limit}</span>
+                <span className="text-white/90">Founding spots claimed</span>
+                <span className="font-bold" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{foundingStats.count}/{foundingStats.limit}</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "#D2D2D7" }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${spotsPercent}%`, background: "#047857" }} />
+              <div className="h-2 w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.3)" }}>
+                <div className="h-full transition-all duration-700" style={{ width: `${spotsPercent}%`, background: AMBER }} />
               </div>
-              <p className="mt-3 text-sm" style={{ color: MUTED }}>
+              <p className="mt-3 text-sm text-white/90">
                 {platformConfig.featuredCities.length}+ cities · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
               </p>
             </div>
           )}
 
           {sportMeta.features?.length > 0 && (
-            <ul className="grid grid-cols-1 gap-2 text-sm" style={{ color: INK }}>
+            <ul className="grid grid-cols-1 gap-2 text-sm">
               {sportMeta.features.slice(0, 4).map((f) => (
                 <li key={f} className="flex items-center gap-2">
-                  <Check className="w-4 h-4 shrink-0" style={{ color: "#047857" }} aria-hidden="true" /> {f}
+                  <Check className="w-4 h-4 shrink-0" style={{ color: AMBER }} aria-hidden="true" /> {f}
                 </li>
               ))}
             </ul>

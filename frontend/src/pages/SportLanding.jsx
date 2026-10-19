@@ -12,14 +12,14 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const BORDER    = "#E5E7EB";
-const TEXT_PRI  = "#1D1D1F";
+const TEXT_PRI  = "#1D1D1D";
 const TEXT_MUTED= "#6B7280";
 
 const SPORT_META = {
   tennis: {
     label: "Tennis", icon: "🎾",
-    color: "#10B981", textOnColor: "#ffffff",
-    palePill: "#D1FAE5", pillText: "#065F46",
+    color: "#008F70", textOnColor: "#ffffff",
+    palePill: "#D1FAE5", pillText: "#00765C",
     tagline: "Competitive singles & doubles leagues for all skill levels",
     description: "Compete in structured tennis leagues with skill-level divisions, best-of-3 set formats, and professional scorekeeping across top courts.",
     formats: ["Singles", "Doubles", "Mixed Doubles"],
@@ -42,8 +42,8 @@ const SPORT_META = {
   },
   pickleball: {
     label: "Pickleball", icon: "🏓",
-    color: "#F97316", textOnColor: "#ffffff",
-    palePill: "#FFEDD5", pillText: "#C2410C",
+    color: "#B7791F", textOnColor: "#ffffff",
+    palePill: "#FFEDD5", pillText: "#F2A922",
     tagline: "The fastest-growing racquet sport, now in organized leagues",
     description: "Ride the pickleball wave with organized singles and doubles leagues. Rally scoring, win-by-2 rules, and skill-based ratings across top facilities.",
     formats: ["Singles", "Doubles", "Mixed Doubles"],
@@ -122,7 +122,7 @@ export default function SportLanding() {
           ].map((item, i) => (
             <motion.div
               key={i}
-              className="rounded-3xl p-6"
+              className="rounded-none p-6"
               style={{
                 background: item.isPill ? meta.palePill : "#ffffff",
                 border: `1px solid ${BORDER}`,
@@ -152,7 +152,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-bold text-4xl mb-3" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
+          <h2 className="font-heading font-bold text-4xl mb-3" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
             About {meta.label} on VENLAX
           </h2>
           <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
@@ -162,7 +162,7 @@ export default function SportLanding() {
         <div className="mb-12">
           <motion.h2
             className="font-heading font-bold text-4xl mb-6"
-            style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
+            style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -174,7 +174,7 @@ Features
             {meta.features.map((f, i) => (
               <motion.div
                 key={f}
-                className="flex items-center gap-3 rounded-2xl p-4"
+                className="flex items-center gap-3 rounded-sm p-4"
                 style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -194,7 +194,7 @@ Features
         {/* Leagues */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading font-bold text-4xl" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
+            <h2 className="font-heading font-bold text-4xl" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
               Open {meta.label} Leagues
             </h2>
             <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ Features
           {loading ? (
             <div className="grid md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-40 rounded-3xl animate-pulse bg-gray-100" />
+                <div key={i} className="h-40 rounded-none animate-pulse bg-gray-100" />
               ))}
             </div>
           ) : leagues.length > 0 ? (
@@ -240,7 +240,7 @@ Features
                 <motion.div
                   key={l.id}
                   onClick={() => navigate(`/leagues/${l.id}`)}
-                  className="rounded-3xl p-6 cursor-pointer transition-all duration-200"
+                  className="rounded-none p-6 cursor-pointer transition-all duration-200"
                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
@@ -251,18 +251,18 @@ Features
                   data-testid={`sport-league-${l.id}`}
                 >
                   <div className="flex justify-between mb-3">
-                    <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", background: meta.palePill, color: meta.pillText }}>
+                    <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: meta.palePill, color: meta.pillText }}>
                       {meta.icon} {meta.label}
                     </span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#065F46" : TEXT_MUTED }}>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "Rubik, sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#00765C" : TEXT_MUTED }}>
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
-                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#1D1D1F" }}>{l.name}</h3>
-                  <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
-                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /><span className="font-medium">{l.city}</span>
+                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#1D1D1D" }}>{l.name}</h3>
+                  <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "Rubik, sans-serif" }}>
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#008F70" }} /><span className="font-medium">{l.city}</span>
                   </p>
-                  <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
+                  <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "Rubik, sans-serif" }}>
                     <span className="font-medium">{l.max_players - (l.current_players || 0)} spots left</span>
                     <span className="font-medium">{l.format}</span>
                   </div>

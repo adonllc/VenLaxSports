@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const SPORT_COLORS = {
-  tennis: '#10B981',      // emerald
-  pickleball: '#F97316',  // orange
+  tennis: '#008F70',      // emerald
+  pickleball: '#F2A922',  // orange
   cricket: '#2563EB',     // blue
 };
 
@@ -34,11 +34,11 @@ export default function MatchCard({ match, sport, onShare }) {
     }
   };
 
-  const sportColor = SPORT_COLORS[sport] || '#10B981';
+  const sportColor = SPORT_COLORS[sport] || '#008F70';
 
   return (
     <motion.div
-      className="max-w-sm mx-auto rounded-2xl overflow-hidden shadow-lg bg-white"
+      className="max-w-sm mx-auto rounded-sm overflow-hidden shadow-lg bg-white"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -57,7 +57,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Winner name */}
         <motion.h2
           className="text-4xl font-bold"
-          style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
+          style={{ fontFamily: "Rubik, system-ui, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -68,7 +68,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* vs opponent */}
         <motion.p
           className="text-lg font-medium text-gray-600"
-          style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
+          style={{ fontFamily: "Rubik, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -79,7 +79,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Score */}
         <motion.p
           className="text-5xl font-bold"
-          style={{ color: sportColor, fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
+          style={{ color: sportColor, fontFamily: "Rubik, system-ui, sans-serif" }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
@@ -90,7 +90,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Rating delta */}
         <motion.p
           className="text-3xl font-bold"
-          style={{ color: sportColor, fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
+          style={{ color: sportColor, fontFamily: "Rubik, system-ui, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -101,7 +101,7 @@ export default function MatchCard({ match, sport, onShare }) {
         {/* Timestamp */}
         <motion.p
           className="text-xs text-gray-500"
-          style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
+          style={{ fontFamily: "Rubik, sans-serif" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

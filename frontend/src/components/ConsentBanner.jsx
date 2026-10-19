@@ -36,7 +36,7 @@ export default function ConsentBanner() {
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-sm text-gray-700 flex-1 leading-relaxed">
           We use analytics to improve this platform. Session recording is only enabled with your consent.{" "}
-          <Link to="/privacy" className="underline text-gray-900 hover:text-[#047857]">
+          <Link to="/privacy" className="underline text-gray-900 hover:text-[#008F70]">
             Privacy Policy
           </Link>
         </p>
@@ -52,9 +52,9 @@ export default function ConsentBanner() {
             onClick={accept}
             data-testid="consent-accept"
             className="px-4 py-2 text-sm font-bold text-white rounded-md transition"
-            style={{ background: "#047857" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#065F46")}
-            onMouseLeave={e => (e.currentTarget.style.background = "#047857")}
+            style={{ background: "#008F70" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "#00765C")}
+            onMouseLeave={e => (e.currentTarget.style.background = "#008F70")}
           >
             Accept
           </button>
