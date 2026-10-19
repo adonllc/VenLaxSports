@@ -224,23 +224,20 @@ export default function Auth() {
   return (
     <div className="min-h-[calc(100vh-64px)] flex" data-testid="auth-page">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1B2B4B 0%, #3D1A09 100%)" }}>
-        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#C24A1D" }} />
-        <div className="absolute inset-0 opacity-25" style={{
-          backgroundImage: "radial-gradient(circle at 30% 50%, #C24A1D 0%, transparent 60%), radial-gradient(circle at 70% 30%, #8B2E0D 0%, transparent 60%), radial-gradient(circle at 50% 80%, #C9572A 0%, transparent 50%)"
-        }} />
-        <div className="relative z-10 text-center text-white">
-          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "white", letterSpacing: "-0.02em" }}>
-            TRACK.<br />RANK.<br /><span style={{ color: "#C9572A" }}>COMPETE.</span>
+      <div className="hidden lg:flex lg:w-1/2 items-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
+        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#10B981" }} />
+        <div className="max-w-md">
+          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Sora', system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
+            TRACK.<br />RANK.<br /><span style={{ color: "#047857" }}>COMPETE.</span>
           </h1>
 
-          <p className="text-xl font-medium mb-10 max-w-md mx-auto leading-relaxed" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "rgba(250,240,230,0.85)" }}>
+          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "'IBM Plex Sans', sans-serif", color: "#4B5563" }}>
             Your sport. Your stats. Your legacy.
           </p>
 
-          <div className="flex justify-center gap-6">
+          <div className="flex gap-6">
             {activeSports.map((s) => (
-              <div key={s.id} className="text-sm font-medium" style={{ color: "rgba(250,240,230,0.70)" }}>{s.icon} {s.label}</div>
+              <div key={s.id} className="text-sm font-medium" style={{ color: "#4B5563" }}>{s.icon} {s.label}</div>
             ))}
           </div>
         </div>
@@ -284,7 +281,7 @@ export default function Auth() {
                 <button
                   onClick={finishTwoFALogin}
                   disabled={!backupCodesSaved}
-                  className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl disabled:opacity-50"
+                  className="w-full py-3 bg-[#047857] text-white font-semibold rounded-xl disabled:opacity-50"
                   data-testid="two-fa-continue-btn"
                 >
                   Continue to dashboard
@@ -327,7 +324,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={twoFALoading || otpCode.length !== 6}
-                  className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl disabled:opacity-60"
+                  className="w-full py-3 bg-[#047857] text-white font-semibold rounded-xl disabled:opacity-60"
                   data-testid="two-fa-submit-btn"
                 >
                   {twoFALoading ? "Verifying..." : twoFA.needsSetup ? "Enable 2FA" : "Verify"}
@@ -518,7 +515,7 @@ export default function Auth() {
                   <select
                     value={form.country}
                     onChange={update("country")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-country"
                   >
                     {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -531,7 +528,7 @@ export default function Auth() {
                     value={form.city}
                     onChange={update("city")}
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-city"
                     autoComplete="address-level2"
                   />
@@ -541,7 +538,7 @@ export default function Auth() {
                   <select
                     value={form.skill_level}
                     onChange={update("skill_level")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-skill-level"
                   >
                     <option value="">Select your USTA/USAPA level</option>
@@ -566,7 +563,7 @@ export default function Auth() {
                     onChange={update("date_of_birth")}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
-                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-dob"
                   />
@@ -582,7 +579,7 @@ export default function Auth() {
                     placeholder="e.g. Parent's name"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
-                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-name"
                   />
@@ -597,7 +594,7 @@ export default function Auth() {
                     placeholder="e.g. +1-555-0123"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
-                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-phone"
                   />
@@ -612,7 +609,7 @@ export default function Auth() {
                     placeholder="e.g. Asthma, allergies (confidential)"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ border: "1px solid #E5E7EB", color: "#065F46", background: "white" }}
-                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C24A1D33"}
+                    onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #C2410C33"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-medical-conditions"
                   />
@@ -661,9 +658,9 @@ export default function Auth() {
               type="submit"
               disabled={loading || (mode === "register" && emailExists === true)}
               className="w-full py-3.5 font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm mt-2"
-              style={{ background: "#C24A1D", color: "white" }}
-              onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#8B2E0D"; }}
-              onMouseLeave={e => e.currentTarget.style.background = "#C24A1D"}
+              style={{ background: "#C2410C", color: "white" }}
+              onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#9A3412"; }}
+              onMouseLeave={e => e.currentTarget.style.background = "#C2410C"}
               data-testid="auth-submit-btn"
             >
               {loading ? (mode === "login" ? "Signing in..." : "Creating account...") : mode === "login" ? "Log In" : mode === "register" && !waiverAgreed ? "Review & Accept Terms" : "Create Account"}
@@ -673,11 +670,11 @@ export default function Auth() {
           <p className="text-center text-sm mt-6" style={{ color: "#6B7280" }}>
             {mode === "login" ? (
               <>Don't have an account?{" "}
-                <button onClick={() => setMode("register")} className="font-semibold hover:underline" style={{ color: "#C24A1D" }} data-testid="switch-to-register">Sign up free</button>
+                <button onClick={() => setMode("register")} className="font-semibold hover:underline" style={{ color: "#C2410C" }} data-testid="switch-to-register">Sign up free</button>
               </>
             ) : (
               <>Already have an account?{" "}
-                <button onClick={() => setMode("login")} className="font-semibold hover:underline" style={{ color: "#C24A1D" }} data-testid="switch-to-login">Log in</button>
+                <button onClick={() => setMode("login")} className="font-semibold hover:underline" style={{ color: "#C2410C" }} data-testid="switch-to-login">Log in</button>
               </>
             )}
           </p>

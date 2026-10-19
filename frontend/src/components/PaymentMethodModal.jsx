@@ -212,7 +212,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
               type="button"
               onClick={handleZelleConfirm}
               disabled={loading || zelleRef.length < 4}
-              className="w-full py-3 bg-[#1B2B4B] text-white text-sm font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60"
+              className="w-full py-3 bg-[#047857] text-white text-sm font-semibold rounded-xl hover:bg-[#065F46] transition-colors disabled:opacity-60"
               data-testid="zelle-confirm-btn"
             >
               {loading ? "Submitting..." : "Confirm payment"}

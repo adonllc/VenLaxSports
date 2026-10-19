@@ -131,7 +131,7 @@ export default function DoublesInviteConfirm() {
           </p>
           <button
             onClick={() => navigate("/")}
-            className="bg-[#1B2B4B] text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-[#142040] transition-colors"
+            className="bg-[#047857] text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-[#065F46] transition-colors"
           >
             Go to Dashboard
           </button>
@@ -202,7 +202,7 @@ export default function DoublesInviteConfirm() {
           <button
             onClick={() => handleAction("accept")}
             disabled={submitting || !waiverAccepted}
-            className="flex-1 bg-[#1B2B4B] text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#142040] transition-colors"
+            className="flex-1 bg-[#047857] text-white rounded-md py-2 text-sm font-medium disabled:opacity-50 hover:bg-[#065F46] transition-colors"
             data-testid="accept-btn"
           >
             {submitting ? "Confirming..." : "Accept & Join"}

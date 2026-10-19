@@ -82,7 +82,7 @@ export default function RewardsCredits() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-[var(--vl-bg)]">
       <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -172,7 +172,7 @@ export default function RewardsCredits() {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              <button
+              <button data-testid="rewards-refresh-btn"
                 onClick={fetchCredits}
                 className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
               >
@@ -190,7 +190,7 @@ export default function RewardsCredits() {
                   <code className="text-2xl font-mono font-bold text-heading-dark dark:text-white">
                     {referralCode.referral_code}
                   </code>
-                  <button
+                  <button data-testid="rewards-copy-code-btn"
                     onClick={handleCopyCode}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
@@ -210,7 +210,7 @@ export default function RewardsCredits() {
                     value={referralCode.referral_link}
                     className="flex-1 bg-transparent text-sm text-heading-dark dark:text-gray-200"
                   />
-                  <button
+                  <button data-testid="rewards-copy-link-btn"
                     onClick={handleCopyLink}
                     className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded transition-colors"
                   >
@@ -221,7 +221,7 @@ export default function RewardsCredits() {
 
               {/* Share Button */}
               {navigator.share && (
-                <button
+                <button data-testid="rewards-share-btn"
                   onClick={handleShare}
                   className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
                 >

@@ -137,7 +137,7 @@ export default function Leagues() {
       </div>
 
       {/* Promo Banner */}
-      <div className="sticky top-0 z-10 border-b" style={{ background: "#EA580C", borderColor: "#C24A1D" }}>
+      <div className="sticky top-0 z-10 border-b" style={{ background: "#EA580C", borderColor: "#C2410C" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <p className="text-sm font-semibold text-white" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
             First league free! Use code <code className="bg-orange-600 px-2 py-0.5 rounded font-mono text-white text-xs">PLAY1FREE</code>

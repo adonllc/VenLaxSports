@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
           </p>
           <p className="mt-2 text-sm text-gray-500">
             Questions? Email{" "}
-            <a href="mailto:support@venlaxsports.com" className="underline hover:text-gray-700">
+            <a data-testid="privacy-support-email" href="mailto:support@venlaxsports.com" className="underline hover:text-gray-700">
               support@venlaxsports.com
             </a>
           </p>
@@ -146,15 +146,15 @@ export default function PrivacyPolicy() {
           <p>VENLAX Sports is operated by VENLAX LLC.</p>
           <p>
             Payments processed by{" "}
-            <a href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">
+            <a data-testid="privacy-stripe-link" href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">
               Stripe, Inc.
             </a>{" "}
             — PCI-DSS Level 1 certified.
           </p>
           <p className="mt-4">
-            <Link to="/terms" className="underline hover:text-gray-700">Terms of Service</Link>
+            <Link data-testid="privacy-terms-link" to="/terms" className="underline hover:text-gray-700">Terms of Service</Link>
             {" · "}
-            <Link to="/" className="underline hover:text-gray-700">← Back to home</Link>
+            <Link data-testid="privacy-home-link" to="/" className="underline hover:text-gray-700">← Back to home</Link>
           </p>
         </div>
       </div>

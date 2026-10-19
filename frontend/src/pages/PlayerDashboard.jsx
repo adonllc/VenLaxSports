@@ -201,7 +201,7 @@ export default function PlayerDashboard() {
   });
   const nextStep = (() => {
     if (leagues.length === 0)
-      return { title: "Join your first league.", body: "Browse leagues in your city and sport. New seasons open year-round.", cta: "Find a League", href: "/join", accent: "#C24A1D", bg: "#FAE0D5", border: "#E5A885" };
+      return { title: "Join your first league.", body: "Browse leagues in your city and sport. New seasons open year-round.", cta: "Find a League", href: "/join", accent: "#C2410C", bg: "#FFEDD5", border: "#E5A885" };
     if (scorePending.length > 0)
       return { title: `${scorePending.length} match${scorePending.length > 1 ? "es" : ""} need a score.`, body: "Submit your result to update your rating and standings.", cta: "Submit Score", href: `/matches/${scorePending[0].id}/score`, accent: "#0B6E4F", bg: "#EDF7F3", border: "#A7D7C5" };
     if (matches.length === 0)
@@ -242,7 +242,7 @@ export default function PlayerDashboard() {
         {/* Profile Header */}
         <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: "#C24A1D" }}>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: "#C2410C" }}>
               <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -263,7 +263,7 @@ export default function PlayerDashboard() {
                 disabled={togglingNotif}
                 className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-60"
                 style={user.email_notifications
-                  ? { background: "#F3F4F6", color: "#C24A1D", border: "1px solid #E5E7EB" }
+                  ? { background: "#F3F4F6", color: "#C2410C", border: "1px solid #E5E7EB" }
                   : { background: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB" }}
                 data-testid="toggle-email-notifications"
                 title="Email updates for match scheduling, scores, and league activity"
@@ -345,7 +345,7 @@ export default function PlayerDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#065F46", bg: "#FFFFFF",   border: "#E5E7EB" },
-            { label: "Wins",          value: wins,           icon: Award,    color: "#7C2D12", bg: "#FAE0D5",   border: "#E5A885" },
+            { label: "Wins",          value: wins,           icon: Award,    color: "#7C2D12", bg: "#FFEDD5",   border: "#E5A885" },
             { label: "Losses",        value: losses,         icon: TrendingUp, color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
             { label: "Total Matches", value: matches.length, icon: Calendar, color: "#374151", bg: "#F3F4F6",   border: "#E5E7EB" },
           ].map((s) => (
@@ -403,7 +403,7 @@ export default function PlayerDashboard() {
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
                     <button
                       onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${invite.token}`)}
-                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C24A1D", border: "1px solid #E5A885" }}
+                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C2410C", border: "1px solid #E5A885" }}
                       data-testid={`copy-invite-${invite.token}`}
                     >
                       Copy link
@@ -433,14 +433,14 @@ export default function PlayerDashboard() {
           <div id="leagues" className="bg-white rounded-2xl overflow-hidden scroll-mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F3F4F6" }}>
               <h2 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>My Leagues</h2>
-              <Link to="/join" className="text-xs font-semibold" style={{ color: "#C24A1D" }}>Find a League</Link>
+              <Link to="/join" className="text-xs font-semibold" style={{ color: "#C2410C" }}>Find a League</Link>
             </div>
             {leagues.length === 0 ? (
               <div className="text-center py-10">
                 <Trophy className="w-8 h-8 mx-auto mb-3" style={{ color: "#E5E7EB" }} />
                 <p className="text-sm font-medium mb-1" style={{ color: "#374151" }}>No leagues yet</p>
                 <p className="text-xs mb-3" style={{ color: "#6B7280" }}>Join a league to start tracking matches and your rating.</p>
-                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#1B2B4B", border: "1px solid #1B2B4B" }} data-testid="browse-leagues-btn">
+                <Link to="/leagues" className="text-sm font-semibold px-4 py-2 rounded-xl" style={{ color: "#047857", border: "1px solid #047857" }} data-testid="browse-leagues-btn">
                   Browse Open Leagues
                 </Link>
               </div>
@@ -455,7 +455,7 @@ export default function PlayerDashboard() {
                         <p className="text-sm font-semibold truncate" style={{ color: "#065F46" }}>
                           {l.name}
                           {l.division_label && (
-                            <span className="ml-2 text-xs font-medium" style={{ color: "#C24A1D" }}>
+                            <span className="ml-2 text-xs font-medium" style={{ color: "#C2410C" }}>
                               {l.division_label}
                               {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
                             </span>
@@ -466,7 +466,7 @@ export default function PlayerDashboard() {
                           <div className="mt-1 text-sm" style={{ color: "#374151" }}>
                             Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
                             {boxStatuses[l.id].promotion_status === "promoted" && (
-                              <span className="ml-2 text-xs font-semibold" style={{ color: "#C24A1D" }}>Promoted ↑</span>
+                              <span className="ml-2 text-xs font-semibold" style={{ color: "#C2410C" }}>Promoted ↑</span>
                             )}
                             {boxStatuses[l.id].promotion_status === "relegated" && (
                               <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
@@ -475,7 +475,7 @@ export default function PlayerDashboard() {
                         )}
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded-full" style={
-                        l.status === "registration" ? { background: "#FAE0D5", color: "#7C2D12" }
+                        l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
                         : l.status === "active" ? { background: "#EDF7F3", color: "#065F46" }
                         : { background: "#F3F4F6", color: "#6B7280" }
                       }>
@@ -512,7 +512,7 @@ export default function PlayerDashboard() {
                       </p>
                       <p className="text-sm" style={{ color: "#6B7280" }}>Rank #{entry.rank} of {entry.total}</p>
                     </div>
-                    <span className="text-2xl font-bold" style={{ color: "#C24A1D" }}>#{entry.rank}</span>
+                    <span className="text-2xl font-bold" style={{ color: "#C2410C" }}>#{entry.rank}</span>
                   </div>
                 ))}
               </div>
@@ -568,11 +568,11 @@ export default function PlayerDashboard() {
                     />
                   </div>
                   {schedMsg && (
-                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
+                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FFEDD5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
                       {schedMsg}
                     </p>
                   )}
-                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="schedule-submit-btn">
+                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#047857" }} data-testid="schedule-submit-btn">
                     {scheduling ? "Scheduling..." : "Schedule Match"}
                   </button>
                 </form>
@@ -603,7 +603,7 @@ export default function PlayerDashboard() {
                       <Link
                         to={`/matches/${m.id}/score`}
                         className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors"
-                        style={{ background: "#1B2B4B" }}
+                        style={{ background: "#047857" }}
                         data-testid={`report-score-btn-${m.id}`}
                       >
                         Report
@@ -657,7 +657,7 @@ export default function PlayerDashboard() {
                     <div key={m.id}>
                       <div className="flex items-center gap-3 px-5 py-3.5">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                          style={isWin ? { background: "#FAE0D5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }}>
+                          style={isWin ? { background: "#FFEDD5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }}>
                           {isWin ? "W" : "L"}
                         </div>
                         <div className="min-w-0 flex-1">

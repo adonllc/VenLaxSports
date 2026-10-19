@@ -6,8 +6,8 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
-const ESPRESSO = "#1B2B4B";
-const RUST = "#C24A1D";
+const ESPRESSO = "#047857";
+const RUST = "#C2410C";
 const SAND_PALE = "#FFFFFF";
 const SAND_LIGHT = "#F3F4F6";
 const BORDER = "#E5E7EB";

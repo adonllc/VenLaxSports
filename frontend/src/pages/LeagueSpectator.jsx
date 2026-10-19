@@ -103,7 +103,7 @@ export default function LeagueSpectator() {
           <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
             <Link
               to={`/leagues/${leagueId}`}
-              className="flex-1 text-center bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition"
+              className="flex-1 text-center bg-[#047857] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#065F46] transition"
               data-testid="spectator-join-btn"
             >
               Join this league
@@ -187,7 +187,7 @@ export default function LeagueSpectator() {
           <p className="text-gray-500 text-sm mb-3">Want to compete? No club required.</p>
           <Link
             to={authUrl}
-            className="inline-block bg-[#1B2B4B] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#142040] transition"
+            className="inline-block bg-[#047857] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
             data-testid="spectator-signup-cta"
           >
             Join VenLax Sports Free

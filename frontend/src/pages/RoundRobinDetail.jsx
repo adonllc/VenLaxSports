@@ -134,7 +134,7 @@ export default function RoundRobinDetail() {
                     <button
                       data-testid="btn-register-team"
                       onClick={() => setShowInviteModal(true)}
-                      className="w-full bg-[#1B2B4B] text-white rounded-md py-2 text-sm font-bold hover:bg-[#142040] transition"
+                      className="w-full bg-[#047857] text-white rounded-md py-2 text-sm font-bold hover:bg-[#065F46] transition"
                     >
                       Register as Team
                     </button>
@@ -145,7 +145,7 @@ export default function RoundRobinDetail() {
                     data-testid="btn-join-league"
                     onClick={handleJoin}
                     disabled={joining}
-                    className="w-full bg-[#1B2B4B] text-white rounded-md py-2 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
+                    className="w-full bg-[#047857] text-white rounded-md py-2 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
                   >
                     {joining ? "Joining..." : "Join League"}
                   </button>
@@ -269,7 +269,7 @@ export default function RoundRobinDetail() {
                 data-testid="btn-send-invite"
                 onClick={handleInvitePartner}
                 disabled={inviteLoading || (!selectedRRPartner && !inviteEmail)}
-                className="flex-1 bg-[#1B2B4B] text-white rounded-md py-2 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
+                className="flex-1 bg-[#047857] text-white rounded-md py-2 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
               >
                 {inviteLoading
                   ? "Processing..."

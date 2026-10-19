@@ -116,7 +116,7 @@ const FORMAT_CARDS = [
     id: "box",
     label: "Box League",
     tagline: "Small groups (6 players) competing within boxes.",
-    color: "bg-violet-600",
+    color: "bg-orange-600",
     highlights: ["Tight-knit groups", "Top 2 promote, bottom 2 relegate each cycle", "No season-end playoffs"],
   },
   {
@@ -162,7 +162,7 @@ export default function Rules() {
           <h1 className="font-heading font-black text-4xl sm:text-5xl mb-2" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }}>Rules</h1>
           <p className="max-w-lg" style={{ color: "#6B7280" }}>
             Quick & clear. We keep only VENLAX-specific rules here. For standard tennis rules & scoring,
-            see <a href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#065F46" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
+            see <a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#065F46" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
           </p>
         </div>
       </div>
@@ -208,13 +208,13 @@ export default function Rules() {
             {VENLAX_RULES.map((section, i) => (
               <div key={i}>
                 <h3 className="font-heading font-bold text-lg mb-4 flex items-center gap-2" style={{ color: "#065F46" }}>
-                  <Trophy size={20} style={{ color: "#C24A1D" }} />
+                  <Trophy size={20} style={{ color: "#C2410C" }} />
                   {section.title}
                 </h3>
                 <ul className="space-y-2 ml-8" style={{ color: "#374151" }}>
                   {section.items.map((item, j) => (
                     <li key={j} className="flex gap-3">
-                      <span className="font-bold mt-0.5" style={{ color: "#C24A1D" }}>•</span>
+                      <span className="font-bold mt-0.5" style={{ color: "#C2410C" }}>•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -245,7 +245,7 @@ export default function Rules() {
 
         {/* Back to Leagues */}
         <div className="text-center pt-12" style={{ borderTop: "1px solid #E5E7EB" }}>
-          <Link to="/leagues" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }} className="hover:underline text-xl font-black">
+          <Link data-testid="rules-leagues-link" to="/leagues" style={{ color: "#047857", fontFamily: "'Sora', system-ui, sans-serif" }} className="hover:underline text-xl font-black">
             ← Back to Leagues
           </Link>
         </div>

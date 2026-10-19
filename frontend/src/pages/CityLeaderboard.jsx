@@ -94,7 +94,7 @@ export default function CityLeaderboard() {
               </p>
               <Link
                 to="/auth"
-                className="inline-block bg-[#1B2B4B] text-white rounded-md px-6 py-2.5 text-sm font-bold hover:bg-[#142040] transition"
+                className="inline-block bg-[#047857] text-white rounded-md px-6 py-2.5 text-sm font-bold hover:bg-[#065F46] transition"
                 data-testid="city-first-player-cta"
               >
                 Join VenLax Sports
@@ -215,7 +215,7 @@ export default function CityLeaderboard() {
           </p>
           <Link
             to="/auth"
-            className="inline-block bg-[#1B2B4B] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#142040] transition"
+            className="inline-block bg-[#047857] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
             data-testid="city-join-cta"
           >
             Join Free · VenLax Sports

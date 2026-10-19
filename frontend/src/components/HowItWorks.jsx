@@ -44,7 +44,7 @@ export default function HowItWorks() {
           <div className="lg:sticky lg:top-24 lg:w-80 flex-shrink-0">
             <p
               className="text-xs font-semibold uppercase tracking-[0.18em] mb-4"
-              style={{ color: "#C9572A" }}
+              style={{ color: "#C2410C" }}
             >
               The Process
             </p>
@@ -53,7 +53,7 @@ export default function HowItWorks() {
               style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: "var(--vl-text)" }}
             >
               Six moves.<br />
-              <span style={{ color: "#C9572A" }}>One championship<br />season.</span>
+              <span style={{ color: "#C2410C" }}>One championship<br />season.</span>
             </h2>
             <p className="text-sm leading-relaxed mb-8 max-w-[28ch]" style={{ color: "var(--vl-text-muted)" }}>
               No admin chaos. No spreadsheets. Ranked competition, handled.
@@ -61,9 +61,9 @@ export default function HowItWorks() {
             <Link
               to="/leagues"
               className="inline-flex items-center gap-2 text-sm font-bold px-6 py-3 rounded-lg text-white transition-colors"
-              style={{ background: "#C9572A" }}
+              style={{ background: "#C2410C" }}
               onMouseEnter={e => e.currentTarget.style.background = "#B04823"}
-              onMouseLeave={e => e.currentTarget.style.background = "#C9572A"}
+              onMouseLeave={e => e.currentTarget.style.background = "#C2410C"}
               data-testid="how-cta-leagues"
             >
               See open leagues <ArrowRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ export default function HowItWorks() {
                     textAlign: "right",
                     color: "var(--vl-step-num)",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#C9572A"}
+                  onMouseEnter={e => e.currentTarget.style.color = "#C2410C"}
                   onMouseLeave={e => e.currentTarget.style.color = "var(--vl-step-num)"}
                 >
                   {s.n}

@@ -72,7 +72,7 @@ export default function Waiver() {
   return (
     <div style={{ background: "#FFFFFF" }} data-testid="waiver-page">
       {/* Hero */}
-      <section className="py-16 sm:py-20 px-6" style={{ background: "#C24A1D" }}>
+      <section className="py-16 sm:py-20 px-6" style={{ background: "#C2410C" }}>
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
@@ -135,9 +135,9 @@ export default function Waiver() {
         {/* Links */}
         <div className="text-center pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 mb-4">
-            Related documents: <Link to="/handbook" className="text-emerald-600 font-semibold hover:underline">Handbook</Link> · <Link to="/terms" className="text-emerald-600 font-semibold hover:underline">Terms</Link>
+            Related documents: <Link data-testid="waiver-handbook-link" to="/handbook" className="text-emerald-600 font-semibold hover:underline">Handbook</Link> · <Link to="/terms" className="text-emerald-600 font-semibold hover:underline">Terms</Link>
           </p>
-          <Link
+          <Link data-testid="waiver-cta-link"
             to="/leagues"
             className="inline-flex items-center gap-2 text-sm font-semibold bg-emerald-500 text-white px-6 py-3 rounded-xl hover:bg-emerald-600 transition-colors"
             data-testid="waiver-cta-leagues"

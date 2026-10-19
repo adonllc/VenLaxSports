@@ -434,19 +434,19 @@ export default function LeagueDetail() {
                   {/* Payment/join status */}
                   {sessionId && !paymentStatus && (
                     <div className="flex items-center gap-2 text-sm mb-3 justify-center" style={{ color: "#374151" }}>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: "#C24A1D" }} />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: "#C2410C" }} />
                       Checking payment...
                     </div>
                   )}
 
                   {paymentStatus?.payment_status === "paid" && (
-                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={{ color: "#C24A1D", background: "#FAE0D5", border: "1px solid #E5A885" }}>
+                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={{ color: "#C2410C", background: "#FFEDD5", border: "1px solid #E5A885" }}>
                       <CheckCircle className="w-4 h-4 flex-shrink-0" /> Payment confirmed!
                     </div>
                   )}
 
                   {joinMsg && (
-                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={joinMsg.includes("success") || joinMsg.includes("joined") ? { background: "#FAE0D5", color: "#C24A1D", border: "1px solid #E5A885" } : { background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }} data-testid="join-message">
+                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={joinMsg.includes("success") || joinMsg.includes("joined") ? { background: "#FFEDD5", color: "#C2410C", border: "1px solid #E5A885" } : { background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }} data-testid="join-message">
                       {joinMsg.includes("success") || joinMsg.includes("joined") ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                       {joinMsg}
                     </div>
@@ -498,8 +498,8 @@ export default function LeagueDetail() {
                               </button>
                             </div>
                           ) : (
-                            <div className="rounded-md p-4 space-y-2" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }}>
-                              <p className="text-sm font-medium" style={{ color: "#C24A1D" }}>
+                            <div className="rounded-md p-4 space-y-2" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }}>
+                              <p className="text-sm font-medium" style={{ color: "#C2410C" }}>
                                 Invite sent to {partnerEmail}
                               </p>
                               <p className="text-xs" style={{ color: "#374151" }}>
@@ -516,7 +516,7 @@ export default function LeagueDetail() {
                                     />
                                     <button
                                       onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`)}
-                                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C24A1D", border: "1px solid #E5A885" }}
+                                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#C2410C", border: "1px solid #E5A885" }}
                                     >
                                       Copy
                                     </button>
@@ -569,7 +569,7 @@ export default function LeagueDetail() {
                                 </button>
                               </div>
                               {promoResult && (
-                                <p className="text-xs font-semibold mt-1.5" style={{ color: "#C24A1D" }} data-testid="promo-success">
+                                <p className="text-xs font-semibold mt-1.5" style={{ color: "#C2410C" }} data-testid="promo-success">
                                   ✓ {promoResult.final_fee === 0 ? "Free entry applied!" : `Save $${promoResult.savings.toFixed(2)} — $${promoResult.final_fee.toFixed(2)} total`}
                                 </p>
                               )}
@@ -593,8 +593,8 @@ export default function LeagueDetail() {
                   )}
 
                   {isRegistered && (
-                    <div className="rounded-xl px-4 py-4 text-center" style={{ background: "#FAE0D5", border: "1px solid #E5A885" }} data-testid="registered-badge">
-                      <CheckCircle className="w-6 h-6 mx-auto mb-1.5" style={{ color: "#C24A1D" }} />
+                    <div className="rounded-xl px-4 py-4 text-center" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }} data-testid="registered-badge">
+                      <CheckCircle className="w-6 h-6 mx-auto mb-1.5" style={{ color: "#C2410C" }} />
                       <p className="font-bold text-sm" style={{ color: "#065F46" }}>You're registered</p>
                       <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Check your email for details.</p>
                     </div>
@@ -680,7 +680,7 @@ export default function LeagueDetail() {
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-heading font-bold text-lg" style={{ color: "#065F46" }}>Matches ({matches.length})</h3>
               {user && (
-                <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#1B2B4B", border: "1px solid #1B2B4B" }} data-testid="schedule-match-link">
+                <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#047857", border: "1px solid #047857" }} data-testid="schedule-match-link">
                   Schedule Match
                 </Link>
               )}
@@ -697,13 +697,13 @@ export default function LeagueDetail() {
                     </div>
                     <div className="flex items-center gap-2">
                       {m.status === "completed" && m.winner_name && (
-                        <span className="text-xs font-medium" style={{ color: "#C24A1D" }}>{m.winner_name} won</span>
+                        <span className="text-xs font-medium" style={{ color: "#C2410C" }}>{m.winner_name} won</span>
                       )}
                       <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F3F4F6", color: "#6B7280" } : m.status === "scheduled" ? { background: "#EDF7F3", color: "#065F46" } : { background: "#F3F4F6", color: "#6B7280" }}>
                         {m.status}
                       </span>
                       {user && m.status === "scheduled" && (user._id === m.player1_id || user.id === m.player1_id || user._id === m.player2_id || user.id === m.player2_id) && (
-                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors" style={{ background: "#1B2B4B" }} data-testid={`report-score-${m.id}`}>
+                        <Link to={`/matches/${m.id}/score`} className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors" style={{ background: "#047857" }} data-testid={`report-score-${m.id}`}>
                           Report Score
                         </Link>
                       )}
@@ -740,10 +740,10 @@ export default function LeagueDetail() {
                       <tr key={i} style={i === 0 ? { background: "#FFFFFF" } : {}}>
                         <td className="px-5 py-3 font-heading font-bold" style={{ color: "#E5E7EB" }}>{i + 1}</td>
                         <td className="px-5 py-3 font-medium" style={{ color: "#065F46" }}>
-                          {i === 0 && <Trophy className="inline w-3.5 h-3.5 mr-1" style={{ color: "#C24A1D" }} />}
+                          {i === 0 && <Trophy className="inline w-3.5 h-3.5 mr-1" style={{ color: "#C2410C" }} />}
                           {s.player_name}
                         </td>
-                        <td className="px-3 py-3 text-center font-semibold" style={{ color: "#C24A1D" }}>{s.wins}</td>
+                        <td className="px-3 py-3 text-center font-semibold" style={{ color: "#C2410C" }}>{s.wins}</td>
                         <td className="px-3 py-3 text-center text-red-600">{s.losses}</td>
                         <td className="px-3 py-3 text-center" style={{ color: "#6B7280" }}>{s.matches_played}</td>
                         <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#065F46" }}>{s.points}</td>
@@ -768,7 +768,7 @@ export default function LeagueDetail() {
                   onClick={() => setActiveBox(box.box_id)}
                   className="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors"
                   style={activeBox === box.box_id
-                    ? { background: "#1B2B4B", color: "white", borderColor: "#1B2B4B" }
+                    ? { background: "#047857", color: "white", borderColor: "#047857" }
                     : { background: "white", color: "#374151", borderColor: "#E5E7EB" }}
                 >
                   Box {box.box_id}
@@ -794,13 +794,13 @@ export default function LeagueDetail() {
                       const isPromote = idx < boxStandings.box_promote;
                       const isRelegate = idx >= box.players.length - boxStandings.box_relegate;
                       return (
-                        <tr key={p.player_id} style={isPromote ? { background: "#FAE0D5" } : isRelegate ? { background: "#FEF2F2" } : {}}>
+                        <tr key={p.player_id} style={isPromote ? { background: "#FFEDD5" } : isRelegate ? { background: "#FEF2F2" } : {}}>
                           <td className="px-4 py-3 font-semibold" style={{ color: "#6B7280" }}>#{p.rank}</td>
                           <td className="px-4 py-3 font-medium" style={{ color: "#065F46" }}>{p.name}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.wins}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.losses}</td>
                           <td className="px-4 py-3 text-right">
-                            {isPromote && <span className="text-xs font-semibold px-2 py-0.5 rounded-md" style={{ color: "#C24A1D", background: "#FAE0D5" }}>Promoting ↑</span>}
+                            {isPromote && <span className="text-xs font-semibold px-2 py-0.5 rounded-md" style={{ color: "#C2410C", background: "#FFEDD5" }}>Promoting ↑</span>}
                             {isRelegate && <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-md">Relegating ↓</span>}
                           </td>
                         </tr>

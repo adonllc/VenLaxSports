@@ -83,10 +83,10 @@ export default function LadderDetail() {
 
         {/* My rank banner */}
         {isInLadder && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-indigo-800">Your Rank</p>
-              <p className="text-2xl font-bold text-indigo-900">#{ladder.my_rank} of {ladder.entry_count}</p>
+              <p className="text-sm font-semibold text-emerald-800">Your Rank</p>
+              <p className="text-2xl font-bold text-emerald-900">#{ladder.my_rank} of {ladder.entry_count}</p>
             </div>
             {cooldownDisplay && (
               <span className="text-xs text-orange-700 bg-orange-100 px-3 py-1.5 rounded-md font-medium">
@@ -108,7 +108,7 @@ export default function LadderDetail() {
             <button
               data-testid="ladder-detail-join"
               onClick={handleJoin}
-              className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors"
+              className="w-full py-3 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors"
             >
               Join this Ladder
             </button>
@@ -129,12 +129,12 @@ export default function LadderDetail() {
                 <div
                   key={entry.player_id}
                   data-testid={`ladder-entry-${entry.rank}`}
-                  className={`px-4 py-3 flex items-center gap-3 ${isMe ? "bg-indigo-50" : ""}`}
+                  className={`px-4 py-3 flex items-center gap-3 ${isMe ? "bg-emerald-50" : ""}`}
                 >
                   <span className="w-8 text-sm font-bold text-gray-400">#{entry.rank}</span>
                   <div className="flex-1">
-                    <p className={`text-sm font-medium ${isMe ? "text-indigo-900" : "text-heading-dark"}`}>
-                      {entry.name} {isMe && <span className="text-xs text-indigo-500">(you)</span>}
+                    <p className={`text-sm font-medium ${isMe ? "text-emerald-900" : "text-heading-dark"}`}>
+                      {entry.name} {isMe && <span className="text-xs text-emerald-500">(you)</span>}
                     </p>
                   </div>
                   <span className="text-sm text-gray-400 font-mono">{Math.round(entry.elo)}</span>
@@ -143,7 +143,7 @@ export default function LadderDetail() {
                       data-testid={`challenge-btn-${entry.player_id}`}
                       onClick={() => handleChallenge(entry.player_id)}
                       disabled={challengingId === entry.player_id}
-                      className="px-3 py-1 text-xs font-semibold bg-[#1B2B4B] text-white rounded-md hover:bg-[#142040] disabled:opacity-50 transition-colors"
+                      className="px-3 py-1 text-xs font-semibold bg-[#047857] text-white rounded-md hover:bg-[#065F46] disabled:opacity-50 transition-colors"
                     >
                       {challengingId === entry.player_id ? "..." : "Challenge"}
                     </button>

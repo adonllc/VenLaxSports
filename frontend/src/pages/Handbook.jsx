@@ -78,7 +78,7 @@ const HANDBOOK_SECTIONS = [
     id: "ratings",
     title: "Ratings Policy",
     icon: TrendingUp,
-    color: "text-purple-600",
+    color: "text-orange-600",
     items: [
       "VenLax uses proprietary ELO-based rating systems.",
       "Ratings are estimates and may fluctuate.",
@@ -133,7 +133,7 @@ export default function Handbook() {
       <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#E5E7EB", background: "rgba(253,246,238,0.92)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap gap-1 text-xs font-semibold overflow-x-auto">
           {HANDBOOK_SECTIONS.map(({ id, title }) => (
-            <a key={id} href={`#${id}`} className="px-3 py-1.5 rounded-full transition-colors whitespace-nowrap" style={{ color: "#374151" }}
+            <a data-testid={`handbook-toc-${id}`} key={id} href={`#${id}`} className="px-3 py-1.5 rounded-full transition-colors whitespace-nowrap" style={{ color: "#374151" }}
                onMouseEnter={e => e.currentTarget.style.background="#F3F4F6"}
                onMouseLeave={e => e.currentTarget.style.background="transparent"}>
               {title}
@@ -192,9 +192,9 @@ export default function Handbook() {
 
         <div className="text-center pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 mb-4">
-            Have questions? Check the <Link to="/rules" className="text-emerald-600 font-semibold hover:underline">League Rules</Link> for format-specific details.
+            Have questions? Check the <Link data-testid="handbook-rules-link" to="/rules" className="text-emerald-600 font-semibold hover:underline">League Rules</Link> for format-specific details.
           </p>
-          <Link
+          <Link data-testid="handbook-cta-link"
             to="/leagues"
             className="inline-flex items-center gap-2 text-sm font-bold bg-emerald-700 text-white px-8 py-3 rounded-lg hover:bg-emerald-800 transition-all hover:scale-105 hover:shadow-lg"
             data-testid="handbook-cta-leagues"

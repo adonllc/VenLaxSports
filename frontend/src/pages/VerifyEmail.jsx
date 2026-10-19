@@ -120,7 +120,7 @@ export default function VerifyEmail() {
         <button
           onClick={handleVerify}
           disabled={loading || digits.some((d) => !d)}
-          className="w-full py-3.5 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-50 text-sm mb-4"
+          className="w-full py-3.5 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors disabled:opacity-50 text-sm mb-4"
           data-testid="verify-btn"
         >
           {loading ? "Verifying..." : "Verify Email"}

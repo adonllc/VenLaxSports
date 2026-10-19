@@ -207,7 +207,7 @@ export default function TennisPickleballLeagues() {
           <p className="mb-4">
             Browse active tennis and pickleball leagues in your city and see real pricing before you sign up.
           </p>
-          <Link
+          <Link data-testid="tp-leagues-cta"
             to="/join"
             className="inline-block font-semibold px-6 py-3 rounded-lg text-white"
             style={{ background: "#10B981" }}

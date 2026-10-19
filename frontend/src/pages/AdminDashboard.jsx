@@ -231,7 +231,7 @@ export default function AdminDashboard() {
 
   const STAT_CARDS = stats ? [
     { label: "Total Users", value: stats.total_users, icon: Users, color: "#374151", bg: "#F3F4F6", border: "#E5E7EB" },
-    { label: "Total Leagues", value: stats.total_leagues, icon: Trophy, color: "#C24A1D", bg: "#FAE0D5", border: "#E5A885" },
+    { label: "Total Leagues", value: stats.total_leagues, icon: Trophy, color: "#C2410C", bg: "#FFEDD5", border: "#E5A885" },
     { label: "Total Matches", value: stats.total_matches, icon: Calendar, color: "#065F46", bg: "#FFFFFF", border: "#E5E7EB" },
     { label: "Revenue (USD)", value: `$${stats.total_revenue?.toFixed(2) || "0.00"}`, icon: DollarSign, color: "#065F46", bg: "#EDF7F3", border: "#0B6E4F" },
   ] : [];
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
       <div className="bg-white" style={{ borderBottom: "1px solid #E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#C24A1D" }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#C2410C" }}>
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={`px-4 sm:px-5 py-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${tab === t.id ? "border-orange-500 text-orange-600" : "border-transparent hover:text-gray-500"}`}
-                style={tab === t.id ? { color: "#C24A1D", borderColor: "#C24A1D" } : { color: "#6B7280" }}
+                style={tab === t.id ? { color: "#C2410C", borderColor: "#C2410C" } : { color: "#6B7280" }}
                 data-testid={`admin-tab-${t.id}`}
               >
                 {t.label}
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                             {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
                           </td>
                           <td className="px-6 py-4 text-sm">
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-purple-100" : "bg-gray-100"}`} style={{ color: u.role === "admin" ? "#6B21A8" : "#374151" }}>
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-orange-100" : "bg-gray-100"}`} style={{ color: u.role === "admin" ? "#6B21A8" : "#374151" }}>
                               {u.role || "user"}
                             </span>
                           </td>
@@ -503,12 +503,12 @@ export default function AdminDashboard() {
                 </div>
 
                 {msg && (
-                  <div className="px-4 py-3 rounded-xl text-sm" style={msg.includes("success") ? { background: "#FAE0D5", color: "#C24A1D", border: "1px solid #E5A885" } : { background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }} data-testid="create-league-message">
+                  <div className="px-4 py-3 rounded-xl text-sm" style={msg.includes("success") ? { background: "#FFEDD5", color: "#C2410C", border: "1px solid #E5A885" } : { background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }} data-testid="create-league-message">
                     {msg}
                   </div>
                 )}
 
-                <button type="submit" disabled={creating} className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#1B2B4B" }} data-testid="create-league-submit">
+                <button type="submit" disabled={creating} className="w-full py-3 text-white font-semibold rounded-xl transition-colors disabled:opacity-60 text-sm" style={{ background: "#047857" }} data-testid="create-league-submit">
                   {creating ? "Creating..." : "Create League"}
                 </button>
               </form>
@@ -526,11 +526,11 @@ export default function AdminDashboard() {
                   data-testid="btn-create-rr-league"
                   onClick={() => setShowRRForm(true)}
                   className="px-4 py-2 rounded-md text-sm font-medium transition"
-                  style={{ border: "1px solid #E5E7EB", color: "#C24A1D" }}
+                  style={{ border: "1px solid #E5E7EB", color: "#C2410C" }}
                 >
                   + Create Round Robin League
                 </button>
-                <button onClick={() => setTab("create")} className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#1B2B4B" }} data-testid="add-league-btn">
+                <button onClick={() => setTab("create")} className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors" style={{ background: "#047857" }} data-testid="add-league-btn">
                   <Plus className="w-4 h-4" /> Add League
                 </button>
               </div>
@@ -572,7 +572,7 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#C24A1D" }}>View</Link>
+                          <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#C2410C" }}>View</Link>
                           {l.status !== "completed" && (
                             <button
                               onClick={() => handleCloseLeague(l.id, l.name)}
@@ -601,7 +601,7 @@ export default function AdminDashboard() {
                               data-testid={`finalize-season-${l.id}`}
                               onClick={() => handleFinalizeSeason(l.id)}
                               className="px-3 py-1.5 text-xs font-medium text-white rounded-md"
-                              style={{ background: "#1B2B4B" }}
+                              style={{ background: "#047857" }}
                             >
                               Finalize Season
                             </button>
@@ -680,7 +680,7 @@ export default function AdminDashboard() {
                 data-testid="create-ladder-btn"
                 onClick={handleCreateLadder}
                 className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-colors"
-                style={{ background: "#1B2B4B" }}
+                style={{ background: "#047857" }}
               >
                 <Plus className="w-4 h-4" /> Create Ladder
               </button>
@@ -704,7 +704,7 @@ export default function AdminDashboard() {
                       <a
                         href={`/ladders/${l.id}`}
                         className="text-xs font-semibold hover:underline"
-                        style={{ color: "#C24A1D" }}
+                        style={{ color: "#C2410C" }}
                         data-testid={`admin-ladder-view-${l.id}`}
                       >
                         View →
@@ -827,7 +827,7 @@ export default function AdminDashboard() {
                     alert(e.response?.data?.detail || "Failed to create league");
                   }
                 }}
-                className="flex-1 text-white rounded-md py-2 text-sm font-bold transition" style={{ background: "#1B2B4B" }}
+                className="flex-1 text-white rounded-md py-2 text-sm font-bold transition" style={{ background: "#047857" }}
               >
                 Create League
               </button>
@@ -925,11 +925,11 @@ function SeasonsTab() {
             />
           </div>
           {msg && (
-            <div className="text-sm px-3 py-2 rounded-lg" style={msg.includes("!") ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="season-message">
+            <div className="text-sm px-3 py-2 rounded-lg" style={msg.includes("!") ? { background: "#FFEDD5", color: "#C2410C" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="season-message">
               {msg}
             </div>
           )}
-          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="season-submit-btn">
+          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#047857" }} data-testid="season-submit-btn">
             {busy ? "Creating..." : "Create Season"}
           </button>
         </form>
@@ -1035,11 +1035,11 @@ function PlayoffsTab({ leagues }) {
             data-testid="playoff-date-input"
           />
           {msg && (
-            <div className="text-sm px-3 py-2 rounded-lg" style={msg.includes("!") ? { background: "#FAE0D5", color: "#C24A1D" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="playoff-message">
+            <div className="text-sm px-3 py-2 rounded-lg" style={msg.includes("!") ? { background: "#FFEDD5", color: "#C2410C" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="playoff-message">
               {msg}
             </div>
           )}
-          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }} data-testid="playoff-submit-btn">
+          <button type="submit" disabled={busy} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#047857" }} data-testid="playoff-submit-btn">
             {busy ? "Generating..." : "Generate Bracket"}
           </button>
           <p className="text-xs text-gray-500">Requires at least N players with recorded match results in the league's standings.</p>
@@ -1122,7 +1122,7 @@ function AutoGenerateTab({ onSuccess }) {
           type="button"
           onClick={handleGenerate}
           disabled={busy}
-          className="w-full py-3 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#1B2B4B" }}
+          className="w-full py-3 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#047857" }}
           data-testid="auto-generate-btn"
         >
           {busy ? "Generating..." : "Generate Leagues"}
@@ -1241,14 +1241,14 @@ function ZelleQueueTab() {
                   <td className="px-4 py-3 text-gray-700">{txn.league_name}</td>
                   <td className="px-4 py-3 font-semibold text-heading-dark">${Number(txn.amount).toFixed(2)}</td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-600">{txn.memo || "—"}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-purple-700 font-semibold">{txn.reference_number || "—"}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-orange-700 font-semibold">{txn.reference_number || "—"}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs">{txn.updated_at ? new Date(txn.updated_at).toLocaleDateString() : new Date(txn.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button
                         onClick={() => act(txn.session_id, "approve")}
                         disabled={actioning === txn.session_id}
-                        className="px-3 py-1.5 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-60" style={{ background: "#C24A1D" }}
+                        className="px-3 py-1.5 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-60" style={{ background: "#C2410C" }}
                         data-testid={`zelle-approve-${txn.session_id}`}
                       >
                         Approve
@@ -1382,7 +1382,7 @@ function WaitlistTab() {
           />
           <button
             onClick={copyCSV}
-            className="text-xs bg-[#1B2B4B] text-white px-3 py-2 rounded-lg hover:bg-[#142040] transition-colors whitespace-nowrap"
+            className="text-xs bg-[#047857] text-white px-3 py-2 rounded-lg hover:bg-[#065F46] transition-colors whitespace-nowrap"
             data-testid="waitlist-copy-csv"
           >
             Copy CSV

@@ -6,7 +6,7 @@ export default function Terms() {
     <div style={{ background: "#FFFFFF" }} data-testid="terms-page">
 
       {/* Hero */}
-      <section className="py-16 sm:py-20 px-6" style={{ background: "#C24A1D" }}>
+      <section className="py-16 sm:py-20 px-6" style={{ background: "#C2410C" }}>
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
@@ -179,22 +179,22 @@ export default function Terms() {
         {/* 5. Dispute Resolution & Arbitration */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-6 h-6 text-purple-600" />
+            <AlertCircle className="w-6 h-6 text-orange-600" />
             <h2 className="font-heading font-black text-2xl text-heading-dark">Dispute Resolution & Escalation</h2>
           </div>
-          <div className="bg-purple-50 border border-purple-200 rounded-2xl p-6 space-y-4">
+          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 space-y-4">
             <div>
-              <h3 className="font-heading font-bold text-base text-purple-900 mb-2">Score Disputes</h3>
-              <ol className="space-y-2 text-sm text-purple-800 ml-4">
+              <h3 className="font-heading font-bold text-base text-orange-900 mb-2">Score Disputes</h3>
+              <ol className="space-y-2 text-sm text-orange-800 ml-4">
                 <li><strong>1. Initial Resolution (24h window):</strong> Players communicate directly and submit agreed score with photographic evidence.</li>
                 <li><strong>2. Organizer Review (24h):</strong> If no agreement, organizer reviews evidence (scorecard photo, timestamps, match location).</li>
                 <li><strong>3. Final Decision:</strong> Organizer rules final within 24 hours. Decision is binding.</li>
               </ol>
             </div>
 
-            <div className="border-t border-purple-200 pt-4">
-              <h3 className="font-heading font-bold text-base text-purple-900 mb-2">Conduct Violations</h3>
-              <ol className="space-y-2 text-sm text-purple-800 ml-4">
+            <div className="border-t border-orange-200 pt-4">
+              <h3 className="font-heading font-bold text-base text-orange-900 mb-2">Conduct Violations</h3>
+              <ol className="space-y-2 text-sm text-orange-800 ml-4">
                 <li><strong>1. Report:</strong> Opponent or witness submits complaint with specific evidence (incident description, witness contact, photo if applicable).</li>
                 <li><strong>2. Investigation:</strong> Organizer interviews both parties, reviews match history.</li>
                 <li><strong>3. Notification:</strong> If violation is substantiated, organizer issues written notice with specific charge and evidence.</li>
@@ -204,9 +204,9 @@ export default function Terms() {
               </ol>
             </div>
 
-            <div className="border-t border-purple-200 pt-4">
-              <h3 className="font-heading font-bold text-base text-purple-900 mb-2">Playoff Seeding Disputes</h3>
-              <p className="text-sm text-purple-800">
+            <div className="border-t border-orange-200 pt-4">
+              <h3 className="font-heading font-bold text-base text-orange-900 mb-2">Playoff Seeding Disputes</h3>
+              <p className="text-sm text-orange-800">
                 If final standings are contested, organizer adjudicates within 48 hours of playoff start.
                 Playoff bracket is locked 24 hours before first match.
               </p>
@@ -244,26 +244,26 @@ export default function Terms() {
         {/* 7. Photography & Recording Rights */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <FileText className="w-6 h-6 text-indigo-600" />
+            <FileText className="w-6 h-6 text-gray-600" />
             <h2 className="font-heading font-black text-2xl text-heading-dark">Photography & Video Recording</h2>
           </div>
           <div className="space-y-4">
-            <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6">
-              <h3 className="font-heading font-bold text-base text-indigo-900 mb-3">Still Photography</h3>
-              <p className="text-sm text-indigo-800 mb-2">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+              <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Still Photography</h3>
+              <p className="text-sm text-gray-800 mb-2">
                 Still photography by spectators, opponents, and organizers is permitted and encouraged.
               </p>
-              <p className="text-xs text-indigo-700">
+              <p className="text-xs text-gray-700">
                 Players may request no photography; photographers must honor request. Player names and ratings are public on league standings.
               </p>
             </div>
 
-            <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6">
-              <h3 className="font-heading font-bold text-base text-indigo-900 mb-3">Live Streaming & Video Recording</h3>
-              <p className="text-sm text-indigo-800 mb-2">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+              <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Live Streaming & Video Recording</h3>
+              <p className="text-sm text-gray-800 mb-2">
                 Recording and streaming requires written consent from BOTH players and the organizer.
               </p>
-              <ul className="space-y-2 text-xs text-indigo-700 ml-4">
+              <ul className="space-y-2 text-xs text-gray-700 ml-4">
                 <li>• Organizer-authorized official recordings for league documentation are permitted with advance notice.</li>
                 <li>• Third-party spectators may NOT record or stream without both players' explicit consent.</li>
                 <li>• Players own their likeness in recordings. VENLAX does not own or profit from player recordings.</li>
@@ -322,7 +322,7 @@ export default function Terms() {
           </Link>
           <Link
             to="/leagues"
-            className="inline-flex items-center gap-2 text-sm font-semibold bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors text-center"
+            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#047857] text-white px-6 py-3 rounded-xl hover:bg-[#065F46] transition-colors text-center"
             data-testid="terms-cta-leagues"
           >
             Browse Leagues →

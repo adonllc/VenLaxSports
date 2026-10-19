@@ -52,9 +52,9 @@ export default function ConsentBanner() {
             onClick={accept}
             data-testid="consent-accept"
             className="px-4 py-2 text-sm font-bold text-white rounded-md transition"
-            style={{ background: "#1B2B4B" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#142040")}
-            onMouseLeave={e => (e.currentTarget.style.background = "#1B2B4B")}
+            style={{ background: "#047857" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "#065F46")}
+            onMouseLeave={e => (e.currentTarget.style.background = "#047857")}
           >
             Accept
           </button>

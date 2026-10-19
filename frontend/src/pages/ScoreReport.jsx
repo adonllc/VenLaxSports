@@ -383,7 +383,7 @@ export default function ScoreReport() {
                       aria-label={`Select ${p.name} as winner`}
                       className={`py-3 px-4 rounded-xl border-2 text-sm font-semibold transition ring-offset-2 ${
                         winnerId === p.id
-                          ? `border-[#1B2B4B] bg-[#1B2B4B] text-white ring-2 ${config.ringClass}`
+                          ? `border-[#047857] bg-[#047857] text-white ring-2 ${config.ringClass}`
                           : "border-gray-200 text-gray-700 hover:border-gray-400"
                       }`}
                       data-testid={`winner-${p.id}`}
@@ -634,7 +634,7 @@ export default function ScoreReport() {
               <button
                 type="submit"
                 disabled={submitting || !winnerId}
-                className="w-full py-3 bg-[#1B2B4B] text-white font-semibold rounded-xl hover:bg-[#142040] transition-colors disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors disabled:opacity-60 text-sm"
                 data-testid="submit-score-btn"
               >
                 {submitting ? "Submitting..." : "Submit Score"}
@@ -681,7 +681,7 @@ export default function ScoreReport() {
                     <button
                       onClick={handleConfirmSubmit}
                       disabled={submitting}
-                      className="flex-1 py-2 px-4 text-sm font-semibold bg-[#1B2B4B] text-white rounded-lg hover:bg-[#142040] transition-colors disabled:opacity-60"
+                      className="flex-1 py-2 px-4 text-sm font-semibold bg-[#047857] text-white rounded-lg hover:bg-[#065F46] transition-colors disabled:opacity-60"
                       data-testid="confirm-submit-btn"
                     >
                       {submitting ? "Submitting..." : "Confirm"}

@@ -76,7 +76,7 @@ export default function VenLaxHero({
       />
 
       {/* Orange top rail */}
-      <div className="absolute top-0 left-0 right-0 h-[3px] z-20" style={{ background: "#C9572A" }} />
+      <div className="absolute top-0 left-0 right-0 h-[3px] z-20" style={{ background: "#C2410C" }} />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pt-24 pb-12 sm:px-6 md:pt-32 md:pb-20 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8 items-start">
@@ -117,7 +117,7 @@ export default function VenLaxHero({
                   <span className="block text-white">YOUR{" "}</span>
                   <span
                     className="block bg-clip-text text-transparent"
-                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C9572A, #B04823)" }}
+                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C2410C, #B04823)" }}
                   >
                     {sportMeta.label.toUpperCase()}.
                   </span>
@@ -128,13 +128,13 @@ export default function VenLaxHero({
                   <span className="block text-white">PASSION.{" "}</span>
                   <span
                     className="block bg-clip-text text-transparent"
-                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C9572A, #B04823)" }}
+                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C2410C, #B04823)" }}
                   >
                     THREE{" "}
                   </span>
                   <span
                     className="block bg-clip-text text-transparent"
-                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C9572A, #B04823)" }}
+                    style={{ backgroundImage: "linear-gradient(135deg, #F97316, #C2410C, #B04823)" }}
                   >
                     SPORTS.
                   </span>
@@ -213,7 +213,7 @@ export default function VenLaxHero({
                         className="h-full rounded-full transition-all duration-700"
                         style={{
                           width: `${spotsPercent}%`,
-                          background: "linear-gradient(to right, #C9572A, #F97316)",
+                          background: "linear-gradient(to right, #C2410C, #F97316)",
                         }}
                       />
                     </div>

@@ -200,7 +200,7 @@ export default function PublicProfile() {
                 className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold transition disabled:opacity-50 ${
                   following
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                    : "bg-white text-[#1B2B4B] border border-gray-200 hover:bg-gray-50"
+                    : "bg-white text-[#047857] border border-gray-200 hover:bg-gray-50"
                 }`}
                 data-testid="follow-btn"
               >
@@ -210,7 +210,7 @@ export default function PublicProfile() {
               <button
                 onClick={handleChallenge}
                 disabled={challenging || challengeSent}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1B2B4B] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#142040] transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#047857] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
                 data-testid="challenge-btn"
               >
                 <Swords className="w-4 h-4" />
@@ -286,7 +286,7 @@ export default function PublicProfile() {
             <p className="text-gray-500 text-sm mb-3">Play competitively. Track your rating.</p>
             <Link
               to="/auth"
-              className="inline-block bg-[#1B2B4B] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#142040] transition"
+              className="inline-block bg-[#047857] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
               data-testid="profile-join-cta"
             >
               Join VenLax Sports Free
