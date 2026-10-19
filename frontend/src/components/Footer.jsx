@@ -28,7 +28,9 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <div className="mb-4">
-              <Logo size="sm" variant="light" testId="footer-logo" />
+              <div className="inline-block bg-white px-4 py-3">
+                <Logo size="md" variant="default" testId="footer-logo" />
+              </div>
             </div>
             <p className="text-sm font-semibold leading-relaxed text-white mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
               {BRAND.tagline_short}
