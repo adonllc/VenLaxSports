@@ -74,7 +74,7 @@ export default function LeagueSpectator() {
               <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${sportColor}`}>
                 {data.sport} · {data.city}
               </p>
-              <h1 className="font-heading font-black text-2xl text-heading-dark mb-2 truncate">
+              <h1 className="font-heading font-bold text-2xl text-heading-dark mb-2 truncate">
                 {data.name}
               </h1>
               <div className="flex flex-wrap gap-3 text-sm text-gray-500">

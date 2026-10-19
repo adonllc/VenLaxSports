@@ -243,11 +243,11 @@ export default function PlayerDashboard() {
         <div className="bg-white rounded-3xl p-6 mb-6" style={{ border: "1px solid #E5E7EB" }}>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="w-16 h-16 rounded-3xl flex items-center justify-center flex-shrink-0" style={{ background: "#C2410C" }}>
-              <span className="text-2xl font-heading font-black text-white">{user.name?.[0]?.toUpperCase()}</span>
+              <span className="text-2xl font-heading font-bold text-white">{user.name?.[0]?.toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-heading font-black text-2xl" style={{ color: "#111827" }}>{user.name}</h1>
+                <h1 className="font-heading font-bold text-2xl" style={{ color: "#1D1D1F" }}>{user.name}</h1>
                 {user.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge">
                     ★ Founding Member
@@ -286,15 +286,15 @@ export default function PlayerDashboard() {
             </div>
             <div className="flex gap-5 sm:gap-4 flex-wrap sm:flex-nowrap">
               <div className="text-center min-w-[48px]">
-                <p className="font-heading font-black text-2xl text-tennis">{user.tennis_rating || 3.0}</p>
+                <p className="font-heading font-bold text-2xl text-tennis">{user.tennis_rating || 3.0}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-tennis mt-0.5">Tennis</p>
               </div>
               <div className="text-center min-w-[48px]">
-                <p className="font-heading font-black text-2xl text-cricket">{user.cricket_rating || 50}</p>
+                <p className="font-heading font-bold text-2xl text-cricket">{user.cricket_rating || 50}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-cricket mt-0.5">Cricket</p>
               </div>
               <div className="text-center min-w-[48px]">
-                <p className="font-heading font-black text-2xl text-pickleball">{user.pickleball_rating || 3.0}</p>
+                <p className="font-heading font-bold text-2xl text-pickleball">{user.pickleball_rating || 3.0}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-pickleball mt-0.5">Pickleball</p>
               </div>
             </div>
@@ -344,14 +344,14 @@ export default function PlayerDashboard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#111827", bg: "#FFFFFF",   border: "#E5E7EB" },
+            { label: "Leagues",       value: leagues.length, icon: Trophy,   color: "#1D1D1F", bg: "#FFFFFF",   border: "#E5E7EB" },
             { label: "Wins",          value: wins,           icon: Award,    color: "#7C2D12", bg: "#FFEDD5",   border: "#E5A885" },
             { label: "Losses",        value: losses,         icon: TrendingUp, color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
             { label: "Total Matches", value: matches.length, icon: Calendar, color: "#374151", bg: "#F3F4F6",   border: "#E5E7EB" },
           ].map((s) => (
             <div key={s.label} className="rounded-3xl p-5" style={{ background: s.bg, border: `1px solid ${s.border}` }} data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}>
               <s.icon className="w-5 h-5 mb-3" style={{ color: s.color }} />
-              <p className="font-heading font-black text-3xl" style={{ color: s.color }}>{s.value}</p>
+              <p className="font-heading font-bold text-3xl" style={{ color: s.color }}>{s.value}</p>
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>{s.label}</p>
             </div>
           ))}
@@ -361,7 +361,7 @@ export default function PlayerDashboard() {
         {nextStep && (
           <div className="rounded-3xl p-5 mb-6 flex items-center justify-between gap-4" style={{ background: nextStep.bg, border: `1px solid ${nextStep.border}` }} data-testid="next-step-card">
             <div>
-              <p className="font-heading font-bold text-sm" style={{ color: "#111827" }}>{nextStep.title}</p>
+              <p className="font-heading font-bold text-sm" style={{ color: "#1D1D1F" }}>{nextStep.title}</p>
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{nextStep.body}</p>
             </div>
             {nextStep.href.startsWith("#") ? (
@@ -389,12 +389,12 @@ export default function PlayerDashboard() {
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3" style={{ color: "#111827" }}>Pending Doubles Invites</h2>
+            <h2 className="text-lg font-semibold mb-3" style={{ color: "#1D1D1F" }}>Pending Doubles Invites</h2>
             <div className="space-y-2">
               {pendingInvites.map((invite) => (
                 <div key={invite.token} className="rounded-md p-4 bg-white flex items-center justify-between" style={{ border: "1px solid #E5E7EB" }}>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: "#111827" }}>{invite.league_name}</p>
+                    <p className="text-sm font-medium" style={{ color: "#1D1D1F" }}>{invite.league_name}</p>
                     <p className="text-xs" style={{ color: "#6B7280" }}>
                       Invited {invite.partner_email} · expires {new Date(invite.expires_at).toLocaleDateString()}
                     </p>
@@ -432,7 +432,7 @@ export default function PlayerDashboard() {
           {/* My Leagues */}
           <div id="leagues" className="bg-white rounded-3xl overflow-hidden scroll-mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex justify-between items-center" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>My Leagues</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>My Leagues</h2>
               <Link to="/join" className="text-xs font-semibold" style={{ color: "#C2410C" }}>Find a League</Link>
             </div>
             {leagues.length === 0 ? (
@@ -452,7 +452,7 @@ export default function PlayerDashboard() {
                     <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
                       <span className="text-lg">{sc.icon || "🏆"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#111827" }}>
+                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1F" }}>
                           {l.name}
                           {l.division_label && (
                             <span className="ml-2 text-xs font-medium" style={{ color: "#C2410C" }}>
@@ -476,7 +476,7 @@ export default function PlayerDashboard() {
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded-full" style={
                         l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
-                        : l.status === "active" ? { background: "#EDF7F3", color: "#111827" }
+                        : l.status === "active" ? { background: "#EDF7F3", color: "#1D1D1F" }
                         : { background: "#F3F4F6", color: "#6B7280" }
                       }>
                         {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
@@ -495,7 +495,7 @@ export default function PlayerDashboard() {
           {ladderEntries.length > 0 && (
             <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
               <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Ladder Rankings</h2>
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Ladder Rankings</h2>
               </div>
               <div className="p-5 space-y-3">
                 {ladderEntries.map((entry) => (
@@ -507,7 +507,7 @@ export default function PlayerDashboard() {
                     onClick={() => navigate(`/ladders/${entry.ladder_id}`)}
                   >
                     <div>
-                      <p className="font-semibold" style={{ color: "#111827" }}>
+                      <p className="font-semibold" style={{ color: "#1D1D1F" }}>
                         {entry.city} · {entry.division_label} {entry.sport.charAt(0).toUpperCase() + entry.sport.slice(1)}
                       </p>
                       <p className="text-sm" style={{ color: "#6B7280" }}>Rank #{entry.rank} of {entry.total}</p>
@@ -525,7 +525,7 @@ export default function PlayerDashboard() {
           {/* Schedule a Match */}
           <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Schedule a Match</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Schedule a Match</h2>
             </div>
             <div className="p-5">
               {leagues.length === 0 ? (
@@ -538,7 +538,7 @@ export default function PlayerDashboard() {
                       value={scheduleLeagueId}
                       onChange={(e) => { setScheduleLeagueId(e.target.value); fetchLeaguePlayers(e.target.value); }}
                       className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1F" }}
                       required
                       data-testid="schedule-league-select"
                     >
@@ -562,7 +562,7 @@ export default function PlayerDashboard() {
                       value={schedDate}
                       onChange={(e) => setSchedDate(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                      style={{ border: "1px solid #E5E7EB", color: "#1D1D1F" }}
                       required
                       data-testid="schedule-date-input"
                     />
@@ -583,7 +583,7 @@ export default function PlayerDashboard() {
           {/* Upcoming Matches */}
           <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Upcoming Matches ({upcoming.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Upcoming Matches ({upcoming.length})</h2>
             </div>
             {upcoming.length === 0 ? (
               <div className="text-center py-10">
@@ -595,7 +595,7 @@ export default function PlayerDashboard() {
                   <div key={m.id} className="px-5 py-4">
                     <div className="flex justify-between items-start gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#111827" }}>{m.player1_name} vs {m.player2_name}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: "#1D1D1F" }}>{m.player1_name} vs {m.player2_name}</p>
                         <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#6B7280" }}>
                           <Clock className="w-3 h-3" /> {new Date(m.scheduled_date).toLocaleString()}
                         </p>
@@ -619,8 +619,8 @@ export default function PlayerDashboard() {
           {followFeed.length > 0 && (
             <div className="bg-white rounded-3xl overflow-hidden mb-6" style={{ border: "1px solid #E5E7EB" }}>
               <div className="p-5 flex items-center gap-2" style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <Users className="w-4 h-4" style={{ color: "#111827" }} />
-                <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>People You Follow</h2>
+                <Users className="w-4 h-4" style={{ color: "#1D1D1F" }} />
+                <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>People You Follow</h2>
               </div>
               <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                 {followFeed.map((m, i) => {
@@ -643,7 +643,7 @@ export default function PlayerDashboard() {
           {/* Recent Results */}
           <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Recent Results ({recent.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Recent Results ({recent.length})</h2>
             </div>
             {recent.length === 0 ? (
               <div className="text-center py-10 text-sm" style={{ color: "#6B7280" }}>No completed matches yet</div>
@@ -661,14 +661,14 @@ export default function PlayerDashboard() {
                           {isWin ? "W" : "L"}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate" style={{ color: "#111827" }}>{m.player1_name} vs {m.player2_name}</p>
+                          <p className="text-sm font-medium truncate" style={{ color: "#1D1D1F" }}>{m.player1_name} vs {m.player2_name}</p>
                           {m.winner_name && <p className="text-xs" style={{ color: "#6B7280" }}>{m.winner_name} won</p>}
                         </div>
                         {m.winner_name && (
                           <button
                             onClick={() => setShareOpenId(isShareOpen ? null : m.id)}
                             className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex-shrink-0"
-                            style={{ color: "#111827", background: "#EDF7F3" }}
+                            style={{ color: "#1D1D1F", background: "#EDF7F3" }}
                             data-testid={`share-match-${m.id}`}
                           >
                             <Share2 className="w-3.5 h-3.5" /> Share
@@ -709,7 +709,7 @@ export default function PlayerDashboard() {
         {interests.length > 0 && (
           <div className="bg-white rounded-3xl overflow-hidden mt-6" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-4" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-sm" style={{ color: "#111827" }}>Notification Subscriptions</h2>
+              <h2 className="font-heading font-bold text-sm" style={{ color: "#1D1D1F" }}>Notification Subscriptions</h2>
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>You'll be notified when these leagues open</p>
             </div>
             <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>

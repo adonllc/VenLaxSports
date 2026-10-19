@@ -49,7 +49,7 @@ export default function HowItWorks() {
               The Process
             </p>
             <h2
-              className="font-heading font-black leading-[0.9] tracking-tight mb-6 uppercase"
+              className="font-heading font-bold leading-[0.9] tracking-tight mb-6 uppercase"
               style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", color: "var(--vl-text)" }}
             >
               Six moves.<br />
@@ -79,7 +79,7 @@ export default function HowItWorks() {
                 data-testid={`how-step-${s.n}`}
               >
                 <span
-                  className="font-heading font-black flex-shrink-0 leading-none mt-0.5 select-none transition-colors duration-200"
+                  className="font-heading font-bold flex-shrink-0 leading-none mt-0.5 select-none transition-colors duration-200"
                   style={{
                     fontSize: "2rem",
                     width: "2.5rem",

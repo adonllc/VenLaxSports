@@ -118,7 +118,7 @@ export default function RoundRobinDetail() {
                 <span className="text-xs border border-emerald-500 text-emerald-600 rounded px-1.5 py-0.5 font-medium">Round Robin</span>
                 <span className="text-xs text-gray-500">{league.sport?.toUpperCase()}</span>
               </div>
-              <h1 className="text-2xl font-black text-heading-dark">{league.name}</h1>
+              <h1 className="text-2xl font-bold text-heading-dark">{league.name}</h1>
               <p className="text-gray-500 mt-1">{league.city} · {isDoubles ? "Doubles" : "Singles"}</p>
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
                 <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>

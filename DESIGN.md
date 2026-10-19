@@ -215,6 +215,7 @@
 | 2026-06-02 | Grid-break hero + disciplined sections | Hero asymmetry creates visual surprise (stat card overlaps grid). Sections snap to grid for predictability. Balances visual interest + usability. |
 | 2026-10-19 | Produck-style redesign | User-supplied reference. Cabinet Grotesk + Hanken Grotesk replace Sora + IBM Plex Sans; Plex Mono kept for data. Dark footer, photo panels, 24px radius, pill CTAs. Emerald/orange kept. Overrides earlier light-only / no-gradient / no-photo rules (see Anti-patterns). |
 | 2026-10-19 | Logo wordmark refresh | `<Logo />` wordmark is Archivo expanded black (900, 112% width): VEN emerald #047857 (same as primary buttons), LAX orange #EA580C, SPORTS in Montserrat 800 wide-spaced beneath (near-black on light, white on dark via `variant="onDark"`). Gold ticks dropped. The three-ring Nexus icon is unchanged. Reference style supplied by user. |
+| 2026-10-19 | Apple-style, full-white redesign | User asked for apple.com as the reference for every page. Replaces the Produck look: white/`#F5F5F7` only, SF system type at weight 600, text-only hero headers, light footer, emerald pills + chevron text links. Cabinet Grotesk / Hanken removed. |
 | 2026-09-03 | Typography production pass | Applied Sora (headings: font-black, text-3xl–6xl) + IBM Plex Sans (body) throughout all redesigned pages. Removed Outfit + mixed fonts. Consistent `fontFamily` style props on all text elements. |
 | 2026-09-03 | Color strategy: restrained + sport-specific | Primary emerald (#10B981) + orange accent (#F97316) as main palette. Sport-specific colors (tennis=emerald, cricket=blue, pickleball=orange) used strategically on top bars, badges, buttons, CTAs. Emerald for success states, orange for secondary actions. |
 | 2026-09-03 | Spacing rhythm via varied gaps | Implemented 16–20px section gaps, 8–12px internal grouping, 24–32px between major blocks. Removed uniform padding everywhere. Rhythm created through proximity: tight grouping (related items), generous separation (distinct sections). |
@@ -230,7 +231,17 @@
 ❌ system-ui font as primary body  
 ❌ Over-animating (every interaction shouldn't move; respect reduced motion)  
 
-## Produck-style Layout System (2026-10-19)
+## Apple-style Layout System (2026-10-19) — CURRENT, supersedes Produck
+Reference: https://www.apple.com (full white). Direction from the user: "change entire all pages reference like apple.com, full white look".
+- **Backgrounds:** page `#FFFFFF`; alternating sections / tiles `#F5F5F7`. No dark surfaces (footer is light `#F5F5F7`). Modal scrims excepted.
+- **Type:** system SF stack (`-apple-system, 'SF Pro Display'/'SF Pro Text', Inter` fallback). Headings weight 600, tracking -0.025 to -0.035em, large and centered (marketing 56-88px). Body ink `#1D1D1F`, secondary `#6E6E73`. IBM Plex Mono stays for data. Logo wordmark keeps Archivo/Montserrat.
+- **Hero:** eyebrow in orange `#C2410C`, giant centered headline, grey subhead, one emerald pill CTA + text links with a chevron ("Explore Tennis >"). Photo sits below the text in a `rounded-[28px]` block, no text on photos.
+- **Tiles:** `#F5F5F7`, `rounded-[28px]`, no border, no shadow; big semibold title + grey body.
+- **Buttons:** primary = emerald `#047857` (hover `#065F46`) pill. Secondary = emerald text link with chevron.
+- **Components:** `PageHero` is a text-only centered header; `SportHero` = centered text + photo + light founding-members tile; `PhotoSlot` used with `overlay={false}`.
+- **Accessibility:** keyboard focus ring `#047857` on inputs (global `:focus-visible` rule), no zoom lock.
+
+## Produck-style Layout System (2026-10-19) — SUPERSEDED by Apple-style above
 Reference: https://produck.framer.website/ (premium product landing). Adopted pieces:
 - **Page background** `#FAFAFA`; white cards, 1px `#E5E7EB` border, **24px radius** (`rounded-3xl`) on large cards and photo blocks.
 - **Hero:** inset rounded photo panel (max 1320px), glass pill label, 72px display heading, pill CTAs.

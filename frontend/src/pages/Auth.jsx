@@ -227,17 +227,17 @@ export default function Auth() {
       <div className="hidden lg:flex lg:w-1/2 items-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
         <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#10B981" }} />
         <div className="max-w-md">
-          <h1 className="font-black text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
+          <h1 className="font-bold text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#047857" }}>COMPETE.</span>
           </h1>
 
-          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "'Hanken Grotesk', sans-serif", color: "#4B5563" }}>
+          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", color: "#6E6E73" }}>
             Your sport. Your stats. Your legacy.
           </p>
 
           <div className="flex gap-6">
             {activeSports.map((s) => (
-              <div key={s.id} className="text-sm font-medium" style={{ color: "#4B5563" }}>{s.icon} {s.label}</div>
+              <div key={s.id} className="text-sm font-medium" style={{ color: "#6E6E73" }}>{s.icon} {s.label}</div>
             ))}
           </div>
         </div>
@@ -248,10 +248,10 @@ export default function Auth() {
         <div className="w-full max-w-md">
         {twoFA ? (
           <div data-testid="two-fa-panel">
-            <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#111827" }}>
+            <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: "#1D1D1F" }}>
               {backupCodes ? "Save your backup codes" : twoFA.needsSetup ? "Set up two-factor authentication" : "Enter your 2FA code"}
             </h1>
-            <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+            <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
               {backupCodes
                 ? "Store these somewhere safe. Each code works once if you lose access to your authenticator app."
                 : twoFA.needsSetup
@@ -263,13 +263,13 @@ export default function Auth() {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-2 bg-gray-50 border border-gray-200 rounded-xl p-4 font-mono text-sm">
                   {backupCodes.map((c) => (
-                    <div key={c} className="text-center py-1" style={{ color: "#111827" }}>{c}</div>
+                    <div key={c} className="text-center py-1" style={{ color: "#1D1D1F" }}>{c}</div>
                   ))}
                 </div>
                 <button
                   onClick={() => navigator.clipboard.writeText(backupCodes.join("\n"))}
                   className="w-full py-2.5 border rounded-xl text-sm font-semibold"
-                  style={{ borderColor: "#E5E7EB", color: "#111827" }}
+                  style={{ borderColor: "#E5E7EB", color: "#1D1D1F" }}
                   data-testid="copy-backup-codes-btn"
                 >
                   Copy codes
@@ -339,7 +339,7 @@ export default function Auth() {
             <button
               onClick={() => { setMode("login"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
+              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#1D1D1F" } : { color: "#6B7280" }}
               data-testid="login-tab"
             >
               Log In
@@ -347,17 +347,17 @@ export default function Auth() {
             <button
               onClick={() => { setMode("register"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#111827" } : { color: "#6B7280" }}
+              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#1D1D1F" } : { color: "#6B7280" }}
               data-testid="register-tab"
             >
               Sign Up
             </button>
           </div>
 
-          <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#111827" }}>
+          <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: "#1D1D1F" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
-          <p className="text-sm mb-8" style={{ fontFamily: "'Hanken Grotesk', sans-serif", color: "#6B7280" }}>
+          <p className="text-sm mb-8" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", color: "#6B7280" }}>
             {mode === "login" ? `Log in to your ${BRAND.name} account.` : "Set up your account to join a league."}
           </p>
 
@@ -402,7 +402,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label htmlFor="input-name" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Full Name *</label>
+                <label htmlFor="input-name" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Full Name *</label>
                 <input
                   id="input-name"
                   type="text"
@@ -412,9 +412,9 @@ export default function Auth() {
                   className="w-full px-4 py-3 rounded-lg text-sm transition-colors"
                   style={{
                     border: "1px solid #E5E7EB",
-                    color: "#111827",
+                    color: "#1D1D1F",
                     background: "white",
-                    fontFamily: "'Hanken Grotesk', sans-serif"
+                    fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif"
                   }}
                   onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
                   onBlur={e => e.currentTarget.style.outline = "none"}
@@ -426,7 +426,7 @@ export default function Auth() {
             )}
 
             <div>
-              <label htmlFor="input-email" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Email Address *</label>
+              <label htmlFor="input-email" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Email Address *</label>
               <input
                 id="input-email"
                 type="email"
@@ -437,8 +437,8 @@ export default function Auth() {
                 style={{
                   border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB",
                   background: mode === "register" && emailExists ? "#FFFBEB" : "white",
-                  color: "#111827",
-                  fontFamily: "'Hanken Grotesk', sans-serif"
+                  color: "#1D1D1F",
+                  fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif"
                 }}
                 onFocus={e => e.currentTarget.style.outline = mode === "register" && emailExists ? "2px solid #F59E0B" : "2px solid #10B981"}
                 onBlur={e => e.currentTarget.style.outline = "none"}
@@ -462,7 +462,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "'Hanken Grotesk', sans-serif" }}>Password *</label>
+              <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Password *</label>
               <div className="relative">
                 <input
                   id="input-password"
@@ -473,9 +473,9 @@ export default function Auth() {
                   className="w-full px-4 py-3 pr-12 rounded-lg text-sm transition-colors"
                   style={{
                     border: "1px solid #E5E7EB",
-                    color: "#111827",
+                    color: "#1D1D1F",
                     background: "white",
-                    fontFamily: "'Hanken Grotesk', sans-serif"
+                    fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif"
                   }}
                   onFocus={e => e.currentTarget.style.outline = "2px solid #10B981"}
                   onBlur={e => e.currentTarget.style.outline = "none"}
@@ -515,7 +515,7 @@ export default function Auth() {
                   <select
                     value={form.country}
                     onChange={update("country")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-country"
                   >
                     {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -528,7 +528,7 @@ export default function Auth() {
                     value={form.city}
                     onChange={update("city")}
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-city"
                     autoComplete="address-level2"
                   />
@@ -538,7 +538,7 @@ export default function Auth() {
                   <select
                     value={form.skill_level}
                     onChange={update("skill_level")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-skill-level"
                   >
                     <option value="">Select your USTA/USAPA level</option>
@@ -562,7 +562,7 @@ export default function Auth() {
                     value={form.date_of_birth}
                     onChange={update("date_of_birth")}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-dob"
@@ -578,7 +578,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_name")}
                     placeholder="e.g. Parent's name"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-name"
@@ -593,7 +593,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_phone")}
                     placeholder="e.g. +1-555-0123"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-phone"
@@ -608,7 +608,7 @@ export default function Auth() {
                     onChange={update("medical_conditions")}
                     placeholder="e.g. Asthma, allergies (confidential)"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#111827", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1F", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #04785733"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-medical-conditions"

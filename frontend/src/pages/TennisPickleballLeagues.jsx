@@ -36,8 +36,8 @@ const JSON_LD = {
 
 const H2 = ({ children }) => (
   <h2
-    className="font-black text-2xl sm:text-3xl mt-14 mb-4"
-    style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+    className="font-bold text-2xl sm:text-3xl mt-14 mb-4"
+    style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
   >
     {children}
   </h2>
@@ -46,7 +46,7 @@ const H2 = ({ children }) => (
 const H3 = ({ children }) => (
   <h3
     className="font-bold text-lg mt-6 mb-2"
-    style={{ color: "#1F2937", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+    style={{ color: "#1F2937", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
   >
     {children}
   </h3>
@@ -67,13 +67,13 @@ export default function TennisPickleballLeagues() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <p
             className="text-xs font-bold uppercase tracking-[0.14em] mb-2"
-            style={{ color: "#EA580C", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+            style={{ color: "#EA580C", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
           >
             Guide
           </p>
           <h1
-            className="font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-4"
-            style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+            className="font-bold text-2xl sm:text-3xl md:text-4xl leading-tight mb-4"
+            style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
           >
             Tennis &amp; Pickleball Leagues Near You: How They Work, What They Cost, and How to Pick One
           </h1>
@@ -201,7 +201,7 @@ export default function TennisPickleballLeagues() {
           className="rounded-lg p-6 mt-10 mb-4"
           style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}
         >
-          <p className="font-bold mb-2" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+          <p className="font-bold mb-2" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
             Ready to find your division?
           </p>
           <p className="mb-4">

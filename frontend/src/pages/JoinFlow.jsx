@@ -108,7 +108,7 @@ export default function JoinFlow() {
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 mb-1">Find your league</p>
-          <h1 className="font-heading font-black text-3xl text-heading-dark">Let's get you competing</h1>
+          <h1 className="font-heading font-bold text-3xl text-heading-dark">Let's get you competing</h1>
         </div>
 
         <ProgressBar step={step} />

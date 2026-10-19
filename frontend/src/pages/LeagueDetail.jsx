@@ -330,9 +330,9 @@ export default function LeagueDetail() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <div className="text-6xl mb-4">⚠</div>
-          <h1 className="font-black text-2xl mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
-          <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>{networkError}</p>
-          <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#047857", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="error-back-to-leagues">
+          <h1 className="font-bold text-2xl mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
+          <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>{networkError}</p>
+          <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#047857", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }} data-testid="error-back-to-leagues">
             Back to Leagues
           </button>
         </div>
@@ -361,7 +361,7 @@ export default function LeagueDetail() {
       {/* Header Banner */}
       <div className={`${headerBg}`} style={{ borderBottom: "1px solid #E5E7EB" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-6 transition-colors font-medium" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="back-to-leagues">
+          <button onClick={() => navigate("/leagues")} className="flex items-center gap-1.5 text-sm mb-6 transition-colors font-medium" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }} data-testid="back-to-leagues">
             <ArrowLeft className="w-4 h-4" /> Back to Leagues
           </button>
 
@@ -369,20 +369,20 @@ export default function LeagueDetail() {
             {/* Title section */}
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                   {config.icon} {config.label}
                 </span>
-                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#111827", fontFamily: "'Hanken Grotesk', sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
                 {isRegistered && (
-                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#10B981", color: "white", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="registered-pill">
+                  <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#10B981", color: "white", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }} data-testid="registered-pill">
                     <CheckCircle className="w-3.5 h-3.5" /> Registered
                   </span>
                 )}
               </div>
-              <h1 className="font-black text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
-              <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+              <h1 className="font-bold text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", color: config.accent || "#10B981" }}>{league.name}</h1>
+              <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
                 <span className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /> {league.current_players || 0}/{league.max_players} players</span>
@@ -393,7 +393,7 @@ export default function LeagueDetail() {
             {(league.division_label || league.format === "mixed_doubles") && (
               <div className="flex flex-wrap items-center gap-3">
                 {league.division_label && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#111827", border: "1px solid #E5E7EB", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#1D1D1F", border: "1px solid #E5E7EB", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
                     {league.division_label}
                     {league.division_ntrp_min && (
                       <span className="ml-1.5 font-normal" style={{ color: "#6B7280" }}>
@@ -403,7 +403,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
                 {league.format === "mixed_doubles" && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#111827", border: "1px solid #D1F5EC", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#1D1D1F", border: "1px solid #D1F5EC", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                     Mixed Doubles
                   </span>
                 )}
@@ -415,14 +415,14 @@ export default function LeagueDetail() {
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="font-semibold text-base" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Season Completed</p>
-                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
+                  <p className="font-semibold text-base" style={{ color: "#1D1D1F", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Season Completed</p>
+                  <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
                 </div>
               ) : (
                 <>
                   {/* Spots bar */}
                   <div className="mb-6">
-                    <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                    <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                       <span style={{ color: "#374151", fontWeight: 500 }}>{spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} remaining</span>
                       <span style={{ color: "#6B7280" }}>{fillPct}% full</span>
                     </div>
@@ -487,7 +487,7 @@ export default function LeagueDetail() {
                                 onClick={handleDoublesJoin}
                                 disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
                                 className="w-full text-white rounded-lg py-3 text-sm font-medium disabled:opacity-50 transition-all hover:shadow-md"
-                                style={{ background: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif" }}
+                                style={{ background: config.accent || "#10B981", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
@@ -555,14 +555,14 @@ export default function LeagueDetail() {
                                   value={promoCode}
                                   onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
                                   placeholder="Promo code"
-                                  className="flex-1 px-3 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono bg-white" style={{ border: "1px solid #E5E7EB", color: "#111827" }}
+                                  className="flex-1 px-3 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono bg-white" style={{ border: "1px solid #E5E7EB", color: "#1D1D1F" }}
                                   data-testid="promo-code-input"
                                 />
                                 <button
                                   onClick={validatePromo}
                                   disabled={promoLoading || !promoCode.trim()}
                                   className="px-4 py-2 text-xs font-semibold text-white rounded-lg disabled:opacity-50 transition-colors"
-                                  style={{ background: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif" }}
+                                  style={{ background: config.accent || "#10B981", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                                   data-testid="apply-promo-btn"
                                 >
                                   {promoLoading ? "..." : "Apply"}
@@ -582,7 +582,7 @@ export default function LeagueDetail() {
                             onClick={handleJoin}
                             disabled={joining || spotsLeft <= 0 || !waiverAccepted}
                             className="w-full py-3 text-white font-bold rounded-lg transition-all text-sm disabled:opacity-60 hover:shadow-xl hover:scale-105 hover:-translate-y-1"
-                            style={{ background: config.accent === "#F97316" ? "#EA580C" : config.accent === "#2563EB" ? "#1D4ED8" : "#047857", fontFamily: "'Hanken Grotesk', sans-serif" }}
+                            style={{ background: config.accent === "#F97316" ? "#EA580C" : config.accent === "#2563EB" ? "#1D4ED8" : "#047857", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                             data-testid="join-league-btn"
                           >
                             {joining ? "Processing..." : spotsLeft <= 0 ? "League Full" : (promoResult && promoResult.final_fee === 0) ? "Join Free" : isFree ? "Join Free" : "Register Now"}
@@ -595,7 +595,7 @@ export default function LeagueDetail() {
                   {isRegistered && (
                     <div className="rounded-xl px-4 py-4 text-center" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }} data-testid="registered-badge">
                       <CheckCircle className="w-6 h-6 mx-auto mb-1.5" style={{ color: "#C2410C" }} />
-                      <p className="font-bold text-sm" style={{ color: "#111827" }}>You're registered</p>
+                      <p className="font-bold text-sm" style={{ color: "#1D1D1F" }}>You're registered</p>
                       <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Check your email for details.</p>
                     </div>
                   )}
@@ -615,7 +615,7 @@ export default function LeagueDetail() {
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className="px-5 py-4 text-sm font-bold border-b-3 transition-all whitespace-nowrap hover:bg-gray-50"
-                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}
+                style={tab === t.id ? { borderBottomColor: config.accent || "#10B981", color: config.accent || "#10B981", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", fontWeight: 800 } : { borderBottomColor: "transparent", color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                 data-testid={`tab-${t.id}`}
                 aria-label={`View ${t.label}`}
                 aria-selected={tab === t.id}
@@ -633,7 +633,7 @@ export default function LeagueDetail() {
         {tab === "overview" && (
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-3xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#111827" }}>League Details</h3>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#1D1D1F" }}>League Details</h3>
               <dl className="space-y-3">
                 {[
                   ["Sport", `${config.icon} ${config.label}`],
@@ -644,13 +644,13 @@ export default function LeagueDetail() {
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">
                     <dt className="text-sm" style={{ color: "#6B7280" }}>{k}</dt>
-                    <dd className="text-sm font-medium text-right" style={{ color: "#111827" }}>{v}</dd>
+                    <dd className="text-sm font-medium text-right" style={{ color: "#1D1D1F" }}>{v}</dd>
                   </div>
                 ))}
               </dl>
             </div>
             <div className="bg-white rounded-3xl p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#111827" }}>About This League</h3>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#1D1D1F" }}>About This League</h3>
               <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{league.description || "No description provided."}</p>
               {league.rules && (
                 <div className="mt-4 p-3 rounded-xl" style={{ background: "#FFFFFF" }}>
@@ -678,7 +678,7 @@ export default function LeagueDetail() {
         {tab === "matches" && (
           <div className="bg-white rounded-3xl overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-heading font-bold text-lg" style={{ color: "#111827" }}>Matches ({matches.length})</h3>
+              <h3 className="font-heading font-bold text-lg" style={{ color: "#1D1D1F" }}>Matches ({matches.length})</h3>
               {user && (
                 <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#047857", border: "1px solid #047857" }} data-testid="schedule-match-link">
                   Schedule Match
@@ -692,14 +692,14 @@ export default function LeagueDetail() {
                 {matches.map((m) => (
                   <div key={m.id} className="flex items-center justify-between px-5 py-4 gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate" style={{ color: "#111827" }}>{m.player1_name} vs {m.player2_name}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "#1D1D1F" }}>{m.player1_name} vs {m.player2_name}</p>
                       <p className="text-xs" style={{ color: "#6B7280" }}>{m.scheduled_date}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {m.status === "completed" && m.winner_name && (
                         <span className="text-xs font-medium" style={{ color: "#C2410C" }}>{m.winner_name} won</span>
                       )}
-                      <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F3F4F6", color: "#6B7280" } : m.status === "scheduled" ? { background: "#EDF7F3", color: "#111827" } : { background: "#F3F4F6", color: "#6B7280" }}>
+                      <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F3F4F6", color: "#6B7280" } : m.status === "scheduled" ? { background: "#EDF7F3", color: "#1D1D1F" } : { background: "#F3F4F6", color: "#6B7280" }}>
                         {m.status}
                       </span>
                       {user && m.status === "scheduled" && (user._id === m.player1_id || user.id === m.player1_id || user._id === m.player2_id || user.id === m.player2_id) && (
@@ -739,14 +739,14 @@ export default function LeagueDetail() {
                     {standings.map((s, i) => (
                       <tr key={i} style={i === 0 ? { background: "#FFFFFF" } : {}}>
                         <td className="px-5 py-3 font-heading font-bold" style={{ color: "#E5E7EB" }}>{i + 1}</td>
-                        <td className="px-5 py-3 font-medium" style={{ color: "#111827" }}>
+                        <td className="px-5 py-3 font-medium" style={{ color: "#1D1D1F" }}>
                           {i === 0 && <Trophy className="inline w-3.5 h-3.5 mr-1" style={{ color: "#C2410C" }} />}
                           {s.player_name}
                         </td>
                         <td className="px-3 py-3 text-center font-semibold" style={{ color: "#C2410C" }}>{s.wins}</td>
                         <td className="px-3 py-3 text-center text-red-600">{s.losses}</td>
                         <td className="px-3 py-3 text-center" style={{ color: "#6B7280" }}>{s.matches_played}</td>
-                        <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#111827" }}>{s.points}</td>
+                        <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#1D1D1F" }}>{s.points}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -758,7 +758,7 @@ export default function LeagueDetail() {
 
         {league?.league_type === "box_league" && boxStandings && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: "#111827" }}>Box Standings</h3>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: "#1D1D1F" }}>Box Standings</h3>
             {/* Box tab pills */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {boxStandings.boxes.map((box) => (
@@ -796,7 +796,7 @@ export default function LeagueDetail() {
                       return (
                         <tr key={p.player_id} style={isPromote ? { background: "#FFEDD5" } : isRelegate ? { background: "#FEF2F2" } : {}}>
                           <td className="px-4 py-3 font-semibold" style={{ color: "#6B7280" }}>#{p.rank}</td>
-                          <td className="px-4 py-3 font-medium" style={{ color: "#111827" }}>{p.name}</td>
+                          <td className="px-4 py-3 font-medium" style={{ color: "#1D1D1F" }}>{p.name}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.wins}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.losses}</td>
                           <td className="px-4 py-3 text-right">

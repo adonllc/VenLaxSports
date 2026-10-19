@@ -19,7 +19,7 @@ export default function Footer() {
     <ContactForm isOpen={contactOpen} onClose={() => setContactOpen(false)} />
     <footer
       className="transition-colors duration-200"
-      style={{ background: "#0B1210" }}
+      style={{ background: "#F5F5F7" }}
       data-testid="footer"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
@@ -28,17 +28,17 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <div className="mb-4">
-              <Logo size="sm" variant="onDark" testId="footer-logo" />
+              <Logo size="sm" variant="default" testId="footer-logo" />
             </div>
-            <p className="text-sm font-semibold leading-relaxed text-white mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+            <p className="text-sm font-semibold leading-relaxed text-[#1D1D1F] mb-2" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-sm text-gray-300 mb-3" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+            <p className="text-sm text-gray-300 mb-3" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
               {platformConfig.footerTagline}
             </p>
             <div className="flex items-center gap-4">
               {activeSports.map((s) => (
-                <span key={s.id} className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                <span key={s.id} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6E6E73]" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
                   <span
                     className="w-2 h-2 rounded-full inline-block"
                     style={{ background: SPORT_DOT[s.id] || "#10B981" }}
@@ -54,7 +54,7 @@ export default function Footer() {
             <div className="grid grid-cols-2 md:inline-grid md:grid-cols-3 gap-8 md:gap-x-16">
               {/* Sports */}
               <div aria-label="Sports navigation">
-                <h3 className="font-black text-xs uppercase tracking-widest mb-4 text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1F]" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Sports
                 </h3>
                 <ul className="space-y-2">
@@ -62,8 +62,8 @@ export default function Footer() {
                     <li key={s.id}>
                       <Link
                         to={`/sport/${s.id}`}
-                        className="text-[13px] text-gray-300 hover:text-white transition-colors"
-                        style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
+                        className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                        style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                       >
                         {s.label}
                       </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
 
               {/* Platform */}
               <div aria-label="Platform navigation">
-                <h3 className="font-black text-xs uppercase tracking-widest mb-4 text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1F]" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Platform
                 </h3>
                 <ul className="space-y-2">
@@ -88,8 +88,8 @@ export default function Footer() {
                     <li key={to}>
                       <Link
                         to={to}
-                        className="text-[13px] text-gray-300 hover:text-white transition-colors"
-                        style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
+                        className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                        style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                       >
                         {label}
                       </Link>
@@ -100,7 +100,7 @@ export default function Footer() {
 
               {/* Legal + Support */}
               <div aria-label="Legal and support navigation">
-                <h3 className="font-black text-xs uppercase tracking-widest mb-4 text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1F]" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Legal
                 </h3>
                 <ul className="space-y-2">
@@ -112,8 +112,8 @@ export default function Footer() {
                     <li key={to}>
                       <Link
                         to={to}
-                        className="text-[13px] text-gray-300 hover:text-white transition-colors"
-                        style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
+                        className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                        style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                       >
                         {label}
                       </Link>
@@ -122,8 +122,8 @@ export default function Footer() {
                   <li>
                     <button
                       onClick={() => setContactOpen(true)}
-                      className="text-[13px] text-gray-300 hover:text-white transition-colors cursor-pointer"
-                      style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
+                      className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] transition-colors cursor-pointer"
+                      style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
                       data-testid="footer-contact-us"
                     >
                       Contact
@@ -136,8 +136,8 @@ export default function Footer() {
         </div>
 
         {/* Featured Cities — Full width, below main content */}
-        <div className="pb-6 border-b border-white/10">
-          <h3 className="font-black text-xs uppercase tracking-widest mb-4 text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+        <div className="pb-6 border-b border-black/10">
+          <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1F]" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
             Browse by City
           </h3>
           <div className="flex flex-wrap gap-5">
@@ -145,8 +145,8 @@ export default function Footer() {
               <Link
                 key={city.name}
                 to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                className="text-[13px] text-gray-300 hover:text-white transition-colors"
-                style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
+                className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
               >
                 {city.icon} {city.name}
               </Link>
@@ -156,7 +156,7 @@ export default function Footer() {
 
         {/* Footer Bottom — Copyright */}
         <div className="pt-5">
-          <p className="text-xs text-gray-400" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+          <p className="text-xs text-[#6E6E73]" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
             © {new Date().getFullYear()} VENLAX Sports. Owned by Cloudy Labs LLC.
           </p>
         </div>

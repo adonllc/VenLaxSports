@@ -127,9 +127,9 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 **Read DESIGN.md before any UI/frontend work.** All typography, colors, spacing, border-radius, motion, and component patterns are defined there. Do not deviate without explicit user approval.
 
 **Key system:**
-- **Typography:** Cabinet Grotesk (headings), Hanken Grotesk (body), IBM Plex Mono (data)
-- **Colors:** emerald primary (buttons `#047857`, hover `#065F46`), orange accent `#C2410C`, page bg `#FAFAFA`, dark footer `#0B1210`
-- **Layout (Produck-style):** 24px card radius (`rounded-3xl`), pill buttons (`rounded-full`), glass pills on photo panels, photos via `PhotoSlot` / `config/photos.js` with dark gradient overlays only
+- **Typography:** SF system stack (`-apple-system`, Inter fallback) at weight 600; IBM Plex Mono (data); logo wordmark Archivo/Montserrat
+- **Colors:** full white `#FFFFFF` + `#F5F5F7` tiles, ink `#1D1D1F`; emerald buttons `#047857` (hover `#065F46`), orange accent `#C2410C`
+- **Layout (Apple-style, full white):** 28px tile radius, pill buttons, centered giant headings, text links with chevrons, no dark surfaces, photos below text (`PhotoSlot`, `overlay={false}`)
 - **Motion:** Minimal. Fade-in on scroll, hover elevate, no playful bounces
 - **Philosophy:** Lead with player progression. Athletic competitive vibe. Serious, not trendy.
 

@@ -111,7 +111,7 @@ export default function Handbook() {
     canonicalPath: "/handbook",
   });
   return (
-    <div style={{ background: "#FAFAFA" }} data-testid="handbook-page">
+    <div style={{ background: "#FFFFFF" }} data-testid="handbook-page">
       <PageHero
         testId="handbook-hero"
         icon={Shield}
@@ -140,7 +140,7 @@ export default function Handbook() {
             <section key={section.id} id={section.id} className="scroll-mt-20">
               <div className="flex items-center gap-3 mb-6">
                 <Icon className={`w-6 h-6 ${section.color}`} />
-                <h2 className="font-heading font-black text-3xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>{section.title}</h2>
+                <h2 className="font-heading font-bold text-3xl text-heading-dark" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>{section.title}</h2>
               </div>
 
               {section.items && (

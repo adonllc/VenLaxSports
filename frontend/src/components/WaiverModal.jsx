@@ -13,7 +13,7 @@ export default function WaiverModal({ isOpen, onAgree, onCancel }) {
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600" />
-            <h2 className="font-heading font-black text-lg text-heading-dark">Liability Waiver</h2>
+            <h2 className="font-heading font-bold text-lg text-heading-dark">Liability Waiver</h2>
           </div>
           <button
             onClick={onCancel}

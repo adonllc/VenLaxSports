@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-    font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: -apple-system, "SF Pro Text", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--vl-bg);
@@ -13,8 +13,9 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Cabinet Grotesk", system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.015em;
+    font-family: -apple-system, "SF Pro Display", Inter, system-ui, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 600;
 }
 
 @layer base {
@@ -41,7 +42,7 @@ h1, h2, h3, h4, h5, h6 {
         --radius: 0.625rem;
 
         /* Landing page color tokens */
-        --vl-bg: #FAFAFA;
+        --vl-bg: #FFFFFF;
         --vl-bg-alt: #F9FAFB;
         --vl-bg-card: #FFFFFF;
         --vl-text: #111827;
@@ -145,3 +146,11 @@ h1, h2, h3, h4, h5, h6 {
 .sport-badge-tennis     { background-color: #D1FAE5; color: #065F46; }
 .sport-badge-cricket    { background-color: #DBEAFE; color: #1E40AF; }
 .sport-badge-pickleball { background-color: #FFEDD5; color: #C2410C; }
+
+/* Keyboard focus safety net: some forms use focus:outline-none without a replacement ring */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #047857 !important;
+    outline-offset: 1px;
+}

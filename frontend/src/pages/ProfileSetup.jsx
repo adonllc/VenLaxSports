@@ -75,7 +75,7 @@ export default function ProfileSetup() {
           {/* Step 0: Sports */}
           {step === 0 && (
             <>
-              <h2 className="font-heading font-black text-2xl text-heading-dark mb-2">Which sports do you play?</h2>
+              <h2 className="font-heading font-bold text-2xl text-heading-dark mb-2">Which sports do you play?</h2>
               <p className="text-sm text-gray-500 mb-6">Select all that apply — you can change this later.</p>
               <div className="space-y-3 mb-8">
                 {activeSports.map((s) => {
@@ -109,7 +109,7 @@ export default function ProfileSetup() {
           {/* Step 1: Skill Level */}
           {step === 1 && (
             <>
-              <h2 className="font-heading font-black text-2xl text-heading-dark mb-2">What's your skill level?</h2>
+              <h2 className="font-heading font-bold text-2xl text-heading-dark mb-2">What's your skill level?</h2>
               <p className="text-sm text-gray-500 mb-6">USTA / USAPA rating. Helps us match you to the right league.</p>
               <div className="grid grid-cols-3 gap-2 mb-8">
                 {SKILL_LEVELS.map((sl) => (
@@ -119,7 +119,7 @@ export default function ProfileSetup() {
                     className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition ${form.skill_level === sl.value ? "border-[#047857] bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}
                     data-testid={`skill-${sl.value}`}
                   >
-                    <span className="font-heading font-black text-lg text-heading-dark">{sl.label}</span>
+                    <span className="font-heading font-bold text-lg text-heading-dark">{sl.label}</span>
                     <span className="text-[10px] text-gray-500 mt-0.5 text-center leading-tight">{sl.desc}</span>
                   </button>
                 ))}
@@ -142,7 +142,7 @@ export default function ProfileSetup() {
           {/* Step 2: Home Court */}
           {step === 2 && (
             <>
-              <h2 className="font-heading font-black text-2xl text-heading-dark mb-2">Where do you usually play?</h2>
+              <h2 className="font-heading font-bold text-2xl text-heading-dark mb-2">Where do you usually play?</h2>
               <p className="text-sm text-gray-500 mb-6">Your preferred facility or court name — helps with match scheduling.</p>
               <div className="space-y-4 mb-8">
                 <div>

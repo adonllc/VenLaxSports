@@ -1,35 +1,27 @@
-import PhotoSlot from "./PhotoSlot";
-
-const HEADING = { fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" };
-
 /**
- * PageHero — inset dark panel header for content pages (legal, handbook, guides).
+ * PageHero — centered, white page header for content pages (legal, handbook, guides).
  * title: ReactNode (use <br /> for line breaks). icon: lucide component (optional).
+ * src/tone are accepted for API compatibility; the Apple-style header is text-only.
  */
-export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src, tone = "ink", testId }) {
+export default function PageHero({ icon: Icon, eyebrow, title, subtitle, testId }) {
   return (
-    <section className="px-4 sm:px-6 pt-4 sm:pt-6" data-testid={testId}>
-      <PhotoSlot src={src} tone={tone} className="max-w-[1200px] mx-auto rounded-3xl">
-        <div className="px-6 sm:px-12 py-14 sm:py-20">
-          {eyebrow && (
-            <span
-              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white mb-6"
-              style={{ background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.28)", backdropFilter: "blur(12px)" }}
-            >
-              {Icon && <Icon className="w-3.5 h-3.5" aria-hidden="true" />}
-              {eyebrow}
-            </span>
-          )}
-          <h1 className="font-extrabold text-4xl sm:text-6xl leading-[1.05] text-white max-w-3xl" style={{ ...HEADING, letterSpacing: "-0.02em" }}>
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="mt-5 text-base sm:text-lg max-w-2xl leading-relaxed" style={{ color: "rgba(255,255,255,0.8)" }}>
-              {subtitle}
-            </p>
-          )}
-        </div>
-      </PhotoSlot>
+    <section className="px-4 sm:px-6 pt-16 md:pt-24 pb-10 md:pb-14 text-center bg-white" data-testid={testId}>
+      <div className="max-w-4xl mx-auto">
+        {eyebrow && (
+          <p className="inline-flex items-center gap-2 text-lg font-semibold mb-3" style={{ color: "#C2410C" }}>
+            {Icon && <Icon className="w-5 h-5" aria-hidden="true" />}
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="font-semibold text-4xl sm:text-6xl md:text-7xl leading-[1.05]" style={{ color: "#1D1D1F", letterSpacing: "-0.035em" }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="mt-5 text-xl md:text-2xl max-w-2xl mx-auto leading-snug" style={{ color: "#6E6E73" }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
     </section>
   );
 }

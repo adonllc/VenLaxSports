@@ -131,15 +131,15 @@ export default function Leagues() {
       {/* Header */}
       <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="font-black text-4xl sm:text-5xl mb-3 text-gray-900" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Browse Leagues</h1>
-          <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>Find competitive leagues across all sports and cities</p>
+          <h1 className="font-bold text-4xl sm:text-5xl mb-3 text-gray-900" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Browse Leagues</h1>
+          <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Find competitive leagues across all sports and cities</p>
         </div>
       </div>
 
       {/* Promo Banner */}
       <div className="sticky top-0 z-10 border-b" style={{ background: "#EA580C", borderColor: "#C2410C" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <p className="text-sm font-semibold text-white" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+          <p className="text-sm font-semibold text-white" style={{ fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
             First league free! Use code <code className="bg-orange-600 px-2 py-0.5 rounded font-mono text-white text-xs">PLAY1FREE</code>
           </p>
         </div>
@@ -157,7 +157,7 @@ export default function Leagues() {
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
               className="w-full pl-10 pr-4 py-3 rounded-lg text-sm border"
-              style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "'Hanken Grotesk', sans-serif" }}
+              style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
               data-testid="filter-search"
             />
           </div>
@@ -167,7 +167,7 @@ export default function Leagues() {
             value={filters.sport}
             onChange={(e) => updateFilter("sport", e.target.value)}
             className="px-4 py-3 rounded-lg text-sm bg-white border focus:outline-none"
-            style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "'Hanken Grotesk', sans-serif", minWidth: "160px" }}
+            style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", minWidth: "160px" }}
             data-testid="filter-sport"
             aria-label="Filter leagues by sport"
           >
@@ -180,7 +180,7 @@ export default function Leagues() {
 
         {/* Secondary Filters — Division + Format toggles */}
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>Skill Level</p>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Skill Level</p>
           <div className="flex flex-wrap gap-2 mb-6">
             {["", "Beginner", "Intermediate", "Advanced", "Competitive"].map((div) => (
               <button
@@ -199,7 +199,7 @@ export default function Leagues() {
             ))}
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>Match Type</p>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>Match Type</p>
           <div className="flex flex-wrap gap-2">
             {[
               { value: "", label: "All Formats", testId: "format-filter-all" },
@@ -226,7 +226,7 @@ export default function Leagues() {
 
         {/* Results count + Clear */}
         <div className="flex items-center justify-between mb-6">
-          <p className="text-sm font-medium" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }} data-testid="leagues-count">
+          <p className="text-sm font-medium" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }} data-testid="leagues-count">
             {loading ? "Loading..." : `${filteredLeagues.length} league${filteredLeagues.length !== 1 ? "s" : ""} found`}
           </p>
           {(filters.sport || filters.city || filters.status || filters.division || filters.format || filters.search) && (
@@ -263,12 +263,12 @@ export default function Leagues() {
         ) : (
           <div className="text-center py-20">
             <Trophy className="w-16 h-16 mx-auto mb-6 opacity-30" />
-            <h3 className="font-black text-2xl mb-3 text-gray-900" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>No leagues found</h3>
-            <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif", maxWidth: "400px", margin: "0 auto" }}>No leagues match your current filters. Try clearing them to see all open leagues.</p>
+            <h3 className="font-bold text-2xl mb-3 text-gray-900" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>No leagues found</h3>
+            <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif", maxWidth: "400px", margin: "0 auto" }}>No leagues match your current filters. Try clearing them to see all open leagues.</p>
             <button
               onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
               className="px-6 py-3 rounded-lg font-semibold transition-all"
-              style={{ background: "#10B981", color: "white", fontFamily: "'Hanken Grotesk', sans-serif" }}
+              style={{ background: "#10B981", color: "white", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
             >
               Clear Filters
             </button>
@@ -314,7 +314,7 @@ function LeagueCard({ league, onClick }) {
                     ? "#DBEAFE"
                     : "#FED7AA",
               color: league.sport === "tennis" ? "#065F46" : league.sport === "cricket" ? "#1E40AF" : "#92400E",
-              fontFamily: "'Hanken Grotesk', sans-serif",
+              fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif",
             }}
           >
             {config.icon} {config.label}
@@ -322,7 +322,7 @@ function LeagueCard({ league, onClick }) {
           {isEnded && (
             <span
               className="text-xs font-semibold px-2 py-1 rounded-md"
-              style={{ background: "#F3F4F6", color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}
+              style={{ background: "#F3F4F6", color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}
             >
               Ended
             </span>
@@ -331,14 +331,14 @@ function LeagueCard({ league, onClick }) {
 
         {/* League name */}
         <h3
-          className="font-black text-xl mb-3 line-clamp-2 leading-snug text-gray-900"
-          style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+          className="font-bold text-xl mb-3 line-clamp-2 leading-snug text-gray-900"
+          style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}
         >
           {league.name}
         </h3>
 
         {/* City + Format */}
-        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
           <div className="flex items-center gap-1.5">
             <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#10B981" }} />
             <span className="font-medium">{league.city}</span>
@@ -353,7 +353,7 @@ function LeagueCard({ league, onClick }) {
 
         {/* Spots available */}
         <div className="mb-4">
-          <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "'Hanken Grotesk', sans-serif" }}>
+          <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif" }}>
             <span>{league.current_players || 0}/{league.max_players} players</span>
             <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>
               {isFull ? "League Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
@@ -375,7 +375,7 @@ function LeagueCard({ league, onClick }) {
 
         {/* Footer: Entry fee + Join button */}
         <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "#F3F4F6" }}>
-          <span className="text-sm font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? "#F97316" : "#10B981", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+          <span className="text-sm font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? "#F97316" : "#10B981", fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>
             {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
           </span>
           <button
@@ -384,7 +384,7 @@ function LeagueCard({ league, onClick }) {
             style={{
               background: isFull ? "#E5E7EB" : "#047857",
               color: isFull ? "#6B7280" : "white",
-              fontFamily: "'Hanken Grotesk', sans-serif",
+              fontFamily: "-apple-system, 'SF Pro Text', Inter, sans-serif",
             }}
             disabled={isFull}
             data-testid={`league-join-${league.id}`}

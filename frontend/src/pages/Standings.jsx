@@ -53,7 +53,7 @@ export default function Standings() {
 
         <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
           <div className="p-8 border-b border-gray-100">
-            <h1 className="font-heading font-black text-4xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Standings</h1>
+            <h1 className="font-heading font-bold text-4xl text-heading-dark" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Standings</h1>
             {league && <p className={`text-sm font-medium mt-1 ${accentClass}`}>{league.name}</p>}
           </div>
 
@@ -95,7 +95,7 @@ export default function Standings() {
                       <td className="px-4 py-4 text-center text-red-500">{s.losses}</td>
                       <td className="px-4 py-4 text-center text-gray-500">{s.draws || 0}</td>
                       <td className="px-4 py-4 text-center text-gray-600">{s.matches_played}</td>
-                      <td className="px-4 py-4 text-center font-heading font-black text-heading-dark text-xl">{s.points}</td>
+                      <td className="px-4 py-4 text-center font-heading font-bold text-heading-dark text-xl">{s.points}</td>
                     </tr>
                   ))}
                 </tbody>

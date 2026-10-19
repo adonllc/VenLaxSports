@@ -219,7 +219,7 @@ export default function ScoreReport() {
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${config.accentClass}`}>
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h2 className="font-heading font-black text-2xl text-heading-dark mb-1">Results Recorded</h2>
+              <h2 className="font-heading font-bold text-2xl text-heading-dark mb-1">Results Recorded</h2>
               <p className={`text-sm font-medium ${config.textClass} mb-6`}>{config.label} Match</p>
               <div className="bg-gray-50 rounded-xl p-4 mb-5 text-left">
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Winner</p>
@@ -251,7 +251,7 @@ export default function ScoreReport() {
           <div className="bg-gray-50 border border-gray-100 rounded-3xl p-6 text-center" data-testid="share-card">
             <p className="text-gray-500 text-xs uppercase tracking-widest mb-3">Share your result</p>
             <div className="text-4xl mb-2">{sportEmoji}</div>
-            <p className="text-heading-dark font-heading font-black text-xl mb-1">
+            <p className="text-heading-dark font-heading font-bold text-xl mb-1">
               {submittedResult.winnerName} won
             </p>
             <p className="text-gray-500 text-sm mb-5">
@@ -342,7 +342,7 @@ export default function ScoreReport() {
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-heading font-black text-2xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Report Match Score</h1>
+                <h1 className="font-heading font-bold text-2xl text-heading-dark" style={{ fontFamily: "-apple-system, 'SF Pro Display', Inter, system-ui, sans-serif" }}>Report Match Score</h1>
                 <p className={`text-sm ${config.textClass}`}>{config.label} Match</p>
               </div>
             </div>

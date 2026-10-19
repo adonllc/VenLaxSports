@@ -55,7 +55,7 @@ export default function RatingHistoryChart({ user, defaultSport = "tennis" }) {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Rating History</p>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="font-heading font-black text-2xl text-heading-dark" data-testid="rating-current">
+            <span className="font-heading font-bold text-2xl text-heading-dark" data-testid="rating-current">
               {currentRating?.toFixed(2)}
             </span>
             {chartData.length > 0 && (

@@ -140,7 +140,7 @@ export default function PublicProfile() {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-heading font-black text-2xl text-heading-dark">{profile.name}</h1>
+                <h1 className="font-heading font-bold text-2xl text-heading-dark">{profile.name}</h1>
                 {profile.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge-public">
                     ★ Founding Member
@@ -170,21 +170,21 @@ export default function PublicProfile() {
           {/* Stats row */}
           <div className="mt-5 flex gap-6">
             <div className="text-center">
-              <p className="text-2xl font-black text-heading-dark">{profile.wins}</p>
+              <p className="text-2xl font-bold text-heading-dark">{profile.wins}</p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Wins</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-black text-heading-dark">{profile.losses}</p>
+              <p className="text-2xl font-bold text-heading-dark">{profile.losses}</p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Losses</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-black text-emerald-600">
+              <p className="text-2xl font-bold text-emerald-600">
                 {profile.tennis_rating?.toFixed(2)}
               </p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Tennis</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-black text-orange-500">
+              <p className="text-2xl font-bold text-orange-500">
                 {profile.pickleball_rating?.toFixed(2)}
               </p>
               <p className="text-xs text-gray-400 uppercase font-medium tracking-wide">Pickleball</p>

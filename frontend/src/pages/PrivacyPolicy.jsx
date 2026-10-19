@@ -113,7 +113,7 @@ export default function PrivacyPolicy() {
       <div className="bg-gray-50 border-b border-gray-200 py-12 px-4">
         <div className="max-w-3xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Legal</p>
-          <h1 className="font-heading font-black text-4xl text-heading-dark">Privacy Policy</h1>
+          <h1 className="font-heading font-bold text-4xl text-heading-dark">Privacy Policy</h1>
           <p className="mt-3 text-gray-600">
             Last updated: May 2026. This policy explains what personal data VENLAX Sports collects,
             how it is used, and your rights under applicable privacy law including the CCPA.

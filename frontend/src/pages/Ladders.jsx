@@ -11,11 +11,11 @@ const RUST = "#C2410C";
 const SAND_PALE = "#FFFFFF";
 const SAND_LIGHT = "#F3F4F6";
 const BORDER = "#E5E7EB";
-const COFFEE = "#111827";
+const COFFEE = "#1D1D1F";
 const MOCHA = "#374151";
 const SIENNA = "#6B7280";
 const SPORT_BADGE = {
-  tennis:     { bg: "#D1FAE5", color: "#111827", border: "#10B981" },
+  tennis:     { bg: "#D1FAE5", color: "#1D1D1F", border: "#10B981" },
   pickleball: { bg: "#FFEDD5", color: "#C2410C", border: "#F97316" },
   cricket:    { bg: "#DBEAFE", color: "#1E40AF", border: "#2563EB" },
 };
@@ -65,7 +65,7 @@ export default function Ladders() {
     <div className="min-h-screen" style={{ background: SAND_PALE }}>
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="font-heading font-black text-3xl" style={{ color: COFFEE }}>Challenge Ladders</h1>
+          <h1 className="font-heading font-bold text-3xl" style={{ color: COFFEE }}>Challenge Ladders</h1>
           <p className="mt-2" style={{ color: MOCHA }}>Always-on ranked play. Challenge anyone above you. No season needed.</p>
         </div>
 

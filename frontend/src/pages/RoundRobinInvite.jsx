@@ -91,7 +91,7 @@ export default function RoundRobinInvite() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
       <div className="max-w-sm w-full bg-white border border-gray-200 rounded-3xl p-8 text-center">
         <div className="text-3xl mb-4">{invite?.sport === "tennis" ? "🎾" : "🏓"}</div>
-        <h1 className="font-black text-heading-dark text-xl mb-1">You're invited!</h1>
+        <h1 className="font-bold text-heading-dark text-xl mb-1">You're invited!</h1>
         <p className="text-gray-500 text-sm mb-6">
           <strong>{invite?.inviter_name}</strong> wants you as their doubles partner
         </p>

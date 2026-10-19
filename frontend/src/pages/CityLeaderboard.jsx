@@ -60,7 +60,7 @@ export default function CityLeaderboard() {
           </p>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="font-heading font-black text-3xl text-heading-dark mb-1">
+              <h1 className="font-heading font-bold text-3xl text-heading-dark mb-1">
                 {city} Leaderboard
               </h1>
               <p className="text-gray-500 text-sm">

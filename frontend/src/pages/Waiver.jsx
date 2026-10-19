@@ -71,7 +71,7 @@ const WAIVER_SECTIONS = [
 
 export default function Waiver() {
   return (
-    <div style={{ background: "#FAFAFA" }} data-testid="waiver-page">
+    <div style={{ background: "#FFFFFF" }} data-testid="waiver-page">
       <PageHero
         testId="waiver-hero"
         icon={AlertTriangle}

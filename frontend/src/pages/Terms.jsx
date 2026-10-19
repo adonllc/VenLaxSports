@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle, FileText, ShieldAlert } from "lucide-react";
 
 export default function Terms() {
   return (
-    <div style={{ background: "#FAFAFA" }} data-testid="terms-page">
+    <div style={{ background: "#FFFFFF" }} data-testid="terms-page">
 
       <PageHero
         testId="terms-hero"
@@ -20,7 +20,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <ShieldAlert className="w-6 h-6 text-red-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Waiver of Liability & Assumption of Risk</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Waiver of Liability & Assumption of Risk</h2>
           </div>
           <div className="bg-red-50 border border-red-200 rounded-3xl p-6 space-y-4">
             <p className="text-sm text-red-900 font-semibold">
@@ -65,7 +65,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <AlertCircle className="w-6 h-6 text-orange-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Emergency Contact & Medical Information</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Emergency Contact & Medical Information</h2>
           </div>
           <div className="space-y-4">
             <div className="bg-orange-50 border border-orange-200 rounded-3xl p-6">
@@ -103,7 +103,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <FileText className="w-6 h-6 text-blue-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Age Requirements & Parental Consent</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Age Requirements & Parental Consent</h2>
           </div>
           <div className="bg-blue-50 border border-blue-200 rounded-3xl p-6 space-y-4">
             <div>
@@ -130,7 +130,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <CheckCircle className="w-6 h-6 text-emerald-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Refund Policy</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Refund Policy</h2>
           </div>
           <div className="space-y-4">
             <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-6">
@@ -171,7 +171,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <AlertCircle className="w-6 h-6 text-orange-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Dispute Resolution & Escalation</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Dispute Resolution & Escalation</h2>
           </div>
           <div className="bg-orange-50 border border-orange-200 rounded-3xl p-6 space-y-4">
             <div>
@@ -209,7 +209,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <AlertCircle className="w-6 h-6 text-amber-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Facility Safety & Home Player Responsibility</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Facility Safety & Home Player Responsibility</h2>
           </div>
           <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 space-y-4">
             <p className="text-sm text-amber-900 font-semibold">
@@ -236,7 +236,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <FileText className="w-6 h-6 text-gray-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Photography & Video Recording</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Photography & Video Recording</h2>
           </div>
           <div className="space-y-4">
             <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6">
@@ -267,7 +267,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <ShieldAlert className="w-6 h-6 text-red-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Indemnification & Insurance</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Indemnification & Insurance</h2>
           </div>
           <div className="bg-red-50 border border-red-200 rounded-3xl p-6 space-y-4 text-sm text-red-900">
             <p className="font-semibold">
@@ -286,7 +286,7 @@ export default function Terms() {
         <section>
           <div className="flex items-center gap-3 mb-4">
             <FileText className="w-6 h-6 text-gray-600" />
-            <h2 className="font-heading font-black text-2xl text-heading-dark">Governing Law & Jurisdiction</h2>
+            <h2 className="font-heading font-bold text-2xl text-heading-dark">Governing Law & Jurisdiction</h2>
           </div>
           <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm text-gray-700 space-y-3">
             <p>
