@@ -17,7 +17,7 @@ function NexusIcon({ size }) {
   );
 }
 
-// Wordmark: VEN (lime) + LAX (orange) in Archivo expanded black, SPORTS wide-spaced beneath
+// Wordmark: VEN (emerald) + LAX (orange) in Archivo expanded black, SPORTS wide-spaced beneath
 function VenlaxWordmark({ size = "md", variant = "default" }) {
   const sizeMap = {
     sm: { fontSize: 26, letterSpacing: -0.5, subtitleFz: 10, subtitleLs: 5 },
@@ -29,9 +29,9 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
 
   const { fontSize, letterSpacing, subtitleFz, subtitleLs } = sizeMap[size] || sizeMap.md;
 
-  // "light"/"hero" = single white mark; "onDark" keeps lime/orange with a white subtitle.
+  // "light"/"hero" = single white mark; "onDark" keeps emerald/orange with a white subtitle.
   const isWhite = variant === "light" || variant === "hero";
-  const venColor = isWhite ? "#FFFFFF" : "#84CC16";
+  const venColor = isWhite ? "#FFFFFF" : "#047857";
   const laxColor = isWhite ? "#FFFFFF" : "#EA580C";
   const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#111827";
 
