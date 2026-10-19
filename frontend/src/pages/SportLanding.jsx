@@ -6,7 +6,7 @@ import { ArrowRight, MapPin, CheckCircle, Bell } from "lucide-react";
 import { isSportActive } from "../config/platformConfig";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
-import VenLaxHero from "../components/VenLaxHero";
+import SportHero from "../components/SportHero";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -105,13 +105,13 @@ export default function SportLanding() {
     <div className="bg-white" style={{ minHeight: "100vh" }} data-testid={`sport-landing-${sport}`}>
 
       {/* Hero */}
-      <VenLaxHero
+      <SportHero
         sportMeta={{ ...meta, id: sport }}
         foundingStats={foundingStats}
         onPrimary={() => navigate(`/leagues?sport=${sport}`)}
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
         {/* Info Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -122,7 +122,7 @@ export default function SportLanding() {
           ].map((item, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl p-6"
+              className="rounded-3xl p-6"
               style={{
                 background: item.isPill ? meta.palePill : "#ffffff",
                 border: `1px solid ${BORDER}`,
@@ -152,7 +152,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-black text-4xl mb-3" style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+          <h2 className="font-heading font-black text-4xl mb-3" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
             About {meta.label} on VENLAX
           </h2>
           <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
@@ -162,7 +162,7 @@ export default function SportLanding() {
         <div className="mb-12">
           <motion.h2
             className="font-heading font-black text-4xl mb-6"
-            style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+            style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -174,7 +174,7 @@ Features
             {meta.features.map((f, i) => (
               <motion.div
                 key={f}
-                className="flex items-center gap-3 rounded-xl p-4"
+                className="flex items-center gap-3 rounded-2xl p-4"
                 style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -194,7 +194,7 @@ Features
         {/* Leagues */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading font-black text-4xl" style={{ color: meta.color, fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+            <h2 className="font-heading font-black text-4xl" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
               Open {meta.label} Leagues
             </h2>
             <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ Features
           {loading ? (
             <div className="grid md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-40 rounded-2xl animate-pulse bg-gray-100" />
+                <div key={i} className="h-40 rounded-3xl animate-pulse bg-gray-100" />
               ))}
             </div>
           ) : leagues.length > 0 ? (
@@ -240,7 +240,7 @@ Features
                 <motion.div
                   key={l.id}
                   onClick={() => navigate(`/leagues/${l.id}`)}
-                  className="rounded-2xl p-6 cursor-pointer transition-all duration-200"
+                  className="rounded-3xl p-6 cursor-pointer transition-all duration-200"
                   style={{ background: "#ffffff", border: `1px solid ${BORDER}` }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
@@ -258,7 +258,7 @@ Features
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
-                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#065F46" }}>{l.name}</h3>
+                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#111827" }}>{l.name}</h3>
                   <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "'Hanken Grotesk', sans-serif" }}>
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#10B981" }} /><span className="font-medium">{l.city}</span>
                   </p>

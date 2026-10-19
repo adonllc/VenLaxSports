@@ -1,4 +1,5 @@
 ﻿import { Link } from "react-router-dom";
+import PageHero from "../components/PageHero";
 import { AlertTriangle, CheckCircle } from "lucide-react";
 
 const WAIVER_SECTIONS = [
@@ -70,23 +71,14 @@ const WAIVER_SECTIONS = [
 
 export default function Waiver() {
   return (
-    <div style={{ background: "#FFFFFF" }} data-testid="waiver-page">
-      {/* Hero */}
-      <section className="py-16 sm:py-20 px-6" style={{ background: "#C2410C" }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
-               style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
-            <AlertTriangle className="w-3.5 h-3.5" />
-            Liability Waiver v1.0
-          </div>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white">
-            Liability Waiver &<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>Participation Agreement</span>
-          </h1>
-          <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
-            Required before registration. Please read all sections carefully.
-          </p>
-        </div>
-      </section>
+    <div style={{ background: "#FAFAFA" }} data-testid="waiver-page">
+      <PageHero
+        testId="waiver-hero"
+        icon={AlertTriangle}
+        eyebrow="Liability Waiver v1.0"
+        title={<>Liability Waiver &amp;<br />Participation Agreement</>}
+        subtitle="Required before registration. Please read all sections carefully."
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 space-y-8">
         {/* Warning banner */}

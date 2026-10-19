@@ -51,7 +51,7 @@ export default function Standings() {
           <ArrowLeft className="w-4 h-4" /> Back to League
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
           <div className="p-8 border-b border-gray-100">
             <h1 className="font-heading font-black text-4xl text-heading-dark" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>Standings</h1>
             {league && <p className={`text-sm font-medium mt-1 ${accentClass}`}>{league.name}</p>}

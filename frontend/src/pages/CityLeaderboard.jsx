@@ -82,7 +82,7 @@ export default function CityLeaderboard() {
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* Top Players */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
             <h2 className="font-heading font-bold text-heading-dark">Top Players</h2>
@@ -94,7 +94,7 @@ export default function CityLeaderboard() {
               </p>
               <Link
                 to="/auth"
-                className="inline-block bg-[#047857] text-white rounded-md px-6 py-2.5 text-sm font-bold hover:bg-[#065F46] transition"
+                className="inline-block bg-[#047857] text-white rounded-full px-6 py-2.5 text-sm font-bold hover:bg-[#065F46] transition"
                 data-testid="city-first-player-cta"
               >
                 Join VenLax Sports
@@ -141,7 +141,7 @@ export default function CityLeaderboard() {
         </div>
 
         {/* Active Leagues */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
             <Users className="w-4 h-4 text-gray-400" />
             <h2 className="font-heading font-bold text-heading-dark">
@@ -215,7 +215,7 @@ export default function CityLeaderboard() {
           </p>
           <Link
             to="/auth"
-            className="inline-block bg-[#047857] text-white rounded-md px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
+            className="inline-block bg-[#047857] text-white rounded-full px-8 py-3 text-sm font-bold hover:bg-[#065F46] transition"
             data-testid="city-join-cta"
           >
             Join Free · VenLax Sports

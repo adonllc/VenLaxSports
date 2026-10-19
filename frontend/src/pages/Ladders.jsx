@@ -15,7 +15,7 @@ const COFFEE = "#111827";
 const MOCHA = "#374151";
 const SIENNA = "#6B7280";
 const SPORT_BADGE = {
-  tennis:     { bg: "#D1FAE5", color: "#065F46", border: "#10B981" },
+  tennis:     { bg: "#D1FAE5", color: "#111827", border: "#10B981" },
   pickleball: { bg: "#FFEDD5", color: "#C2410C", border: "#F97316" },
   cricket:    { bg: "#DBEAFE", color: "#1E40AF", border: "#2563EB" },
 };

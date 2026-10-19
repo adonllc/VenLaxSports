@@ -102,7 +102,7 @@ export default function RewardsCredits() {
         {/* Credit Balance Card */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Credits Balance */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border-l-4 border-emerald-500">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 border-l-4 border-emerald-500">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -130,7 +130,7 @@ export default function RewardsCredits() {
           </div>
 
           {/* Referral Stats */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border-l-4 border-orange-500">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 border-l-4 border-orange-500">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
@@ -159,7 +159,7 @@ export default function RewardsCredits() {
         </div>
 
         {/* Referral Code Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 mb-12">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
               <Gift className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -240,7 +240,7 @@ export default function RewardsCredits() {
 
         {/* Referral Leaderboard */}
         {leaderboard.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 mb-12">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
                 <Trophy className="w-6 h-6 text-amber-600 dark:text-amber-400" />
@@ -270,7 +270,7 @@ export default function RewardsCredits() {
         )}
 
         {/* How It Works */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-8 border border-blue-200 dark:border-blue-800">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-3xl p-8 border border-blue-200 dark:border-blue-800">
           <h3 className="text-xl font-bold text-heading-dark dark:text-white mb-4">How It Works</h3>
 
           <div className="grid md:grid-cols-3 gap-6">

@@ -71,7 +71,7 @@ export default function ProfileSetup() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-8">
+        <div className="bg-white rounded-3xl border border-gray-200 p-8">
           {/* Step 0: Sports */}
           {step === 0 && (
             <>
@@ -98,7 +98,7 @@ export default function ProfileSetup() {
               </div>
               <button
                 onClick={() => setStep(1)}
-                className="w-full py-3.5 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors text-sm flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors text-sm flex items-center justify-center gap-2"
                 data-testid="next-step-1"
               >
                 Continue <ChevronRight className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default function ProfileSetup() {
                 </button>
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 py-3.5 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors text-sm flex items-center justify-center gap-2"
+                  className="flex-1 py-3.5 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors text-sm flex items-center justify-center gap-2"
                   data-testid="next-step-2"
                 >
                   Continue <ChevronRight className="w-4 h-4" />
@@ -177,7 +177,7 @@ export default function ProfileSetup() {
                 <button
                   onClick={handleFinish}
                   disabled={saving}
-                  className="flex-1 py-3.5 bg-[#047857] text-white font-semibold rounded-xl hover:bg-[#065F46] transition-colors disabled:opacity-60 text-sm"
+                  className="flex-1 py-3.5 bg-[#047857] text-white font-semibold rounded-full hover:bg-[#065F46] transition-colors disabled:opacity-60 text-sm"
                   data-testid="finish-setup-btn"
                 >
                   {saving ? "Saving..." : "Go to Dashboard"}

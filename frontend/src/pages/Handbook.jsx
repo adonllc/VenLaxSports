@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import PageHero from "../components/PageHero";
 import { Shield, AlertCircle, Users, CheckCircle, Heart, AlertTriangle, TrendingUp } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 
@@ -110,24 +111,14 @@ export default function Handbook() {
     canonicalPath: "/handbook",
   });
   return (
-    <div style={{ background: "#FFFFFF" }} data-testid="handbook-page">
-      {/* Hero */}
-      <section className="py-20 sm:py-28 px-6" style={{ background: "#EA580C" }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
-               style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.30)", color: "#FAF0E6" }}>
-            <Shield className="w-3.5 h-3.5" />
-            Player Handbook v1.0
-          </div>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl mb-4 leading-tight text-white" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
-            League Rules &<br /><span style={{ color: "rgba(255,255,255,0.9)" }}>Player Handbook</span>
-          </h1>
-          <p className="text-sm sm:text-base max-w-2xl" style={{ color: "rgba(255,255,255,0.80)" }}>
-            Everything you need to know about playing in a VenLax league.
-            Safety, conduct, ratings, disputes — all in one place.
-          </p>
-        </div>
-      </section>
+    <div style={{ background: "#FAFAFA" }} data-testid="handbook-page">
+      <PageHero
+        testId="handbook-hero"
+        icon={Shield}
+        eyebrow="Player Handbook v1.0"
+        title={<>League Rules &amp;<br />Player Handbook</>}
+        subtitle="Everything you need to know about playing in a VenLax league. Safety, conduct, ratings, disputes, all in one place."
+      />
 
       {/* Quick nav */}
       <div className="border-b sticky top-0 z-10 backdrop-blur" style={{ borderColor: "#E5E7EB", background: "rgba(253,246,238,0.92)" }}>

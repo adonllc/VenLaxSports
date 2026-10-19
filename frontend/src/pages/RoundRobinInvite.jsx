@@ -65,7 +65,7 @@ export default function RoundRobinInvite() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
+        <div className="max-w-sm w-full bg-white border border-gray-200 rounded-3xl p-8 text-center">
           <AlertCircle size={40} className="text-red-400 mx-auto mb-4" />
           <h1 className="font-bold text-heading-dark text-lg mb-2">Invite Unavailable</h1>
           <p className="text-gray-500 text-sm mb-6">{error}</p>
@@ -78,7 +78,7 @@ export default function RoundRobinInvite() {
   if (accepted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
+        <div className="max-w-sm w-full bg-white border border-gray-200 rounded-3xl p-8 text-center">
           <Trophy size={40} className="text-emerald-500 mx-auto mb-4" />
           <h1 className="font-bold text-heading-dark text-lg mb-2">You're in!</h1>
           <p className="text-gray-500 text-sm">Redirecting to league...</p>
@@ -89,7 +89,7 @@ export default function RoundRobinInvite() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <div className="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 text-center">
+      <div className="max-w-sm w-full bg-white border border-gray-200 rounded-3xl p-8 text-center">
         <div className="text-3xl mb-4">{invite?.sport === "tennis" ? "🎾" : "🏓"}</div>
         <h1 className="font-black text-heading-dark text-xl mb-1">You're invited!</h1>
         <p className="text-gray-500 text-sm mb-6">
@@ -113,7 +113,7 @@ export default function RoundRobinInvite() {
             <Link
               to={`/auth?next=/round-robin/invite/${token}`}
               data-testid="btn-login-to-accept"
-              className="block w-full bg-[#047857] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#065F46] transition text-center"
+              className="block w-full bg-[#047857] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#065F46] transition text-center"
             >
               Log in to accept
             </Link>
@@ -140,7 +140,7 @@ export default function RoundRobinInvite() {
               data-testid="btn-accept-invite"
               onClick={handleAccept}
               disabled={accepting || !waiverAccepted}
-              className="w-full bg-[#047857] text-white rounded-md py-2.5 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
+              className="w-full bg-[#047857] text-white rounded-full py-2.5 text-sm font-bold hover:bg-[#065F46] transition disabled:opacity-50"
             >
               {accepting ? "Accepting..." : "Accept & Join as Partner"}
             </button>

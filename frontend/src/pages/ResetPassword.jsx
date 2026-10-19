@@ -40,7 +40,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gray-50 px-4" data-testid="reset-password-page">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-8">
+      <div className="w-full max-w-md bg-white rounded-3xl border border-gray-200 p-8">
         <div className="mb-6">
           <Logo size="md" variant="default" testId="reset-logo" />
         </div>
@@ -48,7 +48,7 @@ export default function ResetPassword() {
         {done ? (
           <div className="text-center py-6" data-testid="reset-success">
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <h1 className="font-heading font-black text-3xl text-heading-dark mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#047857" }}>Password updated</h1>
+            <h1 className="font-heading font-black text-3xl text-heading-dark mb-2" style={{ fontFamily: "'Cabinet Grotesk', system-ui, sans-serif", color: "#111827" }}>Password updated</h1>
             <p className="text-gray-500 text-sm">Redirecting you to log in...</p>
           </div>
         ) : (
@@ -99,7 +99,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading || !token}
-                className="w-full py-3 bg-[#047857] text-white font-bold rounded-lg hover:bg-[#065F46] transition-all hover:shadow-lg disabled:opacity-60 text-sm"
+                className="w-full py-3 bg-[#047857] text-white font-bold rounded-full hover:bg-[#065F46] transition-all hover:shadow-lg disabled:opacity-60 text-sm"
                 data-testid="reset-submit-btn"
                 aria-label="Reset password and log in"
               >

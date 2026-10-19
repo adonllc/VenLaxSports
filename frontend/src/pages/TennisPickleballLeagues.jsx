@@ -37,7 +37,7 @@ const JSON_LD = {
 const H2 = ({ children }) => (
   <h2
     className="font-black text-2xl sm:text-3xl mt-14 mb-4"
-    style={{ color: "#047857", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+    style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
   >
     {children}
   </h2>
@@ -73,7 +73,7 @@ export default function TennisPickleballLeagues() {
           </p>
           <h1
             className="font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-4"
-            style={{ color: "#047857", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
+            style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}
           >
             Tennis &amp; Pickleball Leagues Near You: How They Work, What They Cost, and How to Pick One
           </h1>
@@ -201,7 +201,7 @@ export default function TennisPickleballLeagues() {
           className="rounded-lg p-6 mt-10 mb-4"
           style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}
         >
-          <p className="font-bold mb-2" style={{ color: "#047857", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
+          <p className="font-bold mb-2" style={{ color: "#111827", fontFamily: "'Cabinet Grotesk', system-ui, sans-serif" }}>
             Ready to find your division?
           </p>
           <p className="mb-4">
