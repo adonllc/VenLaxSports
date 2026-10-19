@@ -45,7 +45,7 @@ export default function Home() {
           {/* Pillars tagline */}
           <motion.p
             className="text-xl md:text-2xl font-bold mb-6"
-            style={{ color: "#065F46", fontFamily: "'Sora', system-ui, sans-serif" }}
+            style={{ color: "#FFFFFF", fontFamily: "'Sora', system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}

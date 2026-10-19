@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Copy, Share2, DollarSign, TrendingUp, Gift, Trophy } from 'lucide-react';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8001';
 
 export default function RewardsCredits() {
+  const { user, loading: authLoading } = useAuth();
   const [credits, setCredits] = useState(null);
   const [referralCode, setReferralCode] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
@@ -13,8 +16,10 @@ export default function RewardsCredits() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchCredits();
-  }, []);
+    if (user) fetchCredits();
+  }, [user]);
+
+  if (!authLoading && !user) return <Navigate to="/auth" replace />;
 
   const fetchCredits = async () => {
     try {

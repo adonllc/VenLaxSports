@@ -248,9 +248,9 @@ export default function Navbar() {
                 <Link
                   to="/auth?mode=register"
                   className="px-4 py-2 text-sm font-bold rounded-lg text-white transition-colors"
-                  style={{ background: "#C2410C" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#B04823"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#C2410C"}
+                  style={{ background: "#047857" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#065F46"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#047857"}
                   data-testid="nav-register"
                 >
                   Sign Up Free
@@ -348,7 +348,7 @@ export default function Navbar() {
                 <Link
                   to="/auth?mode=register"
                   className="px-3 py-2.5 text-sm font-bold text-white text-center rounded-lg"
-                  style={{ background: "#C2410C" }}
+                  style={{ background: "#047857" }}
                   data-testid="nav-register-mobile"
                 >
                   Sign Up Free

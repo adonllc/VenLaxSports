@@ -41,6 +41,7 @@ const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
 const Ladders = lazy(() => import("./pages/Ladders"));
 const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 const RewardsCredits = lazy(() => import("./pages/RewardsCredits"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const TennisPickleballLeagues = lazy(() => import("./pages/TennisPickleballLeagues"));
 
 const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
@@ -89,6 +90,7 @@ function AppRouter() {
           <Route path="/ladders/:id" element={<LadderDetail />} />
           <Route path="/rewards" element={<RewardsCredits />} />
           <Route path="/tennis-pickleball-leagues" element={<TennisPickleballLeagues />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </RouteErrorBoundary>
