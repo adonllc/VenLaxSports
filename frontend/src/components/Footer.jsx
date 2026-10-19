@@ -33,7 +33,7 @@ export default function Footer() {
             <p className="text-sm font-semibold leading-relaxed text-[#1D1D1D] mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-sm text-gray-300 mb-3" style={{ fontFamily: "Rubik, sans-serif" }}>
+            <p className="text-sm text-[#4C4C4C] mb-3" style={{ fontFamily: "Rubik, sans-serif" }}>
               {platformConfig.footerTagline}
             </p>
             <div className="flex items-center gap-4">
