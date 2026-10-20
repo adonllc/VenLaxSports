@@ -1,5 +1,82 @@
 import { Link } from "react-router-dom";
+import { Check, ArrowRight, Users, User, CalendarDays, Trophy } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import PageHero from "../components/PageHero";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
+
+const GREEN = "#008F70";
+const AMBER = "#F2A922";
+const INK = "#1D1D1D";
+const BODY = "#4C4C4C";
+const GREY = "#F1F1F1";
+
+// ---------------------------------------------------------------- content
+const QUICK_FACTS = [
+  { big: "5–7", small: "matches per season" },
+  { big: "6–8", small: "weeks per season" },
+  { big: "2.0–5.0+", small: "skill rating scale" },
+  { big: "$9.99", small: "singles, per player" },
+];
+
+const STEPS = [
+  { icon: User, title: "Join", body: "Pick your sport, city and format. Choose your starting skill level." },
+  { icon: CalendarDays, title: "Schedule", body: "You and your opponent agree a time and book a court. No fixed weekly slot." },
+  { icon: Trophy, title: "Play and report", body: "Play your match, then report the score. Your rating updates after every result." },
+  { icon: Users, title: "Climb", body: "Standings update live. The top players go to the playoffs." },
+];
+
+const LEVELS = [
+  { level: "Beginner", rating: "2.0 – 2.5", who: "New to competitive play." },
+  { level: "Intermediate", rating: "3.0 – 3.5", who: "You can hold a consistent rally." },
+  { level: "Advanced", rating: "4.0 – 4.5", who: "Tournament-ready." },
+  { level: "Elite", rating: "5.0+", who: "Semi-professional." },
+];
+
+const FORMATS = [
+  { format: "Singles", players: "1 player", price: "$9.99", unit: "per player, per season", note: "One-on-one. The simplest way in." },
+  { format: "Doubles", players: "Team of 2", price: "$19.99", unit: "per team, per season", note: "You and a partner. One partner pays and the other joins at no extra charge." },
+  { format: "Mixed doubles", players: "Team of 2", price: "$19.99", unit: "per team, per season", note: "One man and one woman per team. Same team fee as doubles." },
+];
+
+const STRUCTURES = [
+  { name: "Flex League", line: "You arrange your own match times.", points: ["5–7 matches over 6–8 weeks", "You book courts and agree times", "Top players qualify for playoffs"] },
+  { name: "Round Robin", line: "A fixed schedule where everyone plays everyone once.", points: ["Organizer books courts", "Calendar set upfront", "Top players advance to playoffs"] },
+  { name: "Box League", line: "Small groups of 6 players.", points: ["Top 2 move up, bottom 2 move down each cycle", "Tight-knit groups", "No season-end playoffs"] },
+  { name: "Challenge Ladder", line: "An ongoing ranked list.", points: ["Challenge anyone above you", "Win to swap ranks", "Join any time and climb year-round"] },
+];
+
+const MATCH_TIMELINE = [
+  { when: "Within 48 hours", what: "Contact your opponent. No reply in 48 hours means a walkover to the other player." },
+  { when: "Within 7 days", what: "Play your match. Each match has a 7-day window." },
+  { when: "24 hours before", what: "Confirm the time and court. The higher seed books the court and provides the balls." },
+  { when: "Match day", what: "Arrive on time. 15+ minutes late, or cancelling less than 2 hours before, is a forfeit." },
+  { when: "Within 24 hours after", what: "The winner reports the score. Your opponent confirms within 24 hours, or it is confirmed automatically." },
+];
+
+const POINTS = [
+  { for: "Each match win", pts: "3 points" },
+  { for: "Each match loss", pts: "1 point" },
+  { for: "Sets won minus sets lost", pts: "0.5 per set" },
+  { for: "Games won minus games lost", pts: "0.1 per game" },
+  { for: "Play every match", pts: "+2 bonus" },
+  { for: "Win in straight sets", pts: "+1 bonus" },
+  { for: "Lose a close 3-set match", pts: "+0.5 bonus" },
+];
+
+const COMPARE = [
+  { row: "Court size", tennis: "Larger court, longer rallies", pickle: "Smaller court, quicker points" },
+  { row: "Learning curve", tennis: "Takes longer to build consistent strokes", pickle: "Easier to get competitive in your first month" },
+  { row: "Typical match length", tennis: "Often 90 minutes or more over best of 3 sets", pickle: "Usually under an hour" },
+  { row: "Great if you want", tennis: "Strategic depth and a long-term challenge", pickle: "A fast, social game that fits a weeknight" },
+];
+
+const CHECKLIST = [
+  "Choose the rating that honestly matches how you play. It adjusts after your results.",
+  "Check the league's city, format and start date before you pay.",
+  "Message your opponent within 48 hours of being matched.",
+  "Offer at least 3 time slots to make scheduling easy.",
+  "Read the Rules page once so the score reporting is no surprise.",
+];
 
 const FAQS = [
   {
@@ -13,6 +90,18 @@ const FAQS = [
   {
     q: "What skill level do I need to join a league?",
     a: "Leagues use a rating scale from 2.0 (beginner) to 5.0+ (elite/semi-professional), and you're matched only against opponents near your rating — no prior tournament experience required.",
+  },
+  {
+    q: "Do I need a partner for doubles?",
+    a: "Yes, doubles and mixed doubles are played as a team of two. You invite your partner by email when you register. One partner pays the $19.99 team fee and the other joins at no extra charge.",
+  },
+  {
+    q: "What if my opponent doesn't reply?",
+    a: "You should contact your opponent within 48 hours. If they don't respond within 48 hours, the match is a walkover to you.",
+  },
+  {
+    q: "Can I get a refund?",
+    a: "Entry fees are non-refundable once the league starts.",
   },
   {
     q: "Should I start with tennis or pickleball?",
@@ -34,24 +123,41 @@ const JSON_LD = {
   })),
 };
 
-const H2 = ({ children }) => (
-  <h2
-    className="font-bold text-2xl sm:text-3xl mt-14 mb-4"
-    style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}
-  >
-    {children}
-  </h2>
+// ---------------------------------------------------------------- layout bits
+const Section = ({ id, tint, children }) => (
+  <section id={id} className="px-4 sm:px-6 py-14 md:py-20" style={{ background: tint ? GREY : "#fff" }}>
+    <div className="max-w-[1000px] mx-auto">{children}</div>
+  </section>
 );
 
-const H3 = ({ children }) => (
-  <h3
-    className="font-bold text-lg mt-6 mb-2"
-    style={{ color: "#1F2937", fontFamily: "Rubik, system-ui, sans-serif" }}
-  >
-    {children}
-  </h3>
+const H2 = ({ eyebrow, children, lead }) => (
+  <div className="mb-8">
+    {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GREEN }}>{eyebrow}</p>}
+    <h2 className="font-bold text-3xl md:text-5xl leading-[1.05]" style={{ color: INK }}>{children}</h2>
+    {lead && <p className="mt-4 text-lg max-w-2xl" style={{ color: BODY }}>{lead}</p>}
+  </div>
 );
 
+const Table = ({ head, children, minWidth = 560 }) => (
+  <div className="overflow-x-auto bg-white border" style={{ borderColor: "#E4E4E4" }}>
+    <table className="w-full text-left text-base" style={{ minWidth }}>
+      <thead>
+        <tr style={{ background: GREEN }}>
+          {head.map((h) => (
+            <th key={h} scope="col" className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-white">{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y" style={{ borderColor: "#E4E4E4" }}>{children}</tbody>
+    </table>
+  </div>
+);
+
+const Td = ({ children, strong }) => (
+  <td className={`px-5 py-4 align-top ${strong ? "font-bold" : ""}`} style={{ color: strong ? INK : BODY }}>{children}</td>
+);
+
+// ---------------------------------------------------------------- page
 export default function TennisPickleballLeagues() {
   useDocumentMeta({
     title: "Tennis & Pickleball Leagues Near You | Skill-Matched Play",
@@ -62,171 +168,205 @@ export default function TennisPickleballLeagues() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <p
-            className="text-xs font-bold uppercase tracking-[0.14em] mb-2"
-            style={{ color: "#B7791F", fontFamily: "Rubik, system-ui, sans-serif" }}
-          >
-            Guide
-          </p>
-          <h1
-            className="font-bold text-2xl sm:text-3xl md:text-4xl leading-tight mb-4"
-            style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}
-          >
-            Tennis &amp; Pickleball Leagues Near You: How They Work, What They Cost, and How to Pick One
-          </h1>
-          <p className="text-lg" style={{ color: "#374151" }}>
-            Tennis and pickleball leagues match players by skill level (typically rated 2.0–5.0) into a season of
-            organized matches against local opponents, with results feeding a live ranking. Singles is $9.99 per player
-            and doubles or mixed doubles is $19.99 for the team of two.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white" style={{ color: BODY }}>
+      <PageHero
+        eyebrow="League guide"
+        title={<>Tennis &amp; Pickleball<br />leagues, explained</>}
+        subtitle="Everything you need to join your first league: levels, formats, prices, how a season works and how winners are decided."
+      />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10" style={{ color: "#374151" }}>
-        <H2>How Skill-Based League Matching Actually Works</H2>
-        <p>
-          Every serious league runs on a rating scale, not a gut-feel skill label. VENLAX uses 2.0 through 5.0+:
-          2.0–2.5 is new to competitive play, 3.0–3.5 means you can hold a consistent rally, 4.0–4.5 is
-          tournament-ready, and 5.0+ is semi-professional.
-        </p>
-
-        <H3>How your first few matches set your starting rank</H3>
-        <p>
-          Your initial rating comes from self-assessment when you join, then adjusts based on your actual match
-          results — a strong start against a higher-rated opponent moves you up faster than the number you picked
-          at signup.
-        </p>
-
-        <H3>What happens when you're rated wrong (sandbagging problem)</H3>
-        <p>
-          Static self-ratings are the single biggest complaint in amateur leagues — players lowball their own
-          rating to dominate a bracket they don't belong in. A platform that recalculates rating from real results
-          after every match closes that loophole; one that only asks once at signup doesn't.
-        </p>
-
-        <H2>What a Season Actually Looks Like</H2>
-        <p>
-          A VENLAX Flex League runs 5–7 matches over 6–8 weeks. You get a 7-day window per match, contact your
-          opponent within 48 hours, and book the court yourselves — nobody's waiting on an organizer to set a
-          fixed weekly time slot.
-        </p>
-
-        <H3>Singles vs. doubles vs. mixed doubles formats</H3>
-        <p>
-          Singles is one-on-one. Doubles and mixed doubles are played as a team of two, with one entry fee covering
-          both partners — see the cost breakdown below.
-        </p>
-
-        <H3>Playoffs, standings, and how winners are decided</H3>
-        <p>
-          Standings run on a points formula — wins, losses, set differential, and game differential, plus small
-          bonuses for playing every match and winning in straight sets. The top 4 players (leagues of 12 or fewer)
-          or top 8 (larger leagues) advance to playoffs.
-        </p>
-
-        <H2>Real Cost Breakdown: League vs. Club vs. Pickup</H2>
-        <p>
-          Most league sites make you register before showing a real number. Here's the actual pricing:
-        </p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li><strong>Singles league:</strong> $9.99 per player, per season</li>
-          <li><strong>Doubles league:</strong> $19.99 per team of two, per season</li>
-          <li><strong>Mixed doubles league:</strong> $19.99 per team of two, per season</li>
-        </ul>
-
-        <H3>How doubles pricing works</H3>
-        <p>
-          One partner pays the $19.99 team fee when registering and the other joins at no extra charge, so the
-          fee covers both players for the season.
-        </p>
-
-        <H3>Hidden costs at private clubs leagues don't have</H3>
-        <p>
-          Private club leagues typically require a membership on top of league fees, plus court-time surcharges
-          during peak hours. A city-based league with self-scheduled matches avoids both — you're paying for the
-          season, not for club access.
-        </p>
-
-        <H2>Tennis or Pickleball — Which League Should You Join First?</H2>
-        <p>
-          They're not really competing sports anymore — most serious players end up in both. But if you're picking
-          a starting point:
-        </p>
-
-        <H3>Learning curve comparison for adult beginners</H3>
-        <p>
-          Pickleball's smaller court and slower ball make it far more approachable in your first month. Tennis
-          takes longer to build a consistent serve and groundstrokes, but the ceiling on strategic depth is higher
-          once you get there.
-        </p>
-
-        <H3>Time commitment per match</H3>
-        <p>
-          A pickleball match usually wraps in under an hour. A best-of-3 tennis set format can run well past 90
-          minutes, especially if it goes to a third-set tiebreak.
-        </p>
-
-        <H3>Why most serious players end up playing both</H3>
-        <p>
-          Pickleball's shorter games make it easy to fit in on weeknights; tennis rewards the longer weekend
-          block. Players who start with one for the schedule flexibility often pick up the other within a season
-          or two once they're hooked on competitive play.
-        </p>
-
-        <H2>How to Find a League in Your City</H2>
-        <H3>What to check before joining</H3>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>Does the rating system adjust after real match results, or is it a fixed self-assessment?</li>
-          <li>Is pricing shown before you create an account?</li>
-          <li>Can you self-schedule matches, or are you locked into a fixed weekly slot?</li>
-        </ul>
-
-        <H3>Red flags in league platforms</H3>
-        <p>
-          No visible ranking methodology, no clear refund or withdrawal policy, and pricing hidden behind a signup
-          wall are the three biggest signs a league platform hasn't thought through the player experience.
-        </p>
-
-        <H2>Getting Started: Your First 30 Days</H2>
-        <p>
-          Your first rated match sets the real baseline — expect your rating to move after it, not stay fixed at
-          whatever you entered during signup. From there, every reported result recalculates your standing, so the
-          leaderboard reflects who's actually playing well this season, not who joined with the highest self-rating.
-        </p>
-
-        <div
-          className="rounded-lg p-6 mt-10 mb-4"
-          style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}
-        >
-          <p className="font-bold mb-2" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
-            Ready to find your division?
-          </p>
-          <p className="mb-4">
-            Browse active tennis and pickleball leagues in your city and see real pricing before you sign up.
-          </p>
-          <Link data-testid="tp-leagues-cta"
-            to="/join"
-            className="inline-block font-semibold px-6 py-3 rounded-lg text-white"
-            style={{ background: "#008F70" }}
-            data-testid="seo-page-cta-join"
-          >
-            Find a League →
-          </Link>
-        </div>
-
-        <H2>FAQ</H2>
-        <div className="space-y-6 mt-4">
-          {FAQS.map(({ q, a }) => (
-            <div key={q}>
-              <h3 className="font-bold text-base mb-1" style={{ color: "#1F2937" }}>{q}</h3>
-              <p>{a}</p>
+      {/* QUICK FACTS */}
+      <section className="px-4 sm:px-6 -mt-10 relative z-10">
+        <div className="max-w-[1000px] mx-auto grid grid-cols-2 md:grid-cols-4 text-white" style={{ background: GREEN }}>
+          {QUICK_FACTS.map((f) => (
+            <div key={f.small} className="px-6 py-6 text-center border-white/20 [&:not(:last-child)]:md:border-r">
+              <div className="font-bold text-3xl md:text-4xl leading-none">{f.big}</div>
+              <div className="mt-2 text-sm text-white/90">{f.small}</div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <Section id="how-it-works">
+        <H2 eyebrow="The basics" lead="A season is a handful of matches you arrange yourself, with your rating and the standings updating after every result.">
+          How a league works
+        </H2>
+        <ol className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="p-6 border-t-4" style={{ borderColor: AMBER, background: GREY }}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-9 h-9 flex items-center justify-center font-bold text-white" style={{ background: GREEN }}>{i + 1}</span>
+                <s.icon className="w-5 h-5" style={{ color: GREEN }} aria-hidden="true" />
+              </div>
+              <h3 className="font-bold text-xl mb-1" style={{ color: INK }}>{s.title}</h3>
+              <p className="text-base">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      {/* LEVELS */}
+      <Section id="levels" tint>
+        <H2 eyebrow="Step 1" lead="You pick a starting level when you join. After your first few matches your rating moves based on real results, so it settles on your true level.">
+          Find your level
+        </H2>
+        <Table head={["Level", "Rating", "Who it's for"]} minWidth={420}>
+          {LEVELS.map((l) => (
+            <tr key={l.level}>
+              <Td strong>{l.level}</Td>
+              <Td><span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{l.rating}</span></Td>
+              <Td>{l.who}</Td>
+            </tr>
+          ))}
+        </Table>
+        <p className="mt-4 text-sm">Not sure? Pick the level that honestly matches how you play. You are matched against players near your rating, and it keeps adjusting after your results.</p>
+      </Section>
+
+      {/* FORMATS + PRICING */}
+      <Section id="pricing">
+        <H2 eyebrow="Step 2" lead="Singles is one player. Doubles and mixed doubles are a team of two with one fee that covers both of you.">
+          Pick your format and see the price
+        </H2>
+        <Table head={["Format", "Who plays", "Price", "Good to know"]} minWidth={620}>
+          {FORMATS.map((f) => (
+            <tr key={f.format}>
+              <Td strong>{f.format}</Td>
+              <Td>{f.players}</Td>
+              <Td>
+                <div className="font-bold text-xl" style={{ color: INK }}>{f.price}</div>
+                <div className="text-sm">{f.unit}</div>
+              </Td>
+              <Td>{f.note}</Td>
+            </tr>
+          ))}
+        </Table>
+        <ul className="mt-5 grid gap-2 text-base">
+          <li className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> The price is for the whole season, with no club membership needed.</li>
+          <li className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> Entry fees are non-refundable once the league starts.</li>
+        </ul>
+      </Section>
+
+      {/* SEASON FORMATS */}
+      <Section id="formats" tint>
+        <H2 eyebrow="Step 3" lead="Leagues come in four shapes. Each one is shown on its league page before you join.">
+          Choose how your season runs
+        </H2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {STRUCTURES.map((s) => (
+            <div key={s.name} className="bg-white p-7 border-l-4" style={{ borderColor: GREEN }}>
+              <h3 className="font-bold text-2xl mb-1" style={{ color: INK }}>{s.name}</h3>
+              <p className="mb-4">{s.line}</p>
+              <ul className="grid gap-2 text-base">
+                {s.points.map((p) => (
+                  <li key={p} className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> {p}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* MATCH TIMELINE */}
+      <Section id="match">
+        <H2 eyebrow="Playing" lead="Here is what happens for each match in a Flex League, in order.">
+          Your match, step by step
+        </H2>
+        <Table head={["When", "What happens"]} minWidth={460}>
+          {MATCH_TIMELINE.map((m) => (
+            <tr key={m.when}>
+              <Td strong>{m.when}</Td>
+              <Td>{m.what}</Td>
+            </tr>
+          ))}
+        </Table>
+        <p className="mt-4 text-sm">
+          Full scoring and conduct rules are on the <Link to="/rules" className="font-bold underline" style={{ color: GREEN }}>Rules page</Link>.
+        </p>
+      </Section>
+
+      {/* STANDINGS */}
+      <Section id="standings" tint>
+        <H2 eyebrow="Winning" lead="Every match earns points. The more you play and the cleaner you win, the higher you climb.">
+          How standings and playoffs work
+        </H2>
+        <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-6 items-start">
+          <Table head={["You get points for", "Points"]} minWidth={340}>
+            {POINTS.map((p) => (
+              <tr key={p.for}>
+                <Td>{p.for}</Td>
+                <Td strong>{p.pts}</Td>
+              </tr>
+            ))}
+          </Table>
+          <div className="text-white p-7" style={{ background: GREEN }}>
+            <h3 className="font-bold text-2xl mb-3">Playoffs</h3>
+            <ul className="grid gap-3 text-base">
+              <li><strong>12 players or fewer:</strong> the top 4 advance.</li>
+              <li><strong>More than 12 players:</strong> the top 8 advance.</li>
+              <li>If players tie on points, the tiebreakers are sets, then games, then head-to-head, then opponent strength.</li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      {/* TENNIS vs PICKLEBALL */}
+      <Section id="tennis-or-pickleball">
+        <H2 eyebrow="Choosing a sport" lead="Many players end up in both. If you are picking a starting point, this is how they differ.">
+          Tennis or pickleball first?
+        </H2>
+        <Table head={["", "Tennis", "Pickleball"]} minWidth={560}>
+          {COMPARE.map((c) => (
+            <tr key={c.row}>
+              <Td strong>{c.row}</Td>
+              <Td>{c.tennis}</Td>
+              <Td>{c.pickle}</Td>
+            </tr>
+          ))}
+        </Table>
+      </Section>
+
+      {/* CHECKLIST */}
+      <Section id="first-match" tint>
+        <H2 eyebrow="Ready to play" lead="Five things that make your first season smooth.">
+          Before your first match
+        </H2>
+        <ul className="grid gap-3">
+          {CHECKLIST.map((c) => (
+            <li key={c} className="bg-white px-6 py-4 flex gap-3">
+              <Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" />
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      {/* FAQ */}
+      <Section id="faq">
+        <H2 eyebrow="Questions">Frequently asked questions</H2>
+        <Accordion type="single" collapsible className="w-full">
+          {FAQS.map((f, i) => (
+            <AccordionItem key={f.q} value={`faq-${i}`}>
+              <AccordionTrigger className="text-left text-lg font-bold" style={{ color: INK }}>{f.q}</AccordionTrigger>
+              <AccordionContent className="text-base leading-relaxed" style={{ color: BODY }}>{f.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Section>
+
+      {/* CTA */}
+      <section className="px-4 sm:px-6 py-16 text-center text-white" style={{ background: GREEN }}>
+        <h2 className="font-bold text-3xl md:text-5xl leading-[1.05] mb-4">Ready to find your division?</h2>
+        <p className="text-lg text-white/90 mb-8 max-w-xl mx-auto">Browse active tennis and pickleball leagues in your city and see real pricing before you sign up.</p>
+        <Link
+          to="/join"
+          className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white"
+          style={{ background: AMBER, color: INK }}
+          data-testid="tp-leagues-cta"
+        >
+          Find a League <ArrowRight className="w-4 h-4" aria-hidden="true" />
+        </Link>
+      </section>
     </div>
   );
 }
