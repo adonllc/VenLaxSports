@@ -11,7 +11,7 @@ Legend: `[ ]` todo · `[x]` done
 
 - [ ] **1. Commit the cleanup script** — `backend/scripts/prelaunch_cleanup.py`. Do **not** run it yet; it deletes test data still needed for QA.
 - [ ] **2. Replace stale seed leagues**
-  - `backend/seeds/leagues.py` has 2025 dates and $29.99/$39.99 fees; canonical pricing is singles $9.99, doubles/mixed $19.99 (`pricing_config.py`).
+  - `backend/seeds/leagues.py` (removed 2026-10-20) had 2025 dates and $29.99/$39.99 fees; canonical pricing is singles $9.99, doubles/mixed $19.99 (`pricing_config.py`).
   - Decide launch cities, formats, start dates.
   - Verify `POST /api/admin/auto/leagues` generates correct leagues.
 - [ ] **3. Separate staging from prod**

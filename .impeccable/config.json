@@ -65,6 +65,12 @@
         ],
         "createdAt": "2026-09-22T03:52:15.941Z",
         "reason": "animate-spin rounded-full border-b-2 loading spinner — same standard spinner pattern as LeagueDetail.jsx"
+      },
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-10-19T23:22:03.201Z",
+        "reason": "user chose the reference-style logo lettering (Archivo + Montserrat SPORTS) and confirmed option C; used only for the 'SPORTS' line of the Logo component (Logo.jsx, index.html font link) and the logo preview"
       }
     ]
   }
