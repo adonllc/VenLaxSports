@@ -71,7 +71,7 @@ const COMING_SOON = [
   { icon: MessageCircle, title: "WhatsApp match reminders", body: "Schedule and score nudges in WhatsApp." },
   { icon: Smartphone, title: "iOS and Android apps", body: "Play and report scores from your phone." },
   { icon: CircleDot, title: "Cricket", body: "T10 and T20 leagues with powerplay rules and net run rate standings." },
-  { icon: Sparkles, title: "TYPTI", body: "Our 4th sport is coming soon." },
+  { icon: Sparkles, title: "TYPTI", body: "A fast-paced hybrid racket sport: tennis-style swings, badminton-like ball flight and pickleball court size. Played with a 22-inch strung racket and a 3.5-inch foam ball." },
 ];
 
 const FAQ = [
