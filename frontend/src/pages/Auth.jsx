@@ -224,9 +224,9 @@ export default function Auth() {
   return (
     <div className="min-h-[calc(100vh-64px)] flex" data-testid="auth-page">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 items-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
         <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#008F70" }} />
-        <div className="max-w-md">
+        <div className="max-w-md text-center">
           <h1 className="font-bold text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#008F70" }}>COMPETE.</span>
           </h1>
@@ -235,7 +235,7 @@ export default function Auth() {
             Your sport. Your stats. Your legacy.
           </p>
 
-          <div className="flex gap-6">
+          <div className="flex gap-6 justify-center">
             {activeSports.map((s) => (
               <div key={s.id} className="text-sm font-medium" style={{ color: "#4C4C4C" }}>{s.icon} {s.label}</div>
             ))}
