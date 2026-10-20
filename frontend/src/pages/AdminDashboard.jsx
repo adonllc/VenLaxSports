@@ -1577,10 +1577,29 @@ function FlagsTab() {
   const [envFlags, setEnvFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(null);
+  const [siteLive, setSiteLive] = useState(false);
+  const [launchBusy, setLaunchBusy] = useState(false);
+
+  const setLaunch = async (live) => {
+    const msg = live
+      ? "Go LIVE? Visitors at / will see the full site instead of the waitlist page."
+      : "Return to the pre-launch waitlist page?";
+    if (!window.confirm(msg)) return;
+    setLaunchBusy(true);
+    try {
+      await axios.patch(`${API}/admin/site-live`, { live }, { withCredentials: true });
+      setSiteLive(live);
+    } catch {
+      /* leave state unchanged */
+    } finally {
+      setLaunchBusy(false);
+    }
+  };
 
   const fetchFlags = () => {
     axios.get(`${API}/admin/flags`, { withCredentials: true })
       .then((res) => {
+        setSiteLive(!!res.data.site_live);
         setJobs(res.data.jobs);
         setEnvFlags(res.data.env_flags);
       })
@@ -1609,6 +1628,26 @@ function FlagsTab() {
 
   return (
     <div className="space-y-6" data-testid="flags-tab">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4" data-testid="launch-switch">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-heading-dark">
+            Site launch: {siteLive ? "LIVE" : "pre-launch (waitlist page)"}
+          </h3>
+          <p className="text-xs text-gray-500 mt-1">
+            Switches what visitors see at / instantly, no rebuild. Only applies while VITE_PRELAUNCH=true in the web build.
+          </p>
+        </div>
+        <button
+          onClick={() => setLaunch(!siteLive)}
+          disabled={launchBusy}
+          className="shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+          style={{ background: siteLive ? "#F1F1F1" : "#F2A922", color: "#3D3D3D" }}
+          data-testid="launch-switch-button"
+        >
+          {siteLive ? "Return to pre-launch" : "Go live"}
+        </button>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-gray-200">
           <h3 className="text-sm font-semibold text-heading-dark">Background Jobs</h3>

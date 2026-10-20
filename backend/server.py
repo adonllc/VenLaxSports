@@ -93,6 +93,14 @@ async def founding_members_count():
     return {"count": count, "limit": LIMIT, "spots_left": max(0, LIMIT - count)}
 
 
+@api_router.get("/site-status")
+async def site_status():
+    """Public — runtime launch switch. live=true makes the frontend show the real Home
+    instead of the pre-launch waitlist page, without a rebuild."""
+    doc = await db.feature_flags.find_one({"_id": "site_live"})
+    return {"live": bool(doc and doc.get("enabled"))}
+
+
 @api_router.get("/phase")
 async def get_phase():
     """Expose active phase info so frontend can confirm backend phase."""

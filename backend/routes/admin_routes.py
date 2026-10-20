@@ -64,7 +64,26 @@ async def get_flags(request: Request):
         {"name": "STRIPE_API_KEY", "value": "configured" if os.environ.get("STRIPE_API_KEY") else "not set", "controls": "Payment processing"},
     ]
 
-    return {"jobs": jobs, "env_flags": env_flags}
+    site_live = await db.feature_flags.find_one({"_id": "site_live"})
+    return {"jobs": jobs, "env_flags": env_flags, "site_live": bool(site_live and site_live.get("enabled"))}
+
+
+@router.patch("/site-live")
+async def set_site_live(request: Request, body: dict = Body(...)):
+    """Launch switch: true shows the real Home at /, false shows the pre-launch waitlist page."""
+    db = request.app.state.db
+    admin = await require_admin(request, db)
+    live = bool(body.get("live"))
+    await db.feature_flags.update_one(
+        {"_id": "site_live"},
+        {"$set": {
+            "enabled": live,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": str(admin.get("_id", "")),
+        }},
+        upsert=True,
+    )
+    return {"live": live}
 
 
 @router.patch("/flags/{flag_id}")

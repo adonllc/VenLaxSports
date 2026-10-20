@@ -63,10 +63,12 @@ It prints `READY TO FLIP THE FLAG` only when there are no FAIL lines. WARN lines
 Register, log in, join a league with a $9.99 payment, refund it in Stripe, receive the emails. Then delete the test account (add it to `--extra-delete-emails` and re-run step B2, or delete it in the admin Users tab).
 
 ## F. Launch: the one step
-Frontend flag, baked in at build time:
-1. Coolify, `venlaxsports-web`, Environment: set `VITE_PRELAUNCH=false`.
-2. Redeploy `venlaxsports-web` (about 4 minutes).
+Runtime switch, no rebuild (needs the web and API builds that include `/api/site-status`, and `VITE_PRELAUNCH=true` in the web build, as today):
+1. Log in as admin, Admin dashboard, Flags tab, click **Go live** and confirm.
+2. Check `https://api.venlaxsports.com/api/site-status` returns `{"live": true}` and `https://venlaxsports.com` shows the full Home.
 
-Rollback is the same step in reverse (`VITE_PRELAUNCH=true`, redeploy). Then announce to the waitlist and watch the logs for the first 24 hours.
+Rollback: **Return to pre-launch** in the same place. If the API is unreachable the site falls back to the waitlist page.
 
-> Optional improvement: make this flag a runtime switch in the admin dashboard, so launch and rollback are instant and need no rebuild.
+Fallback (old way, needs a rebuild): set `VITE_PRELAUNCH=false` on `venlaxsports-web` and redeploy (about 4 minutes).
+
+Then announce to the waitlist and watch the logs for the first 24 hours.

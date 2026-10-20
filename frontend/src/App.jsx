@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import axios from "axios";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -107,8 +108,20 @@ function AppShell() {
     if (ref) localStorage.setItem("pending_ref", ref);
   }, [location.search]);
 
-  if (IS_PRELAUNCH && !IS_LAUNCH_LIVE && location.pathname === "/") {
-    return <PreLaunch />;
+  // Runtime launch switch (admin Flags tab). null = still asking the API.
+  const [siteLive, setSiteLive] = useState(null);
+  const gated = IS_PRELAUNCH && !IS_LAUNCH_LIVE;
+  useEffect(() => {
+    if (!gated) return;
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/site-status`, { timeout: 4000 })
+      .then((r) => setSiteLive(!!r.data.live))
+      .catch(() => setSiteLive(false)); // API down: stay on the waitlist page
+  }, [gated]);
+
+  if (gated && location.pathname === "/") {
+    if (siteLive === null) return <PageFallback />;
+    if (!siteLive) return <PreLaunch />;
   }
   return (
     <div className="min-h-screen bg-[var(--vl-bg)] flex flex-col font-body overflow-x-hidden">
