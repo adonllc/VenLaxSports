@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
-  ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles,
+  ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles, UserPlus, Swords,
 } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
@@ -11,6 +12,7 @@ import PhotoSlot from "../components/PhotoSlot";
 import Slant from "../components/Slant";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
+const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 const GREEN = "#008F70";
 const AMBER = "#F2A922";
 const INK = "#3D3D3D";
@@ -64,6 +66,13 @@ const SAFETY = [
   { title: "Players under 18", body: "Parental consent is required. The minimum age is 13." },
   { title: "Fair results", body: "Both players confirm scores. Disputes go to an organizer, with an appeal." },
   { title: "Account security", body: "Two-factor sign-in and Google sign-in are available." },
+];
+
+const GROW = [
+  { slug: "referral", icon: Gift, title: "Share your code", body: "Get your referral code on the Rewards page. You both get $5 credit when your friend joins.", cta: "Get my code", to: "/rewards" },
+  { slug: "partner", icon: UserPlus, title: "Bring a doubles partner", body: "Register for doubles and invite your partner by email. One team fee covers both of you.", cta: "Play doubles", to: "/leagues" },
+  { slug: "challenge", icon: Swords, title: "Challenge a friend", body: "Join a ladder and challenge anyone above you. Win to swap ranks.", cta: "See ladders", to: "/ladders" },
+  { slug: "share", icon: Share2, title: "Share your result", body: "Post your match card with the score and your rating change, and let your friends chase it.", cta: "Join to share", to: "/auth" },
 ];
 
 const COMING_SOON = [
@@ -132,6 +141,13 @@ export default function Home() {
   const navigate = useNavigate();
   const [typeId, setTypeId] = useState("flex");
   const type = LEAGUE_TYPES.find((t) => t.id === typeId);
+  const [founding, setFounding] = useState(null);
+
+  // Real founding-member numbers only; the strip stays hidden if the API fails
+  useEffect(() => {
+    axios.get(`${API}/founding-members`).then((r) => setFounding(r.data)).catch(() => {});
+  }, []);
+  const showFounding = founding && founding.limit > 0 && founding.spots_left > 0;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -320,6 +336,44 @@ export default function Home() {
                 <ShieldCheck className="w-7 h-7 mb-4" style={{ color: GREEN }} aria-hidden="true" />
                 <h3 className="font-bold text-lg mb-1" style={{ color: INK }}>{s.title}</h3>
                 <p className="text-base">{s.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
+
+        {/* GROW FASTER TOGETHER */}
+        <Section tint>
+          <Heading eyebrow="Grow faster together" title="Invite friends, climb the ranks." lead="Every friend who joins with your code earns you both $5 in credit toward your next league. Play with people you know and the season gets better." />
+          {showFounding && (
+            <motion.div {...fadeUp} className="mb-8 p-6 text-white flex flex-col md:flex-row md:items-center gap-4 md:gap-8" style={{ background: GREEN }} data-testid="home-founding-strip">
+              <div className="font-bold text-xl md:text-2xl">Founding member spots are limited</div>
+              <div className="flex-1">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-white/90">Claimed</span>
+                  <span className="font-bold" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{founding.count}/{founding.limit}</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.3)" }}>
+                  <div className="h-full" style={{ width: `${Math.min(100, Math.round((founding.count / founding.limit) * 100))}%`, background: AMBER }} />
+                </div>
+              </div>
+              <div className="text-sm text-white/90">{founding.spots_left} left</div>
+            </motion.div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {GROW.map((g, i) => (
+              <motion.div key={g.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: (i % 2) * 0.08 }}>
+                <Link to={g.to} className="group flex gap-5 h-full bg-white p-7 transition-shadow hover:shadow-lg" data-testid={`home-grow-${g.slug}`}>
+                  <div className="w-12 h-12 shrink-0 flex items-center justify-center" style={{ background: GREEN }}>
+                    <g.icon className="w-6 h-6 text-white" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl mb-1" style={{ color: INK }}>{g.title}</h3>
+                    <p className="text-base leading-snug">{g.body}</p>
+                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold" style={{ color: GREEN }}>
+                      {g.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                    </span>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
