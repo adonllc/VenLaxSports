@@ -1,3 +1,4 @@
+import { Children, cloneElement } from "react";
 import { Link } from "react-router-dom";
 import { Check, ArrowRight, Users, User, CalendarDays, Trophy } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
@@ -138,23 +139,29 @@ const H2 = ({ eyebrow, children, lead }) => (
   </div>
 );
 
-const Table = ({ head, children, minWidth = 560 }) => (
-  <div className="overflow-x-auto bg-white border" style={{ borderColor: "#E4E4E4" }}>
-    <table className="w-full text-left text-base" style={{ minWidth }}>
-      <thead>
-        <tr style={{ background: GREEN }}>
-          {head.map((h) => (
-            <th key={h} scope="col" className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-white">{h}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y" style={{ borderColor: "#E4E4E4" }}>{children}</tbody>
-    </table>
-  </div>
-);
+// On phones each row becomes a stacked card (labels come from the header cells)
+const Table = ({ head, children }) => {
+  const rows = Children.map(children, (row) =>
+    cloneElement(row, {}, Children.map(row.props.children, (td, i) => cloneElement(td, { label: head[i] }))),
+  );
+  return (
+    <div className="bg-white border" style={{ borderColor: "#E4E4E4" }}>
+      <table className="rtable w-full text-left text-base">
+        <thead>
+          <tr style={{ background: GREEN }}>
+            {head.map((h) => (
+              <th key={h} scope="col" className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-white">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y" style={{ borderColor: "#E4E4E4" }}>{rows}</tbody>
+      </table>
+    </div>
+  );
+};
 
-const Td = ({ children, strong }) => (
-  <td className={`px-5 py-4 align-top ${strong ? "font-bold" : ""}`} style={{ color: strong ? INK : BODY }}>{children}</td>
+const Td = ({ children, strong, label }) => (
+  <td data-label={label} className={`px-5 py-4 align-top ${strong ? "font-bold" : ""}`} style={{ color: strong ? INK : BODY }}>{children}</td>
 );
 
 // ---------------------------------------------------------------- page
@@ -180,7 +187,7 @@ export default function TennisPickleballLeagues() {
         <div className="max-w-[1000px] mx-auto grid grid-cols-2 md:grid-cols-4 text-white" style={{ background: GREEN }}>
           {QUICK_FACTS.map((f) => (
             <div key={f.small} className="px-6 py-6 text-center border-white/20 [&:not(:last-child)]:md:border-r">
-              <div className="font-bold text-3xl md:text-4xl leading-none">{f.big}</div>
+              <div className="font-bold text-2xl sm:text-3xl md:text-4xl leading-none whitespace-nowrap">{f.big}</div>
               <div className="mt-2 text-sm text-white/90">{f.small}</div>
             </div>
           ))}
@@ -211,11 +218,11 @@ export default function TennisPickleballLeagues() {
         <H2 eyebrow="Step 1" lead="You pick a starting level when you join. After your first few matches your rating moves based on real results, so it settles on your true level.">
           Find your level
         </H2>
-        <Table head={["Level", "Rating", "Who it's for"]} minWidth={420}>
+        <Table head={["Level", "Rating", "Who it's for"]}>
           {LEVELS.map((l) => (
             <tr key={l.level}>
               <Td strong>{l.level}</Td>
-              <Td><span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{l.rating}</span></Td>
+              <Td><span className="whitespace-nowrap" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{l.rating}</span></Td>
               <Td>{l.who}</Td>
             </tr>
           ))}
@@ -228,7 +235,7 @@ export default function TennisPickleballLeagues() {
         <H2 eyebrow="Step 2" lead="Singles is one player. Doubles and mixed doubles are a team of two with one fee that covers both of you.">
           Pick your format and see the price
         </H2>
-        <Table head={["Format", "Who plays", "Price", "Good to know"]} minWidth={620}>
+        <Table head={["Format", "Who plays", "Price", "Good to know"]}>
           {FORMATS.map((f) => (
             <tr key={f.format}>
               <Td strong>{f.format}</Td>
@@ -275,7 +282,7 @@ export default function TennisPickleballLeagues() {
         <H2 eyebrow="Playing" lead="Here is what happens for each match in a Flex League, in order.">
           Your match, step by step
         </H2>
-        <Table head={["When", "What happens"]} minWidth={460}>
+        <Table head={["When", "What happens"]}>
           {MATCH_TIMELINE.map((m) => (
             <tr key={m.when}>
               <Td strong>{m.when}</Td>
@@ -294,7 +301,7 @@ export default function TennisPickleballLeagues() {
           How standings and playoffs work
         </H2>
         <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-6 items-start">
-          <Table head={["You get points for", "Points"]} minWidth={340}>
+          <Table head={["You get points for", "Points"]}>
             {POINTS.map((p) => (
               <tr key={p.for}>
                 <Td>{p.for}</Td>
@@ -318,7 +325,7 @@ export default function TennisPickleballLeagues() {
         <H2 eyebrow="Choosing a sport" lead="Many players end up in both. If you are picking a starting point, this is how they differ.">
           Tennis or pickleball first?
         </H2>
-        <Table head={["", "Tennis", "Pickleball"]} minWidth={560}>
+        <Table head={["", "Tennis", "Pickleball"]}>
           {COMPARE.map((c) => (
             <tr key={c.row}>
               <Td strong>{c.row}</Td>
