@@ -351,7 +351,7 @@ export default function Home() {
 
         {/* 8. COMING SOON */}
         <Section tint className="!py-14 md:!py-16">
-          <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 items-center">
+          <div className="grid grid-cols-1 gap-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: GREEN }}>Coming soon</p>
               <h2 className="font-bold text-2xl md:text-3xl" style={{ color: INK }}>What we are adding next</h2>
