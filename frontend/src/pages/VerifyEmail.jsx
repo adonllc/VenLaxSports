@@ -82,7 +82,7 @@ export default function VerifyEmail() {
           </div>
           <h1 className="font-heading font-bold text-2xl text-heading-dark mb-2">Verify your email</h1>
           <p className="text-sm text-gray-500">
-            We sent a 6-digit code to <strong className="text-gray-800">{user?.email}</strong>
+            We sent a 6-digit code to <strong className="text-[#3D3D3D]">{user?.email}</strong>
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function VerifyEmail() {
               value={d}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-12 h-14 text-center text-xl font-bold border-2 border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
+              className="w-12 h-14 text-center text-xl font-bold border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#3D3D3D] transition-colors"
               aria-label={`Digit ${i + 1} of 6`}
               data-testid={`otp-digit-${i}`}
               autoFocus={i === 0}
@@ -129,7 +129,7 @@ export default function VerifyEmail() {
         <button
           onClick={handleResend}
           disabled={resending}
-          className="w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-black transition-colors"
+          className="w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-[#3D3D3D] transition-colors"
           data-testid="resend-btn"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${resending ? "animate-spin" : ""}`} />

@@ -33,7 +33,7 @@ function VenlaxWordmark({ size = "md", variant = "default" }) {
   const isWhite = variant === "light" || variant === "hero";
   const venColor = isWhite ? "#FFFFFF" : "#008F70";
   const laxColor = isWhite ? "#FFFFFF" : "#F2A922";
-  const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#1D1D1D";
+  const subColor = isWhite || variant === "onDark" ? "#FFFFFF" : "#3D3D3D";
 
   const wordStyle = {
     fontSize: `${fontSize}px`,

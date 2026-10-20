@@ -320,7 +320,7 @@ export default function LeagueDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D3D3D]" />
       </div>
     );
   }
@@ -330,7 +330,7 @@ export default function LeagueDetail() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <div className="text-6xl mb-4">⚠</div>
-          <h1 className="font-bold text-2xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1F2937" }}>Unable to Load League</h1>
+          <h1 className="font-bold text-2xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#3D3D3D" }}>Unable to Load League</h1>
           <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>{networkError}</p>
           <button onClick={() => navigate("/leagues")} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ background: "#008F70", fontFamily: "Rubik, sans-serif" }} data-testid="error-back-to-leagues">
             Back to Leagues
@@ -372,7 +372,7 @@ export default function LeagueDetail() {
                 <span className={`px-3 py-1.5 text-xs font-semibold rounded-md ${config.badge}`} style={{ fontFamily: "Rubik, sans-serif" }}>
                   {config.icon} {config.label}
                 </span>
-                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#1D1D1D", fontFamily: "Rubik, sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
+                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={league.status === "registration" ? { background: "#D1FAE5", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" } : { background: "#F3F4F6", color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                   {league.status?.charAt(0).toUpperCase() + league.status?.slice(1)}
                 </span>
                 {isRegistered && (
@@ -381,7 +381,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
               </div>
-              <h1 className="font-bold text-3xl sm:text-4xl mb-4 text-gray-900" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: config.accent || "#008F70" }}>{league.name}</h1>
+              <h1 className="font-bold text-3xl sm:text-4xl mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: config.accent || "#008F70" }}>{league.name}</h1>
               <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#008F70" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
@@ -393,7 +393,7 @@ export default function LeagueDetail() {
             {(league.division_label || league.format === "mixed_doubles") && (
               <div className="flex flex-wrap items-center gap-3">
                 {league.division_label && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#1D1D1D", border: "1px solid #E5E7EB", fontFamily: "Rubik, sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#F3F4F6", color: "#3D3D3D", border: "1px solid #E5E7EB", fontFamily: "Rubik, sans-serif" }} data-testid="league-division-badge" title={league.sport === "pickleball" ? "DUPR: Dupr's Pickleball Rating" : "NTRP: National Tennis Rating Program"}>
                     {league.division_label}
                     {league.division_ntrp_min && (
                       <span className="ml-1.5 font-normal" style={{ color: "#6B7280" }}>
@@ -403,7 +403,7 @@ export default function LeagueDetail() {
                   </span>
                 )}
                 {league.format === "mixed_doubles" && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#1D1D1D", border: "1px solid #D1F5EC", fontFamily: "Rubik, sans-serif" }}>
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "#EDF7F3", color: "#3D3D3D", border: "1px solid #D1F5EC", fontFamily: "Rubik, sans-serif" }}>
                     Mixed Doubles
                   </span>
                 )}
@@ -415,7 +415,7 @@ export default function LeagueDetail() {
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="font-semibold text-base" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>Season Completed</p>
+                  <p className="font-semibold text-base" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>Season Completed</p>
                   <p className="text-sm mt-2" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>Roster closed. Check Standings tab for final results.</p>
                 </div>
               ) : (
@@ -555,7 +555,7 @@ export default function LeagueDetail() {
                                   value={promoCode}
                                   onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); setPromoError(""); }}
                                   placeholder="Promo code"
-                                  className="flex-1 px-3 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono bg-white" style={{ border: "1px solid #E5E7EB", color: "#1D1D1D" }}
+                                  className="flex-1 px-3 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono bg-white" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D" }}
                                   data-testid="promo-code-input"
                                 />
                                 <button
@@ -595,7 +595,7 @@ export default function LeagueDetail() {
                   {isRegistered && (
                     <div className="rounded-xl px-4 py-4 text-center" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }} data-testid="registered-badge">
                       <CheckCircle className="w-6 h-6 mx-auto mb-1.5" style={{ color: "#B7791F" }} />
-                      <p className="font-bold text-sm" style={{ color: "#1D1D1D" }}>You're registered</p>
+                      <p className="font-bold text-sm" style={{ color: "#3D3D3D" }}>You're registered</p>
                       <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Check your email for details.</p>
                     </div>
                   )}
@@ -633,7 +633,7 @@ export default function LeagueDetail() {
         {tab === "overview" && (
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-none p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#1D1D1D" }}>League Details</h3>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#3D3D3D" }}>League Details</h3>
               <dl className="space-y-3">
                 {[
                   ["Sport", `${config.icon} ${config.label}`],
@@ -644,13 +644,13 @@ export default function LeagueDetail() {
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">
                     <dt className="text-sm" style={{ color: "#6B7280" }}>{k}</dt>
-                    <dd className="text-sm font-medium text-right" style={{ color: "#1D1D1D" }}>{v}</dd>
+                    <dd className="text-sm font-medium text-right" style={{ color: "#3D3D3D" }}>{v}</dd>
                   </div>
                 ))}
               </dl>
             </div>
             <div className="bg-white rounded-none p-6" style={{ border: "1px solid #E5E7EB" }}>
-              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#1D1D1D" }}>About This League</h3>
+              <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#3D3D3D" }}>About This League</h3>
               <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{league.description || "No description provided."}</p>
               {league.rules && (
                 <div className="mt-4 p-3 rounded-xl" style={{ background: "#FFFFFF" }}>
@@ -678,7 +678,7 @@ export default function LeagueDetail() {
         {tab === "matches" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-heading font-bold text-lg" style={{ color: "#1D1D1D" }}>Matches ({matches.length})</h3>
+              <h3 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Matches ({matches.length})</h3>
               {user && (
                 <Link to="/dashboard" className="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ color: "#008F70", border: "1px solid #008F70" }} data-testid="schedule-match-link">
                   Schedule Match
@@ -692,14 +692,14 @@ export default function LeagueDetail() {
                 {matches.map((m) => (
                   <div key={m.id} className="flex items-center justify-between px-5 py-4 gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate" style={{ color: "#1D1D1D" }}>{m.player1_name} vs {m.player2_name}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "#3D3D3D" }}>{m.player1_name} vs {m.player2_name}</p>
                       <p className="text-xs" style={{ color: "#6B7280" }}>{m.scheduled_date}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {m.status === "completed" && m.winner_name && (
                         <span className="text-xs font-medium" style={{ color: "#B7791F" }}>{m.winner_name} won</span>
                       )}
-                      <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F3F4F6", color: "#6B7280" } : m.status === "scheduled" ? { background: "#EDF7F3", color: "#1D1D1D" } : { background: "#F3F4F6", color: "#6B7280" }}>
+                      <span className="text-xs px-2 py-1 rounded-full" style={m.status === "completed" ? { background: "#F3F4F6", color: "#6B7280" } : m.status === "scheduled" ? { background: "#EDF7F3", color: "#3D3D3D" } : { background: "#F3F4F6", color: "#6B7280" }}>
                         {m.status}
                       </span>
                       {user && m.status === "scheduled" && (user._id === m.player1_id || user.id === m.player1_id || user._id === m.player2_id || user.id === m.player2_id) && (
@@ -739,14 +739,14 @@ export default function LeagueDetail() {
                     {standings.map((s, i) => (
                       <tr key={i} style={i === 0 ? { background: "#FFFFFF" } : {}}>
                         <td className="px-5 py-3 font-heading font-bold" style={{ color: "#E5E7EB" }}>{i + 1}</td>
-                        <td className="px-5 py-3 font-medium" style={{ color: "#1D1D1D" }}>
+                        <td className="px-5 py-3 font-medium" style={{ color: "#3D3D3D" }}>
                           {i === 0 && <Trophy className="inline w-3.5 h-3.5 mr-1" style={{ color: "#B7791F" }} />}
                           {s.player_name}
                         </td>
                         <td className="px-3 py-3 text-center font-semibold" style={{ color: "#B7791F" }}>{s.wins}</td>
                         <td className="px-3 py-3 text-center text-red-600">{s.losses}</td>
                         <td className="px-3 py-3 text-center" style={{ color: "#6B7280" }}>{s.matches_played}</td>
-                        <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#1D1D1D" }}>{s.points}</td>
+                        <td className="px-3 py-3 text-center font-heading font-bold" style={{ color: "#3D3D3D" }}>{s.points}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -758,7 +758,7 @@ export default function LeagueDetail() {
 
         {league?.league_type === "box_league" && boxStandings && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: "#1D1D1D" }}>Box Standings</h3>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: "#3D3D3D" }}>Box Standings</h3>
             {/* Box tab pills */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {boxStandings.boxes.map((box) => (
@@ -796,7 +796,7 @@ export default function LeagueDetail() {
                       return (
                         <tr key={p.player_id} style={isPromote ? { background: "#FFEDD5" } : isRelegate ? { background: "#FEF2F2" } : {}}>
                           <td className="px-4 py-3 font-semibold" style={{ color: "#6B7280" }}>#{p.rank}</td>
-                          <td className="px-4 py-3 font-medium" style={{ color: "#1D1D1D" }}>{p.name}</td>
+                          <td className="px-4 py-3 font-medium" style={{ color: "#3D3D3D" }}>{p.name}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.wins}</td>
                           <td className="px-4 py-3 text-center" style={{ color: "#374151" }}>{p.losses}</td>
                           <td className="px-4 py-3 text-right">

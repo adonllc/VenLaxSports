@@ -105,14 +105,14 @@ export default function RoundRobinLeagues() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F3F4F6", color: "#1D1D1D" }}>{sc.icon} {sc.label}</span>
-                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F0F7FF", color: "#1D1D1D", border: "1px solid #DBEAFE" }}>Round Robin</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F3F4F6", color: "#3D3D3D" }}>{sc.icon} {sc.label}</span>
+                      <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: "#F0F7FF", color: "#3D3D3D", border: "1px solid #DBEAFE" }}>Round Robin</span>
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-md font-semibold ${STATUS_COLORS[lg.status] || "bg-gray-100 text-gray-600"}`} style={{ fontFamily: "Rubik, sans-serif" }}>
                       {lg.status?.charAt(0).toUpperCase() + lg.status?.slice(1)}
                     </span>
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-2 line-clamp-2 leading-snug tracking-[-0.5px]" style={{ color: "#1D1D1D" }}>{lg.name}</h3>
+                  <h3 className="font-heading font-bold text-base mb-2 line-clamp-2 leading-snug tracking-[-0.5px]" style={{ color: "#3D3D3D" }}>{lg.name}</h3>
                   <p className="text-xs flex items-center gap-1.5 mb-4" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                     <span style={{ color: "#008F70" }}>📍</span>
                     <span className="font-medium">{lg.city}</span>

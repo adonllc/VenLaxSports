@@ -240,8 +240,8 @@ export default function Terms() {
           </div>
           <div className="space-y-4">
             <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
-              <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Still Photography</h3>
-              <p className="text-sm text-gray-800 mb-2">
+              <h3 className="font-heading font-bold text-base text-[#3D3D3D] mb-3">Still Photography</h3>
+              <p className="text-sm text-[#3D3D3D] mb-2">
                 Still photography by spectators, opponents, and organizers is permitted and encouraged.
               </p>
               <p className="text-xs text-gray-700">
@@ -250,8 +250,8 @@ export default function Terms() {
             </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded-none p-6">
-              <h3 className="font-heading font-bold text-base text-gray-900 mb-3">Live Streaming & Video Recording</h3>
-              <p className="text-sm text-gray-800 mb-2">
+              <h3 className="font-heading font-bold text-base text-[#3D3D3D] mb-3">Live Streaming & Video Recording</h3>
+              <p className="text-sm text-[#3D3D3D] mb-2">
                 Recording and streaming requires written consent from BOTH players and the organizer.
               </p>
               <ul className="space-y-2 text-xs text-gray-700 ml-4">

@@ -123,7 +123,7 @@ export default function JoinFlow() {
                   <button
                     key={s.id}
                     onClick={() => { setSport(s.id); setStep(1); }}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${sport === s.id ? (SPORT_SELECTED_CLS[s.id] || "border-black bg-gray-50") : "border-gray-200 hover:border-gray-400"}`}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition text-left ${sport === s.id ? (SPORT_SELECTED_CLS[s.id] || "border-[#3D3D3D] bg-gray-50") : "border-gray-200 hover:border-gray-400"}`}
                     data-testid={`pick-sport-${s.id}`}
                   >
                     <span className="text-3xl">{s.icon}</span>
@@ -144,7 +144,7 @@ export default function JoinFlow() {
                   <button
                     key={lt.id}
                     onClick={() => { setLeagueType(lt.id); setStep(2); }}
-                    className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 transition text-left hover:border-gray-400 ${leagueType === lt.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 transition text-left hover:border-gray-400 ${leagueType === lt.id ? "border-[#3D3D3D] bg-gray-50" : "border-gray-200"}`}
                     data-testid={`pick-type-${lt.id}`}
                   >
                     <span className="text-2xl mt-0.5">{lt.icon}</span>
@@ -155,7 +155,7 @@ export default function JoinFlow() {
                   </button>
                 ))}
               </div>
-              <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-black transition-colors">
+              <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#3D3D3D] transition-colors">
                 <ChevronLeft className="w-4 h-4" /> Back
               </button>
             </>
@@ -170,7 +170,7 @@ export default function JoinFlow() {
                   <button
                     key={d.id}
                     onClick={() => { setDivision(d.id); setStep(3); }}
-                    className={`flex flex-col items-center gap-2 p-6 rounded-xl border-2 transition hover:border-gray-400 ${division === d.id ? "border-black bg-gray-50" : "border-gray-200"}`}
+                    className={`flex flex-col items-center gap-2 p-6 rounded-xl border-2 transition hover:border-gray-400 ${division === d.id ? "border-[#3D3D3D] bg-gray-50" : "border-gray-200"}`}
                     data-testid={`pick-division-${d.id}`}
                   >
                     <span className="text-3xl">{d.icon}</span>
@@ -179,7 +179,7 @@ export default function JoinFlow() {
                   </button>
                 ))}
               </div>
-              <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-black transition-colors">
+              <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#3D3D3D] transition-colors">
                 <ChevronLeft className="w-4 h-4" /> Back
               </button>
             </>
@@ -190,7 +190,7 @@ export default function JoinFlow() {
             <>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-heading font-bold text-xl text-heading-dark">Choose a league</h2>
-                <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-black transition-colors">
+                <button onClick={back} className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#3D3D3D] transition-colors">
                   <ChevronLeft className="w-4 h-4" /> Back
                 </button>
               </div>
@@ -206,7 +206,7 @@ export default function JoinFlow() {
                   <p className="text-sm text-gray-400">Check back soon — new seasons drop regularly.</p>
                   <button
                     onClick={() => navigate("/leagues")}
-                    className="mt-4 text-sm font-semibold text-black underline"
+                    className="mt-4 text-sm font-semibold text-[#3D3D3D] underline"
                   >
                     Browse all leagues
                   </button>
@@ -221,7 +221,7 @@ export default function JoinFlow() {
                       <button
                         key={lg.id}
                         onClick={() => navigate(detailPath)}
-                        className={`w-full text-left p-4 rounded-xl border transition ${alreadyIn ? "border-emerald-300 bg-emerald-50/60 hover:border-emerald-500" : "border-gray-200 hover:border-black hover:-translate-y-0.5 hover:shadow-md"}`}
+                        className={`w-full text-left p-4 rounded-xl border transition ${alreadyIn ? "border-emerald-300 bg-emerald-50/60 hover:border-emerald-500" : "border-gray-200 hover:border-[#3D3D3D] hover:-translate-y-0.5 hover:shadow-md"}`}
                         data-testid={`league-option-${lg.id}`}
                       >
                         <div className="flex items-center justify-between mb-1">

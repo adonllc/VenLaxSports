@@ -6,7 +6,7 @@ const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const METHOD_VISUALS = {
   stripe: { icon: <CreditCard className="w-4 h-4" />, color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-  apple_pay: { icon: <span className="font-bold"></span>, color: "bg-black text-white border-black" },
+  apple_pay: { icon: <span className="font-bold"></span>, color: "bg-[#3D3D3D] text-white border-[#3D3D3D]" },
   google_pay: { icon: <span className="font-bold">G</span>, color: "bg-white text-heading-dark border-gray-300" },
   zelle: { icon: <span className="font-bold">Z</span>, color: "bg-purple-50 text-purple-700 border-purple-200" },
 };
@@ -89,7 +89,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-[#3D3D3D]/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
       data-testid="payment-method-modal"
       role="dialog"

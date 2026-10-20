@@ -14,7 +14,7 @@ module.exports = {
                 mono: ["IBM Plex Mono", "monospace"],
             },
             textColor: {
-                heading: "#1D1D1D",
+                heading: "#3D3D3D",
             },
             spacing: {
                 '2xs': '2px',
@@ -84,7 +84,7 @@ module.exports = {
                 'design-system': {
                     'primary': '#10B981',
                     'accent': '#F97316',
-                    'dark': '#1F2937',
+                    'dark': '#3D3D3D',
                     'light': '#F9FAFB',
                     'gray-100': '#F3F4F6',
                     'gray-300': '#D1D5DB',
@@ -161,7 +161,7 @@ module.exports = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
-                "heading-dark": "#1D1D1D",
+                "heading-dark": "#3D3D3D",
             },
             borderRadius: {
                 lg: "var(--radius)",

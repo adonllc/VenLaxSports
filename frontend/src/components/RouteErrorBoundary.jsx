@@ -29,7 +29,7 @@ export default class RouteErrorBoundary extends Component {
       }
       return (
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
-          <p className="text-lg font-semibold text-gray-900">Something went wrong loading this page.</p>
+          <p className="text-lg font-semibold text-[#3D3D3D]">Something went wrong loading this page.</p>
           <button
             onClick={() => window.location.reload()}
             className="px-5 py-2.5 rounded-lg font-semibold text-white"

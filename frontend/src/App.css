@@ -42,7 +42,7 @@
 
 /* ─── Dark Hero ─────────────────────────────────────────────── */
 .hero-dark {
-    background: #0A0A0A;
+    background: #3D3D3D;
 }
 
 /* ─── Glass Nav (upgraded) ───────────────────────────────────── */
@@ -105,7 +105,7 @@
 
 /* ─── Legacy Hero Gradient (kept for other pages) ─────────────── */
 .hero-gradient {
-    background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 50%, #0A0A0A 100%);
+    background: linear-gradient(135deg, #3D3D3D 0%, #3D3D3D 50%, #3D3D3D 100%);
 }
 
 /* ─── Scrollbar Hide ─────────────────────────────────────────── */

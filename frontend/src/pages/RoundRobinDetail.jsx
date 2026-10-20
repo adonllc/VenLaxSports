@@ -171,7 +171,7 @@ export default function RoundRobinDetail() {
                 data-testid={`tab-${tab.toLowerCase()}`}
                 onClick={() => setActiveTab(tab)}
                 className={`py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                  activeTab === tab ? "border-black text-black" : "border-transparent text-gray-500 hover:text-gray-700"
+                  activeTab === tab ? "border-[#3D3D3D] text-[#3D3D3D]" : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {tab}
@@ -254,7 +254,7 @@ export default function RoundRobinDetail() {
       </div>
 
       {showInviteModal && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-[#3D3D3D]/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-none p-6 max-w-sm w-full">
             <h2 className="font-bold text-heading-dark text-lg mb-1">Register as Team</h2>
             <p className="text-sm text-gray-500 mb-4">Find your partner by name or email. If they're not on VenLax yet, invite them.</p>

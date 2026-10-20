@@ -36,7 +36,7 @@ export default function ConsentBanner() {
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-sm text-gray-700 flex-1 leading-relaxed">
           We use analytics to improve this platform. Session recording is only enabled with your consent.{" "}
-          <Link to="/privacy" className="underline text-gray-900 hover:text-[#008F70]">
+          <Link to="/privacy" className="underline text-[#3D3D3D] hover:text-[#008F70]">
             Privacy Policy
           </Link>
         </p>
@@ -44,7 +44,7 @@ export default function ConsentBanner() {
           <button
             onClick={decline}
             data-testid="consent-decline"
-            className="px-4 py-2 text-sm font-medium text-gray-700 rounded-md border border-gray-300 hover:border-gray-500 hover:text-gray-900 transition"
+            className="px-4 py-2 text-sm font-medium text-gray-700 rounded-md border border-gray-300 hover:border-gray-500 hover:text-[#3D3D3D] transition"
           >
             Decline
           </button>

@@ -227,17 +227,17 @@ export default function Auth() {
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative" style={{ background: "#F9FAFB", borderRight: "1px solid #D1D5DB" }}>
         <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: "#008F70" }} />
         <div className="max-w-md text-center">
-          <h1 className="font-bold text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1F2937", letterSpacing: "-0.02em" }}>
+          <h1 className="font-bold text-6xl leading-tight mb-4 tracking-tight" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#3D3D3D", letterSpacing: "-0.02em" }}>
             TRACK.<br />RANK.<br /><span style={{ color: "#008F70" }}>COMPETE.</span>
           </h1>
 
-          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "Rubik, sans-serif", color: "#4C4C4C" }}>
+          <p className="text-xl font-medium mb-10 leading-relaxed" style={{ fontFamily: "Rubik, sans-serif", color: "#5C5C5C" }}>
             Your sport. Your stats. Your legacy.
           </p>
 
           <div className="flex gap-6 justify-center">
             {activeSports.map((s) => (
-              <div key={s.id} className="text-sm font-medium" style={{ color: "#4C4C4C" }}>{s.icon} {s.label}</div>
+              <div key={s.id} className="text-sm font-medium" style={{ color: "#5C5C5C" }}>{s.icon} {s.label}</div>
             ))}
           </div>
         </div>
@@ -248,7 +248,7 @@ export default function Auth() {
         <div className="w-full max-w-md">
         {twoFA ? (
           <div data-testid="two-fa-panel">
-            <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1D1D1D" }}>
+            <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#3D3D3D" }}>
               {backupCodes ? "Save your backup codes" : twoFA.needsSetup ? "Set up two-factor authentication" : "Enter your 2FA code"}
             </h1>
             <p className="text-sm mb-6" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
@@ -263,13 +263,13 @@ export default function Auth() {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-2 bg-gray-50 border border-gray-200 rounded-xl p-4 font-mono text-sm">
                   {backupCodes.map((c) => (
-                    <div key={c} className="text-center py-1" style={{ color: "#1D1D1D" }}>{c}</div>
+                    <div key={c} className="text-center py-1" style={{ color: "#3D3D3D" }}>{c}</div>
                   ))}
                 </div>
                 <button
                   onClick={() => navigator.clipboard.writeText(backupCodes.join("\n"))}
                   className="w-full py-2.5 border rounded-xl text-sm font-semibold"
-                  style={{ borderColor: "#E5E7EB", color: "#1D1D1D" }}
+                  style={{ borderColor: "#E5E7EB", color: "#3D3D3D" }}
                   data-testid="copy-backup-codes-btn"
                 >
                   Copy codes
@@ -339,7 +339,7 @@ export default function Auth() {
             <button
               onClick={() => { setMode("login"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#1D1D1D" } : { color: "#6B7280" }}
+              style={mode === "login" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#3D3D3D" } : { color: "#6B7280" }}
               data-testid="login-tab"
             >
               Log In
@@ -347,14 +347,14 @@ export default function Auth() {
             <button
               onClick={() => { setMode("register"); setError(""); setEmailExists(null); setWaiverAgreed(false); }}
               className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition`}
-              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#1D1D1D" } : { color: "#6B7280" }}
+              style={mode === "register" ? { background: "white", boxShadow: "0 1px 3px rgba(44,18,6,0.15)", color: "#3D3D3D" } : { color: "#6B7280" }}
               data-testid="register-tab"
             >
               Sign Up
             </button>
           </div>
 
-          <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1D1D1D" }}>
+          <h1 className="font-bold text-3xl mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#3D3D3D" }}>
             {mode === "login" ? "Welcome back." : "Enter the circuit."}
           </h1>
           <p className="text-sm mb-8" style={{ fontFamily: "Rubik, sans-serif", color: "#6B7280" }}>
@@ -412,7 +412,7 @@ export default function Auth() {
                   className="w-full px-4 py-3 rounded-lg text-sm transition-colors"
                   style={{
                     border: "1px solid #E5E7EB",
-                    color: "#1D1D1D",
+                    color: "#3D3D3D",
                     background: "white",
                     fontFamily: "Rubik, sans-serif"
                   }}
@@ -437,7 +437,7 @@ export default function Auth() {
                 style={{
                   border: mode === "register" && emailExists ? "1px solid #F59E0B" : "1px solid #E5E7EB",
                   background: mode === "register" && emailExists ? "#FFFBEB" : "white",
-                  color: "#1D1D1D",
+                  color: "#3D3D3D",
                   fontFamily: "Rubik, sans-serif"
                 }}
                 onFocus={e => e.currentTarget.style.outline = mode === "register" && emailExists ? "2px solid #F59E0B" : "2px solid #008F70"}
@@ -452,7 +452,7 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setMode("login"); setError(""); setEmailExists(null); }}
-                    className="text-xs font-semibold text-black underline ml-3 whitespace-nowrap"
+                    className="text-xs font-semibold text-[#3D3D3D] underline ml-3 whitespace-nowrap"
                     data-testid="email-exists-login-btn"
                   >
                     Log in instead →
@@ -473,7 +473,7 @@ export default function Auth() {
                   className="w-full px-4 py-3 pr-12 rounded-lg text-sm transition-colors"
                   style={{
                     border: "1px solid #E5E7EB",
-                    color: "#1D1D1D",
+                    color: "#3D3D3D",
                     background: "white",
                     fontFamily: "Rubik, sans-serif"
                   }}
@@ -515,7 +515,7 @@ export default function Auth() {
                   <select
                     value={form.country}
                     onChange={update("country")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-country"
                   >
                     {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -528,7 +528,7 @@ export default function Auth() {
                     value={form.city}
                     onChange={update("city")}
                     placeholder="Your city (e.g. Austin, Boise, Buffalo — anywhere in the USA)"
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-city"
                     autoComplete="address-level2"
                   />
@@ -538,7 +538,7 @@ export default function Auth() {
                   <select
                     value={form.skill_level}
                     onChange={update("skill_level")}
-                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
+                    className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }} onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"} onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-skill-level"
                   >
                     <option value="">Select your USTA/USAPA level</option>
@@ -562,7 +562,7 @@ export default function Auth() {
                     value={form.date_of_birth}
                     onChange={update("date_of_birth")}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-dob"
@@ -578,7 +578,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_name")}
                     placeholder="e.g. Parent's name"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-name"
@@ -593,7 +593,7 @@ export default function Auth() {
                     onChange={update("emergency_contact_phone")}
                     placeholder="e.g. +1-555-0123"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-emergency-contact-phone"
@@ -608,7 +608,7 @@ export default function Auth() {
                     onChange={update("medical_conditions")}
                     placeholder="e.g. Asthma, allergies (confidential)"
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ border: "1px solid #E5E7EB", color: "#1D1D1D", background: "white" }}
+                    style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }}
                     onFocus={e => e.currentTarget.style.boxShadow="0 0 0 2px #008F7033"}
                     onBlur={e => e.currentTarget.style.boxShadow="none"}
                     data-testid="input-medical-conditions"

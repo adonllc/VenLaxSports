@@ -13,8 +13,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "..
 
 const GREEN = "#008F70";
 const AMBER = "#F2A922";
-const INK = "#1D1D1D";
-const BODY = "#4C4C4C";
+const INK = "#3D3D3D";
+const BODY = "#5C5C5C";
 const GREY = "#F1F1F1";
 
 const fadeUp = {
@@ -90,7 +90,7 @@ function AmberButton({ children, onClick, testId, className = "" }) {
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white ${className}`}
+      className={`inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white ${className}`}
       style={{ background: AMBER, color: INK }}
       data-testid={testId}
     >
@@ -139,7 +139,7 @@ export default function Home() {
         {/* 1. HERO */}
         <section className="relative">
           <PhotoSlot src={PHOTOS.hero} alt="Players competing in a league match" tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
-            <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.38)" }} />
+            <div className="absolute inset-0" style={{ background: "rgba(61,61,61,0.38)" }} />
             <div className="relative flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
               <motion.h1
                 className="font-bold italic text-6xl sm:text-8xl md:text-[144px] leading-[0.95] text-white"
@@ -166,7 +166,7 @@ export default function Home() {
                   <button
                     key={s.id}
                     onClick={() => navigate(`/sport/${s.id}`)}
-                    className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#1D1D1D]"
+                    className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#3D3D3D]"
                     aria-label={`Explore ${s.label} leagues`}
                     data-testid={`hero-explore-${s.id}`}
                   >

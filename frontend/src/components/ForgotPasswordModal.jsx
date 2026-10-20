@@ -35,7 +35,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-[#3D3D3D]/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={handleClose}
       data-testid="forgot-password-modal"
       role="dialog"
@@ -67,7 +67,7 @@ export default function ForgotPasswordModal({ open, onClose, prefillEmail = "" }
             </p>
             <button
               onClick={handleClose}
-              className="mt-6 text-sm font-semibold text-black hover:underline"
+              className="mt-6 text-sm font-semibold text-[#3D3D3D] hover:underline"
             >
               Back to login
             </button>

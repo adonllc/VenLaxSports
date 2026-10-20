@@ -30,15 +30,15 @@ export default function Footer() {
             <div className="mb-4">
               <Logo size="md" variant="default" testId="footer-logo" />
             </div>
-            <p className="text-sm font-semibold leading-relaxed text-[#1D1D1D] mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
+            <p className="text-sm font-semibold leading-relaxed text-[#3D3D3D] mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
               {BRAND.tagline_short}
             </p>
-            <p className="text-sm text-[#4C4C4C] mb-3" style={{ fontFamily: "Rubik, sans-serif" }}>
+            <p className="text-sm text-[#5C5C5C] mb-3" style={{ fontFamily: "Rubik, sans-serif" }}>
               {platformConfig.footerTagline}
             </p>
             <div className="flex items-center gap-4">
               {activeSports.map((s) => (
-                <span key={s.id} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4C4C4C]" style={{ fontFamily: "Rubik, sans-serif" }}>
+                <span key={s.id} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
                   <span
                     className="w-2 h-2 rounded-full inline-block"
                     style={{ background: SPORT_DOT[s.id] || "#008F70" }}
@@ -54,7 +54,7 @@ export default function Footer() {
             <div className="grid grid-cols-2 md:inline-grid md:grid-cols-3 gap-8 md:gap-x-16">
               {/* Sports */}
               <div aria-label="Sports navigation">
-                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Sports
                 </h3>
                 <ul className="space-y-2">
@@ -62,7 +62,7 @@ export default function Footer() {
                     <li key={s.id}>
                       <Link
                         to={`/sport/${s.id}`}
-                        className="text-[13px] text-[#4C4C4C] hover:text-[#1D1D1D] transition-colors"
+                        className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                         style={{ fontFamily: "Rubik, sans-serif" }}
                       >
                         {s.label}
@@ -74,7 +74,7 @@ export default function Footer() {
 
               {/* Platform */}
               <div aria-label="Platform navigation">
-                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Platform
                 </h3>
                 <ul className="space-y-2">
@@ -88,7 +88,7 @@ export default function Footer() {
                     <li key={to}>
                       <Link
                         to={to}
-                        className="text-[13px] text-[#4C4C4C] hover:text-[#1D1D1D] transition-colors"
+                        className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                         style={{ fontFamily: "Rubik, sans-serif" }}
                       >
                         {label}
@@ -100,7 +100,7 @@ export default function Footer() {
 
               {/* Legal + Support */}
               <div aria-label="Legal and support navigation">
-                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Legal
                 </h3>
                 <ul className="space-y-2">
@@ -112,7 +112,7 @@ export default function Footer() {
                     <li key={to}>
                       <Link
                         to={to}
-                        className="text-[13px] text-[#4C4C4C] hover:text-[#1D1D1D] transition-colors"
+                        className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                         style={{ fontFamily: "Rubik, sans-serif" }}
                       >
                         {label}
@@ -122,7 +122,7 @@ export default function Footer() {
                   <li>
                     <button
                       onClick={() => setContactOpen(true)}
-                      className="text-[13px] text-[#4C4C4C] hover:text-[#1D1D1D] transition-colors cursor-pointer"
+                      className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors cursor-pointer"
                       style={{ fontFamily: "Rubik, sans-serif" }}
                       data-testid="footer-contact-us"
                     >
@@ -136,8 +136,8 @@ export default function Footer() {
         </div>
 
         {/* Featured Cities — Full width, below main content */}
-        <div className="pb-6 border-b border-black/10">
-          <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
+        <div className="pb-6 border-b border-[#3D3D3D]/10">
+          <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
             Browse by City
           </h3>
           <div className="flex flex-wrap gap-5">
@@ -145,7 +145,7 @@ export default function Footer() {
               <Link
                 key={city.name}
                 to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                className="text-[13px] text-[#4C4C4C] hover:text-[#1D1D1D] transition-colors"
+                className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                 style={{ fontFamily: "Rubik, sans-serif" }}
               >
                 {city.icon} {city.name}
@@ -156,7 +156,7 @@ export default function Footer() {
 
         {/* Footer Bottom — Copyright */}
         <div className="pt-5">
-          <p className="text-xs text-[#4C4C4C]" style={{ fontFamily: "Rubik, sans-serif" }}>
+          <p className="text-xs text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
             © {new Date().getFullYear()} VENLAX Sports. Owned by Cloudy Labs LLC.
           </p>
         </div>

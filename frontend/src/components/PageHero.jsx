@@ -10,7 +10,7 @@ export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src = P
   return (
     <section data-testid={testId}>
       <PhotoSlot src={src} tone={tone} overlay={false}>
-        <div className="absolute inset-0" style={{ background: src ? "rgba(0,0,0,0.5)" : "transparent" }} />
+        <div className="absolute inset-0" style={{ background: src ? "rgba(61,61,61,0.5)" : "transparent" }} />
         <div className="relative max-w-[1100px] mx-auto px-6 py-20 sm:py-28">
           {eyebrow && (
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] mb-5" style={{ color: "#F2A922" }}>

@@ -131,7 +131,7 @@ export default function Leagues() {
       {/* Header */}
       <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="font-bold text-4xl sm:text-5xl mb-3 text-gray-900" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>Browse Leagues</h1>
+          <h1 className="font-bold text-4xl sm:text-5xl mb-3 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>Browse Leagues</h1>
           <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>Find competitive leagues across all sports and cities</p>
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function Leagues() {
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
               className="w-full pl-10 pr-4 py-3 rounded-lg text-sm border"
-              style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "Rubik, sans-serif" }}
+              style={{ borderColor: "#E5E7EB", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
               data-testid="filter-search"
             />
           </div>
@@ -167,7 +167,7 @@ export default function Leagues() {
             value={filters.sport}
             onChange={(e) => updateFilter("sport", e.target.value)}
             className="px-4 py-3 rounded-lg text-sm bg-white border focus:outline-none"
-            style={{ borderColor: "#E5E7EB", color: "#1F2937", fontFamily: "Rubik, sans-serif", minWidth: "160px" }}
+            style={{ borderColor: "#E5E7EB", color: "#3D3D3D", fontFamily: "Rubik, sans-serif", minWidth: "160px" }}
             data-testid="filter-sport"
             aria-label="Filter leagues by sport"
           >
@@ -232,7 +232,7 @@ export default function Leagues() {
           {(filters.sport || filters.city || filters.status || filters.division || filters.format || filters.search) && (
             <button
               onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 underline"
+              className="text-sm font-medium text-gray-600 hover:text-[#3D3D3D] underline"
               data-testid="clear-filters"
             >
               Clear all
@@ -263,7 +263,7 @@ export default function Leagues() {
         ) : (
           <div className="text-center py-20">
             <Trophy className="w-16 h-16 mx-auto mb-6 opacity-30" />
-            <h3 className="font-bold text-2xl mb-3 text-gray-900" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>No leagues found</h3>
+            <h3 className="font-bold text-2xl mb-3 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>No leagues found</h3>
             <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif", maxWidth: "400px", margin: "0 auto" }}>No leagues match your current filters. Try clearing them to see all open leagues.</p>
             <button
               onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
@@ -331,7 +331,7 @@ function LeagueCard({ league, onClick }) {
 
         {/* League name */}
         <h3
-          className="font-bold text-xl mb-3 line-clamp-2 leading-snug text-gray-900"
+          className="font-bold text-xl mb-3 line-clamp-2 leading-snug text-[#3D3D3D]"
           style={{ fontFamily: "Rubik, system-ui, sans-serif" }}
         >
           {league.name}

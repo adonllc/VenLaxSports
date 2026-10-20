@@ -105,7 +105,7 @@ export default function PublicProfile() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D3D3D]" />
     </div>
   );
 
@@ -113,7 +113,7 @@ export default function PublicProfile() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-sm text-center">
         <p className="text-gray-500 mb-4">{error}</p>
-        <Link to="/leagues" className="text-sm font-medium text-black underline">
+        <Link to="/leagues" className="text-sm font-medium text-[#3D3D3D] underline">
           Browse leagues
         </Link>
       </div>

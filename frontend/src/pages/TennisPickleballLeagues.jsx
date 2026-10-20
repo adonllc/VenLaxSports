@@ -6,8 +6,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "..
 
 const GREEN = "#008F70";
 const AMBER = "#F2A922";
-const INK = "#1D1D1D";
-const BODY = "#4C4C4C";
+const INK = "#3D3D3D";
+const BODY = "#5C5C5C";
 const GREY = "#F1F1F1";
 
 // ---------------------------------------------------------------- content
@@ -363,7 +363,7 @@ export default function TennisPickleballLeagues() {
         <p className="text-lg text-white/90 mb-8 max-w-xl mx-auto">Browse active tennis and pickleball leagues in your city and see real pricing before you sign up.</p>
         <Link
           to="/join"
-          className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white"
+          className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
           style={{ background: AMBER, color: INK }}
           data-testid="tp-leagues-cta"
         >

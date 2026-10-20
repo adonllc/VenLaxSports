@@ -12,7 +12,7 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const BORDER    = "#E5E7EB";
-const TEXT_PRI  = "#1D1D1D";
+const TEXT_PRI  = "#3D3D3D";
 const TEXT_MUTED= "#6B7280";
 
 const SPORT_META = {
@@ -152,7 +152,7 @@ export default function SportLanding() {
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="font-heading font-bold text-4xl mb-3" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
+          <h2 className="font-heading font-bold text-4xl mb-3" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>
             About {meta.label} on VENLAX
           </h2>
           <p className="leading-relaxed" style={{ color: TEXT_MUTED }}>{meta.description}</p>
@@ -162,7 +162,7 @@ export default function SportLanding() {
         <div className="mb-12">
           <motion.h2
             className="font-heading font-bold text-4xl mb-6"
-            style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}
+            style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -194,7 +194,7 @@ Features
         {/* Leagues */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-heading font-bold text-4xl" style={{ color: "#1D1D1D", fontFamily: "Rubik, system-ui, sans-serif" }}>
+            <h2 className="font-heading font-bold text-4xl" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>
               Open {meta.label} Leagues
             </h2>
             <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ Features
                       {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
                     </span>
                   </div>
-                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#1D1D1D" }}>{l.name}</h3>
+                  <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#3D3D3D" }}>{l.name}</h3>
                   <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "Rubik, sans-serif" }}>
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#008F70" }} /><span className="font-medium">{l.city}</span>
                   </p>

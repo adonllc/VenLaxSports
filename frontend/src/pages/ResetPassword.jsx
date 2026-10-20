@@ -48,7 +48,7 @@ export default function ResetPassword() {
         {done ? (
           <div className="text-center py-6" data-testid="reset-success">
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#1D1D1D" }}>Password updated</h1>
+            <h1 className="font-heading font-bold text-3xl text-heading-dark mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: "#3D3D3D" }}>Password updated</h1>
             <p className="text-gray-500 text-sm">Redirecting you to log in...</p>
           </div>
         ) : (

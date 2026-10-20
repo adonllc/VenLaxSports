@@ -175,7 +175,7 @@ export default function ScoreReport() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D3D3D]" />
       </div>
     );
   }
@@ -291,7 +291,7 @@ export default function ScoreReport() {
         <div className="max-w-xl mx-auto px-4 py-8">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6"
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#3D3D3D] mb-6"
             data-testid="back-btn"
           >
             <ArrowLeft className="w-4 h-4" /> Back
@@ -325,7 +325,7 @@ export default function ScoreReport() {
       <div className="max-w-xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#3D3D3D] mb-6"
           data-testid="back-btn"
         >
           <ArrowLeft className="w-4 h-4" /> Back
@@ -642,7 +642,7 @@ export default function ScoreReport() {
             </form>
 
             {confirmModalOpen && (
-              <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="fixed inset-0 z-50 bg-[#3D3D3D]/40 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-900 rounded-none max-w-md w-full p-6 space-y-4">
                   <div>
                     <h2 className="text-lg font-bold text-heading-dark dark:text-gray-100">Confirm Score</h2>

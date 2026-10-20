@@ -45,7 +45,7 @@ export default function LeagueSpectator() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D3D3D]" />
     </div>
   );
 
@@ -54,7 +54,7 @@ export default function LeagueSpectator() {
       <div className="max-w-sm text-center">
         <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-4" />
         <p className="text-gray-500 mb-4">{error}</p>
-        <Link to="/leagues" className="text-sm font-medium text-black underline">
+        <Link to="/leagues" className="text-sm font-medium text-[#3D3D3D] underline">
           Browse all leagues
         </Link>
       </div>
@@ -93,7 +93,7 @@ export default function LeagueSpectator() {
             </div>
             <button
               onClick={handleShare}
-              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-black transition shrink-0"
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#3D3D3D] transition shrink-0"
               data-testid="spectator-share-btn"
             >
               <Share2 className="w-4 h-4" />

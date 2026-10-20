@@ -1,5 +1,5 @@
 const TONES = {
-  ink: "#0F1F1A",
+  ink: "#3D3D3D",
   emerald: "#065F46",
   orange: "#C2410C",
 };
@@ -29,7 +29,7 @@ export default function PhotoSlot({ src, alt = "", tone = "ink", overlay = true,
         </svg>
       )}
       {src && overlay && (
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.32) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(61,61,61,0.78) 0%, rgba(61,61,61,0.5) 55%, rgba(61,61,61,0.32) 100%)" }} />
       )}
       <div className="relative h-full">{children}</div>
     </div>

@@ -5,7 +5,7 @@ import PhotoSlot from "./PhotoSlot";
 
 const GREEN = "#008F70";
 const AMBER = "#F2A922";
-const INK = "#1D1D1D";
+const INK = "#3D3D3D";
 
 /**
  * SportHero — tennis-club style hero for the sport landing pages: photo with
@@ -31,7 +31,7 @@ export default function SportHero({
   return (
     <section>
       <PhotoSlot src={sportMeta.image} alt={`${sportMeta.label} league play`} tone="ink" overlay={false}>
-        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.42)" }} />
+        <div className="absolute inset-0" style={{ background: "rgba(61,61,61,0.42)" }} />
         <div className="relative text-center px-6 pt-24 pb-40 md:pt-32 md:pb-48">
           <p className="text-xs font-bold uppercase tracking-[0.2em] mb-5" style={{ color: AMBER }}>
             {sportMeta.label} leagues, now open
@@ -48,7 +48,7 @@ export default function SportHero({
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={handlePrimary}
-              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#1D1D1D] hover:text-white"
+              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
               style={{ background: AMBER, color: INK }}
               data-testid="sport-hero-join"
             >
@@ -56,7 +56,7 @@ export default function SportHero({
             </button>
             <button
               onClick={handleSecondary}
-              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#1D1D1D]"
+              className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#3D3D3D]"
               data-testid="sport-hero-learn-more"
             >
               Learn more

@@ -11,11 +11,11 @@ const RUST = "#F2A922";
 const SAND_PALE = "#FFFFFF";
 const SAND_LIGHT = "#F3F4F6";
 const BORDER = "#E5E7EB";
-const COFFEE = "#1D1D1D";
+const COFFEE = "#3D3D3D";
 const MOCHA = "#374151";
 const SIENNA = "#6B7280";
 const SPORT_BADGE = {
-  tennis:     { bg: "#D1FAE5", color: "#1D1D1D", border: "#008F70" },
+  tennis:     { bg: "#D1FAE5", color: "#3D3D3D", border: "#008F70" },
   pickleball: { bg: "#FFEDD5", color: "#B7791F", border: "#F2A922" },
   cricket:    { bg: "#DBEAFE", color: "#1E40AF", border: "#2563EB" },
 };

@@ -42,7 +42,7 @@ export default function OAuthCallback() {
       <div className="min-h-screen flex items-center justify-center p-4" data-testid="oauth-callback-error">
         <div className="max-w-sm text-center">
           <p className="text-red-600 font-medium mb-4">{error}</p>
-          <a href="/auth" className="text-sm font-semibold text-black underline">
+          <a href="/auth" className="text-sm font-semibold text-[#3D3D3D] underline">
             ← Back to login
           </a>
         </div>
@@ -53,7 +53,7 @@ export default function OAuthCallback() {
   return (
     <div className="min-h-screen flex items-center justify-center" data-testid="oauth-callback-loading">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D3D3D] mx-auto mb-4" />
         <p className="text-sm text-gray-500">Completing sign-in…</p>
       </div>
     </div>
