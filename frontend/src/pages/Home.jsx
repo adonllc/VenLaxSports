@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
-import { Trophy, TrendingUp, Users, Share2, ArrowRight } from "lucide-react";
+import {
+  Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
+  ArrowRight, Check, Smartphone, MessageCircle,
+} from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
@@ -20,28 +24,65 @@ const fadeUp = {
   transition: { duration: 0.6, ease: "easeOut" },
 };
 
+// ---------------------------------------------------------------- content
 const FEATURES = [
-  { icon: TrendingUp, title: "A rating that moves", body: "Your skill rating rises and falls with every reported match, so your level is always current." },
-  { icon: Users, title: "Matched by skill", body: "Divisions group you with players at your level. Singles, doubles and mixed formats." },
-  { icon: Trophy, title: "Live standings", body: "Wins, losses and rank update as scores come in, through to playoffs." },
-  { icon: Share2, title: "Match cards you can share", body: "Every result becomes a card with the score and your rating change, ready to post." },
+  { slug: "skill", icon: Target, title: "Skill-matched leagues", body: "A rating from 2.0 to 5.0+ puts you against players at your level, and moves after every result.", to: "/tennis-pickleball-leagues" },
+  { slug: "types", icon: LayoutGrid, title: "Four league types", body: "Flex, Round Robin, Box and Challenge Ladder. Pick the rhythm that suits your week.", to: "/leagues" },
+  { slug: "formats", icon: Users, title: "Singles, doubles and mixed", body: "Play solo or with a partner. Invite your partner by email or search for them in the app.", to: "/leagues" },
+  { slug: "scoring", icon: CalendarCheck, title: "Easy scheduling and scoring", body: "Agree a time with your opponent, play, then report the score. Disputes have a clear process.", to: "/rules" },
+  { slug: "standings", icon: Trophy, title: "Live standings and playoffs", body: "Points update as scores come in. The top players move on to a playoff bracket.", to: "/leagues" },
+  { slug: "profile", icon: UserCircle, title: "Your rating and profile", body: "Track your rating history, follow other players and share a public profile.", to: "/auth" },
+  { slug: "cards", icon: Share2, title: "Shareable match cards", body: "Every result becomes a card with the score and your rating change, ready to post.", to: "/auth" },
+  { slug: "rewards", icon: Gift, title: "Rewards and referrals", body: "Bring a friend and you both get $5 in credit toward your next league.", to: "/rewards" },
+  { slug: "safe", icon: ShieldCheck, title: "Safe and fair play", body: "Digital waiver, parental consent for minors, two-factor sign-in and a dispute process.", to: "/terms" },
 ];
 
-const STEPS = [
-  { n: "01", title: "Join a league", body: "Pick your sport, city and division. Register solo or with a partner for doubles." },
-  { n: "02", title: "Schedule and play", body: "Set up matches with your opponents through the league. Play on your own time." },
-  { n: "03", title: "Report the score", body: "Submit the result. Standings and your skill rating update right away." },
+const LEAGUE_TYPES = [
+  { id: "flex", name: "Flex League", line: "You arrange your own match times.", points: ["5–7 matches over 6–8 weeks", "You and your opponent book the court", "Top players qualify for playoffs"], best: "Best for busy schedules." },
+  { id: "rr", name: "Round Robin", line: "A fixed schedule where everyone plays everyone once.", points: ["Organizer books the courts", "Calendar is set upfront", "Top players advance to playoffs"], best: "Best if you like a set plan." },
+  { id: "box", name: "Box League", line: "Small groups of 6 players.", points: ["Top 2 move up each cycle", "Bottom 2 move down", "No season-end playoffs"], best: "Best for steady, close competition." },
+  { id: "ladder", name: "Challenge Ladder", line: "An ongoing ranked list.", points: ["Challenge anyone above you", "Win to swap ranks", "Join any time and climb year-round"], best: "Best for year-round play." },
+];
+
+const PRICING = [
+  { format: "Singles", who: "1 player", price: "$9.99", unit: "per player, per season" },
+  { format: "Doubles", who: "Team of 2", price: "$19.99", unit: "per team, per season" },
+  { format: "Mixed doubles", who: "1 man + 1 woman", price: "$19.99", unit: "per team, per season" },
+];
+
+const SEASON = [
+  { step: "Join", body: "Pick your sport, city, format and level." },
+  { step: "Get matched", body: "You are placed in a league with players near your rating." },
+  { step: "Schedule", body: "Contact your opponent within 48 hours and agree a time." },
+  { step: "Play", body: "Each match has a 7-day window." },
+  { step: "Report", body: "The winner reports the score. Your rating updates." },
+  { step: "Playoffs", body: "Top 4 (or top 8 in bigger leagues) go to the playoffs." },
+];
+
+const SAFETY = [
+  { title: "Waiver and Terms", body: "A digital waiver and clear Terms before you play." },
+  { title: "Players under 18", body: "Parental consent is required. The minimum age is 13." },
+  { title: "Fair results", body: "Both players confirm scores. Disputes go to an organizer, with an appeal." },
+  { title: "Account security", body: "Two-factor sign-in and Google sign-in are available." },
+];
+
+const COMING_SOON = [
+  { icon: Smartphone, title: "Apple Pay and Google Pay", body: "One-tap checkout." },
+  { icon: MessageCircle, title: "WhatsApp match reminders", body: "Schedule and score nudges in WhatsApp." },
 ];
 
 const FAQ = [
   { q: "How does the skill rating work?", a: "It is an ELO-style rating. You gain points for beating higher-rated players and lose fewer when you lose to them, so it settles on your real level." },
-  { q: "Do I need a partner?", a: "Not for singles. For doubles and mixed leagues you can register with a partner and invite them by email." },
-  { q: "How do I report a score?", a: "After the match, open it from your dashboard and submit the result. Standings and ratings update automatically." },
+  { q: "How much does it cost?", a: "Singles is $9.99 per player. Doubles and mixed doubles are $19.99 for the team of two, with one payment covering both partners." },
+  { q: "Do I need a partner?", a: "Not for singles. For doubles and mixed leagues you register with a partner and invite them by email. One partner pays the team fee." },
+  { q: "How do I report a score?", a: "After the match, open it from your dashboard and submit the result. Your opponent confirms, and standings and ratings update automatically." },
   { q: "What if there is a score dispute?", a: "Either player can raise a dispute. The process and timelines are in the League Rules and Terms." },
+  { q: "Can I get a refund?", a: "Entry fees are non-refundable once the league starts." },
+  { q: "Is there an age limit?", a: "The minimum age is 13. Players under 18 need parental consent." },
   { q: "Where can I find the rules?", a: "The Rules page and Player Handbook cover formats, scheduling, conduct and playoffs." },
 ];
 
-// Amber square button, dark text for contrast (AA)
+// ---------------------------------------------------------------- bits
 function AmberButton({ children, onClick, testId, className = "" }) {
   return (
     <button
@@ -55,13 +96,44 @@ function AmberButton({ children, onClick, testId, className = "" }) {
   );
 }
 
+const Section = ({ tint, children, className = "" }) => (
+  <section className={`px-4 sm:px-6 py-20 md:py-28 ${className}`} style={{ background: tint ? GREY : "#fff" }}>
+    <div className="max-w-[1100px] mx-auto">{children}</div>
+  </section>
+);
+
+const Heading = ({ eyebrow, title, lead, center }) => (
+  <motion.div {...fadeUp} className={`mb-12 ${center ? "text-center mx-auto" : ""} max-w-3xl`}>
+    {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GREEN }}>{eyebrow}</p>}
+    <h2 className="font-bold text-4xl md:text-6xl leading-[1.05]" style={{ color: INK }}>{title}</h2>
+    {lead && <p className="mt-4 text-lg" style={{ color: BODY }}>{lead}</p>}
+  </motion.div>
+);
+
+// Sample rating chart (illustrative shape only)
+function SampleChart() {
+  const pts = [3.0, 3.1, 3.05, 3.2, 3.3, 3.28, 3.4, 3.5];
+  const w = 260, h = 90, min = 2.9, max = 3.6;
+  const path = pts.map((v, i) => `${(i / (pts.length - 1)) * w},${h - ((v - min) / (max - min)) * h}`).join(" ");
+  return (
+    <svg viewBox={`-6 -6 ${w + 12} ${h + 12}`} className="w-full" role="img" aria-label="Sample rating history chart trending upward">
+      <polyline points={path} fill="none" stroke={GREEN} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+      {pts.map((v, i) => (
+        <circle key={i} cx={(i / (pts.length - 1)) * w} cy={h - ((v - min) / (max - min)) * h} r="3.5" fill={AMBER} />
+      ))}
+    </svg>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
+  const [typeId, setTypeId] = useState("flex");
+  const type = LEAGUE_TYPES.find((t) => t.id === typeId);
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="min-h-screen flex flex-col bg-white" style={{ color: BODY }}>
-        {/* HERO */}
+        {/* 1. HERO */}
         <section className="relative">
           <PhotoSlot src={PHOTOS.hero} alt="Players competing in a league match" tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
             <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.38)" }} />
@@ -79,13 +151,11 @@ export default function Home() {
                   </span>
                 </span>
               </motion.h1>
-              <motion.p
-                className="mt-8 text-lg md:text-2xl font-medium text-white"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-              >
+              <motion.p className="mt-8 text-lg md:text-2xl font-medium text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2 }}>
                 Ranked leagues for Tennis &amp; Pickleball
+              </motion.p>
+              <motion.p className="mt-2 text-base md:text-lg text-white/90" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.25 }}>
+                Find a league. Play. Rise.
               </motion.p>
               <motion.div className="mt-8 flex flex-wrap gap-3 justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
                 <AmberButton onClick={() => navigate("/auth")} testId="hero-join-venlax">Join VenLax</AmberButton>
@@ -104,7 +174,6 @@ export default function Home() {
             </div>
           </PhotoSlot>
 
-          {/* GREEN STANDARDS BAR */}
           <div className="relative -mt-24 md:-mt-20 px-4 sm:px-6">
             <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-6 justify-between" style={{ background: GREEN }}>
               <div className="text-center md:text-left">
@@ -116,54 +185,144 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ABOUT */}
-        <section className="px-4 sm:px-6 py-24 md:py-32" style={{ background: GREY }}>
-          <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-            <motion.div {...fadeUp}>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: GREEN }}>Why VenLax</p>
-              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05] mb-6" style={{ color: INK }}>
-                Built around your progression
-              </h2>
-              <p className="text-lg leading-relaxed mb-8">
-                Skill-matched divisions, a rating that moves with every result and standings that update as scores come in. Show up, play, and watch your level climb.
-              </p>
-              <AmberButton onClick={() => navigate("/rules")}>Read the rules</AmberButton>
-            </motion.div>
-            <motion.div {...fadeUp} className="relative">
-              <Slant src={PHOTOS.tennis} alt="Tennis league play" className="w-full aspect-[4/3]" />
-              <div className="absolute -bottom-6 left-4 md:-left-6 px-6 py-4 text-white" style={{ background: GREEN }}>
-                <div className="font-bold text-3xl leading-none">{activeSports.length}</div>
-                <div className="text-xs uppercase tracking-wider mt-1">Sports live</div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* FEATURES ACCORDION LIST */}
-        <section className="px-4 sm:px-6 py-24 md:py-32 bg-white">
-          <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
-            <motion.div {...fadeUp}>
-              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05]" style={{ color: INK }}>
-                Everything a competitive league needs
-              </h2>
-            </motion.div>
-            <motion.div {...fadeUp} className="grid gap-px" style={{ background: "#E4E4E4" }}>
-              {FEATURES.map((f) => (
-                <div key={f.title} className="bg-white py-5 flex gap-5">
-                  <div className="w-12 h-12 shrink-0 flex items-center justify-center" style={{ background: GREEN }}>
+        {/* 2. EVERYTHING IN ONE PLACE */}
+        <Section tint>
+          <Heading eyebrow="The platform" title="Everything you need, in one place" lead="From finding a league to sharing your result, here is what VenLax gives every player." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FEATURES.map((f, i) => (
+              <motion.div key={f.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }}>
+                <Link to={f.to} className="group block h-full bg-white p-7 transition-shadow hover:shadow-lg" data-testid={`home-feature-${f.slug}`}>
+                  <div className="w-12 h-12 flex items-center justify-center mb-5" style={{ background: GREEN }}>
                     <f.icon className="w-6 h-6 text-white" aria-hidden="true" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-xl" style={{ color: INK }}>{f.title}</h3>
-                    <p className="mt-1">{f.body}</p>
-                  </div>
+                  <h3 className="font-bold text-xl mb-2" style={{ color: INK }}>{f.title}</h3>
+                  <p className="text-base leading-snug">{f.body}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold" style={{ color: GREEN }}>
+                    Learn more <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
+
+        {/* 3. LEAGUE TYPES (tabs) */}
+        <Section>
+          <Heading eyebrow="Formats" title="Pick how you want to play" lead="Four ways to compete. Choose the one that fits your week." />
+          <div role="tablist" aria-label="League types" className="flex flex-wrap gap-2 mb-6">
+            {LEAGUE_TYPES.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={typeId === t.id}
+                aria-controls={`panel-${t.id}`}
+                id={`tab-${t.id}`}
+                onClick={() => setTypeId(t.id)}
+                className="px-5 py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+                style={typeId === t.id ? { background: GREEN, color: "#fff" } : { background: GREY, color: INK }}
+                data-testid={`home-type-${t.id}`}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+          <div role="tabpanel" id={`panel-${type.id}`} aria-labelledby={`tab-${type.id}`} className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-0">
+            <div className="p-8 md:p-10" style={{ background: GREY }}>
+              <h3 className="font-bold text-3xl mb-2" style={{ color: INK }}>{type.name}</h3>
+              <p className="text-lg mb-6">{type.line}</p>
+              <ul className="grid gap-3">
+                {type.points.map((p) => (
+                  <li key={p} className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> {p}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="p-8 md:p-10 text-white flex flex-col justify-between" style={{ background: GREEN }}>
+              <p className="font-bold text-2xl">{type.best}</p>
+              <Link to={type.id === "ladder" ? "/ladders" : type.id === "rr" ? "/leagues/round-robin" : "/leagues"} className="mt-8 inline-flex items-center gap-2 font-bold uppercase tracking-wider text-sm" style={{ color: AMBER }}>
+                See {type.name}s <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </Section>
+
+        {/* 4. PRICING */}
+        <Section tint>
+          <Heading eyebrow="Pricing" title="Simple pricing" lead="One fee per season. No club membership. Doubles is one fee for the whole team." />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {PRICING.map((p) => (
+              <motion.div key={p.format} {...fadeUp} className="bg-white p-8 border-t-4" style={{ borderColor: AMBER }}>
+                <h3 className="font-bold text-xl" style={{ color: INK }}>{p.format}</h3>
+                <p className="text-sm mb-5">{p.who}</p>
+                <div className="font-bold text-5xl leading-none" style={{ color: GREEN }}>{p.price}</div>
+                <p className="mt-2 text-sm">{p.unit}</p>
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-5 text-sm">Entry fees are non-refundable once the league starts. See the <Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: GREEN }}>League Guide</Link> for details.</p>
+        </Section>
+
+        {/* 5. SEASON AT A GLANCE */}
+        <Section>
+          <Heading eyebrow="Your season" title="Your season at a glance" lead="Most seasons run 5–7 matches over 6–8 weeks." />
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {SEASON.map((s, i) => (
+              <motion.li key={s.step} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }} className="p-6 flex gap-4" style={{ background: GREY }}>
+                <span className="w-10 h-10 shrink-0 flex items-center justify-center font-bold text-white" style={{ background: GREEN }}>{i + 1}</span>
+                <div>
+                  <h3 className="font-bold text-lg" style={{ color: INK }}>{s.step}</h3>
+                  <p className="text-base">{s.body}</p>
                 </div>
-              ))}
+              </motion.li>
+            ))}
+          </ol>
+        </Section>
+
+        {/* 6. PROFILE PREVIEW */}
+        <Section tint>
+          <Heading eyebrow="Your progress" title="See your game improve" lead="Your rating, your results and your standing, all in one profile. The previews below use sample data." />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <motion.div {...fadeUp} className="bg-white p-6">
+              <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: GREEN }}>Rating history</p>
+              <p className="font-bold text-3xl mb-3" style={{ color: INK }}>3.5 <span className="text-base font-medium" style={{ color: BODY }}>sample</span></p>
+              <SampleChart />
+            </motion.div>
+            <motion.div {...fadeUp} className="p-6 text-white" style={{ background: GREEN }}>
+              <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: AMBER }}>Match card · sample</p>
+              <div className="flex items-center justify-between font-bold text-lg"><span>You</span><span>Opponent</span></div>
+              <div className="flex items-center justify-between font-bold text-4xl my-3" style={{ fontVariantNumeric: "tabular-nums" }}><span>6 · 6</span><span className="text-white/70">3 · 4</span></div>
+              <p className="text-sm text-white/90">Rating change: +0.1</p>
+              <p className="mt-4 text-sm font-bold uppercase tracking-wider" style={{ color: AMBER }}>Share your result</p>
+            </motion.div>
+            <motion.div {...fadeUp} className="bg-white p-6">
+              <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: GREEN }}>Standings · sample</p>
+              <ol className="divide-y" style={{ borderColor: "#E4E4E4" }}>
+                {["Player A", "Player B", "You", "Player D"].map((n, i) => (
+                  <li key={n} className="flex items-center gap-3 py-3" style={n === "You" ? { background: "#E8F6F2", margin: "0 -8px", padding: "12px 8px" } : undefined}>
+                    <span className="w-6 font-bold" style={{ color: INK }}>{i + 1}</span>
+                    <span className={n === "You" ? "font-bold" : ""} style={{ color: INK }}>{n}</span>
+                  </li>
+                ))}
+              </ol>
             </motion.div>
           </div>
-        </section>
+          <p className="mt-5 text-sm">You can also follow other players, see an activity feed and share a public profile.</p>
+        </Section>
 
-        {/* GREEN CTA BLOCK WITH SLANTED SPORT PHOTOS */}
+        {/* 7. FAIR AND SAFE */}
+        <Section>
+          <Heading eyebrow="Trust" title="Fair and safe for everyone" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {SAFETY.map((s) => (
+              <motion.div key={s.title} {...fadeUp} className="p-6" style={{ background: GREY }}>
+                <ShieldCheck className="w-7 h-7 mb-4" style={{ color: GREEN }} aria-hidden="true" />
+                <h3 className="font-bold text-lg mb-1" style={{ color: INK }}>{s.title}</h3>
+                <p className="text-base">{s.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
+
+        {/* SPORT CHOICE (green) */}
         <section className="px-4 sm:px-6 py-20 md:py-28 text-white" style={{ background: GREEN }}>
           <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 items-center">
             <motion.div {...fadeUp}>
@@ -187,26 +346,29 @@ export default function Home() {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
-        <section className="px-4 sm:px-6 py-24 md:py-32" style={{ background: GREY }}>
-          <div className="max-w-[1100px] mx-auto">
-            <motion.h2 {...fadeUp} className="font-bold text-4xl md:text-6xl leading-[1.05] text-center mb-14" style={{ color: INK }}>
-              From signup to standings in three steps
-            </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {STEPS.map((s, i) => (
-                <motion.div key={s.n} {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.08 }} className="bg-white p-8 border-t-4" style={{ borderColor: AMBER }}>
-                  <span className="font-bold text-4xl" style={{ color: GREEN }}>{s.n}</span>
-                  <h3 className="font-bold text-2xl mt-3 mb-2" style={{ color: INK }}>{s.title}</h3>
-                  <p>{s.body}</p>
-                </motion.div>
+        {/* 8. COMING SOON */}
+        <Section tint className="!py-14 md:!py-16">
+          <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: GREEN }}>Coming soon</p>
+              <h2 className="font-bold text-2xl md:text-3xl" style={{ color: INK }}>What we are adding next</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {COMING_SOON.map((c) => (
+                <div key={c.title} className="bg-white p-5 flex gap-4 items-start">
+                  <c.icon className="w-6 h-6 shrink-0" style={{ color: GREEN }} aria-hidden="true" />
+                  <div>
+                    <h3 className="font-bold" style={{ color: INK }}>{c.title}</h3>
+                    <p className="text-sm">{c.body}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* FAQ */}
-        <section className="px-4 sm:px-6 py-24 md:py-32 bg-white">
+        {/* 9. FAQ */}
+        <Section>
           <div className="max-w-[820px] mx-auto">
             <motion.h2 {...fadeUp} className="font-bold text-4xl md:text-5xl leading-[1.1] text-center mb-4" style={{ color: INK }}>
               Everything you need to know
@@ -228,8 +390,7 @@ export default function Home() {
               </Accordion>
             </motion.div>
           </div>
-        </section>
-
+        </Section>
       </div>
     </MotionConfig>
   );
