@@ -254,8 +254,11 @@ export default function TennisPickleballLeagues() {
         </H2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {STRUCTURES.map((s) => (
-            <div key={s.name} className="bg-white p-7 border-l-4" style={{ borderColor: GREEN }}>
-              <h3 className="font-bold text-2xl mb-1" style={{ color: INK }}>{s.name}</h3>
+            <div key={s.name} className="bg-white p-7">
+              <h3 className="font-bold text-2xl mb-1 flex items-center gap-3" style={{ color: INK }}>
+                <span className="w-3 h-3 shrink-0" style={{ background: GREEN, transform: "skewX(-20deg)" }} aria-hidden="true" />
+                {s.name}
+              </h3>
               <p className="mb-4">{s.line}</p>
               <ul className="grid gap-2 text-base">
                 {s.points.map((p) => (
