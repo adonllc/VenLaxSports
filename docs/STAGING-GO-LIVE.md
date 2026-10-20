@@ -63,6 +63,12 @@ curl -s https://api-staging.venlaxsports.com/api/founding-members # count 0
 ```
 Then log in as `adonllcusa@gmail.com` and check the admin Users tab: only you and admins remain.
 
+## 6. Preflight (read-only)
+```bash
+python -m scripts.launch_preflight --target staging
+```
+Expect a Stripe TEST key on staging. FAIL lines show what is still missing.
+
 ## Not done here (leagues)
 Staging is left with 0 leagues on purpose. Create real ones later with `POST /api/admin/auto/leagues` from the admin dashboard once launch cities and dates are chosen.
 
