@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
-  ArrowRight, Check, Smartphone, MessageCircle,
+  ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles,
 } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
@@ -67,8 +67,11 @@ const SAFETY = [
 ];
 
 const COMING_SOON = [
-  { icon: Smartphone, title: "Apple Pay and Google Pay", body: "One-tap checkout." },
+  { icon: CreditCard, title: "Apple Pay and Google Pay", body: "One-tap checkout." },
   { icon: MessageCircle, title: "WhatsApp match reminders", body: "Schedule and score nudges in WhatsApp." },
+  { icon: Smartphone, title: "iOS and Android apps", body: "Play and report scores from your phone." },
+  { icon: CircleDot, title: "Cricket", body: "Our 3rd sport is coming soon." },
+  { icon: Sparkles, title: "TYPTI", body: "Our 4th sport is coming soon." },
 ];
 
 const FAQ = [
@@ -353,7 +356,7 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: GREEN }}>Coming soon</p>
               <h2 className="font-bold text-2xl md:text-3xl" style={{ color: INK }}>What we are adding next</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {COMING_SOON.map((c) => (
                 <div key={c.title} className="bg-white p-5 flex gap-4 items-start">
                   <c.icon className="w-6 h-6 shrink-0" style={{ color: GREEN }} aria-hidden="true" />
