@@ -6,6 +6,7 @@ import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle } 
 import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import { leagueDescription } from "../utils/leagueDescription";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -651,7 +652,16 @@ export default function LeagueDetail() {
             </div>
             <div className="bg-white rounded-none p-6" style={{ border: "1px solid #E5E7EB" }}>
               <h3 className="font-heading font-bold text-lg mb-4" style={{ color: "#3D3D3D" }}>About This League</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{league.description || "No description provided."}</p>
+              {league.description ? (
+                <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{league.description}</p>
+              ) : (
+                <div data-testid="league-auto-description">
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: "#374151" }}>{leagueDescription(league).summary}</p>
+                  <ul className="text-sm space-y-2 list-disc pl-5" style={{ color: "#374151" }}>
+                    {leagueDescription(league).points.map((pt) => <li key={pt}>{pt}</li>)}
+                  </ul>
+                </div>
+              )}
               {league.rules && (
                 <div className="mt-4 p-3 rounded-xl" style={{ background: "#FFFFFF" }}>
                   <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: "#374151" }}>Rules</p>

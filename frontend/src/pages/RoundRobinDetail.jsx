@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { leagueDescription } from "../utils/leagueDescription";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Users, Calendar } from "lucide-react";
@@ -184,12 +185,19 @@ export default function RoundRobinDetail() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === "Overview" && (
           <div className="space-y-6">
-            {league.description && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="font-bold text-heading-dark mb-2">About</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h2 className="font-bold text-heading-dark mb-2">About</h2>
+              {league.description ? (
                 <p className="text-gray-600 text-sm leading-relaxed">{league.description}</p>
-              </div>
-            )}
+              ) : (
+                <div data-testid="league-auto-description">
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">{leagueDescription(league).summary}</p>
+                  <ul className="text-gray-600 text-sm space-y-2 list-disc pl-5">
+                    {leagueDescription(league).points.map((pt) => <li key={pt}>{pt}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <h2 className="font-bold text-heading-dark mb-3">Format</h2>
               <ul className="text-sm text-gray-600 space-y-2">
