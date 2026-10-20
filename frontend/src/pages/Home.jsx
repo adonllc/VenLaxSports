@@ -70,7 +70,7 @@ const COMING_SOON = [
   { icon: CreditCard, title: "Apple Pay and Google Pay", body: "One-tap checkout." },
   { icon: MessageCircle, title: "WhatsApp match reminders", body: "Schedule and score nudges in WhatsApp." },
   { icon: Smartphone, title: "iOS and Android apps", body: "Play and report scores from your phone." },
-  { icon: CircleDot, title: "Cricket", body: "Our 3rd sport is coming soon." },
+  { icon: CircleDot, title: "Cricket", body: "T10 and T20 leagues with powerplay rules and net run rate standings." },
   { icon: Sparkles, title: "TYPTI", body: "Our 4th sport is coming soon." },
 ];
 
