@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import PageHero from "../components/PageHero";
 
 const SECTIONS = [
   {
@@ -109,23 +110,12 @@ const SECTIONS = [
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-gray-50 border-b border-gray-200 py-12 px-4">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Legal</p>
-          <h1 className="font-heading font-bold text-4xl text-heading-dark">Privacy Policy</h1>
-          <p className="mt-3 text-gray-600">
-            Last updated: May 2026. This policy explains what personal data VENLAX Sports collects,
-            how it is used, and your rights under applicable privacy law including the CCPA.
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Questions? Email{" "}
-            <a data-testid="privacy-support-email" href="mailto:support@venlaxsports.com" className="underline hover:text-gray-700">
-              support@venlaxsports.com
-            </a>
-          </p>
-        </div>
-      </div>
+      <PageHero
+        compact
+        eyebrow="Legal"
+        title="Privacy Policy"
+        subtitle={<>Last updated: May 2026. This policy explains what personal data VENLAX Sports collects, how it is used, and your rights under applicable privacy law including the CCPA.{" "}Questions? Email{" "}<a data-testid="privacy-support-email" href="mailto:support@venlaxsports.com" className="underline">support@venlaxsports.com</a></>}
+      />
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">

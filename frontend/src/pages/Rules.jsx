@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import PageHero from "../components/PageHero";
+import { GALLERY } from "../config/photos";
 import { Trophy, TrendingUp } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 
@@ -155,17 +157,13 @@ export default function Rules() {
   });
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="border-b" style={{ background: "white", borderColor: "#E5E7EB" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] mb-2" style={{ color: "#B7791F", fontFamily: "Rubik, system-ui, sans-serif" }}>Rules & Formats</p>
-          <h1 className="font-heading font-bold text-4xl sm:text-5xl mb-2" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>Rules</h1>
-          <p className="max-w-lg" style={{ color: "#6B7280" }}>
-            Quick & clear. We keep only VENLAX-specific rules here. For standard tennis rules & scoring,
-            see <a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" style={{ color: "#3D3D3D" }} className="hover:underline font-semibold">USTA Rules of Tennis →</a>
-          </p>
-        </div>
-      </div>
+      <PageHero
+        compact
+        src={GALLERY.tennis[3]}
+        eyebrow="Rules & Formats"
+        title="Rules"
+        subtitle={<>Quick &amp; clear. We keep only VENLAX-specific rules here. For standard tennis rules &amp; scoring, see{" "}<a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" className="underline font-semibold text-white">USTA Rules of Tennis →</a></>}
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Divisions */}

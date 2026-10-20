@@ -617,7 +617,7 @@ export default function Auth() {
                 </div>
 
                 {/* Terms Acceptance */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="bg-[#F1F1F1] border border-[#E4E4E4] rounded-lg p-3">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -627,14 +627,14 @@ export default function Auth() {
                       data-testid="input-terms-accepted"
                       required
                     />
-                    <span className="text-xs text-blue-900 leading-relaxed">
+                    <span className="text-xs text-[#3D3D3D] leading-relaxed">
                       I have read and agree to the{" "}
                       <a
                         href="/terms"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-semibold hover:underline"
-                        style={{ color: "#1E40AF" }}
+                        style={{ color: "#008F70" }}
                       >
                         Terms of Service
                       </a>

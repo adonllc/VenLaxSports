@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import PageHero from "../components/PageHero";
+import { GALLERY } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Trophy } from "lucide-react";
@@ -128,19 +130,13 @@ export default function Leagues() {
 
   return (
     <div className="min-h-screen bg-white" data-testid="leagues-page">
-      {/* Header */}
-      <div className="border-b" style={{ borderColor: "#E5E7EB" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="font-bold text-4xl sm:text-5xl mb-3 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>Browse Leagues</h1>
-          <p className="max-w-2xl text-lg" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>Find competitive leagues across all sports and cities</p>
-        </div>
-      </div>
+      <PageHero compact src={GALLERY.tennis[2]} eyebrow="Leagues" title="Browse Leagues" subtitle="Find competitive leagues across all sports and cities" />
 
       {/* Promo Banner */}
       <div className="sticky top-0 z-10 border-b" style={{ background: "#F2A922", borderColor: "#F2A922" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <p className="text-sm font-semibold text-white" style={{ fontFamily: "Rubik, sans-serif" }}>
-            First league free! Use code <code className="bg-orange-600 px-2 py-0.5 rounded font-mono text-white text-xs">PLAY1FREE</code>
+          <p className="text-sm font-semibold text-[#3D3D3D]" style={{ fontFamily: "Rubik, sans-serif" }}>
+            First league free! Use code <code className="bg-[#3D3D3D] px-2 py-0.5 font-mono text-white text-xs">PLAY1FREE</code>
           </p>
         </div>
       </div>
