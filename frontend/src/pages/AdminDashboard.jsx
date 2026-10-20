@@ -1103,7 +1103,7 @@ function AutoGenerateTab({ onSuccess }) {
         <p className="text-sm text-gray-500 mb-5">
           Spin up the next cycle of leagues for every active sport &amp; format. Each generated
           league is open to players from <strong>any USA city</strong> with standardized pricing
-          (<strong>$9.99 singles</strong> / <strong>$19.99 doubles</strong>). Re-running is safe — duplicates are skipped.
+          (<strong>$9.99 singles</strong> / <strong>$19.99 doubles (per team)</strong>). Re-running is safe — duplicates are skipped.
         </p>
         <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Cadence</label>
         <select

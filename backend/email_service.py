@@ -213,7 +213,7 @@ async def send_password_reset(to: str, player_name: str, reset_url: str) -> None
 
 async def send_partner_invite(to: str, inviter_name: str, league_name: str,
                                sport: str, entry_fee: float, accept_url: str) -> None:
-    fee_line = f"<li><strong>Entry fee:</strong> ${entry_fee:.2f} (split or per team)</li>" if entry_fee > 0 else ""
+    fee_line = f"<li><strong>Entry fee:</strong> ${entry_fee:.2f} (one fee per team of two)</li>" if entry_fee > 0 else ""
     body = f"""
       <p><strong>{inviter_name}</strong> has invited you to join them as a doubles partner in a VENLAX Round Robin league.</p>
       <ul style="padding-left:18px;margin:0 0 12px">

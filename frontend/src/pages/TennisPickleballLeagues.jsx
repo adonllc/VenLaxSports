@@ -4,7 +4,7 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 const FAQS = [
   {
     q: "How much does it cost to join a tennis or pickleball league?",
-    a: "Singles leagues run $9.99 per player. Doubles and mixed doubles run $19.99 per player, since that fee splits court time and match coordination across four players instead of two.",
+    a: "Singles leagues are $9.99 per player. Doubles and mixed doubles are $19.99 for the team of two — one payment covers both partners.",
   },
   {
     q: "How long does a typical tennis or pickleball league season last?",
@@ -79,8 +79,8 @@ export default function TennisPickleballLeagues() {
           </h1>
           <p className="text-lg" style={{ color: "#374151" }}>
             Tennis and pickleball leagues match players by skill level (typically rated 2.0–5.0) into a season of
-            organized matches against local opponents, with results feeding a live ranking. Costs run $9.99–$19.99
-            per player depending on format, with singles cheaper than doubles or mixed leagues.
+            organized matches against local opponents, with results feeding a live ranking. Singles is $9.99 per player
+            and doubles or mixed doubles is $19.99 for the team of two.
           </p>
         </div>
       </div>
@@ -116,8 +116,8 @@ export default function TennisPickleballLeagues() {
 
         <H3>Singles vs. doubles vs. mixed doubles formats</H3>
         <p>
-          Singles is one-on-one and the cheapest entry point. Doubles and mixed doubles split coordination and
-          court costs across four players, which is why they're priced differently — see the cost breakdown below.
+          Singles is one-on-one. Doubles and mixed doubles are played as a team of two, with one entry fee covering
+          both partners — see the cost breakdown below.
         </p>
 
         <H3>Playoffs, standings, and how winners are decided</H3>
@@ -133,14 +133,14 @@ export default function TennisPickleballLeagues() {
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li><strong>Singles league:</strong> $9.99 per player, per season</li>
-          <li><strong>Doubles league:</strong> $19.99 per player, per season</li>
-          <li><strong>Mixed doubles league:</strong> $19.99 per player, per season</li>
+          <li><strong>Doubles league:</strong> $19.99 per team of two, per season</li>
+          <li><strong>Mixed doubles league:</strong> $19.99 per team of two, per season</li>
         </ul>
 
-        <H3>Why doubles costs more</H3>
+        <H3>How doubles pricing works</H3>
         <p>
-          Doubles and mixed doubles split match coordination and court-booking overhead across four players
-          instead of two, which is reflected directly in the entry fee.
+          One partner pays the $19.99 team fee when registering and the other joins at no extra charge, so the
+          fee covers both players for the season.
         </p>
 
         <H3>Hidden costs at private clubs leagues don't have</H3>

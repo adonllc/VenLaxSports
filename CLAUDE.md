@@ -77,7 +77,7 @@ Public API endpoints (`/api/leagues`, `/api/cities`) filter by active sports + c
 - `auth_utils.py` — JWT creation/verification, password hashing
 - `email_service.py` — aiosmtplib; falls back to console when `SMTP_HOST` unset
 - `rating_utils.py` — ELO-style deltas for tennis/pickleball (K=0.05)
-- `pricing_config.py` — canonical pricing: singles=$9.99, doubles/mixed=$19.99
+- `pricing_config.py` — canonical pricing: singles=$9.99 per player, doubles/mixed=$19.99 per team of two (one payment, partner joins free)
 - `seeds/` — idempotent seed scripts (admin, cities, leagues, indexes, pricing)
 - `tests/` — pytest files; run against a live MongoDB instance
 
