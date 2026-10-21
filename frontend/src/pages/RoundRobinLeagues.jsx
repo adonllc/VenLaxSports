@@ -3,7 +3,7 @@ import PageHero from "../components/PageHero";
 import { GALLERY } from "../config/photos";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Users, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -114,10 +114,6 @@ export default function RoundRobinLeagues() {
                     <span className="font-medium">{lg.city}</span>
                   </p>
                   <div className="flex items-center justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
-                    <span className="flex items-center gap-1 font-medium">
-                      <Users size={14} />
-                      {lg.current_players}/{rr.max_players || lg.max_players}
-                    </span>
                     <span className="flex items-center gap-1 font-medium">
                       <Trophy size={14} />
                       {rr.division_type === "doubles" ? "Doubles" : "Singles"}

@@ -386,7 +386,9 @@ export default function LeagueDetail() {
               <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#008F70" }} /> {league.city}</span>
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
-                <span className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /> {league.current_players || 0}/{league.max_players} players</span>
+                {user?.role === "admin" && (
+                  <span className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /> {league.current_players || 0}/{league.max_players} players</span>
+                )}
               </div>
             </div>
 
@@ -421,7 +423,8 @@ export default function LeagueDetail() {
                 </div>
               ) : (
                 <>
-                  {/* Spots bar */}
+                  {/* Spots bar: admin only, players never see registration counts */}
+                  {user?.role === "admin" && (
                   <div className="mb-6">
                     <div className="flex justify-between text-sm mb-2" style={{ fontFamily: "Rubik, sans-serif" }}>
                       <span style={{ color: "#374151", fontWeight: 500 }}>{spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} remaining</span>
@@ -431,6 +434,7 @@ export default function LeagueDetail() {
                       <div className="h-full rounded-full transition-[width]" style={{ width: `${fillPct}%`, background: config.accent || "#008F70" }} />
                     </div>
                   </div>
+                  )}
 
                   {/* Payment/join status */}
                   {sessionId && !paymentStatus && (

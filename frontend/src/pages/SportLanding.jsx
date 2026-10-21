@@ -263,7 +263,6 @@ Features
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#008F70" }} /><span className="font-medium">{l.city}</span>
                   </p>
                   <div className="flex justify-between pt-3 border-t text-xs" style={{ borderColor: "#F3F4F6", color: TEXT_MUTED, fontFamily: "Rubik, sans-serif" }}>
-                    <span className="font-medium">{l.max_players - (l.current_players || 0)} spots left</span>
                     <span className="font-medium">{l.format}</span>
                   </div>
                 </motion.div>

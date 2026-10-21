@@ -276,6 +276,8 @@ export default function Leagues() {
 }
 
 function LeagueCard({ league, onClick }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const config = SPORT_CONFIG[league.sport] || { badge: "bg-gray-100", icon: "🏆", label: league.sport };
   const spotsLeft = league.max_players - (league.current_players || 0);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
@@ -350,11 +352,12 @@ function LeagueCard({ league, onClick }) {
         {/* Spots available */}
         <div className="mb-4">
           <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
-            <span>{league.current_players || 0}/{league.max_players} players</span>
+            {isAdmin ? <span>{league.current_players || 0}/{league.max_players} players</span> : <span />}
             <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>
-              {isFull ? "League Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
+              {isFull ? "League Full" : isAdmin ? `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left` : ""}
             </span>
           </div>
+          {isAdmin && (
           <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
             <div
               className="h-full rounded-full transition-[width] duration-300"
@@ -364,6 +367,7 @@ function LeagueCard({ league, onClick }) {
               }}
             />
           </div>
+          )}
         </div>
 
         {/* Spacer */}

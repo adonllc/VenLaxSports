@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Trophy, Users, Calendar, Share2, AlertCircle } from "lucide-react";
+import { Trophy, Calendar, Share2, AlertCircle } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -78,10 +78,6 @@ export default function LeagueSpectator() {
                 {data.name}
               </h1>
               <div className="flex flex-wrap gap-3 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5" />
-                  {data.current_players}/{data.max_players} players
-                </span>
                 <span className={`capitalize px-2 py-0.5 rounded-full text-xs font-semibold ${
                   data.status === "active"
                     ? "bg-emerald-100 text-emerald-700"

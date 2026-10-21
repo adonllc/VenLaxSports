@@ -122,7 +122,9 @@ export default function RoundRobinDetail() {
               <h1 className="text-2xl font-bold text-heading-dark">{league.name}</h1>
               <p className="text-gray-500 mt-1">{league.city} · {isDoubles ? "Doubles" : "Singles"}</p>
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
-                <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>
+                {user?.role === "admin" && (
+                  <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>
+                )}
                 <span className="flex items-center gap-1"><Calendar size={14} /> Starts {league.start_date}</span>
               </div>
             </div>

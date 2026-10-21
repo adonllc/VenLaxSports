@@ -234,7 +234,7 @@ export default function JoinFlow() {
                         </div>
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{lg.city}</span>
-                          <span className="flex items-center gap-1"><Users className="w-3 h-3" />{spotsLeft} spots left</span>
+                          {user?.role === "admin" && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{spotsLeft} spots left</span>}
                           <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(lg.start_date)}</span>
                         </div>
                       </button>
