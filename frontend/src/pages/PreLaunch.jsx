@@ -248,14 +248,14 @@ export default function PreLaunch() {
             <Logo size="sm" withIcon={true} />
           </div>
           <motion.a
-            href="#early-access"
+            href="#join"
             className="text-sm font-bold px-6 py-2.5 rounded-lg transition-all"
             style={{ background: PRIMARY, color: "white" }}
             whileHover={{ scale: 1.05, y: -2, boxShadow: `0 8px 16px ${PRIMARY}30` }}
             whileTap={{ scale: 0.95 }}
             data-testid="nav-cta"
           >
-            Get Early Access
+            Join the Waitlist
           </motion.a>
         </div>
       </nav>
@@ -344,7 +344,7 @@ export default function PreLaunch() {
             animate="visible"
           >
             <motion.a
-              href="#early-access"
+              href="#join"
               className="font-semibold px-8 py-4 rounded-lg transition-all text-base"
               style={{ background: PRIMARY, color: "white" }}
               whileHover={{ scale: 1.05, y: -3, boxShadow: `0 12px 32px ${PRIMARY}30` }}
@@ -354,7 +354,7 @@ export default function PreLaunch() {
               {spotsRemaining === null ? "Secure My Spot" : spotsRemaining > 0 ? `Secure My Spot - ${spotsRemaining} Left` : "Join the Waitlist"}
             </motion.a>
             <motion.a
-              href="#early-access"
+              href="#join"
               className="font-medium px-8 py-4 rounded-lg transition-all text-base"
               style={{ border: `2px solid ${PRIMARY}`, color: PRIMARY, background: PALE_BLUE }}
               whileHover={{ scale: 1.05, y: -3 }}
@@ -372,7 +372,7 @@ export default function PreLaunch() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            Limited early-access spots per city. No spam, ever.
+            Limited spots per city. No spam, ever.
           </motion.p>
         </div>
       </section>
@@ -741,7 +741,7 @@ export default function PreLaunch() {
             viewport={viewportConfig}
           >
             {[
-              { tier: "Free", invites: "0", perks: ["Early access signup", "City matchmaking"] },
+              { tier: "Free", invites: "0", perks: ["Waitlist signup", "City matchmaking"] },
               { tier: "Tier 1", invites: "3+", perks: ["Free first match", "Priority matchmaking", "Founding badge"] },
               { tier: "Tier 2", invites: "10+", perks: ["3 months free", "Premium stats", "VIP support", "Founder status"] },
             ].map((t, idx) => (
@@ -788,7 +788,7 @@ export default function PreLaunch() {
       </section>
 
       {/* Final CTA */}
-      <section id="early-access" className="py-24 px-6" style={{ background: PRIMARY, color: "white" }}>
+      <section id="join" className="py-24 px-6" style={{ background: PRIMARY, color: "white" }}>
         <div className="max-w-xl mx-auto text-center">
           <motion.h2
             className="font-black mb-4"
@@ -808,7 +808,7 @@ export default function PreLaunch() {
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            Early access members become the competitive foundation of their city. First to rank. First to shape the culture.
+            Founding members become the competitive foundation of their city. First to rank. First to shape the culture.
             {spotsRemaining !== null && spotsRemaining > 0 ? ` Only ${spotsRemaining} spots left.` : ""}
           </motion.p>
 
@@ -823,7 +823,7 @@ export default function PreLaunch() {
                   🏆 You're a Founding Member.
                 </p>
                 <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.9)" }}>
-                  You've claimed your early access spot. When {city || "your city"} opens, you're getting in first.
+                  You've claimed your spot. When {city || "your city"} opens, you're getting in first.
                 </p>
                 <p className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
                   Expect matching invitations within 24 hours of launch.
@@ -854,7 +854,7 @@ export default function PreLaunch() {
                       Copy Link
                     </motion.button>
                     <motion.a
-                      href={`https://wa.me/?text=${encodeURIComponent(`I'm getting early access to VENLAX - competitive Tennis/Pickleball leagues. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
+                      href={`https://wa.me/?text=${encodeURIComponent(`I'm joining VENLAX - competitive Tennis/Pickleball leagues. Join me: ${window.location.origin}/?ref=${waitlistId}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="py-2.5 rounded-md text-sm font-medium text-center block transition-colors"
@@ -937,9 +937,9 @@ export default function PreLaunch() {
                 variants={staggerItem}
                 data-testid="waitlist-submit"
               >
-                {submitting ? "Securing your spot..." : "Secure My Early Access Spot"}
+                {submitting ? "Securing your spot..." : "Secure My Spot"}
               </motion.button>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.75)" }}>Limited early-access spots per city. First come, first placed. No spam, ever.</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.75)" }}>Limited spots per city. First come, first placed. No spam, ever.</p>
             </motion.form>
           )}
         </div>

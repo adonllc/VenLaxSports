@@ -419,15 +419,15 @@ async def send_credit_expiry_reminder(to: str, player_name: str, balance: float,
 async def send_early_access_confirmed(to: str) -> None:
     body = """
       <p>Welcome to VENLAX Sports! 🎉</p>
-      <p>You're officially on the Early Access list.</p>
-      <p>Thanks for joining us at the beginning of our journey. As one of our early members, you'll get exclusive access to new features, previews, and updates before they're released to everyone else.</p>
+      <p>You're officially on the VENLAX Sports waitlist.</p>
+      <p>Thanks for joining us at the beginning of our journey. As one of our first members, you'll hear about new features, previews, and launch updates before everyone else.</p>
       <p>We're building more than just another sports app—we're creating a platform that makes it easier for players to connect, compete, and grow their local sports communities.</p>
       <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">What to expect</h2>
       <ul style="padding-left:18px;margin:0 0 16px">
-        <li>🎾 Early access to new features</li>
+        <li>🎾 First look at new features</li>
         <li>🏓 Multiple play formats including Singles, Doubles, Round Robin, Social Games, and Tournaments</li>
         <li>📍 City-wide player matchmaking</li>
-        <li>🚀 Early invitations to beta releases and special events</li>
+        <li>🚀 Invitations to launch events and special leagues</li>
         <li>💡 Opportunities to help shape the future of VENLAX Sports</li>
       </ul>
       <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">Help Us Build Something Players Love</h2>
@@ -439,7 +439,7 @@ async def send_early_access_confirmed(to: str) -> None:
       <p>See you on the court!</p>
       <p><strong>The VENLAX Sports Team</strong></p>
     """
-    await send_email(to, "Welcome to VENLAX Sports Early Access", _wrap("Welcome to VENLAX Sports", body))
+    await send_email(to, "Welcome to the VENLAX Sports waitlist", _wrap("Welcome to VENLAX Sports", body))
 
 
 async def send_generic(to: str, subject: str, body: str) -> None:
