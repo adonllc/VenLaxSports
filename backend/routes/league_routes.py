@@ -72,7 +72,14 @@ async def my_leagues(request: Request):
     if not league_ids:
         return []
     leagues = await db.leagues.find({"_id": {"$in": league_ids}}).to_list(50)
-    return [_serialize(l) for l in leagues]
+    import league_schedule
+    out = []
+    for l in leagues:
+        progress = await league_schedule.league_progress(db, l, user["_id"])
+        doc = _serialize(l)
+        doc["progress"] = progress
+        out.append(doc)
+    return out
 
 
 @router.get("/{league_id}")

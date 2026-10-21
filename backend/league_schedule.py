@@ -4,12 +4,25 @@ Each player (or doubles team) gets `matches_per_player` opponents drawn at rando
 players of a compatible rating, never a repeat opponent unless the league allows rematches,
 with a Home or Away role per match. Home proposes the date, time and court; Away confirms.
 
+Rules for the cases the spec calls out
+  * Eligible players: paid or free registrations, active accounts, not withdrawn/unavailable.
+    A player whose rating is outside the league's division range is reported as a warning
+    (not silently dropped: they paid to join).
+  * Odd number of players: one bye per round, rotating, so a few players get one match fewer.
+  * Too few opponents: matches per player is capped at (players - 1) unless the league sets
+    allow_rematches. Fewer than 2 eligible players: the league is not opened.
+  * Retry or a second job run: a lock on the league plus the "already generated" check mean
+    the schedule is created exactly once. Regenerating is explicit and allowed only until a
+    match is proposed, scheduled or played.
+  * Every match is ONE record shared by both sides. Home and Away are stored on it.
+
 Shared by the admin "Open to Play" button, the nightly auto-open job, and the
-regenerate / adjust tools (allowed only until someone starts scheduling or playing).
+regenerate / adjust tools.
 """
 from __future__ import annotations
 
 import random
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 from bson import ObjectId
@@ -19,7 +32,9 @@ from models import Match
 from pairing_utils import DEFAULT_BAND, pair_units
 
 DEFAULT_MATCHES_PER_PLAYER = 4
-MIN_PLAYERS_AUTO_START = 8  # players (or teams) needed before a league opens by itself
+MIN_PLAYERS_AUTO_START = 8      # players (or teams) needed before a league opens by itself
+LOCK_SECONDS = 300              # a generation lock older than this is considered abandoned
+UNAVAILABLE = ("withdrawn", "unavailable")
 
 
 class ScheduleLocked(Exception):
@@ -27,13 +42,17 @@ class ScheduleLocked(Exception):
 
 
 async def build_units(db, league: dict):
-    """Registered players (singles) or teams (doubles) as pairing units, plus the user docs."""
+    """Eligible players (singles) or teams (doubles) as pairing units.
+
+    Returns (units, users, warnings).
+    """
     league_id = str(league["_id"])
     sport = league["sport"]
     is_doubles = league.get("format") in ("doubles", "mixed")
     regs = await db.player_leagues.find(
         {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}}
     ).to_list(500)
+    regs = [r for r in regs if r.get("status") not in UNAVAILABLE]
 
     ids = {r["player_id"] for r in regs} | {r["partner_id"] for r in regs if r.get("partner_id")}
     users = {}
@@ -46,6 +65,17 @@ async def build_units(db, league: dict):
     def name_of(uid: str, fallback: str = "") -> str:
         return users.get(uid, {}).get("name", fallback)
 
+    def active(uid: str) -> bool:
+        return users.get(uid, {}).get("is_active", True) is not False
+
+    warnings: list[str] = []
+    lo, hi = league.get("division_ntrp_min"), league.get("division_ntrp_max")
+    if lo is not None or hi is not None:
+        for uid in ids:
+            r = rating_of(uid)
+            if (lo is not None and r < float(lo)) or (hi is not None and r > float(hi)):
+                warnings.append(f"{name_of(uid)} is rated {r:g}, outside this division ({lo or 'any'}–{hi or 'any'})")
+
     units = []
     for r in regs:
         pid = r["player_id"]
@@ -53,20 +83,27 @@ async def build_units(db, league: dict):
             partner = r.get("partner_id")
             if not partner or pid > partner:
                 continue  # one record per team
+            if not (active(pid) and active(partner)):
+                warnings.append(f"Team {name_of(pid)} & {name_of(partner)} skipped: an account is inactive")
+                continue
             units.append({
                 "id": pid, "partner_id": partner, "members": [pid, partner],
                 "name": f"{name_of(pid, r['player_name'])} & {name_of(partner, r.get('partner_name', ''))}",
                 "rating": (rating_of(pid) + rating_of(partner)) / 2,
             })
         else:
+            if not active(pid):
+                warnings.append(f"{name_of(pid, r['player_name'])} skipped: account is inactive")
+                continue
             units.append({"id": pid, "members": [pid], "name": name_of(pid, r["player_name"]), "rating": rating_of(pid)})
-    return units, users
+    return units, users, warnings
 
 
 def plan_schedule(units: list[dict], rounds: int, seed: str, band: float = DEFAULT_BAND):
     """Return [{"round": n, "pairs": [(home, away), ...], "bye": unit | None}, ...].
 
     Opponents are random within `band` rating points and never repeat unless unavoidable.
+    Home goes to whoever has had fewer home games so far (a coin flip on ties).
     The seed makes a given schedule reproducible (a regeneration uses a new seed).
     """
     rng = random.Random(seed)
@@ -89,6 +126,35 @@ def plan_schedule(units: list[dict], rounds: int, seed: str, band: float = DEFAU
             byes.add(bye["id"])
         plan.append({"round": n, "pairs": out, "bye": bye})
     return plan
+
+
+def validate_plan(units: list[dict], plan: list[dict], rounds: int, allow_rematches: bool) -> None:
+    """Refuse to publish a schedule that breaks a rule. Raises ValueError."""
+    ids = {u["id"] for u in units}
+    seen_pairs: set = set()
+    matches: Counter = Counter()
+    byes: Counter = Counter()
+    for p in plan:
+        in_round: set = set()
+        for home, away in p["pairs"]:
+            if home["id"] == away["id"]:
+                raise ValueError("A player was paired with themselves")
+            if home["id"] not in ids or away["id"] not in ids:
+                raise ValueError("A match references a player who is not in the league")
+            if home["id"] in in_round or away["id"] in in_round:
+                raise ValueError("A player appears twice in the same round")
+            in_round |= {home["id"], away["id"]}
+            key = frozenset({home["id"], away["id"]})
+            if key in seen_pairs and not allow_rematches:
+                raise ValueError("A rematch was generated but this league does not allow rematches")
+            seen_pairs.add(key)
+            matches[home["id"]] += 1
+            matches[away["id"]] += 1
+        if p["bye"]:
+            byes[p["bye"]["id"]] += 1
+    for u in units:
+        if matches[u["id"]] + byes[u["id"]] != rounds:
+            raise ValueError(f"{u['name']} did not receive the expected number of matches")
 
 
 def round_deadlines(league: dict, rounds: int, now: datetime) -> list[datetime]:
@@ -161,6 +227,22 @@ def _has_activity(m: dict) -> bool:
     return m.get("schedule_status") in ("proposed", "scheduled") or m.get("status") != "scheduled"
 
 
+async def _acquire_lock(db, league: dict) -> bool:
+    """Only one generation per league at a time (admin double-click, retry, job overlap)."""
+    now = datetime.now(timezone.utc)
+    stale = (now - timedelta(seconds=LOCK_SECONDS)).isoformat()
+    got = await db.leagues.find_one_and_update(
+        {"_id": league["_id"],
+         "$or": [{"generation_lock": {"$exists": False}}, {"generation_lock": None}, {"generation_lock": {"$lt": stale}}]},
+        {"$set": {"generation_lock": now.isoformat()}},
+    )
+    return got is not None
+
+
+async def _release_lock(db, league: dict) -> None:
+    await db.leagues.update_one({"_id": league["_id"]}, {"$set": {"generation_lock": None}})
+
+
 async def open_league_to_play(db, league: dict, matches_per_player: int | None = None,
                               preview: bool = False, regenerate: bool = False) -> dict:
     """Generate the season schedule. preview=True changes nothing.
@@ -175,54 +257,73 @@ async def open_league_to_play(db, league: dict, matches_per_player: int | None =
     if existing and any(_has_activity(m) for m in existing):
         raise ScheduleLocked("Play has started (a match was scheduled or played), so the schedule can no longer be regenerated")
 
-    units, users = await build_units(db, league)
+    units, users, warnings = await build_units(db, league)
     if len(units) < 2:
-        raise ValueError("At least two registered players (or teams) are needed")
+        raise ValueError("At least two eligible players (or teams) are needed")
 
+    allow_rematches = bool(league.get("allow_rematches"))
     wanted = int(matches_per_player or league.get("matches_per_player") or DEFAULT_MATCHES_PER_PLAYER)
     # Without rematches nobody can have more matches than there are other opponents.
-    rounds = max(1, wanted if league.get("allow_rematches") else min(wanted, len(units) - 1))
+    rounds = max(1, wanted if allow_rematches else min(wanted, len(units) - 1))
     generation = int(league.get("schedule_generation") or 0) + 1
     plan = plan_schedule(units, rounds, f"{league_id}:{generation}", float(league.get("rating_band") or DEFAULT_BAND))
+    validate_plan(units, plan, rounds, allow_rematches)  # nothing is published unless every rule holds
+
     now = datetime.now(timezone.utc)
     deadlines = round_deadlines(league, rounds, now)
-
+    short = sum(1 for p in plan if p["bye"])
     summary = {
         "players": len(units),
         "rounds": rounds,
         "matches": sum(len(p["pairs"]) for p in plan),
         "byes": [p["bye"]["name"] for p in plan if p["bye"]],
+        "players_with_fewer_matches": len({p["bye"]["id"] for p in plan if p["bye"]}) if short else 0,
+        "warnings": warnings,
         "regenerating": bool(existing),
         "sample_round_1": [{"home": h["name"], "away": a["name"]} for h, a in plan[0]["pairs"]],
     }
     if preview:
         return {"preview": True, **summary}
 
-    is_doubles = league.get("format") in ("doubles", "mixed")
-    docs = []
-    for p, deadline in zip(plan, deadlines):
-        for home, away in p["pairs"]:
-            docs.append(Match(
-                league_id=league_id, sport=league["sport"],
-                player1_id=home["id"], player2_id=away["id"],
-                player1_name=users.get(home["id"], {}).get("name", home["name"]),
-                player2_name=users.get(away["id"], {}).get("name", away["name"]),
-                scheduled_date=deadline.isoformat(), deadline=deadline.isoformat(),
-                schedule_status="unscheduled", round=p["round"], notes=f"Round {p['round']}",
-                team1_partner_id=home.get("partner_id"), team2_partner_id=away.get("partner_id"),
-                team1_partner_name=users.get(home.get("partner_id"), {}).get("name") if is_doubles else None,
-                team2_partner_name=users.get(away.get("partner_id"), {}).get("name") if is_doubles else None,
-            ).to_mongo())
-    if existing:
-        await db.matches.delete_many({"league_id": league_id, "deadline": {"$ne": None}})
-    if docs:
-        await db.matches.insert_many(docs)
-    await db.leagues.update_one(
-        {"_id": league["_id"]},
-        {"$set": {"status": "active", "activated_at": league.get("activated_at") or now.isoformat(),
-                  "matches_per_player": rounds, "schedule_generation": generation,
-                  "updated_at": now.isoformat()}},
-    )
+    if not await _acquire_lock(db, league):
+        raise ValueError("The schedule is already being generated. Try again in a moment")
+    try:
+        is_doubles = league.get("format") in ("doubles", "mixed")
+        docs, number = [], 0
+        for p, deadline in zip(plan, deadlines):
+            for home, away in p["pairs"]:
+                number += 1
+                docs.append(Match(
+                    league_id=league_id, sport=league["sport"], division=league.get("division_label"),
+                    player1_id=home["id"], player2_id=away["id"],
+                    home_player_id=home["id"], away_player_id=away["id"],
+                    player1_name=users.get(home["id"], {}).get("name", home["name"]),
+                    player2_name=users.get(away["id"], {}).get("name", away["name"]),
+                    scheduled_date=deadline.isoformat(), deadline=deadline.isoformat(),
+                    schedule_status="unscheduled", round=p["round"], match_number=number,
+                    schedule_generation=generation, notes=f"Round {p['round']}",
+                    team1_partner_id=home.get("partner_id"), team2_partner_id=away.get("partner_id"),
+                    team1_partner_name=users.get(home.get("partner_id"), {}).get("name") if is_doubles else None,
+                    team2_partner_name=users.get(away.get("partner_id"), {}).get("name") if is_doubles else None,
+                ).to_mongo())
+        if existing:
+            await db.matches.delete_many({"league_id": league_id, "deadline": {"$ne": None}})
+        try:
+            if docs:
+                await db.matches.insert_many(docs)
+        except Exception:
+            # never leave a half-published schedule behind
+            await db.matches.delete_many({"league_id": league_id, "schedule_generation": generation})
+            raise
+        # The league flips to "open" only after every match exists
+        await db.leagues.update_one(
+            {"_id": league["_id"]},
+            {"$set": {"status": "active", "activated_at": league.get("activated_at") or now.isoformat(),
+                      "matches_per_player": rounds, "schedule_generation": generation,
+                      "schedule_published_at": now.isoformat(), "updated_at": now.isoformat()}},
+        )
+    finally:
+        await _release_lock(db, league)
     await email_player_schedules(db, league, {m for u in units for m in u["members"]}, updated=bool(existing))
     return {"preview": False, "created": len(docs), **summary}
 
@@ -239,7 +340,7 @@ async def adjust_match(db, league: dict, match: dict, new_home_id: str, new_away
     if new_home_id == new_away_id:
         raise ValueError("A match needs two different players")
 
-    units, users = await build_units(db, league)
+    units, users, _ = await build_units(db, league)
     by_id = {u["id"]: u for u in units}
     if new_home_id not in by_id or new_away_id not in by_id:
         raise ValueError("Both players must be registered in this league")
@@ -259,6 +360,7 @@ async def adjust_match(db, league: dict, match: dict, new_home_id: str, new_away
     old_members = set(_side(match, 1) + _side(match, 2))
     update = {
         "player1_id": home["id"], "player2_id": away["id"],
+        "home_player_id": home["id"], "away_player_id": away["id"],
         "player1_name": users.get(home["id"], {}).get("name", home["name"]),
         "player2_name": users.get(away["id"], {}).get("name", away["name"]),
         "team1_partner_id": home.get("partner_id"), "team2_partner_id": away.get("partner_id"),
@@ -269,3 +371,90 @@ async def adjust_match(db, league: dict, match: dict, new_home_id: str, new_away
     await db.matches.update_one({"_id": match["_id"]}, {"$set": update})
     await email_player_schedules(db, league, old_members | set(home["members"]) | set(away["members"]), updated=True)
     return {"id": str(match["_id"]), "home": home["name"], "away": away["name"]}
+
+
+# ── Player-facing league status (My Leagues) ─────────────────────────────────
+
+PHASE_LABELS = {
+    "registration_open": "Registration Open",
+    "upcoming": "Upcoming",
+    "ready_to_play": "Ready to Play",
+    "open_to_play": "Open to Play",
+    "in_progress": "In Progress",
+    "playoffs": "Playoffs",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+}
+
+
+def league_phase(league: dict, schedule_published: bool, any_played: bool, today: str) -> str:
+    """One place that decides what a league is called to the player.
+
+    "Ready to Play" and "Open to Play" are only used once the matchups were generated and
+    published. Ready = published, the season has not started yet. Open = the season started
+    and nobody has played yet. After the first result it is In Progress, then Playoffs.
+    """
+    status = league.get("status")
+    if status == "cancelled":
+        return "cancelled"
+    if status == "completed":
+        return "completed"
+    if league.get("playoffs_status"):
+        return "playoffs"
+    if status == "registration":
+        return "registration_open"
+    if status == "upcoming":
+        return "upcoming"
+    if status == "active":
+        if league.get("league_type", "flex") != "flex":
+            return "in_progress"  # round robin / box leagues keep their own flows
+        if not schedule_published:
+            return "upcoming"
+        if any_played:
+            return "in_progress"
+        return "ready_to_play" if (league.get("start_date") or "") > today else "open_to_play"
+    return "upcoming"
+
+
+async def league_progress(db, league: dict, user_id: str) -> dict:
+    """Status, match progress and the primary action for one player's league card."""
+    league_id = str(league["_id"])
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    published = bool(league.get("schedule_generation")) and bool(league.get("schedule_published_at"))
+
+    mine = await db.matches.find({
+        "league_id": league_id, "deadline": {"$ne": None},
+        "$or": [{"player1_id": user_id}, {"player2_id": user_id},
+                {"team1_partner_id": user_id}, {"team2_partner_id": user_id}],
+    }).to_list(200)
+    all_played = await db.matches.find({"league_id": league_id, "deadline": {"$ne": None}, "status": "completed"}).to_list(1)
+
+    phase = league_phase(league, published, bool(all_played), today)
+    total = len(mine)
+    done = sum(1 for m in mine if m.get("status") == "completed")
+    confirmed = sum(1 for m in mine if m.get("status") != "completed" and m.get("schedule_status") == "scheduled")
+
+    lid = league_id
+    is_rr = league.get("league_type") == "round_robin"
+    actions = {
+        "registration_open": ("View League", f"/leagues/{lid}"),
+        "upcoming": ("View League", f"/leagues/{lid}"),
+        "ready_to_play": ("Ready to Play", f"/leagues/{lid}/my-matches"),
+        "open_to_play": ("Open to Play", f"/leagues/{lid}/my-matches"),
+        "in_progress": ("View Matches", f"/round-robin/{lid}" if is_rr else f"/leagues/{lid}/my-matches"),
+        "playoffs": ("View Playoffs", f"/leagues/{lid}/standings"),
+        "completed": ("View Results", f"/leagues/{lid}/standings"),
+        "cancelled": ("View League", f"/leagues/{lid}"),
+    }
+    label, href = actions[phase]
+    return {
+        "phase": phase,
+        "label": PHASE_LABELS[phase],
+        "action": {"label": label, "href": href},
+        "schedule_published": published,
+        # the headcount is shown only once the season is set: counts stay hidden while registering
+        "players": league.get("current_players") if published else None,
+        "matches_total": total,
+        "matches_completed": done,
+        "matches_confirmed": confirmed,
+    }

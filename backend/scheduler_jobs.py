@@ -40,7 +40,7 @@ async def auto_open_leagues(db) -> None:
     opened = 0
     for league in leagues:
         try:
-            units, _ = await league_schedule.build_units(db, league)
+            units, _, _ = await league_schedule.build_units(db, league)
             if len(units) < league_schedule.MIN_PLAYERS_AUTO_START:
                 logger.info("auto_open_leagues: %s has %d players, below the minimum of %d; left in registration",
                             league.get("name"), len(units), league_schedule.MIN_PLAYERS_AUTO_START)

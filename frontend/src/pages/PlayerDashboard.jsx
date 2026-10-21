@@ -448,53 +448,80 @@ export default function PlayerDashboard() {
               <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                 {leagues.map((l) => {
                   const sc = SPORT_COLORS[l.sport] || {};
+                  const pr = l.progress || {};
+                  const ready = pr.phase === "ready_to_play" || pr.phase === "open_to_play";
+                  const pct = pr.matches_total ? Math.round((pr.matches_completed / pr.matches_total) * 100) : 0;
+                  const dates = (iso) => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "");
+                  const chip =
+                    ready ? { background: "#F2A922", color: "#3D3D3D" }
+                    : pr.phase === "in_progress" || pr.phase === "playoffs" ? { background: "#008F70", color: "#fff" }
+                    : pr.phase === "registration_open" ? { background: "#FFEDD5", color: "#7C2D12" }
+                    : { background: "#F1F1F1", color: "#5C5C5C" };
                   return (
-                    <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
-                      <span className="text-lg">{sc.icon || "🏆"}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#3D3D3D" }}>
-                          {l.name}
-                          {l.division_label && (
-                            <span className="ml-2 text-xs font-medium" style={{ color: "#B7791F" }}>
-                              {l.division_label}
-                              {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs" style={{ color: "#6B7280" }}>{l.city} • {l.format}</p>
-                        {boxStatuses[l.id] && (
-                          <div className="mt-1 text-sm" style={{ color: "#374151" }}>
-                            Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
-                            {boxStatuses[l.id].promotion_status === "promoted" && (
-                              <span className="ml-2 text-xs font-semibold" style={{ color: "#B7791F" }}>Promoted ↑</span>
+                    <div key={l.id} className="px-5 py-4" data-testid={`my-league-${l.id}`}>
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg">{sc.icon || "🏆"}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold" style={{ color: "#3D3D3D" }}>{l.name}</p>
+                          <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
+                            {(l.sport || "").charAt(0).toUpperCase() + (l.sport || "").slice(1)} • {l.format}
+                            {l.division_label && (
+                              <span className="ml-1" style={{ color: "#B7791F" }}>
+                                • {l.division_label}
+                                {l.division_ntrp_min ? ` (${l.division_ntrp_min}–${l.division_ntrp_max || "+"}${l.sport === "pickleball" ? " DUPR" : " NTRP"})` : ""}
+                              </span>
                             )}
-                            {boxStatuses[l.id].promotion_status === "relegated" && (
-                              <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      {l.status === "active" && (l.league_type || "flex") === "flex" ? (
-                        <Link
-                          to={`/leagues/${l.id}/my-matches`}
-                          className="text-xs font-bold uppercase tracking-wide px-3 py-1.5 whitespace-nowrap"
-                          style={{ background: "#F2A922", color: "#3D3D3D" }}
-                          data-testid={`open-to-play-${l.id}`}
-                        >
-                          Open to Play
-                        </Link>
-                      ) : (
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={
-                          l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
-                          : l.status === "active" ? { background: "#EDF7F3", color: "#3D3D3D" }
-                          : { background: "#F3F4F6", color: "#6B7280" }
-                        }>
-                          {l.status === "registration" ? "Registration open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
+                            {` • ${l.city}`}
+                          </p>
+                          <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
+                            {dates(l.start_date)} – {dates(l.end_date)}
+                            {pr.players ? ` • ${pr.players} players` : ""}
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold px-2.5 py-1 whitespace-nowrap" style={chip} data-testid={`league-status-chip-${l.id}`}>
+                          {pr.label || (l.status === "registration" ? "Registration Open" : l.status)}
                         </span>
+                      </div>
+
+                      {boxStatuses[l.id] && (
+                        <div className="mt-2 ml-8 text-sm" style={{ color: "#374151" }}>
+                          Box {boxStatuses[l.id].box_id} · Rank #{boxStatuses[l.id].rank} of {boxStatuses[l.id].total}
+                          {boxStatuses[l.id].promotion_status === "promoted" && (
+                            <span className="ml-2 text-xs font-semibold" style={{ color: "#B7791F" }}>Promoted ↑</span>
+                          )}
+                          {boxStatuses[l.id].promotion_status === "relegated" && (
+                            <span className="ml-2 text-xs font-semibold text-red-600">Relegated ↓</span>
+                          )}
+                        </div>
                       )}
-                      <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium" style={{ color: "#6B7280" }}>
-                        Standings
-                      </Link>
+
+                      {pr.matches_total > 0 && (
+                        <div className="mt-3 ml-8" data-testid={`league-progress-${l.id}`}>
+                          <div className="flex justify-between text-xs mb-1" style={{ color: "#5C5C5C" }}>
+                            <span>{pr.matches_completed} of {pr.matches_total} matches played</span>
+                            <span>{pr.matches_confirmed} confirmed</span>
+                          </div>
+                          <div className="h-1.5 w-full" style={{ background: "#F1F1F1" }}>
+                            <div className="h-full" style={{ width: `${pct}%`, background: "#008F70" }} />
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-3 ml-8 flex items-center gap-4">
+                        {pr.action && (
+                          <Link
+                            to={pr.action.href}
+                            className="text-xs font-bold uppercase tracking-wide px-4 py-2 whitespace-nowrap"
+                            style={ready ? { background: "#F2A922", color: "#3D3D3D" } : { background: "#008F70", color: "#fff" }}
+                            data-testid={`league-action-${l.id}`}
+                          >
+                            {pr.action.label}
+                          </Link>
+                        )}
+                        <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium" style={{ color: "#6B7280" }}>
+                          Standings
+                        </Link>
+                      </div>
                     </div>
                   );
                 })}

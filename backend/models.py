@@ -256,6 +256,11 @@ class Match(BaseDocument):
     team1_partner_name: Optional[str] = None
     team2_partner_id: Optional[str] = None
     team2_partner_name: Optional[str] = None
+    home_player_id: Optional[str] = None      # explicit Home / Away (player1 = Home, player2 = Away)
+    away_player_id: Optional[str] = None
+    match_number: Optional[int] = None        # 1..N within the league's generated schedule
+    division: Optional[str] = None
+    schedule_generation: Optional[int] = None # which generation of the schedule created this match
     deadline: Optional[str] = None            # play-by date for generated season matches
     schedule_status: Optional[str] = None     # unscheduled | proposed | scheduled (None = legacy)
     proposal: Optional[Dict] = None           # {proposed_by, date, venue, note}

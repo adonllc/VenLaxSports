@@ -54,6 +54,10 @@ class Coll:
                     return False
                 if "$ne" in v and doc.get(k) == v["$ne"]:
                     return False
+                if "$exists" in v and (k in doc) != v["$exists"]:
+                    return False
+                if "$lt" in v and not (doc.get(k) is not None and doc.get(k) < v["$lt"]):
+                    return False
             elif doc.get(k) != v:
                 return False
         return True
@@ -71,6 +75,14 @@ class Coll:
 
     async def delete_many(self, q):
         self.docs = [d for d in self.docs if not self._match(d, q)]
+
+    async def find_one_and_update(self, q, upd):
+        d = await self.find_one(q)
+        if d:
+            before = dict(d)
+            d.update(upd.get("$set", {}))
+            return before
+        return None
 
     async def update_one(self, q, upd):
         d = await self.find_one(q)
@@ -278,3 +290,93 @@ def test_admin_open_to_play_rejects_non_flex(sent, monkeypatch):
     with pytest.raises(HTTPException) as e:
         run(admin_routes.open_to_play(lid, request_for(db), {"confirm": True}))
     assert e.value.status_code == 400
+
+
+# ── Spec checks: canonical records, fields, validation, idempotency, status ─────────────
+
+def test_sixteen_players_four_matches_is_32_unique_canonical_matches_with_all_fields(sent):
+    db, lid, ids = make_league(16)
+    league_of(db)["division_label"] = "Intermediate"
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    ms = db.matches.docs
+    assert len(ms) == 32
+    assert sorted(m["match_number"] for m in ms) == list(range(1, 33))
+    assert len({str(m["_id"]) for m in ms}) == 32
+    for m in ms:
+        assert m["home_player_id"] == m["player1_id"] and m["away_player_id"] == m["player2_id"]
+        assert m["home_player_id"] != m["away_player_id"]
+        assert m["league_id"] == lid and m["sport"] == "tennis" and m["division"] == "Intermediate"
+        assert m["status"] == "scheduled" and m["schedule_status"] == "unscheduled" and m["round"] in (1, 2, 3, 4)
+    # one record per pairing: nobody has a second, conflicting record for the same match
+    assert len({frozenset({m["player1_id"], m["player2_id"]}) for m in ms}) == 32
+
+
+def test_adjust_keeps_home_and_away_fields_in_sync(sent):
+    db, lid, ids = make_league(8)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    m = db.matches.docs[0]
+    h, a = m["player1_id"], m["player2_id"]
+    run(league_schedule.adjust_match(db, league_of(db), m, a, h))
+    assert m["home_player_id"] == a and m["away_player_id"] == h and m["player1_id"] == a
+
+
+def test_retry_does_not_duplicate_and_a_held_lock_blocks_a_second_run(sent):
+    db, lid, ids = make_league(8)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    with pytest.raises(ValueError):  # admin retries the start action
+        run(league_schedule.open_league_to_play(db, league_of(db)))
+    assert len(db.matches.docs) == 16
+
+    db2, lid2, _ = make_league(8)
+    from datetime import datetime, timezone
+    league_of(db2)["generation_lock"] = datetime.now(timezone.utc).isoformat()  # another run in progress
+    with pytest.raises(ValueError):
+        run(league_schedule.open_league_to_play(db2, league_of(db2)))
+    assert db2.matches.docs == []
+
+
+def test_validate_plan_refuses_rule_breaking_schedules():
+    units = [{"id": "a", "name": "A", "rating": 3}, {"id": "b", "name": "B", "rating": 3}]
+    a, b = units
+    with pytest.raises(ValueError):
+        league_schedule.validate_plan(units, [{"round": 1, "pairs": [(a, a)], "bye": None}], 1, False)
+    with pytest.raises(ValueError):  # rematch not allowed
+        league_schedule.validate_plan(units, [{"round": 1, "pairs": [(a, b)], "bye": None},
+                                              {"round": 2, "pairs": [(b, a)], "bye": None}], 2, False)
+    league_schedule.validate_plan(units, [{"round": 1, "pairs": [(a, b)], "bye": None},
+                                          {"round": 2, "pairs": [(b, a)], "bye": None}], 2, True)
+
+
+def test_eligibility_skips_inactive_and_withdrawn_and_warns_about_division(sent):
+    db, lid, ids = make_league(10)
+    league_of(db).update({"division_ntrp_min": 3.7, "division_ntrp_max": 4.0})
+    db.users.docs[0]["is_active"] = False
+    db.player_leagues.docs[1]["status"] = "withdrawn"
+    pv = run(league_schedule.open_league_to_play(db, league_of(db), preview=True))
+    assert pv["players"] == 8
+    assert any("outside this division" in w for w in pv["warnings"])
+    assert any("inactive" in w for w in pv["warnings"])
+
+
+def test_league_phase_only_ready_after_schedule_is_published():
+    ph = league_schedule.league_phase
+    lg = {"status": "registration", "league_type": "flex", "start_date": "2026-11-08"}
+    assert ph(lg, False, False, "2026-10-01") == "registration_open"
+    lg["status"] = "active"
+    assert ph(lg, False, False, "2026-10-01") == "upcoming"  # active but nothing published: not ready
+    assert ph(lg, True, False, "2026-10-01") == "ready_to_play"
+    assert ph(lg, True, False, "2026-11-09") == "open_to_play"
+    assert ph(lg, True, True, "2026-11-09") == "in_progress"
+    assert ph({**lg, "playoffs_status": "round_1"}, True, True, "2026-12-30") == "playoffs"
+    assert ph({**lg, "status": "completed"}, True, True, "2027-01-04") == "completed"
+
+
+def test_league_progress_card_data(sent):
+    db, lid, ids = make_league(8)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    me = db.matches.docs[0]["player1_id"]
+    prog = run(league_schedule.league_progress(db, league_of(db), me))
+    assert prog["schedule_published"] and prog["matches_total"] == 4 and prog["matches_completed"] == 0
+    assert prog["label"] in ("Ready to Play", "Open to Play") and prog["action"]["href"].endswith("/my-matches")
+    before = run(league_schedule.league_progress(db, {**league_of(db), "schedule_published_at": None, "schedule_generation": None}, me))
+    assert before["players"] is None and before["label"] != "Open to Play"
