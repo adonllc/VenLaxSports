@@ -475,7 +475,6 @@ export default function PlayerDashboard() {
                           </p>
                           <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
                             {dates(l.start_date)} – {dates(l.end_date)}
-                            {pr.players ? ` • ${pr.players} players` : ""}
                           </p>
                         </div>
                         <span className="text-xs font-bold px-2.5 py-1 whitespace-nowrap" style={chip} data-testid={`league-status-chip-${l.id}`}>

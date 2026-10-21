@@ -379,7 +379,7 @@ def test_league_progress_card_data(sent):
     assert prog["schedule_published"] and prog["matches_total"] == 4 and prog["matches_completed"] == 0
     assert prog["label"] in ("Ready to Play", "Open to Play") and prog["action"]["href"].endswith("/my-matches")
     before = run(league_schedule.league_progress(db, {**league_of(db), "schedule_published_at": None, "schedule_generation": None}, me))
-    assert before["players"] is None and before["label"] != "Open to Play"
+    assert "players" not in before and before["label"] != "Open to Play"
 
 
 def test_open_replaces_matches_left_by_the_retired_create_round_tool(sent):

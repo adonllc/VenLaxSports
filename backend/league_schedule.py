@@ -462,8 +462,6 @@ async def league_progress(db, league: dict, user_id: str) -> dict:
         "label": PHASE_LABELS[phase],
         "action": {"label": label, "href": href},
         "schedule_published": published,
-        # the headcount is shown only once the season is set: counts stay hidden while registering
-        "players": league.get("current_players") if published else None,
         "matches_total": total,
         "matches_completed": done,
         "matches_confirmed": confirmed,
