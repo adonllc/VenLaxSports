@@ -380,3 +380,20 @@ def test_league_progress_card_data(sent):
     assert prog["label"] in ("Ready to Play", "Open to Play") and prog["action"]["href"].endswith("/my-matches")
     before = run(league_schedule.league_progress(db, {**league_of(db), "schedule_published_at": None, "schedule_generation": None}, me))
     assert before["players"] is None and before["label"] != "Open to Play"
+
+
+def test_open_replaces_matches_left_by_the_retired_create_round_tool(sent):
+    db, lid, ids = make_league(8)
+    league_of(db)["status"] = "active"  # was activated by the old tool, but nothing was published
+    old = {"_id": ObjectId(), "league_id": lid, "round": 1, "player1_id": ids[0], "player2_id": ids[1],
+           "status": "scheduled", "schedule_status": None, "deadline": None}
+    db.matches.docs.append(old)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    assert old not in db.matches.docs and len(db.matches.docs) == 16
+    assert all(m["deadline"] for m in db.matches.docs)
+
+    db2, lid2, ids2 = make_league(8)
+    db2.matches.docs.append({"_id": ObjectId(), "league_id": lid2, "round": 1, "player1_id": ids2[0], "player2_id": ids2[1],
+                             "status": "completed", "deadline": None})
+    with pytest.raises(league_schedule.ScheduleLocked):
+        run(league_schedule.open_league_to_play(db2, league_of(db2)))

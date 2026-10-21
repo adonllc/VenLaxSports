@@ -256,6 +256,14 @@ async def open_league_to_play(db, league: dict, matches_per_player: int | None =
         raise ValueError("This league already has a generated schedule")
     if existing and any(_has_activity(m) for m in existing):
         raise ScheduleLocked("Play has started (a match was scheduled or played), so the schedule can no longer be regenerated")
+    # Round matches made by the retired single-round "Create round" tool have no deadline; they
+    # are replaced by the full schedule, unless one has already been played.
+    legacy = await db.matches.find({
+        "league_id": league_id, "round": {"$ne": None}, "deadline": None,
+        "is_rr": {"$ne": True}, "is_playoff": {"$ne": True},
+    }).to_list(2000)
+    if any(m.get("status") != "scheduled" for m in legacy):
+        raise ScheduleLocked("A round created earlier has already been played, so a new schedule cannot replace it")
 
     units, users, warnings = await build_units(db, league)
     if len(units) < 2:
@@ -308,6 +316,8 @@ async def open_league_to_play(db, league: dict, matches_per_player: int | None =
                 ).to_mongo())
         if existing:
             await db.matches.delete_many({"league_id": league_id, "deadline": {"$ne": None}})
+        for m in legacy:
+            await db.matches.delete_many({"_id": m["_id"]})
         try:
             if docs:
                 await db.matches.insert_many(docs)

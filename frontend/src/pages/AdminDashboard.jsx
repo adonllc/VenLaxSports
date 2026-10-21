@@ -591,7 +591,7 @@ export default function AdminDashboard() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#B7791F" }}>View</Link>
-                          {l.status === "registration" && (l.league_type || "flex") === "flex" && (
+                          {(l.status === "registration" || (l.status === "active" && !l.matches_per_player)) && (l.league_type || "flex") === "flex" && (
                             <button
                               onClick={() => handleOpenToPlay(l)}
                               className="text-xs font-bold" style={{ color: "#008F70" }}
@@ -601,7 +601,7 @@ export default function AdminDashboard() {
                               Open to Play
                             </button>
                           )}
-                          {l.status === "active" && (l.league_type || "flex") === "flex" && (
+                          {l.status === "active" && l.matches_per_player && (l.league_type || "flex") === "flex" && (
                             <>
                               <button
                                 onClick={() => handleOpenToPlay(l, true)}
