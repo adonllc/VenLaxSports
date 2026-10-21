@@ -5,6 +5,8 @@ CITIES = [
     {"name": "San Francisco", "country": "USA", "state": "CA"},
     {"name": "Atlanta", "country": "USA", "state": "GA"},
     {"name": "Houston", "country": "USA", "state": "TX"},
+    {"name": "Dallas", "country": "USA", "state": "TX"},
+    {"name": "Charlotte", "country": "USA", "state": "NC"},
     {"name": "Phoenix", "country": "USA", "state": "AZ"},
     {"name": "Seattle", "country": "USA", "state": "WA"},
     {"name": "Mumbai", "country": "India", "state": "Maharashtra"},

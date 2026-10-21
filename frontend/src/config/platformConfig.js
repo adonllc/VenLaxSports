@@ -71,6 +71,8 @@ const PHASE_1 = {
     { name: "San Francisco", icon: "🌉", sports: ["Tennis"],               desc: "Competitive singles & doubles. Join the circuit." },
     { name: "Atlanta",       icon: "🏟️", sports: ["Pickleball", "Tennis"], desc: "The South's fastest-rising pickleball scene." },
     { name: "Houston",       icon: "🤠", sports: ["Tennis", "Pickleball"], desc: "Ranked leagues at Houston's elite clubs." },
+    { name: "Dallas",        icon: "⭐", sports: ["Tennis", "Pickleball"], desc: "Singles and doubles seasons across the Dallas area." },
+    { name: "Charlotte",     icon: "🏀", sports: ["Tennis", "Pickleball"], desc: "Ranked seasons for Charlotte players." },
   ],
   citySectionTitle: "Pick Your City. Enter Your Season.",
   citySectionDesc: "Ranked Tennis & Pickleball leagues running across the USA. New seasons open year-round.",
