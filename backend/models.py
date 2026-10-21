@@ -256,6 +256,9 @@ class Match(BaseDocument):
     team1_partner_name: Optional[str] = None
     team2_partner_id: Optional[str] = None
     team2_partner_name: Optional[str] = None
+    deadline: Optional[str] = None            # play-by date for generated season matches
+    schedule_status: Optional[str] = None     # unscheduled | proposed | scheduled (None = legacy)
+    proposal: Optional[Dict] = None           # {proposed_by, date, venue, note}
 
 
 class MatchCreate(BaseModel):

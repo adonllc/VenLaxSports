@@ -279,33 +279,69 @@ async def send_schedule_released(to: str, player_name: str, league_name: str, le
                      _wrap("Your schedule is ready", body, "View schedule", url))
 
 
-async def send_round_pairing(to: str, player_name: str, league_name: str, league_id: str, round_no: int,
-                             opponent_name: str, opponent_email: str, play_by: str) -> None:
-    """Tell a player who they play this round and how to reach them."""
-    url = f"{_get_frontend_url()}/leagues/{league_id}" if _get_frontend_url() else f"/leagues/{league_id}"
+async def send_league_open(to: str, player_name: str, league_name: str, league_id: str, rows: list,
+                             updated: bool = False) -> None:
+    """Season opened: list every opponent with Home/Away role, contact and play-by date."""
+    url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
+    items = "".join(
+        f"<li><strong>Round {r['round']} · {r['role']}</strong> vs {r['opponent']}"
+        f" ({r['email']}) — play by {r['deadline']}</li>"
+        for r in rows
+    )
     body = f"""
       <p>Hi {player_name},</p>
-      <p>Your round {round_no} opponent in <strong>{league_name}</strong> is <strong>{opponent_name}</strong>.</p>
+      <p>{"The schedule for" if updated else ""} <strong>{league_name}</strong> {"was updated by the organizer. Here are your matches:" if updated else "is open to play. Here are your matches:"}</p>
+      <ul style="padding-left:18px;margin:0 0 16px">{items}</ul>
+      <p><strong>Home</strong> proposes the date, time and court. <strong>Away</strong> confirms or suggests another time.
+      Open your matches to schedule, and report each score after you play.</p>
+      <p>Your email address is shared with your opponents only so you can arrange the matches.</p>
+    """
+    subject = f"Schedule updated — {league_name}" if updated else f"{league_name} is open to play — your matches"
+    await send_email(to, subject, _wrap("Your matches are ready", body, "View my matches", url))
+
+
+async def send_match_proposed(to: str, player_name: str, opponent_name: str, league_name: str, league_id: str,
+                              when: str, venue: str, note: str) -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
+    extra = f"<li><strong>Note:</strong> {note}</li>" if note else ""
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>{opponent_name} proposed a time for your <strong>{league_name}</strong> match:</p>
       <ul style="padding-left:18px;margin:0 0 16px">
-        <li><strong>Contact them within 48 hours:</strong> <a href="mailto:{opponent_email}">{opponent_email}</a></li>
-        <li><strong>Play by:</strong> {play_by}</li>
-        <li>After the match, report the score on VENLAX Sports so standings and ratings update.</li>
+        <li><strong>When:</strong> {when}</li>
+        <li><strong>Where:</strong> {venue}</li>{extra}
       </ul>
-      <p>If you cannot reach your opponent within 48 hours, let us know at feedback@venlaxsports.com.</p>
-      <p>Your email address is shared with your opponent only so you can arrange the match.</p>
+      <p>Open your matches to confirm, or suggest another time.</p>
     """
-    await send_email(to, f"Round {round_no}: you play {opponent_name} — {league_name}",
-                     _wrap(f"Round {round_no} opponent", body, "View league", url))
+    await send_email(to, f"{opponent_name} proposed a match time — {league_name}", _wrap("Confirm your match", body, "Confirm or suggest a time", url))
 
 
-async def send_round_bye(to: str, player_name: str, league_name: str, league_id: str, round_no: int) -> None:
-    url = f"{_get_frontend_url()}/leagues/{league_id}" if _get_frontend_url() else f"/leagues/{league_id}"
+async def send_match_confirmed(to: str, player_name: str, opponent_name: str, league_name: str, league_id: str,
+                               when: str, venue: str) -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
     body = f"""
       <p>Hi {player_name},</p>
-      <p>There is an odd number of players in <strong>{league_name}</strong>, so you have a bye in round {round_no}.
-      You do not need to play this round. You will be paired again in the next round.</p>
+      <p>Your <strong>{league_name}</strong> match against {opponent_name} is confirmed.</p>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li><strong>When:</strong> {when}</li>
+        <li><strong>Where:</strong> {venue}</li>
+      </ul>
+      <p>After you play, report the score so standings and ratings update.</p>
     """
-    await send_email(to, f"Round {round_no}: bye — {league_name}", _wrap(f"Round {round_no}: you have a bye", body, "View league", url))
+    await send_email(to, f"Match confirmed vs {opponent_name} — {league_name}", _wrap("Match confirmed", body, "View my matches", url))
+
+
+async def send_match_declined(to: str, player_name: str, opponent_name: str, league_name: str, league_id: str,
+                              message: str) -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
+    msg = f"<p><strong>Their message:</strong> {message}</p>" if message else ""
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>{opponent_name} could not make the time you proposed for your <strong>{league_name}</strong> match.</p>
+      {msg}
+      <p>Open your matches to propose another time.</p>
+    """
+    await send_email(to, f"Please propose another time — {league_name}", _wrap("Propose another time", body, "Propose a time", url))
 
 
 async def send_season_open(to: str, player_name: str, city: str, sport: str,

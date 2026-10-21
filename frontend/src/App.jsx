@@ -44,6 +44,7 @@ const LadderDetail = lazy(() => import("./pages/LadderDetail"));
 const RewardsCredits = lazy(() => import("./pages/RewardsCredits"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const TennisPickleballLeagues = lazy(() => import("./pages/TennisPickleballLeagues"));
+const LeagueMatches = lazy(() => import("./pages/LeagueMatches"));
 
 const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
 const IS_LAUNCH_LIVE = import.meta.env.VITE_LAUNCH_LIVE === "true";
@@ -76,6 +77,7 @@ function AppRouter() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/matches/:id/score" element={<ScoreReport />} />
           <Route path="/leagues/:id/standings" element={<Standings />} />
+          <Route path="/leagues/:id/my-matches" element={<LeagueMatches />} />
           <Route path="/round-robin/invite/:token" element={<RoundRobinInvite />} />
           <Route path="/round-robin/:id" element={<RoundRobinDetail />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

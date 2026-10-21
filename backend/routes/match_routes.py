@@ -1,4 +1,6 @@
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from models import Match, MatchCreate, MatchScore, MatchCard
@@ -26,9 +28,194 @@ async def my_matches(request: Request):
     user = await get_current_user(request, db)
     uid = user["_id"]
     matches = await db.matches.find(
-        {"$or": [{"player1_id": uid}, {"player2_id": uid}]}
+        {"$or": [{"player1_id": uid}, {"player2_id": uid}, {"team1_partner_id": uid}, {"team2_partner_id": uid}]}
     ).sort("scheduled_date", -1).to_list(50)
     return [_serialize(m) for m in matches]
+
+
+def _side_ids(match: dict, which: int) -> list[str]:
+    ids = [match["player1_id"], match.get("team1_partner_id")] if which == 1 else [match["player2_id"], match.get("team2_partner_id")]
+    return [i for i in ids if i]
+
+
+def _side_label(match: dict, which: int) -> str:
+    names = [match.get("player1_name"), match.get("team1_partner_name")] if which == 1 else [match.get("player2_name"), match.get("team2_partner_name")]
+    return " & ".join(n for n in names if n)
+
+
+async def _users_by_id(db, ids: list[str]) -> dict:
+    out = {}
+    async for u in db.users.find({"_id": {"$in": [ObjectId(i) for i in ids if ObjectId.is_valid(i)]}}):
+        out[str(u["_id"])] = u
+    return out
+
+
+def _fmt_when(iso: str) -> str:
+    try:
+        return datetime.fromisoformat(iso.replace("Z", "+00:00")).strftime("%a %b %d, %Y at %I:%M %p UTC")
+    except Exception:
+        return iso
+
+
+@router.get("/league/{league_id}/mine")
+async def my_league_matches(league_id: str, request: Request):
+    """The caller's season matches in one league, with opponent, Home/Away role and schedule state."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    uid = user["_id"]
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    ms = await db.matches.find({
+        "league_id": league_id,
+        "$or": [{"player1_id": uid}, {"player2_id": uid}, {"team1_partner_id": uid}, {"team2_partner_id": uid}],
+    }).sort("round", 1).to_list(200)
+
+    ids = [i for m in ms for i in _side_ids(m, 1) + _side_ids(m, 2)]
+    users = await _users_by_id(db, ids)
+    out = []
+    for m in ms:
+        mine = 1 if uid in _side_ids(m, 1) else 2
+        other = 2 if mine == 1 else 1
+        out.append({
+            "id": str(m["_id"]), "round": m.get("round"),
+            "role": "home" if mine == 1 else "away",
+            "opponent": {
+                "name": _side_label(m, other),
+                "email": ", ".join(users.get(i, {}).get("email", "") for i in _side_ids(m, other) if users.get(i, {}).get("email")),
+            },
+            "partner_name": _side_label(m, mine) if len(_side_ids(m, mine)) > 1 else None,
+            "deadline": m.get("deadline"), "schedule_status": m.get("schedule_status"),
+            "scheduled_date": m.get("scheduled_date"), "venue": m.get("venue"),
+            "proposal": m.get("proposal"), "last_decline": m.get("last_decline"),
+            "status": m.get("status"), "winner_id": m.get("winner_id"),
+            "result": (("won" if m.get("winner_id") in _side_ids(m, mine) else "lost") if m.get("winner_id") else None),
+        })
+    return {
+        "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": league.get("sport"),
+                   "format": league.get("format"), "start_date": league.get("start_date"), "end_date": league.get("end_date"),
+                   "matches_per_player": league.get("matches_per_player")},
+        "user_id": uid,
+        "matches": out,
+    }
+
+
+class ProposeIn(BaseModel):
+    date: str
+    venue: str
+    note: Optional[str] = None
+
+
+class RespondIn(BaseModel):
+    action: str  # confirm | decline
+    message: Optional[str] = None
+
+
+async def _load_match_for(db, match_id: str):
+    try:
+        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="Match not found")
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    league = await db.leagues.find_one({"_id": ObjectId(match["league_id"])})
+    return match, league
+
+
+@router.post("/{match_id}/propose")
+async def propose_match_time(match_id: str, data: ProposeIn, request: Request):
+    """Home proposes a date, time and court. Away is emailed to confirm."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    match, league = await _load_match_for(db, match_id)
+    if match.get("schedule_status") is None:
+        raise HTTPException(status_code=400, detail="This match is not part of a generated schedule")
+    if user["_id"] not in _side_ids(match, 1):
+        raise HTTPException(status_code=403, detail="Only the Home player proposes the time")
+    if match.get("status") != "scheduled":
+        raise HTTPException(status_code=400, detail="This match is already finished")
+    venue = (data.venue or "").strip()
+    if not venue or len(venue) > 120:
+        raise HTTPException(status_code=400, detail="Enter the court or venue (up to 120 characters)")
+    try:
+        when = datetime.fromisoformat(data.date.replace("Z", "+00:00"))
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid date and time")
+    now = datetime.now(timezone.utc)
+    if when <= now:
+        raise HTTPException(status_code=400, detail="Pick a time in the future")
+    try:
+        last = datetime.fromisoformat(league["end_date"]).replace(tzinfo=timezone.utc) + timedelta(days=1)
+    except Exception:
+        last = None
+    if last and when > last:
+        raise HTTPException(status_code=400, detail="That is after the end of the season")
+
+    proposal = {"proposed_by": user["_id"], "date": when.isoformat(), "venue": venue,
+                "note": (data.note or "").strip()[:300], "at": now.isoformat()}
+    await db.matches.update_one(
+        {"_id": match["_id"]},
+        {"$set": {"schedule_status": "proposed", "proposal": proposal, "last_decline": None, "updated_at": now.isoformat()}},
+    )
+    away_ids = _side_ids(match, 2)
+    users = await _users_by_id(db, away_ids)
+    for aid in away_ids:
+        a = users.get(aid)
+        if a and a.get("email"):
+            email_service.schedule(email_service.send_match_proposed(
+                a["email"], a.get("name", ""), _side_label(match, 1), league["name"], match["league_id"],
+                _fmt_when(proposal["date"]), venue, proposal["note"]))
+    return {"schedule_status": "proposed", "proposal": proposal}
+
+
+@router.post("/{match_id}/respond")
+async def respond_to_proposal(match_id: str, data: RespondIn, request: Request):
+    """Away confirms the proposed time, or declines so Home proposes another."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    match, league = await _load_match_for(db, match_id)
+    if user["_id"] not in _side_ids(match, 2):
+        raise HTTPException(status_code=403, detail="Only the Away player responds to a proposal")
+    if match.get("schedule_status") != "proposed" or not match.get("proposal"):
+        raise HTTPException(status_code=400, detail="There is no proposal to respond to")
+    if data.action not in ("confirm", "decline"):
+        raise HTTPException(status_code=400, detail="Action must be confirm or decline")
+    now = datetime.now(timezone.utc).isoformat()
+    prop = match["proposal"]
+    everyone = await _users_by_id(db, _side_ids(match, 1) + _side_ids(match, 2))
+
+    if data.action == "confirm":
+        await db.matches.update_one(
+            {"_id": match["_id"]},
+            {"$set": {"schedule_status": "scheduled", "scheduled_date": prop["date"], "venue": prop["venue"],
+                      "proposal": None, "updated_at": now}},
+        )
+        for who in _side_ids(match, 1) + _side_ids(match, 2):
+            u = everyone.get(who)
+            if u and u.get("email"):
+                opp = _side_label(match, 2 if who in _side_ids(match, 1) else 1)
+                email_service.schedule(email_service.send_match_confirmed(
+                    u["email"], u.get("name", ""), opp, league["name"], match["league_id"],
+                    _fmt_when(prop["date"]), prop["venue"]))
+        return {"schedule_status": "scheduled", "scheduled_date": prop["date"], "venue": prop["venue"]}
+
+    message = (data.message or "").strip()[:300]
+    await db.matches.update_one(
+        {"_id": match["_id"]},
+        {"$set": {"schedule_status": "unscheduled", "proposal": None,
+                  "last_decline": {"message": message, "at": now}, "updated_at": now}},
+    )
+    for hid in _side_ids(match, 1):
+        u = everyone.get(hid)
+        if u and u.get("email"):
+            email_service.schedule(email_service.send_match_declined(
+                u["email"], u.get("name", ""), _side_label(match, 2), league["name"], match["league_id"], message))
+    return {"schedule_status": "unscheduled"}
 
 
 @router.post("")
@@ -143,7 +330,7 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
         raise HTTPException(status_code=404, detail="Match not found")
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
-    if user["_id"] not in [match["player1_id"], match["player2_id"]]:
+    if user["_id"] not in _side_ids(match, 1) + _side_ids(match, 2):
         raise HTTPException(status_code=403, detail="Not a player in this match")
     if match["status"] == "completed":
         raise HTTPException(status_code=400, detail="Match already completed")
@@ -355,26 +542,30 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str, sco
     winner_pts = round(3.0 + 0.5 * (w_sets - l_sets) + 0.1 * (w_games - l_games) + winner_bonus, 2)
     loser_pts = round(1.0 + 0.5 * (l_sets - w_sets) + 0.1 * (l_games - w_games) + loser_bonus, 2)
 
-    await db.standings.update_one(
-        {"league_id": league_id, "player_id": winner_id},
-        {"$inc": {
-            "wins": 1, "matches_played": 1, "points": winner_pts,
-            "sets_won": w_sets, "sets_lost": l_sets,
-            "games_won": w_games, "games_lost": l_games,
-            "bonus_points": winner_bonus,
-        }, "$set": {"updated_at": now}},
-        upsert=True,
-    )
-    await db.standings.update_one(
-        {"league_id": league_id, "player_id": loser_id},
-        {"$inc": {
-            "losses": 1, "matches_played": 1, "points": loser_pts,
-            "sets_won": l_sets, "sets_lost": w_sets,
-            "games_won": l_games, "games_lost": w_games,
-            "bonus_points": loser_bonus,
-        }, "$set": {"updated_at": now}},
-        upsert=True,
-    )
+    winner_side = _side_ids(match, 1) if str(winner_id) == str(match["player1_id"]) else _side_ids(match, 2)
+    loser_side = _side_ids(match, 2) if str(winner_id) == str(match["player1_id"]) else _side_ids(match, 1)
+    for pid in winner_side:  # a doubles partner earns the same result as the team
+        await db.standings.update_one(
+            {"league_id": league_id, "player_id": pid},
+            {"$inc": {
+                "wins": 1, "matches_played": 1, "points": winner_pts,
+                "sets_won": w_sets, "sets_lost": l_sets,
+                "games_won": w_games, "games_lost": l_games,
+                "bonus_points": winner_bonus,
+            }, "$set": {"updated_at": now}},
+            upsert=True,
+        )
+    for pid in loser_side:
+        await db.standings.update_one(
+            {"league_id": league_id, "player_id": pid},
+            {"$inc": {
+                "losses": 1, "matches_played": 1, "points": loser_pts,
+                "sets_won": l_sets, "sets_lost": w_sets,
+                "games_won": l_games, "games_lost": w_games,
+                "bonus_points": loser_bonus,
+            }, "$set": {"updated_at": now}},
+            upsert=True,
+        )
 
 
 async def _update_ratings(db, match: dict, winner_id: str):

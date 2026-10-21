@@ -206,20 +206,21 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleCreateRound = async (l) => {
-    const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/pairings`, body, { withCredentials: true });
+  const [adjustLeague, setAdjustLeague] = useState(null);
+
+  const handleOpenToPlay = async (l, regenerate = false) => {
+    const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/open-to-play`, { regenerate, ...body }, { withCredentials: true });
     try {
       const { data: pv } = await call({ confirm: false });
-      const lines = pv.matches.map((m) => `${m.player1}  vs  ${m.player2}`).join("\n");
-      const warn = pv.unplayed_previous_round ? `\n\nWARNING: ${pv.unplayed_previous_round} match(es) from the previous round are still unplayed.` : "";
-      const bye = pv.bye ? `\nBye: ${pv.bye}` : "";
-      if (!window.confirm(`Round ${pv.round} for "${l.name}":\n\n${lines}${bye}${warn}\n\nCreate these matches, activate the league if needed, and email every player their opponent?`)) return;
-      const { data } = await call({ confirm: true, force: !!pv.unplayed_previous_round });
-      alert(`Round ${data.round} created: ${data.created} match(es). Players have been emailed.`);
+      const byes = pv.byes.length ? `\nByes (odd number of players): ${pv.byes.join(", ")}` : "";
+      const verb = regenerate ? "Regenerate the schedule for" : "Open to play";
+      if (!window.confirm(`${verb} "${l.name}"?\n\n${pv.players} players or teams, ${pv.rounds} matches each, ${pv.matches} matches in total, opponents of a similar rating drawn at random with no repeats, Home and Away balanced.${byes}\n\nEvery player is emailed their opponents. Continue?`)) return;
+      const { data } = await call({ confirm: true });
+      alert(`${data.created} matches created. Players have been emailed their opponents.`);
       fetchLeagues();
     } catch (e) {
       const d = e.response?.data?.detail;
-      alert(typeof d === "string" ? d : "Failed to create round");
+      alert(typeof d === "string" ? d : "Could not open the league to play");
     }
   };
 
@@ -590,15 +591,35 @@ export default function AdminDashboard() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#B7791F" }}>View</Link>
-                          {(l.status === "registration" || l.status === "active") && (l.league_type || "flex") === "flex" && (
+                          {l.status === "registration" && (l.league_type || "flex") === "flex" && (
                             <button
-                              onClick={() => handleCreateRound(l)}
+                              onClick={() => handleOpenToPlay(l)}
                               className="text-xs font-bold" style={{ color: "#008F70" }}
-                              data-testid={`create-round-${l.id}`}
-                              title="Pair players for the next round and email everyone their opponent"
+                              data-testid={`open-to-play-${l.id}`}
+                              title="Generate every player's matches and open the league to play"
                             >
-                              Create round
+                              Open to Play
                             </button>
+                          )}
+                          {l.status === "active" && (l.league_type || "flex") === "flex" && (
+                            <>
+                              <button
+                                onClick={() => handleOpenToPlay(l, true)}
+                                className="text-xs font-bold" style={{ color: "#008F70" }}
+                                data-testid={`regenerate-${l.id}`}
+                                title="Draw a new schedule (only until a match is scheduled or played)"
+                              >
+                                Regenerate
+                              </button>
+                              <button
+                                onClick={() => setAdjustLeague(l)}
+                                className="text-xs font-bold" style={{ color: "#008F70" }}
+                                data-testid={`adjust-${l.id}`}
+                                title="Change opponents or Home/Away on individual matches"
+                              >
+                                Adjust
+                              </button>
+                            </>
                           )}
                           {l.status !== "completed" && (
                             <button
@@ -758,6 +779,7 @@ export default function AdminDashboard() {
         {tab === "waitlist" && <WaitlistTab />}
         {tab === "referrals" && <ReferralsTab />}
         {tab === "flags" && <FlagsTab />}
+        {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
       </div>
 
       {showRRForm && (
@@ -1726,6 +1748,80 @@ function FlagsTab() {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AdjustScheduleModal({ league, onClose }) {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [rows, setRows] = useState(null);
+  const [edits, setEdits] = useState({});
+  const [msg, setMsg] = useState("");
+
+  const load = () =>
+    axios.get(`${API}/admin/leagues/${league.id}/schedule`, { withCredentials: true })
+      .then((r) => setRows(r.data))
+      .catch(() => setMsg("Could not load the schedule."));
+  useEffect(() => { load(); }, []);
+
+  const people = {};
+  (rows || []).forEach((m) => { people[m.home_id] = m.home; people[m.away_id] = m.away; });
+
+  const save = async (m) => {
+    const e = edits[m.id] || {};
+    try {
+      await axios.patch(`${API}/admin/matches/${m.id}/adjust`, { home_id: e.home_id || m.home_id, away_id: e.away_id || m.away_id }, { withCredentials: true });
+      setEdits((prev) => { const n = { ...prev }; delete n[m.id]; return n; });
+      setMsg("Saved. The affected players were emailed their updated schedule.");
+      load();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not save that change.");
+    }
+  };
+
+  const sel = { border: "1px solid #D9D9D9", color: "#3D3D3D", padding: "4px 6px", fontSize: "12px", maxWidth: "160px" };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="adjust-modal">
+      <div className="bg-white w-full max-w-3xl max-h-[85vh] overflow-auto p-5">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Adjust matches: {league.name}</h3>
+            <p className="text-xs" style={{ color: "#5C5C5C" }}>
+              Change the Home or Away player of a match. Matches that are already proposed, scheduled or played are locked. No pair may meet twice.
+            </p>
+          </div>
+          <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }} data-testid="adjust-close">Close</button>
+        </div>
+        {msg && <p className="text-sm mb-3 p-2" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="status">{msg}</p>}
+        {!rows ? <p className="text-sm">Loading...</p> : (
+          <table className="w-full text-sm">
+            <thead><tr className="text-left text-xs uppercase" style={{ color: "#5C5C5C" }}><th className="py-1">Round</th><th>Home</th><th>Away</th><th /></tr></thead>
+            <tbody>
+              {rows.map((m) => (
+                <tr key={m.id} className="border-t" style={{ borderColor: "#E5E7EB" }} data-testid={`adjust-row-${m.id}`}>
+                  <td className="py-2">{m.round}</td>
+                  {["home_id", "away_id"].map((field) => (
+                    <td key={field}>
+                      <select disabled={m.locked} style={sel} value={(edits[m.id] || {})[field] || m[field]}
+                        onChange={(e) => setEdits((prev) => ({ ...prev, [m.id]: { ...(prev[m.id] || {}), [field]: e.target.value } }))}
+                        data-testid={`adjust-${field}-${m.id}`}>
+                        {Object.entries(people).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                      </select>
+                    </td>
+                  ))}
+                  <td className="text-right">
+                    {m.locked ? <span className="text-xs" style={{ color: "#5C5C5C" }}>Locked</span> : (
+                      <button disabled={!edits[m.id]} onClick={() => save(m)} className="text-xs font-bold disabled:opacity-40" style={{ color: "#008F70" }} data-testid={`adjust-save-${m.id}`}>Save</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

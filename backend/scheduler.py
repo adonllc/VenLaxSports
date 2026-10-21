@@ -1,6 +1,6 @@
 """APScheduler configuration for background jobs.
 
-Five jobs, all sharing the app's live db connection:
+Six jobs, all sharing the app's live db connection:
   - weekly_referral_campaign   every Monday 9:00 UTC
   - auto_status_transitions    daily 00:05 UTC
   - send_match_reminders       every hour
@@ -15,6 +15,7 @@ import logging
 from email_campaign_scheduler import send_weekly_campaign
 from scheduler_jobs import (
     auto_status_transitions,
+    auto_open_leagues,
     send_match_reminders,
     auto_forfeit_stale_matches,
     send_credit_expiry_reminders,
@@ -43,6 +44,15 @@ def start_scheduler(db):
             args=[db],
             id="auto_status_transitions",
             name="League Status Auto-Transitions",
+            replace_existing=True,
+            max_instances=1,
+        )
+        scheduler.add_job(
+            auto_open_leagues,
+            trigger=CronTrigger(hour=0, minute=10),
+            args=[db],
+            id="auto_open_leagues",
+            name="Open leagues to play on their start date",
             replace_existing=True,
             max_instances=1,
         )
@@ -76,7 +86,7 @@ def start_scheduler(db):
 
         if not scheduler.running:
             scheduler.start()
-            logger.info("Scheduler started — 5 background jobs registered")
+            logger.info("Scheduler started — 6 background jobs registered")
         else:
             logger.info("Scheduler already running")
 

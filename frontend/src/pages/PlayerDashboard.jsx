@@ -474,13 +474,24 @@ export default function PlayerDashboard() {
                           </div>
                         )}
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={
-                        l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
-                        : l.status === "active" ? { background: "#EDF7F3", color: "#3D3D3D" }
-                        : { background: "#F3F4F6", color: "#6B7280" }
-                      }>
-                        {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
-                      </span>
+                      {l.status === "active" && (l.league_type || "flex") === "flex" ? (
+                        <Link
+                          to={`/leagues/${l.id}/my-matches`}
+                          className="text-xs font-bold uppercase tracking-wide px-3 py-1.5 whitespace-nowrap"
+                          style={{ background: "#F2A922", color: "#3D3D3D" }}
+                          data-testid={`open-to-play-${l.id}`}
+                        >
+                          Open to Play
+                        </Link>
+                      ) : (
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={
+                          l.status === "registration" ? { background: "#FFEDD5", color: "#7C2D12" }
+                          : l.status === "active" ? { background: "#EDF7F3", color: "#3D3D3D" }
+                          : { background: "#F3F4F6", color: "#6B7280" }
+                        }>
+                          {l.status === "registration" ? "Registration open" : l.status === "active" ? "Active" : l.status === "completed" ? "Ended" : l.status}
+                        </span>
+                      )}
                       <Link to={`/leagues/${l.id}/standings`} className="text-xs font-medium" style={{ color: "#6B7280" }}>
                         Standings
                       </Link>
@@ -543,7 +554,7 @@ export default function PlayerDashboard() {
                       data-testid="schedule-league-select"
                     >
                       <option value="">Choose a league...</option>
-                      {leagues.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                      {leagues.filter((l) => !l.matches_per_player).map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                     </select>
                   </div>
                   <div>
@@ -587,7 +598,7 @@ export default function PlayerDashboard() {
             </div>
             {upcoming.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-sm" style={{ color: "#6B7280" }}>No scheduled matches. Use the form below to schedule one.</p>
+                <p className="text-sm" style={{ color: "#6B7280" }}>No matches yet. When your league opens to play, your opponents appear here.</p>
               </div>
             ) : (
               <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
@@ -595,11 +606,28 @@ export default function PlayerDashboard() {
                   <div key={m.id} className="px-5 py-4">
                     <div className="flex justify-between items-start gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#3D3D3D" }}>{m.player1_name} vs {m.player2_name}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: "#3D3D3D" }}>
+                          {m.round && <span className="mr-1.5 text-xs font-bold" style={{ color: "#008F70" }}>R{m.round} · {[m.player1_id, m.team1_partner_id].includes(user.id) || [m.player1_id, m.team1_partner_id].includes(user._id) ? "HOME" : "AWAY"}</span>}
+                          {m.player1_name} vs {m.player2_name}
+                        </p>
                         <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#6B7280" }}>
-                          <Clock className="w-3 h-3" /> {new Date(m.scheduled_date).toLocaleString()}
+                          <Clock className="w-3 h-3" />
+                          {m.schedule_status === "scheduled" || !m.schedule_status
+                            ? `${new Date(m.scheduled_date).toLocaleString()}${m.venue ? ` · ${m.venue}` : ""}`
+                            : `Play by ${new Date(m.deadline || m.scheduled_date).toLocaleDateString()} · ${m.schedule_status === "proposed" ? "time proposed, awaiting confirmation" : "needs scheduling"}`}
                         </p>
                       </div>
+                      {m.schedule_status && m.schedule_status !== "scheduled" && (
+                        <Link
+                          to={`/leagues/${m.league_id}/my-matches`}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-lg"
+                          style={{ color: "#008F70", border: "1px solid #008F70" }}
+                          data-testid={`schedule-btn-${m.id}`}
+                        >
+                          Schedule
+                        </Link>
+                      )}
+                      {(!m.schedule_status || m.schedule_status === "scheduled") && (
                       <Link
                         to={`/matches/${m.id}/score`}
                         className="text-xs font-semibold text-white px-2.5 py-1 rounded-lg transition-colors"
@@ -608,6 +636,7 @@ export default function PlayerDashboard() {
                       >
                         Report
                       </Link>
+                      )}
                     </div>
                   </div>
                 ))}

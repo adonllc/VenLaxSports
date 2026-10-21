@@ -2,6 +2,7 @@
 
 Jobs registered in scheduler.py:
   - auto_status_transitions    daily 00:05 UTC
+  - auto_open_leagues          daily 00:10 UTC
   - send_match_reminders       every hour
   - auto_forfeit_stale_matches daily 01:00 UTC
   - send_credit_expiry_reminders daily 10:00 UTC
@@ -17,6 +18,39 @@ async def is_job_enabled(db, job_id: str) -> bool:
     """Admin-toggleable switch for a background job. Defaults to enabled if never set."""
     flag = await db.feature_flags.find_one({"_id": job_id})
     return flag.get("enabled", True) if flag else True
+
+
+async def auto_open_leagues(db) -> None:
+    """Open flex leagues to play on their start date, if they have enough players.
+
+    Generates every player's matches and emails them. Leagues below the minimum stay in
+    registration so the admin can decide (open manually, extend, or cancel).
+    """
+    if not await is_job_enabled(db, "auto_open_leagues"):
+        return
+    import league_schedule
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    leagues = await db.leagues.find({
+        "status": "registration",
+        "league_type": {"$in": ["flex", None]},
+        "start_date": {"$lte": today},
+    }).to_list(500)
+
+    opened = 0
+    for league in leagues:
+        try:
+            units, _ = await league_schedule.build_units(db, league)
+            if len(units) < league_schedule.MIN_PLAYERS_AUTO_START:
+                logger.info("auto_open_leagues: %s has %d players, below the minimum of %d; left in registration",
+                            league.get("name"), len(units), league_schedule.MIN_PLAYERS_AUTO_START)
+                continue
+            await league_schedule.open_league_to_play(db, league)
+            opened += 1
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("auto_open_leagues failed for %s: %s", league.get("name"), exc)
+    if opened:
+        logger.info("auto_open_leagues: opened %d leagues", opened)
 
 
 async def auto_status_transitions(db) -> None:
@@ -57,6 +91,7 @@ async def send_match_reminders(db) -> None:
     matches = await db.matches.find({
         "status": "scheduled",
         "scheduled_date": {"$gte": window_start, "$lte": window_end},
+        "schedule_status": {"$nin": ["unscheduled", "proposed"]},
         "reminder_sent": {"$ne": True},
     }).to_list(500)
 
