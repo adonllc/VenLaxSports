@@ -279,6 +279,35 @@ async def send_schedule_released(to: str, player_name: str, league_name: str, le
                      _wrap("Your schedule is ready", body, "View schedule", url))
 
 
+async def send_round_pairing(to: str, player_name: str, league_name: str, league_id: str, round_no: int,
+                             opponent_name: str, opponent_email: str, play_by: str) -> None:
+    """Tell a player who they play this round and how to reach them."""
+    url = f"{_get_frontend_url()}/leagues/{league_id}" if _get_frontend_url() else f"/leagues/{league_id}"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Your round {round_no} opponent in <strong>{league_name}</strong> is <strong>{opponent_name}</strong>.</p>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li><strong>Contact them within 48 hours:</strong> <a href="mailto:{opponent_email}">{opponent_email}</a></li>
+        <li><strong>Play by:</strong> {play_by}</li>
+        <li>After the match, report the score on VENLAX Sports so standings and ratings update.</li>
+      </ul>
+      <p>If you cannot reach your opponent within 48 hours, let us know at feedback@venlaxsports.com.</p>
+      <p>Your email address is shared with your opponent only so you can arrange the match.</p>
+    """
+    await send_email(to, f"Round {round_no}: you play {opponent_name} — {league_name}",
+                     _wrap(f"Round {round_no} opponent", body, "View league", url))
+
+
+async def send_round_bye(to: str, player_name: str, league_name: str, league_id: str, round_no: int) -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}" if _get_frontend_url() else f"/leagues/{league_id}"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>There is an odd number of players in <strong>{league_name}</strong>, so you have a bye in round {round_no}.
+      You do not need to play this round. You will be paired again in the next round.</p>
+    """
+    await send_email(to, f"Round {round_no}: bye — {league_name}", _wrap(f"Round {round_no}: you have a bye", body, "View league", url))
+
+
 async def send_season_open(to: str, player_name: str, city: str, sport: str,
                             league_name: str, join_url: str) -> None:
     sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")

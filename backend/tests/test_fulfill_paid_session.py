@@ -11,9 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 # routes.payment_routes imports email_service; stub its sender so no mail goes out
 import email_service  # noqa: E402
 
-SENT = []
-email_service.schedule = lambda coro: (SENT.append(1), coro.close())
-
 from routes import payment_routes  # noqa: E402
 
 
@@ -59,7 +56,9 @@ class FakeDb:
             setattr(self, n, Coll())
 
 
-def test_paid_session_registers_once_and_is_idempotent():
+def test_paid_session_registers_once_and_is_idempotent(monkeypatch):
+    SENT = []
+    monkeypatch.setattr(email_service, "schedule", lambda coro: (SENT.append(1), coro.close()))
     db = FakeDb()
     uid, lid = str(ObjectId()), str(ObjectId())
     db.users.docs.append({"_id": ObjectId(uid), "name": "Pat", "email": "pat@example.com", "country": "USA"})

@@ -54,6 +54,9 @@ async def create_match(data: MatchCreate, request: Request):
         raise HTTPException(status_code=404, detail="Opponent not found")
     if not opponent:
         raise HTTPException(status_code=404, detail="Opponent not found")
+    opp_in_league = await db.player_leagues.find_one({"player_id": data.player2_id, "league_id": data.league_id})
+    if not opp_in_league:
+        raise HTTPException(status_code=400, detail="Your opponent is not registered in this league")
 
     # Conflict detection: block scheduling if either player has a match within ±1 h
     if data.scheduled_date:

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, Request, Body
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 import os
 from auth_utils import require_admin
-from models import LeagueUpdate, PlayerLeague, Standing
+from models import LeagueUpdate, PlayerLeague, Standing, Match
 import email_service
+from pairing_utils import pair_units
 
 router = APIRouter()
 
@@ -254,25 +255,134 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="League not found")
 
-    # If status just became active, notify all registered flex-league players
-    if update_data.get("status") == "active" and prev.get("status") != "active":
-        league_type = prev.get("league_type", "flex")
-        if league_type == "flex":
-            regs = await db.player_leagues.find(
-                {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}},
-            ).to_list(200)
-            valid_pids = [ObjectId(r["player_id"]) for r in regs if ObjectId.is_valid(r["player_id"])]
-            notif_players = await db.users.find(
-                {"_id": {"$in": valid_pids}}, {"email": 1, "name": 1, "email_notifications": 1}
-            ).to_list(len(valid_pids))
-            for player in notif_players:
-                if player.get("email_notifications", True):
-                    email_service.schedule(email_service.send_schedule_released(
-                        player["email"], player["name"],
-                        prev["name"], league_id, league_type,
-                    ))
+    # Flex leagues have no pre-built schedule: players are told their opponent when the admin
+    # creates a round (POST /leagues/{id}/pairings), so no generic "schedule released" email here.
 
     return {"message": "League updated"}
+
+
+@router.post("/leagues/{league_id}/pairings")
+async def create_round_pairings(league_id: str, request: Request, body: dict = Body(default={})):
+    """Pair the league's players for the next round (flex leagues).
+
+    confirm=false returns a preview and changes nothing. confirm=true creates the matches,
+    activates the league if it is still in registration, and emails every player their
+    opponent. Doubles leagues pair teams.
+    """
+    db = request.app.state.db
+    await require_admin(request, db)
+    confirm = bool(body.get("confirm"))
+    force = bool(body.get("force"))
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="League not found")
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    if league.get("league_type", "flex") != "flex":
+        raise HTTPException(status_code=400, detail="Pairings are for flex leagues only")
+    if league.get("status") not in ("registration", "active"):
+        raise HTTPException(status_code=400, detail="League is not open or active")
+
+    sport = league["sport"]
+    is_doubles = league.get("format") in ("doubles", "mixed")
+    regs = await db.player_leagues.find(
+        {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}}
+    ).to_list(500)
+
+    user_ids = {r["player_id"] for r in regs} | {r["partner_id"] for r in regs if r.get("partner_id")}
+    users = {}
+    async for u in db.users.find({"_id": {"$in": [ObjectId(i) for i in user_ids if ObjectId.is_valid(i)]}}):
+        users[str(u["_id"])] = u
+
+    def rating_of(uid: str) -> float:
+        return float(users.get(uid, {}).get(f"{sport}_rating") or 3.0)
+
+    units = []
+    for r in regs:
+        pid = r["player_id"]
+        if is_doubles:
+            partner = r.get("partner_id")
+            if not partner or pid > partner:
+                continue  # one record per team; the other member is covered by the partner
+            units.append({
+                "id": pid, "partner_id": partner,
+                "members": [pid, partner],
+                "name": f"{users.get(pid, {}).get('name', r['player_name'])} & {users.get(partner, {}).get('name', r.get('partner_name', ''))}",
+                "rating": (rating_of(pid) + rating_of(partner)) / 2,
+            })
+        else:
+            units.append({"id": pid, "members": [pid], "name": users.get(pid, {}).get("name", r["player_name"]), "rating": rating_of(pid)})
+    if len(units) < 2:
+        raise HTTPException(status_code=400, detail="At least two registered players (or teams) are needed")
+
+    prior = await db.matches.find({"league_id": league_id, "is_rr": {"$ne": True}}).to_list(2000)
+    played = {frozenset({m["player1_id"], m["player2_id"]}) for m in prior}
+    round_no = max([m.get("round") or 0 for m in prior] + [0]) + 1
+    pending = sum(1 for m in prior if m.get("round") == round_no - 1 and m.get("status") == "scheduled")
+
+    pairs, bye = pair_units(units, played, set(league.get("byes") or []))
+    preview = {
+        "round": round_no,
+        "matches": [{"player1": a["name"], "player2": b["name"]} for a, b in pairs],
+        "bye": bye["name"] if bye else None,
+        "unplayed_previous_round": pending,
+    }
+    if not confirm:
+        return {"preview": True, **preview}
+    if pending and not force:
+        raise HTTPException(status_code=409, detail=f"{pending} match(es) from round {round_no - 1} are still unplayed")
+
+    now = datetime.now(timezone.utc)
+    play_by_dt = (now + timedelta(days=7)).replace(hour=23, minute=59, second=0, microsecond=0)
+    play_by = play_by_dt.isoformat()
+    play_by_label = play_by_dt.strftime("%b %d, %Y")
+
+    docs = []
+    for a, b in pairs:
+        docs.append(Match(
+            league_id=league_id, sport=sport,
+            player1_id=a["id"], player2_id=b["id"],
+            player1_name=users.get(a["id"], {}).get("name", a["name"]) if not is_doubles else a["name"].split(" & ")[0],
+            player2_name=users.get(b["id"], {}).get("name", b["name"]) if not is_doubles else b["name"].split(" & ")[0],
+            scheduled_date=play_by, notes=f"Round {round_no} pairing", round=round_no,
+            team1_partner_id=a.get("partner_id"), team2_partner_id=b.get("partner_id"),
+            team1_partner_name=users.get(a.get("partner_id"), {}).get("name") if is_doubles else None,
+            team2_partner_name=users.get(b.get("partner_id"), {}).get("name") if is_doubles else None,
+        ).to_mongo())
+    if docs:
+        await db.matches.insert_many(docs)
+
+    update = {"$set": {"updated_at": now.isoformat()}}
+    if league.get("status") == "registration":
+        update["$set"].update({"status": "active", "activated_at": now.isoformat()})
+    if bye:
+        update["$addToSet"] = {"byes": bye["id"]}
+    await db.leagues.update_one({"_id": league["_id"]}, update)
+
+    # Pairing emails are transactional (the player cannot play without them), so they
+    # are sent regardless of the marketing-notification toggle.
+    def addr(uid: str) -> str:
+        return users.get(uid, {}).get("email", "")
+
+    for a, b in pairs:
+        for me, other in ((a, b), (b, a)):
+            other_emails = ", ".join(e for e in (addr(m) for m in other["members"]) if e)
+            for uid in me["members"]:
+                u = users.get(uid)
+                if u and u.get("email"):
+                    email_service.schedule(email_service.send_round_pairing(
+                        u["email"], u.get("name", ""), league["name"], league_id, round_no,
+                        other["name"], other_emails, play_by_label))
+    if bye:
+        for uid in bye["members"]:
+            u = users.get(uid)
+            if u and u.get("email"):
+                email_service.schedule(email_service.send_round_bye(
+                    u["email"], u.get("name", ""), league["name"], league_id, round_no))
+
+    return {"preview": False, "created": len(docs), **preview}
 
 
 @router.delete("/leagues/{league_id}")

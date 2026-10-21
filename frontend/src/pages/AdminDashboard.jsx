@@ -206,6 +206,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCreateRound = async (l) => {
+    const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/pairings`, body, { withCredentials: true });
+    try {
+      const { data: pv } = await call({ confirm: false });
+      const lines = pv.matches.map((m) => `${m.player1}  vs  ${m.player2}`).join("\n");
+      const warn = pv.unplayed_previous_round ? `\n\nWARNING: ${pv.unplayed_previous_round} match(es) from the previous round are still unplayed.` : "";
+      const bye = pv.bye ? `\nBye: ${pv.bye}` : "";
+      if (!window.confirm(`Round ${pv.round} for "${l.name}":\n\n${lines}${bye}${warn}\n\nCreate these matches, activate the league if needed, and email every player their opponent?`)) return;
+      const { data } = await call({ confirm: true, force: !!pv.unplayed_previous_round });
+      alert(`Round ${data.round} created: ${data.created} match(es). Players have been emailed.`);
+      fetchLeagues();
+    } catch (e) {
+      const d = e.response?.data?.detail;
+      alert(typeof d === "string" ? d : "Failed to create round");
+    }
+  };
+
   const handleAssignBoxes = async (leagueId) => {
     try {
       const { data } = await axios.post(`${API}/box-leagues/${leagueId}/assign-boxes`, {}, { withCredentials: true });
@@ -573,6 +590,16 @@ export default function AdminDashboard() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#B7791F" }}>View</Link>
+                          {(l.status === "registration" || l.status === "active") && (l.league_type || "flex") === "flex" && (
+                            <button
+                              onClick={() => handleCreateRound(l)}
+                              className="text-xs font-bold" style={{ color: "#008F70" }}
+                              data-testid={`create-round-${l.id}`}
+                              title="Pair players for the next round and email everyone their opponent"
+                            >
+                              Create round
+                            </button>
+                          )}
                           {l.status !== "completed" && (
                             <button
                               onClick={() => handleCloseLeague(l.id, l.name)}

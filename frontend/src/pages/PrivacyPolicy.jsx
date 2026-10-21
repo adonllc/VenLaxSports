@@ -47,7 +47,7 @@ const SECTIONS = [
     title: "5. Public Information",
     body: [
       "Your name, city, skill ratings, and league results are visible to other logged-in users on the platform.",
-      "Your email address is never displayed publicly.",
+      "Your email address is never displayed publicly. When you are matched with an opponent in a league, your name and email address are shared with that opponent (and their partner in doubles) only so you can arrange the match.",
       "If you want your profile to be less visible, contact support@venlaxsports.com.",
     ],
   },
