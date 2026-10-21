@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Trophy, Check } from "lucide-react";
-import platformConfig, { activeSportIds } from "../config/platformConfig";
+import platformConfig, { activeSportIds, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 import PhotoSlot from "./PhotoSlot";
 
 const GREEN = "#008F70";
@@ -26,6 +26,7 @@ export default function SportHero({
   const navigate = useNavigate();
   const handlePrimary = onPrimary ?? (() => navigate(`/join?sport=${sportMeta.id}`));
   const handleSecondary = onSecondary ?? (() => navigate("/auth?mode=register"));
+  const showStats = foundingStats.count >= FOUNDING_DISPLAY_FLOOR;
   const spotsPercent = foundingStats.limit > 0 ? Math.round((foundingStats.count / foundingStats.limit) * 100) : 0;
 
   return (
@@ -69,13 +70,19 @@ export default function SportHero({
         <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-center" style={{ background: GREEN }}>
           <div className="flex items-center gap-4">
             <Trophy className="h-9 w-9" style={{ color: AMBER }} aria-hidden="true" />
-            <div>
-              <div className="text-4xl font-bold leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>{foundingStats.count}</div>
-              <div className="text-sm text-white/90 mt-1">Founding members</div>
-            </div>
+            {showStats ? (
+              <div>
+                <div className="text-4xl font-bold leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>{foundingStats.count}</div>
+                <div className="text-sm text-white/90 mt-1">Founding members</div>
+              </div>
+            ) : (
+              <p className="text-lg font-bold">
+                {platformConfig.featuredCities.length}+ cities · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
+              </p>
+            )}
           </div>
 
-          {foundingStats.limit > 0 && (
+          {showStats && foundingStats.limit > 0 && (
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-white/90">Founding spots claimed</span>

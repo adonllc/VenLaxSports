@@ -6,7 +6,7 @@ import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
   ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles, UserPlus, Swords,
 } from "lucide-react";
-import { activeSports } from "../config/platformConfig";
+import { activeSports, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
 import Slant from "../components/Slant";
@@ -147,7 +147,7 @@ export default function Home() {
   useEffect(() => {
     axios.get(`${API}/founding-members`).then((r) => setFounding(r.data)).catch(() => {});
   }, []);
-  const showFounding = founding && founding.limit > 0 && founding.spots_left > 0;
+  const showFounding = founding && founding.limit > 0 && founding.spots_left > 0 && founding.count >= FOUNDING_DISPLAY_FLOOR;
 
   return (
     <MotionConfig reducedMotion="user">

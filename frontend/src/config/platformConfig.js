@@ -174,4 +174,7 @@ export const isSportActive = (sportId) => activeSportIds.includes(sportId);
 // Active country (e.g., "USA" or "India")
 export const activeCountry = platformConfig.country;
 
+// Founding-member numbers are real; hide them until the count is big enough to read as social proof.
+export const FOUNDING_DISPLAY_FLOOR = 25;
+
 export default platformConfig;

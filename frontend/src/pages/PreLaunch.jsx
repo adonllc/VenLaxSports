@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
+import { FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://api.venlaxsports.com";
 
@@ -299,7 +300,7 @@ export default function PreLaunch() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-              {spotsRemaining === null
+              {spotsRemaining === null || joinedCount < FOUNDING_DISPLAY_FLOOR
                 ? "🚀 Founding members are claiming their spots"
                 : spotsRemaining > 0
                   ? `🚀 ${joinedCount}+ founding members claimed their spots - only ${spotsRemaining} left`
