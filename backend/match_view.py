@@ -14,6 +14,12 @@ STATES = (
 OPEN_DISPUTE = ("pending", "investigating", "appealed")
 
 
+def side_ids(match: dict, which: int) -> list[str]:
+    """User ids on side 1 (Home) or side 2 (Away): the player plus the doubles partner."""
+    ids = [match["player1_id"], match.get("team1_partner_id")] if which == 1 else [match["player2_id"], match.get("team2_partner_id")]
+    return [i for i in ids if i]
+
+
 def _parse(iso):
     try:
         d = datetime.fromisoformat((iso or "").replace("Z", "+00:00"))

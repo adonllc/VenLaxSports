@@ -117,10 +117,20 @@ async def my_league_matches(league_id: str, request: Request):
             "skill_level": next((x["skill_level"] for x in members if x["skill_level"]), None),
         }
 
+    import tz_utils
+    from match_scheduling import CHANGE_CUTOFF_HOURS
+    tzname = tz_utils.league_tz_name(league)
+    names = {i: u.get("name", "") for i, u in users.items()}
+
     cards = []
     for m in ms:
         mine = 1 if uid in _side_ids(m, 1) else 2
         other = 2 if mine == 1 else 1
+        prop = m.get("proposal")
+        booked = m.get("schedule_status") == "scheduled"
+        when = tz_utils.as_utc(m.get("scheduled_date"))
+        can_change = bool(booked and m.get("status") == "scheduled" and m.get("deadline") and when
+                          and when - now >= timedelta(hours=CHANGE_CUTOFF_HOURS))
         cards.append({
             "id": str(m["_id"]), "round": m.get("round"), "match_number": m.get("match_number"),
             "is_playoff": bool(m.get("is_playoff")),
@@ -130,7 +140,13 @@ async def my_league_matches(league_id: str, request: Request):
             "partner_name": _side_label(m, mine) if len(_side_ids(m, mine)) > 1 else None,
             "deadline": m.get("deadline"), "schedule_status": m.get("schedule_status"),
             "scheduled_date": m.get("scheduled_date"), "venue": m.get("venue"),
-            "proposal": m.get("proposal"), "last_decline": m.get("last_decline"),
+            "proposal": ({**prop, "by_me": prop.get("proposer_side") == mine, "can_respond": prop.get("proposer_side") != mine}
+                         if prop else None),
+            "pending_change": bool(prop and booked),
+            "can_change": can_change,
+            "needs_help": bool(m.get("needs_help")),
+            "last_decline": m.get("last_decline"),
+            "history": [{**h, "by_name": h.get("by_name") or names.get(h.get("by"), "")} for h in (m.get("schedule_history") or [])][-10:],
             "status": m.get("status"), "winner_id": m.get("winner_id"),
             "sport": m.get("sport"), "score_data": m.get("score_data"),
             "player1_name": m.get("player1_name"), "player2_name": m.get("player2_name"),
@@ -155,7 +171,8 @@ async def my_league_matches(league_id: str, request: Request):
     return {
         "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": sport,
                    "format": league.get("format"), "start_date": league.get("start_date"), "end_date": league.get("end_date"),
-                   "matches_per_player": league.get("matches_per_player")},
+                   "matches_per_player": league.get("matches_per_player"),
+                   "tz": tzname, "tz_abbr": tz_utils.tz_abbr(tzname)},
         "user_id": uid,
         "summary": summary,
         "matches": cards,
@@ -163,7 +180,7 @@ async def my_league_matches(league_id: str, request: Request):
 
 
 class ProposeIn(BaseModel):
-    date: str
+    date: str            # a wall-clock time ("2026-11-02T19:00", read in the league time zone) or a full ISO instant
     venue: str
     note: Optional[str] = None
 
@@ -184,97 +201,48 @@ async def _load_match_for(db, match_id: str):
     return match, league
 
 
+def _raise(e):
+    raise HTTPException(status_code=e.status, detail=e.detail)
+
+
 @router.post("/{match_id}/propose")
 async def propose_match_time(match_id: str, data: ProposeIn, request: Request):
-    """Home proposes a date, time and court. Away is emailed to confirm."""
+    """Propose, counter-propose, or ask to change a time. The other side is notified."""
+    import match_scheduling
     db = request.app.state.db
     user = await get_current_user(request, db)
     match, league = await _load_match_for(db, match_id)
-    if match.get("schedule_status") is None:
-        raise HTTPException(status_code=400, detail="This match is not part of a generated schedule")
-    if user["_id"] not in _side_ids(match, 1):
-        raise HTTPException(status_code=403, detail="Only the Home player proposes the time")
-    if match.get("status") != "scheduled":
-        raise HTTPException(status_code=400, detail="This match is already finished")
-    venue = (data.venue or "").strip()
-    if not venue or len(venue) > 120:
-        raise HTTPException(status_code=400, detail="Enter the court or venue (up to 120 characters)")
     try:
-        when = datetime.fromisoformat(data.date.replace("Z", "+00:00"))
-        if when.tzinfo is None:
-            when = when.replace(tzinfo=timezone.utc)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid date and time")
-    now = datetime.now(timezone.utc)
-    if when <= now:
-        raise HTTPException(status_code=400, detail="Pick a time in the future")
-    try:
-        last = datetime.fromisoformat(league["end_date"]).replace(tzinfo=timezone.utc) + timedelta(days=1)
-    except Exception:
-        last = None
-    if last and when > last:
-        raise HTTPException(status_code=400, detail="That is after the end of the season")
-
-    proposal = {"proposed_by": user["_id"], "date": when.isoformat(), "venue": venue,
-                "note": (data.note or "").strip()[:300], "at": now.isoformat()}
-    await db.matches.update_one(
-        {"_id": match["_id"]},
-        {"$set": {"schedule_status": "proposed", "proposal": proposal, "last_decline": None, "updated_at": now.isoformat()}},
-    )
-    away_ids = _side_ids(match, 2)
-    users = await _users_by_id(db, away_ids)
-    for aid in away_ids:
-        a = users.get(aid)
-        if a and a.get("email"):
-            email_service.schedule(email_service.send_match_proposed(
-                a["email"], a.get("name", ""), _side_label(match, 1), league["name"], match["league_id"],
-                _fmt_when(proposal["date"]), venue, proposal["note"]))
+        proposal = await match_scheduling.propose(db, match, league, user["_id"], data.date, data.venue, data.note)
+    except match_scheduling.SchedulingError as e:
+        _raise(e)
     return {"schedule_status": "proposed", "proposal": proposal}
 
 
 @router.post("/{match_id}/respond")
 async def respond_to_proposal(match_id: str, data: RespondIn, request: Request):
-    """Away confirms the proposed time, or declines so Home proposes another."""
+    """The other side confirms or declines the pending proposal."""
+    import match_scheduling
     db = request.app.state.db
     user = await get_current_user(request, db)
     match, league = await _load_match_for(db, match_id)
-    if user["_id"] not in _side_ids(match, 2):
-        raise HTTPException(status_code=403, detail="Only the Away player responds to a proposal")
-    if match.get("schedule_status") != "proposed" or not match.get("proposal"):
-        raise HTTPException(status_code=400, detail="There is no proposal to respond to")
-    if data.action not in ("confirm", "decline"):
-        raise HTTPException(status_code=400, detail="Action must be confirm or decline")
-    now = datetime.now(timezone.utc).isoformat()
-    prop = match["proposal"]
-    everyone = await _users_by_id(db, _side_ids(match, 1) + _side_ids(match, 2))
+    try:
+        return await match_scheduling.respond(db, match, league, user["_id"], data.action, data.message)
+    except match_scheduling.SchedulingError as e:
+        _raise(e)
 
-    if data.action == "confirm":
-        await db.matches.update_one(
-            {"_id": match["_id"]},
-            {"$set": {"schedule_status": "scheduled", "scheduled_date": prop["date"], "venue": prop["venue"],
-                      "proposal": None, "updated_at": now}},
-        )
-        for who in _side_ids(match, 1) + _side_ids(match, 2):
-            u = everyone.get(who)
-            if u and u.get("email"):
-                opp = _side_label(match, 2 if who in _side_ids(match, 1) else 1)
-                email_service.schedule(email_service.send_match_confirmed(
-                    u["email"], u.get("name", ""), opp, league["name"], match["league_id"],
-                    _fmt_when(prop["date"]), prop["venue"]))
-        return {"schedule_status": "scheduled", "scheduled_date": prop["date"], "venue": prop["venue"]}
 
-    message = (data.message or "").strip()[:300]
-    await db.matches.update_one(
-        {"_id": match["_id"]},
-        {"$set": {"schedule_status": "unscheduled", "proposal": None,
-                  "last_decline": {"message": message, "at": now}, "updated_at": now}},
-    )
-    for hid in _side_ids(match, 1):
-        u = everyone.get(hid)
-        if u and u.get("email"):
-            email_service.schedule(email_service.send_match_declined(
-                u["email"], u.get("name", ""), _side_label(match, 2), league["name"], match["league_id"], message))
-    return {"schedule_status": "unscheduled"}
+@router.post("/{match_id}/cancel-time")
+async def cancel_match_time(match_id: str, request: Request):
+    """Either player cancels a confirmed time (up to 24 hours before). Not a forfeit."""
+    import match_scheduling
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    match, league = await _load_match_for(db, match_id)
+    try:
+        return await match_scheduling.cancel_time(db, match, league, user["_id"])
+    except match_scheduling.SchedulingError as e:
+        _raise(e)
 
 
 @router.post("")

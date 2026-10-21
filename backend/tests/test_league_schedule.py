@@ -37,6 +37,22 @@ class Cursor:
         return gen()
 
 
+def _get(doc, key):
+    cur = doc
+    for part in key.split("."):
+        if not isinstance(cur, dict):
+            return None
+        cur = cur.get(part)
+    return cur
+
+
+def _set(doc, key, value):
+    parts = key.split(".")
+    for part in parts[:-1]:
+        doc = doc.setdefault(part, {})
+    doc[parts[-1]] = value
+
+
 class Coll:
     def __init__(self):
         self.docs = []
@@ -47,18 +63,24 @@ class Coll:
             if k == "$or":
                 if not any(cls._match(doc, sub) for sub in v):
                     return False
-            elif isinstance(v, dict):
-                if "$in" in v and doc.get(k) not in v["$in"]:
+                continue
+            have = _get(doc, k)
+            if isinstance(v, dict):
+                if "$in" in v and have not in v["$in"]:
                     return False
-                if "$nin" in v and doc.get(k) in v["$nin"]:
+                if "$nin" in v and have in v["$nin"]:
                     return False
-                if "$ne" in v and doc.get(k) == v["$ne"]:
+                if "$ne" in v and have == v["$ne"]:
                     return False
-                if "$exists" in v and (k in doc) != v["$exists"]:
+                if "$exists" in v and (have is not None or k in doc) != v["$exists"]:
                     return False
-                if "$lt" in v and not (doc.get(k) is not None and doc.get(k) < v["$lt"]):
+                if "$lt" in v and not (have is not None and have < v["$lt"]):
                     return False
-            elif doc.get(k) != v:
+                if "$lte" in v and not (have is not None and have <= v["$lte"]):
+                    return False
+                if "$gte" in v and not (have is not None and have >= v["$gte"]):
+                    return False
+            elif have != v:
                 return False
         return True
 
@@ -83,14 +105,18 @@ class Coll:
         d = await self.find_one(q)
         if d:
             before = dict(d)
-            d.update(upd.get("$set", {}))
+            for k, v in upd.get("$set", {}).items():
+                _set(d, k, v)
             return before
         return None
 
     async def update_one(self, q, upd):
         d = await self.find_one(q)
         if d:
-            d.update(upd.get("$set", {}))
+            for k, v in upd.get("$set", {}).items():
+                _set(d, k, v)
+            for k, v in upd.get("$push", {}).items():
+                d.setdefault(k, []).extend(v["$each"] if isinstance(v, dict) else [v])
 
 
 class FakeDb:

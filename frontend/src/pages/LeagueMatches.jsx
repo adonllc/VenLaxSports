@@ -15,7 +15,13 @@ const MUTED = "#5C5C5C";
 // "2026-11-08" is a calendar date, not a moment in UTC: parse it as local so it never shows a day early
 const parseDate = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso));
 const fmtDate = (iso) => (iso ? parseDate(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "");
-const fmtDateTime = (iso) => (iso ? new Date(iso).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "");
+// Match times are shown in the league city's time zone so both players read the same clock time
+const fmtDateTime = (iso, tz) => (iso ? new Date(iso).toLocaleString("en-US", { timeZone: tz, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }) : "");
+const hoursLeft = (iso) => Math.max(0, Math.round((new Date(iso).getTime() - Date.now()) / 3600000));
+const ACTION_TEXT = {
+  proposed: "proposed a time", countered: "suggested another time", change_requested: "asked to change the time",
+  confirmed: "confirmed", declined: "declined", time_cancelled: "cancelled the time", expired: "proposal expired", organizer_set: "set the time",
+};
 const ordinal = (n) => `${n}${["th", "st", "nd", "rd"][(n % 100 >> 3) ^ 1 && n % 10 < 4 ? n % 10 : 0]}`;
 
 // Group order follows the product spec; Playoffs (when they exist) lead.
@@ -54,13 +60,13 @@ function Avatar({ person, size = 48 }) {
   );
 }
 
-function MatchCard({ m, onChanged }) {
-  const [open, setOpen] = useState(false);       // Home: proposal form
-  const [declining, setDeclining] = useState(false); // Away: suggest another time
+function MatchCard({ m, tz, tzAbbr, onChanged }) {
+  const [form, setForm] = useState(null);   // null | "propose" | "decline"
   const [when, setWhen] = useState("");
   const [venue, setVenue] = useState(m.venue || "");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const chip = chipFor(m);
@@ -68,15 +74,17 @@ function MatchCard({ m, onChanged }) {
   const opp = m.opponent;
   const first = opp.members?.[0] || { name: opp.name };
   const scored = m.state === "completed" ? buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name) : null;
+  const booked = m.schedule_status === "scheduled";
   const confirmedTime = ["scheduled", "in_progress", "awaiting_result", "completed"].includes(m.state);
+  const prop = m.proposal;
+  const open = m.status === "scheduled" && !m.is_playoff && m.schedule_status; // schedulable generated match
 
   const call = async (path, body) => {
     setBusy(true);
     setError("");
     try {
       await axios.post(`${API}/matches/${m.id}/${path}`, body, { withCredentials: true });
-      setOpen(false);
-      setDeclining(false);
+      setForm(null);
       await onChanged();
     } catch (e) {
       const d = e.response?.data?.detail;
@@ -86,14 +94,19 @@ function MatchCard({ m, onChanged }) {
     }
   };
 
-  const propose = (e) => {
+  const submitProposal = (e) => {
     e.preventDefault();
     if (!when) return setError("Pick a date and time.");
-    call("propose", { date: new Date(when).toISOString(), venue, note });
+    call("propose", { date: when, venue, note }); // wall-clock time: the server reads it in the league time zone
+  };
+  const cancelTime = () => {
+    if (window.confirm("Cancel this confirmed time? The match goes back to Not Scheduled and your opponent is told. It is not a forfeit.")) call("cancel-time", {});
   };
 
   const inputStyle = { border: "1px solid #D9D9D9", color: INK, fontFamily: "Rubik, sans-serif" };
   const rating = [opp.rating != null ? `Rating ${opp.rating}` : null, opp.skill_level].filter(Boolean).join(" · ");
+  const buttonBase = "px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50";
+  const proposeLabel = !open ? "" : booked ? "Reschedule" : prop && !prop.by_me ? "Suggest another time" : "Schedule match";
 
   return (
     <article className="bg-white p-5 sm:p-6" style={{ border: "1px solid #E5E7EB" }} data-testid={`match-card-${m.id}`}>
@@ -131,7 +144,7 @@ function MatchCard({ m, onChanged }) {
           </li>
         )}
         {confirmedTime ? (
-          <li className="flex items-center gap-2"><Calendar className="w-4 h-4 shrink-0" style={{ color: GREEN }} />{fmtDateTime(m.scheduled_date)}</li>
+          <li className="flex items-center gap-2" data-testid={`match-when-${m.id}`}><Calendar className="w-4 h-4 shrink-0" style={{ color: GREEN }} />{fmtDateTime(m.scheduled_date, tz)}</li>
         ) : m.deadline ? (
           <li className="flex items-center gap-2"><Clock className="w-4 h-4 shrink-0" style={{ color: GREEN }} />Play by {fmtDate(m.deadline)}</li>
         ) : null}
@@ -147,64 +160,77 @@ function MatchCard({ m, onChanged }) {
         </p>
       )}
 
-      {/* Not scheduled: Home proposes, Away waits */}
-      {m.state === "not_scheduled" && isHome && (
-        <div className="mt-4">
-          {m.last_decline && (
-            <p className="text-sm mb-3 p-3" style={{ background: "#F1F1F1", color: INK }} data-testid={`match-declined-${m.id}`}>
-              {opp.name} could not make that time{m.last_decline.message ? `: "${m.last_decline.message}"` : "."} Please propose another.
-            </p>
-          )}
-          {!open && (
-            <button onClick={() => setOpen(true)} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ background: AMBER, color: INK }} data-testid={`schedule-match-${m.id}`}>
-              Schedule match
-            </button>
-          )}
-        </div>
+      {m.needs_help && open && !booked && (
+        <p className="mt-4 text-sm p-3" style={{ background: AMBER, color: INK }} data-testid={`needs-help-${m.id}`}>
+          This match is due soon and has no confirmed time. The league organizer has been alerted and can help.
+        </p>
       )}
+
+      {/* Waiting on Home to make the first proposal */}
       {m.state === "not_scheduled" && !isHome && (
         <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>
           {opp.name} is Home and will propose a date, time and court. You will get an email to confirm.
         </p>
       )}
-
-      {/* Awaiting confirmation */}
-      {m.state === "awaiting_confirmation" && isHome && m.proposal && (
-        <div className="mt-4 p-3 text-sm" style={{ background: "#F1F1F1", color: INK }}>
-          You proposed <strong>{fmtDateTime(m.proposal.date)}</strong> at <strong>{m.proposal.venue}</strong>. Waiting for {opp.name} to confirm.
-          <button onClick={() => setOpen(true)} className="ml-3 underline font-semibold" style={{ color: GREEN }}>Change</button>
-        </div>
+      {m.state === "not_scheduled" && m.last_decline && (
+        <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }} data-testid={`match-declined-${m.id}`}>
+          {m.last_decline.message ? `Last proposal was declined: "${m.last_decline.message}".` : "The last proposal was declined or expired."} {isHome ? "Please propose another time." : ""}
+        </p>
       )}
-      {m.state === "awaiting_confirmation" && !isHome && m.proposal && (
-        <div className="mt-4 p-4" style={{ border: `1px solid ${GREEN}` }}>
-          <p className="text-sm font-bold mb-1" style={{ color: INK }}>{opp.name} proposed:</p>
-          <p className="text-sm" style={{ color: INK }}>{fmtDateTime(m.proposal.date)} · {m.proposal.venue}</p>
-          {m.proposal.note && <p className="text-sm mt-1" style={{ color: MUTED }}>"{m.proposal.note}"</p>}
-          {!declining ? (
+
+      {/* A proposal is waiting. It is never shown as a booking. */}
+      {prop && (
+        <div className="mt-4 p-4" style={{ border: `1px solid ${prop.can_respond ? GREEN : "#E5E7EB"}` }} data-testid={`proposal-${m.id}`}>
+          <p className="text-sm font-bold mb-1" style={{ color: INK }}>
+            {prop.by_me ? "You proposed" : `${opp.name} ${prop.kind === "reschedule" ? "asked to change the time to" : prop.kind === "counter" ? "suggested" : "proposed"}`}
+            {prop.by_me ? ":" : ":"}
+          </p>
+          <p className="text-sm" style={{ color: INK }}>{fmtDateTime(prop.date, tz)} · {prop.venue}</p>
+          {prop.note && <p className="text-sm mt-1" style={{ color: MUTED }}>"{prop.note}"</p>}
+          <p className="text-xs mt-2" style={{ color: MUTED }}>
+            {prop.by_me ? `Waiting for ${opp.name} to answer.` : "Reply needed."} Expires in {hoursLeft(prop.expires_at)}h.
+            {booked ? " Your current booking stays until this is accepted." : ""}
+          </p>
+          {prop.can_respond && form !== "decline" && (
             <div className="mt-3 flex flex-wrap gap-2">
-              <button disabled={busy} onClick={() => call("respond", { action: "confirm" })} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white disabled:opacity-50" style={{ background: GREEN }} data-testid={`confirm-match-${m.id}`}>
-                Confirm
-              </button>
-              <button disabled={busy} onClick={() => setDeclining(true)} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ border: `1px solid ${INK}`, color: INK }} data-testid={`suggest-time-${m.id}`}>
-                Suggest another time
-              </button>
+              <button disabled={busy} onClick={() => call("respond", { action: "confirm" })} className={`${buttonBase} text-white`} style={{ background: GREEN }} data-testid={`confirm-match-${m.id}`}>Confirm</button>
+              <button disabled={busy} onClick={() => { setForm("propose"); setVenue(prop.venue); }} className={buttonBase} style={{ border: `1px solid ${INK}`, color: INK }} data-testid={`suggest-time-${m.id}`}>Suggest another time</button>
+              <button disabled={busy} onClick={() => setForm("decline")} className="px-3 py-2.5 text-sm underline" style={{ color: MUTED }} data-testid={`decline-${m.id}`}>Decline</button>
             </div>
-          ) : (
+          )}
+          {prop.can_respond && form === "decline" && (
             <div className="mt-3">
               <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`msg-${m.id}`}>Message to {opp.name} (optional)</label>
               <textarea id={`msg-${m.id}`} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={300} rows={2} className="w-full px-3 py-2 text-sm" style={inputStyle} placeholder="e.g. I can play weekday evenings after 6pm" data-testid={`decline-message-${m.id}`} />
               <div className="mt-2 flex gap-2">
-                <button disabled={busy} onClick={() => call("respond", { action: "decline", message })} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: AMBER, color: INK }} data-testid={`send-decline-${m.id}`}>Send</button>
-                <button onClick={() => setDeclining(false)} className="px-4 py-2.5 text-sm underline" style={{ color: MUTED }}>Cancel</button>
+                <button disabled={busy} onClick={() => call("respond", { action: "decline", message })} className={buttonBase} style={{ background: AMBER, color: INK }} data-testid={`send-decline-${m.id}`}>Send</button>
+                <button onClick={() => setForm(null)} className="px-4 py-2.5 text-sm underline" style={{ color: MUTED }}>Cancel</button>
               </div>
             </div>
+          )}
+          {prop.by_me && form !== "propose" && (
+            <button onClick={() => setForm("propose")} className="mt-2 text-sm underline font-semibold" style={{ color: GREEN }} data-testid={`change-proposal-${m.id}`}>Change my proposal</button>
           )}
         </div>
       )}
 
-      {/* Scheduled: Home may reschedule */}
-      {m.state === "scheduled" && isHome && !m.is_playoff && !open && m.schedule_status === "scheduled" && (
-        <button onClick={() => setOpen(true)} className="mt-4 text-sm underline font-semibold" style={{ color: GREEN }} data-testid={`reschedule-${m.id}`}>Reschedule</button>
+      {/* First proposal (Home) */}
+      {open && m.state === "not_scheduled" && isHome && form !== "propose" && (
+        <button onClick={() => setForm("propose")} className={`mt-4 ${buttonBase}`} style={{ background: AMBER, color: INK }} data-testid={`schedule-match-${m.id}`}>Schedule match</button>
+      )}
+
+      {/* Confirmed: change or cancel the time (either player, until 24 hours before) */}
+      {open && booked && !prop && (
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          {m.can_change ? (
+            <>
+              <button onClick={() => setForm("propose")} className="text-sm underline font-semibold" style={{ color: GREEN }} data-testid={`reschedule-${m.id}`}>Reschedule</button>
+              <button onClick={cancelTime} disabled={busy} className="text-sm underline font-semibold disabled:opacity-50" style={{ color: MUTED }} data-testid={`cancel-time-${m.id}`}>Cancel time</button>
+            </>
+          ) : (
+            <p className="text-xs" style={{ color: MUTED }}>Within 24 hours of the match only the organizer can change the time. Email feedback@venlaxsports.com.</p>
+          )}
+        </div>
       )}
 
       {/* Match day or past: report the score */}
@@ -219,12 +245,14 @@ function MatchCard({ m, onChanged }) {
       {m.state === "disputed" && <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>A dispute is open on this match. The league organizer is reviewing it.</p>}
       {m.state === "cancelled" && <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>This match was cancelled or ended as a walkover.</p>}
 
-      {/* Home: proposal form */}
-      {open && (
-        <form onSubmit={propose} className="mt-4 p-4 space-y-3" style={{ border: "1px solid #E5E7EB" }} data-testid={`propose-form-${m.id}`}>
+      {/* Proposal form: first proposal, counter-proposal or change request */}
+      {form === "propose" && (
+        <form onSubmit={submitProposal} className="mt-4 p-4 space-y-3" style={{ border: "1px solid #E5E7EB" }} data-testid={`propose-form-${m.id}`}>
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: INK }}>{proposeLabel || "Propose a time"}</p>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`when-${m.id}`}>Date and time</label>
+            <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`when-${m.id}`}>Date and time ({tzAbbr})</label>
             <input id={`when-${m.id}`} type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} required className="w-full px-3 py-2 text-sm" style={inputStyle} data-testid={`propose-when-${m.id}`} />
+            <p className="text-xs mt-1" style={{ color: MUTED }}>Times are in {tzAbbr} (the league's time zone) for both players.</p>
           </div>
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`venue-${m.id}`}>Court or venue</label>
@@ -235,15 +263,34 @@ function MatchCard({ m, onChanged }) {
             <input id={`note-${m.id}`} type="text" value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} className="w-full px-3 py-2 text-sm" style={inputStyle} data-testid={`propose-note-${m.id}`} />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={busy} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: AMBER, color: INK }} data-testid={`send-proposal-${m.id}`}>
+            <button type="submit" disabled={busy} className={buttonBase} style={{ background: AMBER, color: INK }} data-testid={`send-proposal-${m.id}`}>
               {busy ? "Sending..." : "Send to opponent"}
             </button>
-            <button type="button" onClick={() => setOpen(false)} className="px-4 py-2.5 text-sm underline" style={{ color: MUTED }}>Cancel</button>
+            <button type="button" onClick={() => setForm(null)} className="px-4 py-2.5 text-sm underline" style={{ color: MUTED }}>Cancel</button>
           </div>
         </form>
       )}
 
       {error && <p className="mt-3 text-sm" style={{ color: "#B42318" }} role="alert" data-testid={`match-error-${m.id}`}>{error}</p>}
+
+      {m.history?.length > 0 && (
+        <div className="mt-4 pt-3" style={{ borderTop: "1px solid #F1F1F1" }}>
+          <button onClick={() => setShowHistory((v) => !v)} className="text-xs underline" style={{ color: MUTED }} aria-expanded={showHistory} data-testid={`history-toggle-${m.id}`}>
+            {showHistory ? "Hide" : "Show"} scheduling history ({m.history.length})
+          </button>
+          {showHistory && (
+            <ul className="mt-2 space-y-1 text-xs" style={{ color: MUTED }} data-testid={`history-${m.id}`}>
+              {m.history.map((h, i) => (
+                <li key={i}>
+                  {fmtDateTime(h.at, tz)} · {h.by_name || "System"} {ACTION_TEXT[h.action] || h.action}
+                  {h.date ? ` (${fmtDateTime(h.date, tz)}${h.venue ? `, ${h.venue}` : ""})` : ""}
+                  {h.message ? ` — "${h.message}"` : ""}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -341,7 +388,7 @@ export default function LeagueMatches() {
               {g.title} <span style={{ color: MUTED }}>({g.items.length})</span>
             </h2>
             <div className="space-y-4">
-              {g.items.map((m) => <MatchCard key={m.id} m={m} onChanged={load} />)}
+              {g.items.map((m) => <MatchCard key={m.id} m={m} tz={league.tz} tzAbbr={league.tz_abbr} onChanged={load} />)}
             </div>
           </section>
         ))

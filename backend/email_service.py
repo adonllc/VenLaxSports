@@ -301,19 +301,25 @@ async def send_league_open(to: str, player_name: str, league_name: str, league_i
 
 
 async def send_match_proposed(to: str, player_name: str, opponent_name: str, league_name: str, league_id: str,
-                              when: str, venue: str, note: str) -> None:
+                              when: str, venue: str, note: str, kind: str = "initial", expires: str = "") -> None:
     url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
     extra = f"<li><strong>Note:</strong> {note}</li>" if note else ""
+    lead = {
+        "counter": f"{opponent_name} suggested a different time for your <strong>{league_name}</strong> match:",
+        "reschedule": f"{opponent_name} asked to change the time of your confirmed <strong>{league_name}</strong> match. Your current booking stays until you accept:",
+    }.get(kind, f"{opponent_name} proposed a time for your <strong>{league_name}</strong> match:")
+    expiry = f"<p>Please answer by <strong>{expires}</strong>, or the proposal expires.</p>" if expires else ""
     body = f"""
       <p>Hi {player_name},</p>
-      <p>{opponent_name} proposed a time for your <strong>{league_name}</strong> match:</p>
+      <p>{lead}</p>
       <ul style="padding-left:18px;margin:0 0 16px">
         <li><strong>When:</strong> {when}</li>
         <li><strong>Where:</strong> {venue}</li>{extra}
       </ul>
-      <p>Open your matches to confirm, or suggest another time.</p>
+      {expiry}
+      <p>Open your matches to confirm, suggest another time, or decline.</p>
     """
-    await send_email(to, f"{opponent_name} proposed a match time — {league_name}", _wrap("Confirm your match", body, "Confirm or suggest a time", url))
+    await send_email(to, f"{opponent_name} proposed a match time — {league_name}", _wrap("Confirm your match", body, "Confirm or reply", url))
 
 
 async def send_match_confirmed(to: str, player_name: str, opponent_name: str, league_name: str, league_id: str,
@@ -342,6 +348,59 @@ async def send_match_declined(to: str, player_name: str, opponent_name: str, lea
       <p>Open your matches to propose another time.</p>
     """
     await send_email(to, f"Please propose another time — {league_name}", _wrap("Propose another time", body, "Propose a time", url))
+
+
+async def _schedule_mail(to: str, subject: str, heading: str, lines: list[str], league_id: str, cta: str) -> None:
+    url = f"{_get_frontend_url()}/leagues/{league_id}/my-matches" if _get_frontend_url() else f"/leagues/{league_id}/my-matches"
+    body = "".join(f"<p>{ln}</p>" for ln in lines)
+    await send_email(to, subject, _wrap(heading, body, cta, url))
+
+
+async def send_proposal_reminder(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                 when: str, expires: str) -> None:
+    await _schedule_mail(to, f"Reply needed: match time with {opponent} — {league_name}", "Reply needed",
+                         [f"Hi {name},", f"{opponent} proposed <strong>{when}</strong> for your {league_name} match and is waiting for your answer.",
+                          f"The proposal expires at <strong>{expires}</strong>."], league_id, "Reply now")
+
+
+async def send_proposal_expired(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                kept_booking: bool) -> None:
+    detail = ("Your existing confirmed time is unchanged." if kept_booking
+              else "The match is back to Not Scheduled. The Home player can propose a new time.")
+    await _schedule_mail(to, f"Proposal expired — {league_name}", "Proposal expired",
+                         [f"Hi {name},", f"The time proposed for your match with {opponent} in {league_name} was not answered in time and has expired.", detail],
+                         league_id, "View my matches")
+
+
+async def send_match_cancelled_time(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                    was: str, by_you: bool) -> None:
+    who = "You cancelled" if by_you else f"{opponent} cancelled"
+    await _schedule_mail(to, f"Match time cancelled — {league_name}", "Match time cancelled",
+                         [f"Hi {name},", f"{who} the confirmed time ({was}) for your {league_name} match.",
+                          "The match is back to Not Scheduled. It still needs to be played by its play-by date."], league_id, "Schedule again")
+
+
+async def send_reschedule_declined(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                   booked: str, message: str) -> None:
+    msg = f"<strong>Their message:</strong> {message}" if message else ""
+    await _schedule_mail(to, f"Change declined — {league_name}", "Change declined",
+                         [f"Hi {name},", f"{opponent} declined the new time. Your match stays booked for <strong>{booked}</strong>.", msg],
+                         league_id, "View my matches")
+
+
+async def send_schedule_attention(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                  deadline: str) -> None:
+    await _schedule_mail(to, f"Your match is due soon and not scheduled — {league_name}", "Match not scheduled yet",
+                         [f"Hi {name},", f"Your {league_name} match against {opponent} must be played by <strong>{deadline}</strong> and has no confirmed time yet.",
+                          "Propose or confirm a time now. If you cannot agree, the league organizer has been alerted and can help. Unplayed matches end as walkovers."],
+                         league_id, "Schedule now")
+
+
+async def send_organizer_set_time(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                                  when: str, venue: str) -> None:
+    await _schedule_mail(to, f"The organizer scheduled your match — {league_name}", "Match scheduled by the organizer",
+                         [f"Hi {name},", f"The league organizer scheduled your match against {opponent}:",
+                          f"<strong>When:</strong> {when}<br><strong>Where:</strong> {venue}"], league_id, "View my matches")
 
 
 async def send_season_open(to: str, player_name: str, city: str, sport: str,

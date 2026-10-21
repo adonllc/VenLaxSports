@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
@@ -1758,6 +1758,9 @@ function AdjustScheduleModal({ league, onClose }) {
   const [rows, setRows] = useState(null);
   const [edits, setEdits] = useState({});
   const [msg, setMsg] = useState("");
+  const [setting, setSetting] = useState(null); // match id whose time the organizer is setting
+  const [when, setWhen] = useState("");
+  const [venue, setVenue] = useState("");
 
   const load = () =>
     axios.get(`${API}/admin/leagues/${league.id}/schedule`, { withCredentials: true })
@@ -1767,6 +1770,7 @@ function AdjustScheduleModal({ league, onClose }) {
 
   const people = {};
   (rows || []).forEach((m) => { people[m.home_id] = m.home; people[m.away_id] = m.away; });
+  const needHelp = (rows || []).filter((m) => m.needs_help && m.schedule_status !== "scheduled").length;
 
   const save = async (m) => {
     const e = edits[m.id] || {};
@@ -1781,43 +1785,84 @@ function AdjustScheduleModal({ league, onClose }) {
     }
   };
 
-  const sel = { border: "1px solid #D9D9D9", color: "#3D3D3D", padding: "4px 6px", fontSize: "12px", maxWidth: "160px" };
+  const setTime = async (m) => {
+    try {
+      await axios.post(`${API}/admin/matches/${m.id}/set-time`, { date: when, venue }, { withCredentials: true });
+      setSetting(null); setWhen(""); setVenue("");
+      setMsg("Time set. Both players were emailed.");
+      load();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not set that time.");
+    }
+  };
+
+  const sel = { border: "1px solid #D9D9D9", color: "#3D3D3D", padding: "4px 6px", fontSize: "12px", maxWidth: "150px" };
+  const label = (m) => (m.status === "completed" ? "Played" : m.schedule_status === "scheduled" ? "Scheduled" : m.schedule_status === "proposed" ? "Proposed" : "Not scheduled");
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="adjust-modal">
-      <div className="bg-white w-full max-w-3xl max-h-[85vh] overflow-auto p-5">
+      <div className="bg-white w-full max-w-4xl max-h-[85vh] overflow-auto p-5">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
-            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Adjust matches: {league.name}</h3>
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Matches: {league.name}</h3>
             <p className="text-xs" style={{ color: "#5C5C5C" }}>
-              Change the Home or Away player of a match. Matches that are already proposed, scheduled or played are locked. No pair may meet twice.
+              Change Home/Away or opponents until a match is proposed, scheduled or played. For pairs who cannot agree, use Set time: it books the match and emails both players (times are in the league's time zone).
             </p>
           </div>
           <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }} data-testid="adjust-close">Close</button>
         </div>
+        {needHelp > 0 && (
+          <p className="text-sm mb-3 p-2 font-semibold" style={{ background: "#F2A922", color: "#3D3D3D" }} role="alert" data-testid="needs-help-banner">
+            {needHelp} match{needHelp === 1 ? " is" : "es are"} close to the play-by date with no confirmed time. Players were alerted. Use Set time to book them.
+          </p>
+        )}
         {msg && <p className="text-sm mb-3 p-2" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="status">{msg}</p>}
         {!rows ? <p className="text-sm">Loading...</p> : (
           <table className="w-full text-sm">
-            <thead><tr className="text-left text-xs uppercase" style={{ color: "#5C5C5C" }}><th className="py-1">Round</th><th>Home</th><th>Away</th><th /></tr></thead>
+            <thead><tr className="text-left text-xs uppercase" style={{ color: "#5C5C5C" }}><th className="py-1">Round</th><th>Home</th><th>Away</th><th>Status</th><th /></tr></thead>
             <tbody>
               {rows.map((m) => (
-                <tr key={m.id} className="border-t" style={{ borderColor: "#E5E7EB" }} data-testid={`adjust-row-${m.id}`}>
-                  <td className="py-2">{m.round}</td>
-                  {["home_id", "away_id"].map((field) => (
-                    <td key={field}>
-                      <select disabled={m.locked} style={sel} value={(edits[m.id] || {})[field] || m[field]}
-                        onChange={(e) => setEdits((prev) => ({ ...prev, [m.id]: { ...(prev[m.id] || {}), [field]: e.target.value } }))}
-                        data-testid={`adjust-${field}-${m.id}`}>
-                        {Object.entries(people).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-                      </select>
+                <Fragment key={m.id}>
+                  <tr className="border-t" style={{ borderColor: "#E5E7EB" }} data-testid={`adjust-row-${m.id}`}>
+                    <td className="py-2">{m.round}</td>
+                    {["home_id", "away_id"].map((field) => (
+                      <td key={field}>
+                        <select disabled={m.locked} style={sel} value={(edits[m.id] || {})[field] || m[field]}
+                          onChange={(e) => setEdits((prev) => ({ ...prev, [m.id]: { ...(prev[m.id] || {}), [field]: e.target.value } }))}
+                          data-testid={`adjust-${field}-${m.id}`}>
+                          {Object.entries(people).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                        </select>
+                      </td>
+                    ))}
+                    <td className="text-xs" data-testid={`adjust-status-${m.id}`}>
+                      {label(m)}{m.needs_help && m.schedule_status !== "scheduled" ? <span className="ml-1 font-bold" style={{ color: "#B7791F" }}>· needs help</span> : null}
                     </td>
-                  ))}
-                  <td className="text-right">
-                    {m.locked ? <span className="text-xs" style={{ color: "#5C5C5C" }}>Locked</span> : (
-                      <button disabled={!edits[m.id]} onClick={() => save(m)} className="text-xs font-bold disabled:opacity-40" style={{ color: "#008F70" }} data-testid={`adjust-save-${m.id}`}>Save</button>
-                    )}
-                  </td>
-                </tr>
+                    <td className="text-right whitespace-nowrap">
+                      {!m.locked && (
+                        <button disabled={!edits[m.id]} onClick={() => save(m)} className="text-xs font-bold disabled:opacity-40 mr-3" style={{ color: "#008F70" }} data-testid={`adjust-save-${m.id}`}>Save</button>
+                      )}
+                      {m.status !== "completed" && (
+                        <button onClick={() => { setSetting(setting === m.id ? null : m.id); setWhen(""); setVenue(m.venue || ""); }} className="text-xs font-bold" style={{ color: "#008F70" }} data-testid={`set-time-${m.id}`}>Set time</button>
+                      )}
+                    </td>
+                  </tr>
+                  {setting === m.id && (
+                    <tr data-testid={`set-time-form-${m.id}`}>
+                      <td colSpan={5} className="pb-3">
+                        <div className="flex flex-wrap items-end gap-2 p-2" style={{ background: "#F1F1F1" }}>
+                          <label className="text-xs">Date and time
+                            <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} className="block mt-1 px-2 py-1 text-xs" style={{ border: "1px solid #D9D9D9" }} data-testid={`set-time-when-${m.id}`} />
+                          </label>
+                          <label className="text-xs">Court or venue
+                            <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} maxLength={120} className="block mt-1 px-2 py-1 text-xs" style={{ border: "1px solid #D9D9D9" }} data-testid={`set-time-venue-${m.id}`} />
+                          </label>
+                          <button onClick={() => setTime(m)} disabled={!when || !venue} className="text-xs font-bold px-3 py-1.5 disabled:opacity-40" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid={`set-time-save-${m.id}`}>Book it</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

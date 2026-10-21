@@ -21,6 +21,10 @@ JOB_FLAGS = {
         "label": "Auto-Open Leagues to Play",
         "description": "On each league's start date, generates every player's matches and opens it to play if it has 8+ players. Daily 00:10 UTC.",
     },
+    "schedule_housekeeping": {
+        "label": "Match Scheduling Housekeeping",
+        "description": "Expires unanswered time proposals after 48h, reminds at 24h, and alerts players and the organizer when a match is 48h from its play-by date with no confirmed time. Hourly.",
+    },
     "auto_status_transitions": {
         "label": "League Auto Status Transitions",
         "description": "Flips league status upcoming→active→completed based on start/end dates. Daily 00:05 UTC.",
@@ -305,6 +309,8 @@ async def league_schedule_overview(league_id: str, request: Request):
         "home": m.get("player1_name"), "away": m.get("player2_name"),
         "home_id": m["player1_id"], "away_id": m["player2_id"],
         "deadline": m.get("deadline"), "schedule_status": m.get("schedule_status"),
+        "scheduled_date": m.get("scheduled_date"), "venue": m.get("venue"),
+        "needs_help": bool(m.get("needs_help")),
         "status": m.get("status"), "locked": league_schedule._has_activity(m),
     } for m in ms]
 
@@ -331,6 +337,26 @@ async def adjust_match(match_id: str, request: Request, body: dict = Body(...)):
         raise HTTPException(status_code=409, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/matches/{match_id}/set-time")
+async def set_match_time(match_id: str, request: Request, body: dict = Body(...)):
+    """Organizer books a match directly, for pairs who could not agree. Both players are notified."""
+    import match_scheduling
+    db = request.app.state.db
+    admin = await require_admin(request, db)
+    try:
+        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    except Exception:
+        raise HTTPException(status_code=404, detail="Match not found")
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    league = await _get_league_or_404(db, match["league_id"])
+    try:
+        return await match_scheduling.organizer_set_time(
+            db, match, league, str(admin.get("_id", "")), body.get("date", ""), body.get("venue", ""))
+    except match_scheduling.SchedulingError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
 
 
 async def _get_league_or_404(db, league_id: str) -> dict:

@@ -3,6 +3,7 @@
 Jobs registered in scheduler.py:
   - auto_status_transitions    daily 00:05 UTC
   - auto_open_leagues          daily 00:10 UTC
+  - schedule_housekeeping      every hour
   - send_match_reminders       every hour
   - auto_forfeit_stale_matches daily 01:00 UTC
   - send_credit_expiry_reminders daily 10:00 UTC
@@ -51,6 +52,17 @@ async def auto_open_leagues(db) -> None:
             logger.warning("auto_open_leagues failed for %s: %s", league.get("name"), exc)
     if opened:
         logger.info("auto_open_leagues: opened %d leagues", opened)
+
+
+async def schedule_housekeeping(db) -> None:
+    """Expire stale time proposals, send reminders, flag matches with no time near their deadline."""
+    if not await is_job_enabled(db, "schedule_housekeeping"):
+        return
+    import match_scheduling
+
+    counts = await match_scheduling.process_proposals(db)
+    if any(counts.values()):
+        logger.info("schedule_housekeeping: %s", counts)
 
 
 async def auto_status_transitions(db) -> None:
