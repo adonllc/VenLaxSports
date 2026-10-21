@@ -219,6 +219,135 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     return {"url": session.url, "session_id": session.id}
 
 
+def _metadata_dict(obj) -> dict:
+    """Stripe metadata as a plain dict. stripe>=15 objects are no longer dict-like (no .get)."""
+    if not obj:
+        return {}
+    if isinstance(obj, dict):
+        return obj
+    try:
+        return obj.to_dict()
+    except Exception:
+        return {}
+
+
+async def fulfill_paid_session(db, session_id: str, session_meta: dict) -> dict:
+    """Register the player (or doubles pair) for a paid Checkout session, exactly once.
+
+    Called from both the status poll and the Stripe webhook, so a paid player is
+    registered even if they close the tab before returning to the site. An atomic
+    claim on the transaction makes concurrent callers safe.
+    """
+    claimed = await db.payment_transactions.find_one_and_update(
+        {"session_id": session_id, "fulfilled": {"$ne": True}},
+        {"$set": {"fulfilled": True}},
+    )
+    if not claimed:
+        txn = await db.payment_transactions.find_one({"session_id": session_id}) or {}
+        return txn.get("fulfill_result") or {"status": "complete", "payment_status": "paid"}
+    try:
+        result = await _register_paid_player(db, claimed, session_id, session_meta)
+    except Exception:
+        await db.payment_transactions.update_one({"session_id": session_id}, {"$set": {"fulfilled": False}})
+        raise
+    await db.payment_transactions.update_one({"session_id": session_id}, {"$set": {"fulfill_result": result}})
+    return result
+
+
+async def _register_paid_player(db, txn: dict, session_id: str, session_meta: dict) -> dict:
+    now = datetime.now(timezone.utc).isoformat()
+    league_id = txn.get("league_id")
+    user_id = txn.get("user_id")
+
+    meta = txn.get("metadata") or {}
+    is_doubles = meta.get("is_doubles") == "true" or session_meta.get("is_doubles") == "true"
+    invite_token = meta.get("invite_token") or session_meta.get("invite_token")
+
+    # -- Doubles paid path ---------------------------------------------------
+    if is_doubles and invite_token:
+        invite = await db.doubles_invites.find_one({"token": invite_token})
+        if invite and invite.get("partner_user_id"):
+            try:
+                partner_user_doc = await db.users.find_one({"_id": ObjectId(invite["partner_user_id"])})
+            except Exception:
+                partner_user_doc = None
+            if partner_user_doc:
+                partner_user_doc["_id"] = str(partner_user_doc["_id"])
+                partner_user_dict = {
+                    "_id": partner_user_doc["_id"],
+                    "id": partner_user_doc["_id"],
+                    "email": partner_user_doc.get("email", ""),
+                    "name": partner_user_doc.get("name", ""),
+                    "first_name": partner_user_doc.get("first_name", ""),
+                    "last_name": partner_user_doc.get("last_name", ""),
+                }
+                try:
+                    league_doc = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])})
+                except Exception:
+                    league_doc = None
+                if league_doc:
+                    from routes.doubles_routes import _create_doubles_pair
+                    await _create_doubles_pair(
+                        db, invite, league_doc, partner_user_dict,
+                        notify_partner_as_added=bool(invite.get("partner_added_by_initiator")),
+                    )
+            return {"status": "paid", "payment_status": "paid", "is_doubles": True}
+        # Email invite: the partner has not confirmed yet, so mark the initiator as paid
+        if invite and invite.get("status") != "initiator_paid":
+            await db.doubles_invites.update_one(
+                {"token": invite_token},
+                {"$set": {"status": "initiator_paid"}},
+            )
+        return {"status": "paid", "payment_status": "paid", "is_doubles": True, "invite_pending": True}
+    # -- End doubles paid path -----------------------------------------------
+
+    already_registered = await db.player_leagues.find_one(
+        {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}
+    )
+    if not already_registered:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+        player = await db.users.find_one({"_id": ObjectId(user_id)})
+        if league and player:
+            # Retrieve waiver consent recorded at join time
+            consent = await db.waiver_consents.find_one(
+                {"user_id": user_id, "league_id": league_id},
+                sort=[("waiver_accepted_at", -1)],
+            )
+            pl = PlayerLeague(
+                player_id=user_id,
+                player_name=player["name"],
+                league_id=league_id,
+                sport=league["sport"],
+                payment_status="paid",
+                session_id=session_id,
+                waiver_accepted_at=consent["waiver_accepted_at"] if consent else now,
+            )
+            await db.player_leagues.insert_one(pl.to_mongo())
+            await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
+            s = Standing(
+                league_id=league_id,
+                player_id=user_id,
+                player_name=player["name"],
+                sport=league["sport"],
+                country=player.get("country", "USA"),
+            )
+            await db.standings.insert_one(s.to_mongo())
+
+            # Notify player of paid registration
+            if player.get("email") and player.get("email_notifications", True):
+                email_service.schedule(email_service.send_registration_confirmed(
+                    player["email"], player["name"], league["name"], league["sport"],
+                    league_id, paid=True, amount=float(txn.get("amount", 0)),
+                    currency=txn.get("currency", "USD")))
+
+            # Record promo use if code was applied
+            promo_code = (txn.get("metadata") or {}).get("promo_code")
+            if promo_code:
+                await _record_promo_use(db, promo_code, user_id, league_id)
+
+    return {"status": "complete", "payment_status": "paid"}
+
+
 @router.get("/status/{session_id}")
 async def get_payment_status(session_id: str, request: Request):
     db = request.app.state.db
@@ -231,8 +360,8 @@ async def get_payment_status(session_id: str, request: Request):
     if str(txn.get("user_id", "")) != str(user["_id"]):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    if txn.get("payment_status") == "paid":
-        return {"status": "complete", "payment_status": "paid"}
+    if txn.get("fulfilled") and txn.get("fulfill_result"):
+        return txn["fulfill_result"]
 
     import stripe
 
@@ -253,105 +382,7 @@ async def get_payment_status(session_id: str, request: Request):
     )
 
     if status.payment_status == "paid":
-        league_id = txn.get("league_id")
-        user_id = txn.get("user_id")
-
-        # ── Doubles paid path ─────────────────────────────────────────────────
-        meta = txn.get("metadata") or {}
-        # Also check Stripe session metadata if available
-        try:
-            session_meta = status.metadata if hasattr(status, "metadata") and status.metadata else {}
-        except Exception:
-            session_meta = {}
-        is_doubles = (
-            meta.get("is_doubles") == "true"
-            or session_meta.get("is_doubles") == "true"
-        )
-        invite_token = meta.get("invite_token") or session_meta.get("invite_token")
-
-        if is_doubles and invite_token:
-            invite = await db.doubles_invites.find_one({"token": invite_token})
-            if invite and invite.get("partner_user_id"):
-                try:
-                    partner_user_doc = await db.users.find_one(
-                        {"_id": ObjectId(invite["partner_user_id"])}
-                    )
-                except Exception:
-                    partner_user_doc = None
-                if partner_user_doc:
-                    partner_user_doc["_id"] = str(partner_user_doc["_id"])
-                    partner_user_dict = {
-                        "_id": partner_user_doc["_id"],
-                        "id": partner_user_doc["_id"],
-                        "email": partner_user_doc.get("email", ""),
-                        "name": partner_user_doc.get("name", ""),
-                        "first_name": partner_user_doc.get("first_name", ""),
-                        "last_name": partner_user_doc.get("last_name", ""),
-                    }
-                    try:
-                        league_doc = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])})
-                    except Exception:
-                        league_doc = None
-                    if league_doc:
-                        from routes.doubles_routes import _create_doubles_pair
-                        await _create_doubles_pair(
-                            db, invite, league_doc, partner_user_dict,
-                            notify_partner_as_added=bool(invite.get("partner_added_by_initiator")),
-                        )
-                return {"status": "paid", "is_doubles": True}
-            else:
-                # Email-invite: P2 hasn't confirmed yet — mark P1 as paid
-                if invite and invite.get("status") != "initiator_paid":
-                    await db.doubles_invites.update_one(
-                        {"token": invite_token},
-                        {"$set": {"status": "initiator_paid"}},
-                    )
-                return {"status": "paid", "is_doubles": True, "invite_pending": True}
-        # ── End doubles paid path ─────────────────────────────────────────────
-
-        already_registered = await db.player_leagues.find_one(
-            {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}
-        )
-        if not already_registered:
-            league = await db.leagues.find_one({"_id": ObjectId(league_id)})
-            player = await db.users.find_one({"_id": ObjectId(user_id)})
-            if league and player:
-                # Retrieve waiver consent recorded at join time
-                consent = await db.waiver_consents.find_one(
-                    {"user_id": user_id, "league_id": league_id},
-                    sort=[("waiver_accepted_at", -1)],
-                )
-                pl = PlayerLeague(
-                    player_id=user_id,
-                    player_name=player["name"],
-                    league_id=league_id,
-                    sport=league["sport"],
-                    payment_status="paid",
-                    session_id=session_id,
-                    waiver_accepted_at=consent["waiver_accepted_at"] if consent else now,
-                )
-                await db.player_leagues.insert_one(pl.to_mongo())
-                await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$inc": {"current_players": 1}})
-                s = Standing(
-                    league_id=league_id,
-                    player_id=user_id,
-                    player_name=player["name"],
-                    sport=league["sport"],
-                    country=player.get("country", "USA"),
-                )
-                await db.standings.insert_one(s.to_mongo())
-
-                # Notify player of paid registration
-                if player.get("email") and player.get("email_notifications", True):
-                    email_service.schedule(email_service.send_registration_confirmed(
-                        player["email"], player["name"], league["name"], league["sport"],
-                        league_id, paid=True, amount=float(txn.get("amount", 0)),
-                        currency=txn.get("currency", "USD")))
-
-                # Record promo use if code was applied
-                promo_code = (txn.get("metadata") or {}).get("promo_code")
-                if promo_code:
-                    await _record_promo_use(db, promo_code, user_id, league_id)
+        return await fulfill_paid_session(db, session_id, _metadata_dict(status.metadata))
 
     return {
         "status": status.status,

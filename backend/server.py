@@ -4,6 +4,7 @@ load_dotenv()
 from fastapi import FastAPI, APIRouter, Request, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+import json
 import os
 import logging
 from pathlib import Path
@@ -132,8 +133,10 @@ async def stripe_webhook(request: Request):
         logging.getLogger(__name__).warning(f"Webhook signature verification failed: {e}")
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
+    # stripe>=15 event objects are not dict-like, so read the verified payload as plain JSON
+    payload = json.loads(body)
+    if payload.get("type") == "checkout.session.completed":
+        session = payload["data"]["object"]
         if session.get("payment_status") == "paid":
             await db.payment_transactions.update_one(
                 {"session_id": session["id"]},
@@ -143,6 +146,9 @@ async def stripe_webhook(request: Request):
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 }},
             )
+            # Register the player now, so it does not depend on them returning to the site
+            from routes.payment_routes import fulfill_paid_session
+            await fulfill_paid_session(db, session["id"], session.get("metadata") or {})
 
     return {"received": True}
 
