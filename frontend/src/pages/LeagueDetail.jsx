@@ -128,6 +128,8 @@ export default function LeagueDetail() {
       setTimeout(() => pollPaymentStatus(sid, attempts + 1), 2000);
     } catch (e) {
       console.error(e);
+      // Keep trying a few times; the spinner must never run forever
+      setTimeout(() => pollPaymentStatus(sid, attempts + 1), 2000);
     }
   };
 
@@ -441,6 +443,12 @@ export default function LeagueDetail() {
                     <div className="flex items-center gap-2 text-sm mb-3 justify-center" style={{ color: "#374151" }}>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: "#F2A922" }} />
                       Checking payment...
+                    </div>
+                  )}
+
+                  {paymentStatus?.status === "timeout" && (
+                    <div className="flex items-center gap-2 text-sm rounded-xl px-3 py-2 mb-3" style={{ color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA" }} data-testid="payment-timeout">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" /> We could not confirm your payment yet. If you were charged, your spot is saved. Refresh this page in a minute or email feedback@venlaxsports.com.
                     </div>
                   )}
 
