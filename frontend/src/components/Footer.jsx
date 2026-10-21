@@ -176,7 +176,7 @@ export default function Footer() {
         {/* Footer Bottom — Copyright */}
         <div className="pt-5">
           <p className="text-xs text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
-            © {new Date().getFullYear()} VENLAX Sports. Owned by Cloudy Labs LLC.
+            © {new Date().getFullYear()} VENLAX Sports.
           </p>
         </div>
       </div>
