@@ -11,6 +11,7 @@ export const BRAND = {
   url: "https://venlaxsports.com",
   email: "hello@venlaxsports.com",
   payments_email: "payments@venlaxsports.com",
+  feedback_email: "feedback@venlaxsports.com",
 
   tagline_short: "Victory. Energy. eXperience.",
   tagline_long: "Where champions are made.",

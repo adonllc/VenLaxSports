@@ -135,6 +135,25 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Feedback — bug reports and suggestions go straight to the team inbox */}
+        <div
+          className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-white border border-[#3D3D3D]/10"
+          data-testid="footer-feedback"
+        >
+          <p className="text-sm text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
+            <span className="font-bold text-[#3D3D3D]">Notice a bug or have a feature suggestion?</span>{" "}
+            Drop us a line and let's level up VENLAX Sports together.
+          </p>
+          <a
+            href={`mailto:${BRAND.feedback_email}?subject=${encodeURIComponent("VENLAX Sports feedback")}`}
+            className="shrink-0 text-center px-6 py-3 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
+            style={{ background: "#F2A922", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+            data-testid="footer-email-team"
+          >
+            Email Our Team
+          </a>
+        </div>
+
         {/* Featured Cities — Full width, below main content */}
         <div className="pb-6 border-b border-[#3D3D3D]/10">
           <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
