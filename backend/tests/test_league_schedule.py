@@ -68,6 +68,9 @@ class Coll:
     def find(self, q=None, *a, **kw):
         return Cursor([d for d in self.docs if self._match(d, q or {})])
 
+    async def count_documents(self, q=None):
+        return len([d for d in self.docs if self._match(d, q or {})])
+
     async def insert_many(self, docs):
         for d in docs:
             d.setdefault("_id", ObjectId())
@@ -92,7 +95,7 @@ class Coll:
 
 class FakeDb:
     def __init__(self):
-        for n in ("leagues", "users", "player_leagues", "matches"):
+        for n in ("leagues", "users", "player_leagues", "matches", "disputes", "standings"):
             setattr(self, n, Coll())
 
 
@@ -397,3 +400,95 @@ def test_open_replaces_matches_left_by_the_retired_create_round_tool(sent):
                              "status": "completed", "deadline": None})
     with pytest.raises(league_schedule.ScheduleLocked):
         run(league_schedule.open_league_to_play(db2, league_of(db2)))
+
+
+# ── My Matches page: states, privacy, authorization, progress ───────────────────────────
+from datetime import datetime, timedelta, timezone  # noqa: E402
+
+import match_view  # noqa: E402
+
+NOW = datetime(2026, 11, 20, 15, 0, tzinfo=timezone.utc)
+
+
+def _m(**kw):
+    base = {"_id": "m1", "status": "scheduled", "schedule_status": "unscheduled", "scheduled_date": "2026-12-01T10:00:00+00:00"}
+    base.update(kw)
+    return base
+
+
+def test_match_states_follow_the_spec_groups():
+    st = lambda m, d=frozenset(): match_view.match_state(m, NOW, set(d))  # noqa: E731
+    assert st(_m()) == "not_scheduled"
+    assert st(_m(schedule_status="proposed")) == "awaiting_confirmation"
+    assert st(_m(schedule_status="scheduled", scheduled_date="2026-11-25T10:00:00+00:00")) == "scheduled"
+    assert st(_m(schedule_status="scheduled", scheduled_date="2026-11-20T09:00:00+00:00")) == "in_progress"
+    assert st(_m(schedule_status="scheduled", scheduled_date="2026-11-18T09:00:00+00:00")) == "awaiting_result"
+    assert st(_m(status="completed")) == "completed"
+    assert st(_m(status="walkover")) == "cancelled" and st(_m(status="cancelled")) == "cancelled"
+    assert st(_m(status="completed"), {"m1"}) == "disputed"
+    # a legacy self-scheduled match (no schedule_status) is judged by its date
+    assert st({"_id": "x", "status": "scheduled", "scheduled_date": "2026-12-05T10:00:00+00:00"}) == "scheduled"
+
+
+def test_playoff_rules_and_rank():
+    assert match_view.playoff_top_n(12) == 4 and match_view.playoff_top_n(16) == 8
+    standings = [{"player_id": "a", "matches_played": 2}, {"player_id": "b", "matches_played": 0}]
+    assert match_view.standing_rank(standings, "a") == 1
+    assert match_view.standing_rank(standings, "b") is None  # unranked until they have played
+    assert match_view.playoff_status(3, 4, {}, False)["status"] == "in_position"
+    assert match_view.playoff_status(5, 4, {}, False)["status"] == "outside"
+    assert match_view.playoff_status(None, 4, {}, False)["status"] == "unranked"
+    assert match_view.playoff_status(2, 4, {"playoffs_status": "round_1"}, True)["status"] == "qualified"
+    assert match_view.playoff_status(9, 8, {"playoffs_status": "round_1"}, False)["status"] == "not_qualified"
+
+
+def test_my_matches_page_data_privacy_authorization_and_progress(sent, monkeypatch):
+    db, lid, ids = make_league(8)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    m = db.matches.docs[0]
+    home, away = m["player1_id"], m["player2_id"]
+    for u in db.users.docs:
+        if str(u["_id"]) == away:
+            u.update({"profile_public": False, "avatar": "http://x/a.png", "skill_level": "advanced"})
+        if str(u["_id"]) == home:
+            u.update({"avatar": "http://x/h.png", "skill_level": "intermediate"})
+
+    as_user(monkeypatch, db, home)
+    page = run(match_routes.my_league_matches(lid, request_for(db)))
+    card = next(c for c in page["matches"] if c["id"] == str(m["_id"]))
+    assert card["match_number"] == m["match_number"] and card["role"] == "home" and card["state"] == "not_scheduled"
+    opp = card["opponent"]  # private profile: name and email shared, avatar/rating/skill hidden
+    assert opp["name"] and opp["email"] and opp["rating"] is None and opp["skill_level"] is None
+    assert opp["members"][0]["avatar"] is None
+    assert page["summary"]["total"] == 4 and page["summary"]["remaining"] == 4 and page["summary"]["wins"] == 0
+    assert page["summary"]["playoff"]["status"] == "unranked" and page["summary"]["rank"] is None
+
+    as_user(monkeypatch, db, away)  # the opponent sees the public side of the home player
+    page2 = run(match_routes.my_league_matches(lid, request_for(db)))
+    card2 = next(c for c in page2["matches"] if c["id"] == str(m["_id"]))
+    assert card2["role"] == "away" and card2["opponent"]["rating"] is not None
+    assert card2["opponent"]["members"][0]["avatar"] == "http://x/h.png"
+
+    # someone who is not in the league cannot open it
+    stranger = ObjectId()
+    db.users.docs.append({"_id": stranger, "name": "Stranger", "email": "s@example.com", "role": "player"})
+    as_user(monkeypatch, db, str(stranger))
+    with pytest.raises(HTTPException) as e:
+        run(match_routes.my_league_matches(lid, request_for(db)))
+    assert e.value.status_code == 403
+
+
+def test_summary_counts_results_rank_and_playoff_position(sent, monkeypatch):
+    db, lid, ids = make_league(8)
+    run(league_schedule.open_league_to_play(db, league_of(db)))
+    me = ids[0]
+    mine = [m for m in db.matches.docs if me in (m["player1_id"], m["player2_id"])]
+    mine[0].update({"status": "completed", "winner_id": me})
+    mine[1].update({"status": "completed", "winner_id": mine[1]["player2_id"] if mine[1]["player1_id"] == me else mine[1]["player1_id"]})
+    mine[2].update({"schedule_status": "scheduled", "scheduled_date": "2099-01-01T10:00:00+00:00"})
+    for pid, pts in ((me, 4.0), (ids[1], 3.0), (ids[2], 1.0)):
+        db.standings.docs.append({"league_id": lid, "player_id": pid, "matches_played": 2, "points": pts, "wins": 1})
+    as_user(monkeypatch, db, me)
+    s = run(match_routes.my_league_matches(lid, request_for(db)))["summary"]
+    assert (s["total"], s["completed"], s["scheduled"], s["remaining"], s["wins"], s["losses"]) == (4, 2, 1, 2, 1, 1)
+    assert s["rank"] == 1 and s["playoff"] == {"status": "in_position", "top_n": 4}

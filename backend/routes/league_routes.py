@@ -419,6 +419,13 @@ async def get_league_players(league_id: str, request: Request):
     return players
 
 
+def standing_sort_key(s: dict):
+    """Sort: points, then set differential, game differential, wins (the tiebreak chain)."""
+    set_diff = s.get("sets_won", 0) - s.get("sets_lost", 0)
+    game_diff = s.get("games_won", 0) - s.get("games_lost", 0)
+    return (-round(s.get("points", 0), 4), -set_diff, -game_diff, -s.get("wins", 0))
+
+
 @router.get("/{league_id}/standings")
 async def get_league_standings(league_id: str, request: Request):
     db = request.app.state.db
@@ -426,13 +433,7 @@ async def get_league_standings(league_id: str, request: Request):
         {"league_id": league_id}, {"_id": 0}
     ).to_list(100)
 
-    # Sort: points → set differential → game differential → wins (tiebreak chain)
-    def _sort_key(s):
-        set_diff = s.get("sets_won", 0) - s.get("sets_lost", 0)
-        game_diff = s.get("games_won", 0) - s.get("games_lost", 0)
-        return (-round(s.get("points", 0), 4), -set_diff, -game_diff, -s.get("wins", 0))
-
-    standings.sort(key=_sort_key)
+    standings.sort(key=standing_sort_key)
     return standings
 
 

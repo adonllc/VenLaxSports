@@ -59,7 +59,16 @@ def _fmt_when(iso: str) -> str:
 
 @router.get("/league/{league_id}/mine")
 async def my_league_matches(league_id: str, request: Request):
-    """The caller's season matches in one league, with opponent, Home/Away role and schedule state."""
+    """The caller's matches in one league, grouped data for the My Matches page.
+
+    Only a player registered in the league (or an admin) can open it, and only their own
+    matches are returned. Opponent avatar, rating and skill level are included only when
+    the opponent's profile is public; the name and contact email are always shared with an
+    assigned opponent, as the Privacy Policy states.
+    """
+    from routes.league_routes import standing_sort_key
+    import match_view
+
     db = request.app.state.db
     user = await get_current_user(request, db)
     uid = user["_id"]
@@ -69,37 +78,87 @@ async def my_league_matches(league_id: str, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
+    registered = await db.player_leagues.find_one({"player_id": uid, "league_id": league_id})
+    if not registered and user.get("role") not in ("admin", "city_admin"):
+        raise HTTPException(status_code=403, detail="You are not registered in this league")
+
     ms = await db.matches.find({
         "league_id": league_id,
         "$or": [{"player1_id": uid}, {"player2_id": uid}, {"team1_partner_id": uid}, {"team2_partner_id": uid}],
     }).sort("round", 1).to_list(200)
+    ms.sort(key=lambda m: (m.get("match_number") or 10_000, m.get("round") or 0))
 
-    ids = [i for m in ms for i in _side_ids(m, 1) + _side_ids(m, 2)]
-    users = await _users_by_id(db, ids)
-    out = []
+    users = await _users_by_id(db, [i for m in ms for i in _side_ids(m, 1) + _side_ids(m, 2)])
+    sport = league.get("sport")
+    rating_key = f"{sport}_rating"
+    open_disputes = await db.disputes.find(
+        {"league_id": league_id, "match_id": {"$ne": None}, "status": {"$in": list(match_view.OPEN_DISPUTE)}}
+    ).to_list(500)
+    disputed = {d["match_id"] for d in open_disputes}
+    now = datetime.now(timezone.utc)
+
+    def opponent_view(m: dict, other: int) -> dict:
+        members = []
+        for i in _side_ids(m, other):
+            u = users.get(i, {})
+            shown = u.get("profile_public", True)
+            members.append({
+                "name": u.get("name", ""),
+                "avatar": u.get("avatar") if shown else None,
+                "rating": u.get(rating_key) if shown else None,
+                "skill_level": u.get("skill_level") if shown else None,
+            })
+        rated = [x["rating"] for x in members if x["rating"] is not None]
+        return {
+            "name": _side_label(m, other),
+            "email": ", ".join(users.get(i, {}).get("email", "") for i in _side_ids(m, other) if users.get(i, {}).get("email")),
+            "members": members,
+            "rating": round(sum(rated) / len(rated), 2) if rated else None,
+            "skill_level": next((x["skill_level"] for x in members if x["skill_level"]), None),
+        }
+
+    cards = []
     for m in ms:
         mine = 1 if uid in _side_ids(m, 1) else 2
         other = 2 if mine == 1 else 1
-        out.append({
-            "id": str(m["_id"]), "round": m.get("round"),
+        cards.append({
+            "id": str(m["_id"]), "round": m.get("round"), "match_number": m.get("match_number"),
+            "is_playoff": bool(m.get("is_playoff")),
             "role": "home" if mine == 1 else "away",
-            "opponent": {
-                "name": _side_label(m, other),
-                "email": ", ".join(users.get(i, {}).get("email", "") for i in _side_ids(m, other) if users.get(i, {}).get("email")),
-            },
+            "state": match_view.match_state(m, now, disputed),
+            "opponent": opponent_view(m, other),
             "partner_name": _side_label(m, mine) if len(_side_ids(m, mine)) > 1 else None,
             "deadline": m.get("deadline"), "schedule_status": m.get("schedule_status"),
             "scheduled_date": m.get("scheduled_date"), "venue": m.get("venue"),
             "proposal": m.get("proposal"), "last_decline": m.get("last_decline"),
             "status": m.get("status"), "winner_id": m.get("winner_id"),
+            "sport": m.get("sport"), "score_data": m.get("score_data"),
+            "player1_name": m.get("player1_name"), "player2_name": m.get("player2_name"),
             "result": (("won" if m.get("winner_id") in _side_ids(m, mine) else "lost") if m.get("winner_id") else None),
         })
+
+    standings = await db.standings.find({"league_id": league_id}).to_list(500)
+    standings.sort(key=standing_sort_key)
+    rank = match_view.standing_rank(standings, uid)
+    mine_row = next((s for s in standings if s.get("player_id") == uid), None)
+    player_count = await db.player_leagues.count_documents(
+        {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}})
+    top_n = match_view.playoff_top_n(player_count)
+    in_bracket = False
+    if league.get("playoffs_status"):
+        in_bracket = bool(await db.matches.find_one({
+            "league_id": league_id, "is_playoff": True,
+            "$or": [{"player1_id": uid}, {"player2_id": uid}, {"team1_partner_id": uid}, {"team2_partner_id": uid}],
+        }))
+    summary = match_view.build_summary(cards, mine_row, rank, match_view.playoff_status(rank, top_n, league, in_bracket))
+
     return {
-        "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": league.get("sport"),
+        "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": sport,
                    "format": league.get("format"), "start_date": league.get("start_date"), "end_date": league.get("end_date"),
                    "matches_per_player": league.get("matches_per_player")},
         "user_id": uid,
-        "matches": out,
+        "summary": summary,
+        "matches": cards,
     }
 
 
