@@ -126,7 +126,7 @@ async def my_league_matches(league_id: str, request: Request):
     for m in ms:
         mine = 1 if uid in _side_ids(m, 1) else 2
         other = 2 if mine == 1 else 1
-        prop = m.get("proposal")
+        prop = m.get("proposal") if m.get("status") == "scheduled" else None
         booked = m.get("schedule_status") == "scheduled"
         when = tz_utils.as_utc(m.get("scheduled_date"))
         can_change = bool(booked and m.get("status") == "scheduled" and m.get("deadline") and when
@@ -374,6 +374,7 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
                 "winner_id": score_data.winner_id,
                 "winner_name": winner_name,
                 "score_data": score_data.score_data,
+                "proposal": None,  # a finished match has no pending time proposal or change request
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }
         },

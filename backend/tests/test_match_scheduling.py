@@ -269,3 +269,16 @@ def test_home_who_proposed_is_not_forfeited_and_future_deadlines_are_left_alone(
 def match_view_state(m):
     import match_view
     return match_view.match_state(m, NOW(), set())
+
+
+def test_a_finished_match_shows_no_pending_proposal_and_is_ignored_by_housekeeping(sent, monkeypatch):
+    db, lg, m = setup()
+    book(db, lg, m)
+    run(ms.propose(db, m, lg, m["player1_id"], iso(8), "Court 2", None))          # pending change request
+    m["status"], m["winner_id"] = "completed", m["player1_id"]                    # score reported meanwhile
+    as_user(monkeypatch, db, m["player2_id"])
+    card = next(c for c in run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["matches"] if c["id"] == str(m["_id"]))
+    assert card["state"] == "completed" and card["proposal"] is None and card["pending_change"] is False
+    sent.clear()
+    assert run(ms.process_proposals(db, NOW() + timedelta(hours=60)))["expired"] == 0
+    assert sent == [] and m["proposal"] is not None                                # nobody emailed about a finished match

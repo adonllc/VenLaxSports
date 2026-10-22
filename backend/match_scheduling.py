@@ -319,7 +319,7 @@ async def process_proposals(db, now: datetime | None = None) -> dict:
             league_cache[lid] = await db.leagues.find_one({"_id": ObjectId(lid)})
         return league_cache[lid]
 
-    expired = await db.matches.find({"proposal.expires_at": {"$lt": now_iso}}).to_list(500)
+    expired = await db.matches.find({"proposal.expires_at": {"$lt": now_iso}, "status": "scheduled"}).to_list(500)
     for m in expired:
         league = await league_of(m)
         if not league:
@@ -338,7 +338,7 @@ async def process_proposals(db, now: datetime | None = None) -> dict:
                     u["email"], u.get("name", ""), opp, league["name"], m["league_id"], booked))
         counts["expired"] += 1
 
-    due = await db.matches.find({"proposal.expires_at": {"$gte": now_iso}, "proposal.remind_at": {"$lte": now_iso},
+    due = await db.matches.find({"status": "scheduled", "proposal.expires_at": {"$gte": now_iso}, "proposal.remind_at": {"$lte": now_iso},
                                  "proposal.reminded": {"$ne": True}}).to_list(500)
     for m in due:
         league = await league_of(m)
