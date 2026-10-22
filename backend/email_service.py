@@ -571,7 +571,7 @@ async def send_launch_announcement(to: str, first_name: str, unsubscribe_url: st
         <li>🚀 Keep improving and climb the ranks, on your own time</li>
       </ul>
       <p><strong>Your next move? Sign up free.</strong></p>
-      <p>Your account is ready when you are. Complete your sign-up and join the VenLax Sports community today. Season entry from $9.99.</p>
+      <p>Your account is ready when you are. Complete your sign-up and join the VenLax Sports community today.</p>
       <p>No waiting. No excuses. Just you, your game, and your next challenge.</p>
       <p><strong>VenLax Sports</strong><br>Earn Your Rank on Your Own Time.</p>
       <p>See you on the court!<br>Team VenLax Sports</p>

@@ -93,7 +93,7 @@ def test_email_wording_and_compliance_footer(monkeypatch):
     monkeypatch.setattr(email_service, "send_email", fake_send)
     run(email_service.send_launch_announcement("a@x.com", "", "https://api.example.test/u?token=1"))
     h = out["html"]
-    assert "Hi there," in h and "Sign up free" in h and "from $9.99" in h
+    assert "Hi there," in h and "Sign up free" in h and "$9.99" not in h
     assert "Register FREE" not in h and "early-access" not in h.lower() and "early access" not in h.lower()
     assert "Unsubscribe" in h and "Atlanta, GA 30350, United States" in h
     run(email_service.send_launch_announcement("a@x.com", "Sam", "u"))
