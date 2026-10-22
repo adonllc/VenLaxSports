@@ -423,10 +423,131 @@ function playoffLine(p) {
   switch (p?.status) {
     case "in_position": return `In a qualifying position (the top ${p.top_n} advance)`;
     case "outside": return `Outside the top ${p.top_n} for now`;
+    case "needs_more_matches": return "Play more matches to be eligible";
     case "qualified": return "Qualified for the playoffs";
     case "not_qualified": return "Did not qualify for the playoffs";
     default: return "Play a match to get ranked";
   }
+}
+
+const STATUS_STYLE = {
+  in_position: { title: "In a qualifying position", bg: GREEN_TINT, color: GREEN_D },
+  outside: { title: "Outside the cut-off for now", bg: AMBER_TINT, color: INK },
+  needs_more_matches: { title: "Not eligible yet", bg: AMBER_TINT, color: INK },
+  qualified: { title: "Qualified for the playoffs", bg: GREEN_D, color: "#fff" },
+  not_qualified: { title: "Did not qualify for the playoffs", bg: GREY, color: INK },
+  unranked: { title: "Not ranked yet", bg: GREY, color: INK },
+};
+
+function Stat({ label, value, sub, testId }) {
+  return (
+    <div className="p-3" style={{ background: GREY }} data-testid={testId}>
+      <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: MUTED }}>{label}</p>
+      <p className="text-2xl font-semibold leading-tight mt-1" style={{ fontFamily: MONO, color: INK }}>{value}</p>
+      {sub && <p className="text-xs mt-0.5" style={{ color: MUTED }}>{sub}</p>}
+    </div>
+  );
+}
+
+function gapLine(po) {
+  if (!po.gap) return null;
+  const amt = po.gap.amount;
+  return po.gap.direction === "ahead"
+    ? `${amt} ${po.gap.unit} ahead of the cut-off.`
+    : `${amt} ${po.gap.unit} behind the cut-off.`;
+}
+
+function nextText(po, summary) {
+  if (po.status === "needs_more_matches") {
+    const bits = [];
+    if (po.min_matches) bits.push(`at least ${po.min_matches} matches played`);
+    if (po.min_win_pct) bits.push(`a win percentage of at least ${po.min_win_pct}%`);
+    return `To be eligible you need ${bits.join(" and ")}.`;
+  }
+  if (po.status === "qualified" || po.status === "not_qualified") return null;
+  if (summary.season_complete) return "Your league matches are done. Playoff places are confirmed when the organizer creates the bracket.";
+  return null;
+}
+
+function BracketView({ bracket }) {
+  return (
+    <div className="mt-4 overflow-x-auto" data-testid="playoff-bracket">
+      <div className="flex gap-4 min-w-max">
+        {bracket.rounds.map((r) => (
+          <div key={r.round} className="w-52">
+            <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: MUTED }}>{r.label}</p>
+            <div className="space-y-2">
+              {r.matches.map((m) => (
+                <div key={m.id} className="p-2.5 text-sm" style={{ border: `1px solid ${m.mine ? GREEN_D : "#D9D9D9"}`, background: m.mine ? GREEN_TINT : "#fff" }}>
+                  {[[m.player1_name, "p1"], [m.player2_name, "p2"]].map(([nm]) => (
+                    <p key={nm} className={m.winner_name === nm ? "font-bold" : ""} style={{ color: m.winner_id && m.winner_name !== nm ? MUTED : INK }}>{nm}</p>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PlayoffPanel({ summary }) {
+  const po = summary.playoff || {};
+  const st = STATUS_STYLE[po.status] || STATUS_STYLE.unranked;
+  const pct = summary.total ? Math.round((100 * summary.completed) / summary.total) : 0;
+  const nt = nextText(po, summary);
+  const bracket = po.bracket;
+  return (
+    <section aria-label="Playoff progress" className="mt-5 bg-white" style={{ border: "1px solid #D9D9D9" }} data-testid="playoff-panel">
+      <div className="px-5 sm:px-6 pt-5">
+        <p className="text-xs font-bold uppercase tracking-widest" style={{ color: MUTED }}>Playoff progress</p>
+        <div className="flex items-end justify-between gap-4 mt-2">
+          <p className="text-lg font-bold" style={{ color: INK }}>Matches completed <span style={{ fontFamily: MONO }}>{summary.completed} / {summary.total}</span></p>
+          <p className="text-xs" style={{ color: MUTED }}>{summary.remaining} remaining</p>
+        </div>
+        <div className="mt-2 h-2" style={{ background: "#E5E5E5" }} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Matches completed">
+          <div className="h-2" style={{ width: `${pct}%`, background: GREEN_D }} />
+        </div>
+      </div>
+
+      <div className="px-5 sm:px-6 mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <Stat label="Wins" value={summary.wins} testId="stat-wins" />
+        <Stat label="Losses" value={summary.losses} testId="stat-losses" />
+        <Stat label="Points" value={summary.points} sub={summary.win_pct != null ? `${summary.win_pct}% wins` : null} testId="stat-points" />
+        <Stat label="Rank" value={summary.rank ? ordinal(summary.rank) : "—"} testId="stat-rank" />
+        <Stat label="Pending results" value={summary.pending_results} sub={summary.pending_results ? "Played, score not in" : null} testId="stat-pending" />
+        <Stat label="Score disputes" value={summary.disputes} sub={summary.disputes ? "Organizer reviewing" : null} testId="stat-disputes" />
+      </div>
+
+      <div className="mx-5 sm:mx-6 mt-4 p-4" style={{ background: st.bg, color: st.color }} data-testid="qualification-status">
+        <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: st.color }}>Playoff qualification</p>
+        <p className="text-lg font-bold mt-1">{st.title}</p>
+        {gapLine(po) && <p className="text-sm mt-0.5">{gapLine(po)}</p>}
+        {nt && <p className="text-sm mt-1">{nt}</p>}
+        <p className="text-sm mt-2">{po.rule_text}</p>
+      </div>
+
+      {bracket && (
+        <div className="mx-5 sm:mx-6 mt-4" data-testid="playoff-next">
+          {bracket.champion && <p className="p-4 text-lg font-bold" style={{ background: GREEN_D, color: "#fff" }}>You won the playoffs. Congratulations!</p>}
+          {bracket.eliminated && <p className="p-4 text-sm" style={{ background: GREY, color: INK }}>You were knocked out of the playoffs. Thanks for playing this season.</p>}
+          {bracket.next_match && (
+            <div className="p-4" style={{ background: AMBER_TINT, color: INK }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest">Your next playoff match · {bracket.next_match.round_label}</p>
+              <p className="text-lg font-bold mt-1">vs {bracket.next_match.opponent_name}</p>
+              {bracket.next_match.scheduled_date && <p className="text-sm">Play by {fmtDate(bracket.next_match.scheduled_date)}{bracket.next_match.venue ? ` · ${bracket.next_match.venue}` : ""}</p>}
+            </div>
+          )}
+          <BracketView bracket={bracket} />
+        </div>
+      )}
+
+      <p className="px-5 sm:px-6 py-4 text-xs" style={{ color: MUTED }}>
+        Playoff places depend on this league's rules and the final standings. Completing your matches does not qualify you by itself.
+      </p>
+    </section>
+  );
 }
 
 export default function LeagueMatches() {
@@ -498,6 +619,8 @@ export default function LeagueMatches() {
           <div className="py-3 px-2" style={{ background: GREEN }} data-testid="summary-playoff">{playoffLine(summary.playoff)}</div>
         </div>
       </section>
+
+      <PlayoffPanel summary={summary} />
 
       <p className="mt-5 text-sm p-4" style={{ background: "#F1F1F1", color: INK }}>
         <strong>Home</strong> proposes the date, time and court before the play-by date. <strong>Away</strong> confirms or suggests another time. If no time has been proposed by the play-by date, the match may be awarded to Away. Report each score after you play.

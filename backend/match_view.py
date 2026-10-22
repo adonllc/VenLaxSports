@@ -90,6 +90,11 @@ def build_summary(cards: list[dict], standing: dict | None, rank, playoff: dict)
         "scheduled": scheduled,
         "completed": completed,
         "remaining": max(0, total - completed - cancelled),
+        "pending_results": sum(1 for c in league_cards if c["state"] == "awaiting_result"),
+        "disputes": sum(1 for c in league_cards if c["state"] == "disputed"),
+        "season_complete": total > 0 and completed + cancelled >= total,
+        "win_pct": (round(100.0 * (standing or {}).get("wins", 0) / (standing or {}).get("matches_played", 1), 1)
+                    if standing and (standing.get("matches_played") or 0) else None),
         "wins": sum(1 for c in league_cards if c.get("result") == "won"),
         "losses": sum(1 for c in league_cards if c.get("result") == "lost"),
         "rank": rank,

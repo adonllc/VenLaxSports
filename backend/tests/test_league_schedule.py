@@ -524,4 +524,6 @@ def test_summary_counts_results_rank_and_playoff_position(sent, monkeypatch):
     as_user(monkeypatch, db, me)
     s = run(match_routes.my_league_matches(lid, request_for(db)))["summary"]
     assert (s["total"], s["completed"], s["scheduled"], s["remaining"], s["wins"], s["losses"]) == (4, 2, 1, 2, 1, 1)
-    assert s["rank"] == 1 and s["playoff"] == {"status": "in_position", "top_n": 4}
+    assert s["rank"] == 1 and s["playoff"]["status"] == "in_position" and s["playoff"]["top_n"] == 4
+    assert s["pending_results"] == 0 and s["disputes"] == 0 and s["season_complete"] is False
+    assert s["playoff"]["gap"] is None and s["playoff"]["rule_text"].startswith("The top 4 players by points")

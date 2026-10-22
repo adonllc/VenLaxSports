@@ -170,6 +170,7 @@ class LeagueUpdate(BaseModel):
     entry_fee: Optional[float] = None
     season_id: Optional[str] = None
     rules: Optional[str] = None
+    qualification: Optional[Dict] = None  # playoff rule, see qualification.py
 
 
 # ─── Round Robin Config ───────────────────────────────

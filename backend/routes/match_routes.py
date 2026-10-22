@@ -66,8 +66,9 @@ async def my_league_matches(league_id: str, request: Request):
     the opponent's profile is public; the name and contact email are always shared with an
     assigned opponent, as the Privacy Policy states.
     """
-    from routes.league_routes import standing_sort_key
     import match_view
+    import playoff_view
+    import qualification
 
     db = request.app.state.db
     user = await get_current_user(request, db)
@@ -156,19 +157,19 @@ async def my_league_matches(league_id: str, request: Request):
         })
 
     standings = await db.standings.find({"league_id": league_id}).to_list(500)
-    standings.sort(key=standing_sort_key)
-    rank = match_view.standing_rank(standings, uid)
-    mine_row = next((s for s in standings if s.get("player_id") == uid), None)
+    played = await db.matches.find({"league_id": league_id, "is_playoff": {"$ne": True},
+                                    "status": {"$in": ["completed", "walkover"]}}).to_list(2000)
     player_count = await db.player_leagues.count_documents(
         {"league_id": league_id, "payment_status": {"$in": ["paid", "free"]}})
-    top_n = match_view.playoff_top_n(player_count)
-    in_bracket = False
-    if league.get("playoffs_status"):
-        in_bracket = bool(await db.matches.find_one({
-            "league_id": league_id, "is_playoff": True,
-            "$or": [{"player1_id": uid}, {"player2_id": uid}, {"team1_partner_id": uid}, {"team2_partner_id": uid}],
-        }))
-    summary = match_view.build_summary(cards, mine_row, rank, match_view.playoff_status(rank, top_n, league, in_bracket))
+    rule = qualification.rule_for(league, player_count)
+    ranked = qualification.rank_players(standings, played, rule)
+    me_rank = qualification.standing_for(ranked, uid)
+    rank = me_rank["rank"] if me_rank and (me_rank["row"].get("matches_played") or 0) else None
+    mine_row = me_rank["row"] if me_rank else None
+    playoff_docs = await db.matches.find({"league_id": league_id, "is_playoff": True}).to_list(200) if league.get("playoffs_status") else []
+    bracket = playoff_view.build_bracket(league, playoff_docs, uid)
+    summary = match_view.build_summary(cards, mine_row, rank, {})
+    summary["playoff"] = playoff_view.playoff_block(league, rule, ranked, uid, summary["season_complete"], bracket)
 
     return {
         "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": sport,

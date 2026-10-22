@@ -207,6 +207,7 @@ export default function AdminDashboard() {
   };
 
   const [adjustLeague, setAdjustLeague] = useState(null);
+  const [rulesLeague, setRulesLeague] = useState(null);
 
   const handleOpenToPlay = async (l, regenerate = false) => {
     const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/open-to-play`, { regenerate, ...body }, { withCredentials: true });
@@ -621,6 +622,16 @@ export default function AdminDashboard() {
                               </button>
                             </>
                           )}
+                          {l.status !== "completed" && (l.league_type || "flex") === "flex" && (
+                            <button
+                              onClick={() => setRulesLeague(l)}
+                              className="text-xs font-bold" style={{ color: "#008F70" }}
+                              data-testid={`playoff-rules-${l.id}`}
+                              title="Who qualifies for the playoffs"
+                            >
+                              Playoff rules
+                            </button>
+                          )}
                           {l.status !== "completed" && (
                             <button
                               onClick={() => handleCloseLeague(l.id, l.name)}
@@ -780,6 +791,7 @@ export default function AdminDashboard() {
         {tab === "referrals" && <ReferralsTab />}
         {tab === "flags" && <FlagsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
+        {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}
       </div>
 
       {showRRForm && (
@@ -1867,6 +1879,79 @@ function AdjustScheduleModal({ league, onClose }) {
             </tbody>
           </table>
         )}
+      </div>
+    </div>
+  );
+}
+
+function PlayoffRulesModal({ league, onClose, onSaved }) {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const q = league.qualification || {};
+  const [mode, setMode] = useState(q.mode || "points");
+  const [topN, setTopN] = useState(q.top_n || (league.max_players > 12 || (league.current_players || 0) > 12 ? 8 : 4));
+  const [minMatches, setMinMatches] = useState(q.min_matches || 0);
+  const [minWinPct, setMinWinPct] = useState(q.min_win_pct || 0);
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    setBusy(true);
+    setMsg("");
+    try {
+      await axios.put(`${API}/admin/leagues/${league.id}`, {
+        qualification: { mode, top_n: Number(topN), min_matches: Number(minMatches) || 0, min_win_pct: Number(minWinPct) || 0 },
+      }, { withCredentials: true });
+      onSaved();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not save the rule.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = { border: "1px solid #B5B5B5", color: "#3D3D3D", background: "#fff", padding: "6px 8px", fontSize: "14px", width: "100%" };
+  const label = "block text-xs font-bold uppercase tracking-wider mb-1";
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="playoff-rules-modal">
+      <div className="bg-white w-full max-w-md p-5">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Playoff rules</h3>
+            <p className="text-xs" style={{ color: "#5C5C5C" }}>{league.name}. Players see this rule on My Matches. Finishing all matches never qualifies anyone by itself.</p>
+          </div>
+          <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }}>Close</button>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className={label} htmlFor="pr-mode" style={{ color: "#5C5C5C" }}>Rank players by</label>
+            <select id="pr-mode" value={mode} onChange={(e) => setMode(e.target.value)} style={field} data-testid="playoff-rule-mode">
+              <option value="points">Points</option>
+              <option value="win_pct">Win percentage</option>
+            </select>
+          </div>
+          <div>
+            <label className={label} htmlFor="pr-top" style={{ color: "#5C5C5C" }}>Players who qualify (top N)</label>
+            <select id="pr-top" value={topN} onChange={(e) => setTopN(e.target.value)} style={field} data-testid="playoff-rule-topn">
+              {[2, 4, 8, 16].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={label} htmlFor="pr-min" style={{ color: "#5C5C5C" }}>Minimum matches played</label>
+              <input id="pr-min" type="number" min="0" max="50" value={minMatches} onChange={(e) => setMinMatches(e.target.value)} style={field} data-testid="playoff-rule-minmatches" />
+            </div>
+            <div>
+              <label className={label} htmlFor="pr-pct" style={{ color: "#5C5C5C" }}>Minimum win % (0 = none)</label>
+              <input id="pr-pct" type="number" min="0" max="100" value={minWinPct} onChange={(e) => setMinWinPct(e.target.value)} style={field} data-testid="playoff-rule-minwinpct" />
+            </div>
+          </div>
+          <p className="text-xs" style={{ color: "#5C5C5C" }}>Ties are broken by wins, then head-to-head, then set and game difference.</p>
+          {msg && <p className="text-sm p-2" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="alert">{msg}</p>}
+          <button onClick={save} disabled={busy} className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="playoff-rule-save">
+            {busy ? "Saving..." : "Save rule"}
+          </button>
+        </div>
       </div>
     </div>
   );

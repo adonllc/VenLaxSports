@@ -9,6 +9,7 @@ from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
 import email_service
 import asyncio
 import notification_dispatch
+import qualification
 import secrets
 
 router = APIRouter(redirect_slashes=False)
@@ -433,7 +434,12 @@ async def get_league_standings(league_id: str, request: Request):
         {"league_id": league_id}, {"_id": 0}
     ).to_list(100)
 
-    standings.sort(key=standing_sort_key)
+    league = await db.leagues.find_one({"_id": ObjectId(league_id)}) if ObjectId.is_valid(league_id) else None
+    played = await db.matches.find({"league_id": league_id, "is_playoff": {"$ne": True},
+                                    "status": {"$in": ["completed", "walkover"]}}).to_list(2000)
+    rule = qualification.rule_for(league or {}, len(standings))
+    order = {r["player_id"]: r["rank"] for r in qualification.rank_players(standings, played, rule)}
+    standings.sort(key=lambda s: order.get(s.get("player_id"), 10**6))
     return standings
 
 

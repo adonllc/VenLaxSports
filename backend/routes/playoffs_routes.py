@@ -7,17 +7,18 @@ and a bracket_round field so the UI can render a bracket view.
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from bson import ObjectId
 from auth_utils import require_admin
 from models import Match
+import qualification
 
 router = APIRouter()
 
 
 class BracketCreate(BaseModel):
     league_id: str
-    top_n: int = 8  # must be a power of 2 (2, 4, 8, 16)
+    top_n: Optional[int] = None  # 2, 4, 8 or 16; default is the league's qualification rule
     first_round_date: str  # ISO date string (YYYY-MM-DD)
 
 
@@ -61,8 +62,6 @@ async def generate_bracket(data: BracketCreate, request: Request):
     db = request.app.state.db
     await require_admin(request, db)
 
-    if not _is_power_of_two(data.top_n):
-        raise HTTPException(status_code=400, detail="top_n must be 2, 4, 8, or 16")
     if not ObjectId.is_valid(data.league_id):
         raise HTTPException(status_code=404, detail="League not found")
 
@@ -70,33 +69,39 @@ async def generate_bracket(data: BracketCreate, request: Request):
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
 
-    # Qualification thresholds: ≤12 players → Top 4, >12 → Top 8
     player_count = await db.player_leagues.count_documents({
         "league_id": data.league_id,
         "payment_status": {"$in": ["paid", "free"]},
     })
-    recommended_top_n = 4 if player_count <= 12 else 8
-    if data.top_n > recommended_top_n:
+    rule = qualification.rule_for(league, player_count)
+    top_n = data.top_n or rule["top_n"]
+    if not _is_power_of_two(top_n):
+        raise HTTPException(status_code=400, detail="top_n must be 2, 4, 8, or 16")
+    if top_n != rule["top_n"]:
+        rule = {**rule, "top_n": top_n}
+    if not league.get("qualification"):
+        # No rule configured: keep the long-standing cap (12 or fewer players -> top 4, more -> top 8)
+        recommended_top_n = qualification.default_top_n(player_count)
+        if top_n > recommended_top_n:
+            raise HTTPException(
+                status_code=400,
+                detail=(f"League has {player_count} players. Maximum qualifying spots: {recommended_top_n} "
+                        f"({'12 or fewer players: top 4' if player_count <= 12 else 'more than 12 players: top 8'}). "
+                        f"Set top_n to {recommended_top_n} or less."),
+            )
+    elif top_n > player_count:
+        raise HTTPException(status_code=400, detail=f"League has only {player_count} players; cannot seed {top_n}.")
+
+    # Rank exactly as players see it, then seed the players who meet the rule
+    rows = await db.standings.find({"league_id": data.league_id}, {"_id": 0}).to_list(500)
+    played = await db.matches.find({"league_id": data.league_id, "is_playoff": {"$ne": True},
+                                    "status": {"$in": ["completed", "walkover"]}}).to_list(2000)
+    standings = [r["row"] for r in qualification.rank_players(rows, played, rule) if r["qualifies"]]
+
+    if len(standings) < top_n:
         raise HTTPException(
             status_code=400,
-            detail=(
-                f"League has {player_count} players. "
-                f"Maximum qualifying spots: {recommended_top_n} "
-                f"({'≤12 players → Top 4' if player_count <= 12 else '>12 players → Top 8'}). "
-                f"Set top_n ≤ {recommended_top_n}."
-            ),
-        )
-
-    # Pull top-N standings
-    standings = await db.standings.find(
-        {"league_id": data.league_id},
-        {"_id": 0},
-    ).sort([("points", -1), ("wins", -1)]).limit(data.top_n).to_list(data.top_n)
-
-    if len(standings) < data.top_n:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Only {len(standings)} players have standings — need {data.top_n}",
+            detail=f"Only {len(standings)} players meet the qualification rule - need {top_n}. {qualification.rule_text(rule)}",
         )
 
     # Avoid duplicate bracket generation
@@ -106,7 +111,7 @@ async def generate_bracket(data: BracketCreate, request: Request):
     if existing > 0:
         raise HTTPException(status_code=400, detail="Playoff bracket already generated for this league")
 
-    pairs = _seed_pairs(data.top_n)
+    pairs = _seed_pairs(top_n)
     now = datetime.now(timezone.utc).isoformat()
     created_ids: list[str] = []
 
@@ -135,13 +140,13 @@ async def generate_bracket(data: BracketCreate, request: Request):
     # Flag the league as in playoffs
     await db.leagues.update_one(
         {"_id": ObjectId(data.league_id)},
-        {"$set": {"playoffs_status": "round_1", "updated_at": now}},
+        {"$set": {"playoffs_status": "round_1", "playoff_top_n": top_n, "updated_at": now}},
     )
 
     return {
         "message": f"Playoff bracket generated — {len(created_ids)} matches",
         "match_ids": created_ids,
-        "rounds_total": data.top_n.bit_length() - 1,  # e.g., 8 → 3 rounds
+        "rounds_total": top_n.bit_length() - 1,  # e.g., 8 → 3 rounds
     }
 
 

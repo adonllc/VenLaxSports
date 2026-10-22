@@ -255,6 +255,12 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
 
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if "qualification" in update_data:
+        import qualification
+        try:
+            update_data["qualification"] = qualification.validate_rule(update_data["qualification"])
+        except (ValueError, TypeError) as e:
+            raise HTTPException(status_code=400, detail=str(e))
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     try:
         result = await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$set": update_data})
