@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, Calendar, MapPin, CheckCircle, Clock } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { buildScoreSummary } from "../utils/scoreSummary";
@@ -50,46 +50,115 @@ function chipFor(m) {
   }
 }
 
-function Avatar({ person, size = 48 }) {
+const GREEN_D = "#00765C"; // darker green for small text and filled labels (passes contrast)
+const GREEN_TINT = "#E6F3F0";
+const AMBER_TINT = "#FDF0D0";
+const GREY = "#F1F1F1";
+const MONO = "'IBM Plex Mono', monospace";
+
+function Avatar({ person, size = 52, bg, side }) {
   const initials = (person?.name || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
-  const style = { width: size, height: size, borderRadius: "50%", flexShrink: 0 };
+  const clip = side === "right" ? "polygon(14% 0, 100% 0, 100% 100%, 0 100%)" : "polygon(0 0, 100% 0, 86% 100%, 0 100%)";
+  const style = { width: size, height: size, flexShrink: 0, clipPath: clip };
   return person?.avatar ? (
     <img src={person.avatar} alt="" style={{ ...style, objectFit: "cover" }} data-testid="opponent-avatar" />
   ) : (
-    <div aria-hidden="true" className="flex items-center justify-center font-bold text-sm" style={{ ...style, background: "#F1F1F1", color: INK }} data-testid="opponent-initials">{initials}</div>
+    <div aria-hidden="true" className="flex items-center justify-center font-bold text-base" style={{ ...style, background: bg, color: "#fff" }} data-testid="opponent-initials">{initials}</div>
   );
 }
 
-function PlayerSide({ person, role, label, align, testId }) {
-  const lead = person?.members?.[0] || { name: person?.name };
-  const isHome = role === "home";
-  const level = person?.skill_level ? String(person.skill_level) : null;
-  const right = align === "right";
+function RoleTag({ role }) {
+  const home = role === "home";
   return (
-    <div className={`flex items-center gap-3 min-w-0 ${right ? "sm:flex-row-reverse sm:text-right" : ""}`} data-testid={testId}>
-      <Avatar person={lead} size={52} />
-      <div className="min-w-0">
-        <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: MUTED }}>{label}</p>
-        <h3 className="text-lg font-bold leading-tight break-words" style={{ color: INK }}>{person?.name || "You"}</h3>
+    <span className="text-[11px] font-bold uppercase tracking-widest px-2 py-0.5"
+          style={home ? { background: GREEN_D, color: "#fff" } : { border: `1.5px solid ${INK}`, color: INK }}>
+      {home ? "Home" : "Away"}
+    </span>
+  );
+}
+
+// One side of the scoreboard. "You" is green and left, "Opponent" is grey and mirrored on wide screens.
+function PlayerPanel({ person, role, label, you, testId }) {
+  const lead = person?.members?.[0] || { name: person?.name };
+  const level = person?.skill_level ? String(person.skill_level) : null;
+  const mirror = !you;
+  return (
+    <div className={`p-4 sm:p-[18px] flex gap-3.5 items-start min-w-0 ${mirror ? "sm:flex-row-reverse sm:text-right" : ""}`}
+         style={{ background: you ? GREEN_TINT : GREY }} data-testid={testId}>
+      <Avatar person={lead} size={52} bg={you ? GREEN_D : MUTED} side={mirror ? "right" : "left"} />
+      <div className="min-w-0 flex-1">
+        <div className={`flex flex-wrap items-center gap-2 ${mirror ? "sm:justify-end" : ""}`}>
+          <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: you ? GREEN_D : MUTED }}>{label}</span>
+          {role && <RoleTag role={role} />}
+        </div>
+        <h3 className="text-xl font-bold leading-tight mt-1 break-words" style={{ color: INK }}>{person?.name || "You"}</h3>
         {person?.email && (
-          right ? (
-            <a href={`mailto:${person.email}`} className="block text-xs underline break-all" style={{ color: GREEN }} data-testid={`${testId}-email`}>{person.email}</a>
-          ) : (
-            <p className="text-xs break-all" style={{ color: MUTED }} data-testid={`${testId}-email`}>{person.email}</p>
-          )
+          you
+            ? <p className="text-xs mt-0.5 break-all" style={{ color: MUTED }} data-testid={`${testId}-email`}>{person.email}</p>
+            : <a href={`mailto:${person.email}`} className="block text-xs mt-0.5 underline break-all" style={{ color: GREEN_D }} data-testid={`${testId}-email`}>{person.email}</a>
         )}
-        <div className={`mt-1.5 flex flex-wrap items-center gap-2 ${right ? "sm:justify-end" : ""}`}>
-          {role && (
-            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5"
-                  style={isHome ? { background: GREEN, color: "#fff" } : { border: `1px solid ${INK}`, color: INK }}>
-              {isHome ? "Home" : "Away"}
-            </span>
-          )}
-          <span className="text-xs" style={{ color: MUTED }}>
-            {person?.rating != null ? `Rating ${person.rating}` : "Rating hidden"}{level ? ` · ${level}` : ""}
+        <div className={`mt-2.5 flex items-baseline gap-2 ${mirror ? "sm:flex-row-reverse" : ""}`}>
+          <span className="text-2xl font-semibold leading-none" style={{ fontFamily: MONO, color: INK }}>{person?.rating != null ? person.rating : "—"}</span>
+          <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: MUTED }}>
+            {person?.rating != null ? "Rating" : "Rating hidden"}{level ? ` · ${level}` : ""}
           </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+const STEPS = ["Propose time", "Confirm time", "Play and report"];
+// 1-based step the match is on; steps before it are done
+const stepOf = (m) => (m.state === "not_scheduled" ? 1 : m.state === "awaiting_confirmation" ? 2 : ["scheduled", "in_progress", "awaiting_result"].includes(m.state) ? 3 : 0);
+
+function Stepper({ step }) {
+  return (
+    <div className="px-5 sm:px-6 pt-4" data-testid="match-stepper">
+      <div className="hidden sm:flex items-center">
+        {STEPS.map((label, i) => {
+          const n = i + 1;
+          const done = n < step;
+          const active = n === step;
+          return (
+            <div key={label} className={`flex items-center ${n < 3 ? "flex-1" : ""}`}>
+              <div className="w-[22px] h-[22px] flex items-center justify-center text-xs font-bold shrink-0"
+                   style={done ? { background: GREEN_D, color: "#fff" } : active ? { background: AMBER, color: INK } : { border: "1.5px solid #B5B5B5", color: "#6B6B6B" }}>
+                {done ? <CheckCircle className="w-3 h-3" aria-hidden="true" /> : n}
+              </div>
+              <span className={`mx-2 text-xs whitespace-nowrap ${active ? "font-bold" : ""}`} style={{ color: active ? INK : MUTED }}>{label}</span>
+              {n < 3 && <div className="flex-1 h-0.5" style={{ background: done ? GREEN_D : "#D9D9D9" }} />}
+            </div>
+          );
+        })}
+      </div>
+      <div className="sm:hidden">
+        <div className="flex gap-1">
+          {STEPS.map((l, i) => <div key={l} className="flex-1 h-1" style={{ background: i + 1 < step ? GREEN_D : i + 1 === step ? AMBER : "#D9D9D9" }} />)}
+        </div>
+        <p className="text-xs mt-1.5" style={{ color: MUTED }}><strong style={{ color: INK }}>Step {step} of 3</strong> · {STEPS[step - 1]}</p>
+      </div>
+    </div>
+  );
+}
+
+// "YOUR MOVE", "WAITING", "CONFIRMED": the one thing this match needs from you right now
+function NextBar({ tone, label, children, testId }) {
+  const bg = tone === "move" ? AMBER_TINT : tone === "ok" ? GREEN_TINT : tone === "win" ? GREEN_D : GREY;
+  const color = tone === "win" ? "#fff" : INK;
+  return (
+    <div className="mx-5 sm:mx-6 mt-4 p-4" style={{ background: bg, color }} data-testid={testId}>
+      <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: tone === "ok" ? GREEN_D : color }}>{label}</p>
+      {children}
+    </div>
+  );
+}
+
+function DetailRow({ label, value, testId }) {
+  return (
+    <div className="flex sm:block justify-between gap-3" data-testid={testId}>
+      <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: MUTED }}>{label}</p>
+      <p className="text-sm sm:text-[15px] font-medium sm:mt-0.5 text-right sm:text-left" style={{ color: INK }}>{value}</p>
     </div>
   );
 }
@@ -136,125 +205,148 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
     if (window.confirm("Cancel this confirmed time? The match goes back to Not Scheduled and your opponent is told. It is not a forfeit.")) call("cancel-time", {});
   };
 
-  const inputStyle = { border: "1px solid #D9D9D9", color: INK, fontFamily: "Rubik, sans-serif" };
+  const inputStyle = { border: "1px solid #B5B5B5", color: INK, background: "#fff", fontFamily: "Rubik, sans-serif" };
   const me = m.me || {};
   const buttonBase = "px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50";
   const proposeLabel = !open ? "" : booked ? "Reschedule" : prop && !prop.by_me ? "Suggest another time" : "Schedule match";
 
+  const step = open || m.state === "completed" ? stepOf(m) : 0;
+  const myRole = m.is_playoff ? null : m.role;
+  const oppRole = m.is_playoff ? null : isHome ? "away" : "home";
+  const bigBtn = "inline-block text-center text-[13px] font-bold uppercase tracking-wider px-5 py-3 disabled:opacity-50";
+  const lostOrWon = m.result === "won" ? "YOU WON" : m.result === "lost" ? "YOU LOST" : "RESULT SUBMITTED";
+
   return (
-    <article className="bg-white p-5 sm:p-6" style={{ border: "1px solid #E5E7EB" }} data-testid={`match-card-${m.id}`}>
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: MUTED }} data-testid={`match-number-${m.id}`}>
+    <article className="bg-white pb-5" style={{ border: "1px solid #D9D9D9" }} data-testid={`match-card-${m.id}`}>
+      <div className="flex items-center gap-2 px-5 sm:px-6 py-3.5" style={{ borderBottom: "1px solid #E5E5E5" }}>
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: MUTED }} data-testid={`match-number-${m.id}`}>
           {m.is_playoff ? "Playoff match" : `Match ${m.match_number || m.round}`}
         </span>
-        <span className="ml-auto text-xs font-bold px-2.5 py-1" style={{ background: chip.bg, color: chip.color }} data-testid={`match-status-${m.id}`}>
+        <span className="ml-auto text-xs font-bold pl-3.5 pr-5 py-1.5" style={{ background: chip.bg, color: chip.color, clipPath: "polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)" }} data-testid={`match-status-${m.id}`}>
           {chip.label}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-5" data-testid={`match-title-${m.id}`}>
-        <PlayerSide person={me} role={m.is_playoff ? null : m.role} label="You" testId={`match-me-${m.id}`} />
-        <div className="flex items-center gap-3 sm:block" aria-hidden="true">
-          <div className="h-px flex-1 sm:hidden" style={{ background: "#E5E7EB" }} />
-          <span className="text-sm font-bold tracking-widest" style={{ color: MUTED }}>VS</span>
-          <div className="h-px flex-1 sm:hidden" style={{ background: "#E5E7EB" }} />
-        </div>
-        <PlayerSide person={opp} role={m.is_playoff ? null : isHome ? "away" : "home"} label="Opponent" align="right" testId={`match-opponent-${m.id}`} />
-      </div>
+      {step > 0 && <Stepper step={step} />}
 
-      <div className="mt-4 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm" style={{ borderTop: "1px solid #E5E7EB", color: MUTED }}>
-        <div className="flex items-start gap-2.5" data-testid={`match-when-${m.id}`}>
-          <Calendar className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
-          <div>
-            <p className="font-bold" style={{ color: INK }}>Match date</p>
-            <p>{confirmedTime ? fmtDateTime(m.scheduled_date, tz) : "Not scheduled"}</p>
-            {!confirmedTime && m.deadline && <p className="text-xs">Play by {fmtDate(m.deadline)}</p>}
+      <div className="px-5 sm:px-6 pt-4" data-testid={`match-title-${m.id}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_52px_minmax(0,1fr)] items-stretch">
+          <PlayerPanel person={me} role={myRole} label="You" you testId={`match-me-${m.id}`} />
+          <div className="flex items-center gap-3 sm:justify-center py-2 sm:py-0" aria-hidden="true">
+            <div className="h-px flex-1 sm:hidden" style={{ background: "#D9D9D9" }} />
+            <div className="w-10 h-10 flex items-center justify-center text-[13px] font-bold tracking-wide" style={{ background: AMBER, color: INK }}>VS</div>
+            <div className="h-px flex-1 sm:hidden" style={{ background: "#D9D9D9" }} />
           </div>
-        </div>
-        <div className="flex items-start gap-2.5">
-          <MapPin className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
-          <div>
-            <p className="font-bold" style={{ color: INK }}>Venue / Court</p>
-            <p>{m.venue && confirmedTime ? m.venue : "To be confirmed"}</p>
-          </div>
+          <PlayerPanel person={opp} role={oppRole} label="Opponent" testId={`match-opponent-${m.id}`} />
         </div>
       </div>
-
-      {m.state === "completed" && (
-        <p className="mt-3 text-sm font-semibold" style={{ color: INK }} data-testid={`match-result-${m.id}`}>
-          {m.forfeit
-            ? (m.result === "won" ? "Awarded to you: no time was proposed by the play-by date" : "Awarded to your opponent: no time was proposed by the play-by date")
-            : m.result === "won" ? "You won" : m.result === "lost" ? "You lost" : "Result submitted"}
-          {scored?.scoreStr ? ` · ${scored.scoreStr}` : ""}
-        </p>
-      )}
 
       {m.needs_help && open && !booked && (
-        <p className="mt-4 text-sm p-3" style={{ background: AMBER, color: INK }} data-testid={`needs-help-${m.id}`}>
+        <p className="mx-5 sm:mx-6 mt-4 text-sm p-3" style={{ background: AMBER, color: INK }} data-testid={`needs-help-${m.id}`}>
           This match is due soon and has no confirmed time. The league organizer has been alerted and can help.
         </p>
       )}
 
-      {/* Waiting on Home to make the first proposal */}
-      {m.state === "not_scheduled" && !isHome && (
-        <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>
-          {opp.name} is Home and will propose a date, time and court before the play-by date. You will get an email to confirm.
-        </p>
+      {/* ---- the next step, in one bar ---- */}
+      {m.state === "not_scheduled" && isHome && open && (
+        <NextBar tone="move" label="Your move · You are Home" testId={`next-${m.id}`}>
+          <p className="text-sm mt-1">Propose a date, time and court before <strong>{fmtDate(m.deadline)}</strong>. {opp.name} will confirm or suggest another time.</p>
+          {m.last_decline && (
+            <p className="text-sm mt-2" data-testid={`match-declined-${m.id}`}>
+              {m.last_decline.message ? `Last proposal was declined: "${m.last_decline.message}".` : "The last proposal was declined or expired."} Please propose another time.
+            </p>
+          )}
+          {form !== "propose" && (
+            <button onClick={() => setForm("propose")} className={`${bigBtn} mt-3 w-full sm:w-auto`} style={{ background: AMBER, color: INK }} data-testid={`schedule-match-${m.id}`}>Schedule match</button>
+          )}
+        </NextBar>
       )}
-      {m.state === "not_scheduled" && m.last_decline && (
-        <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }} data-testid={`match-declined-${m.id}`}>
-          {m.last_decline.message ? `Last proposal was declined: "${m.last_decline.message}".` : "The last proposal was declined or expired."} {isHome ? "Please propose another time." : ""}
-        </p>
+      {m.state === "not_scheduled" && !isHome && (
+        <NextBar tone="wait" label="Waiting · Home goes first" testId={`next-${m.id}`}>
+          <p className="text-sm mt-1">{opp.name} is Home and proposes the date, time and court before <strong>{fmtDate(m.deadline)}</strong>. You will get an email to confirm.</p>
+          {m.last_decline && (
+            <p className="text-sm mt-2" data-testid={`match-declined-${m.id}`}>
+              {m.last_decline.message ? `Last proposal was declined: "${m.last_decline.message}".` : "The last proposal was declined or expired."}
+            </p>
+          )}
+        </NextBar>
       )}
 
       {/* A proposal is waiting. It is never shown as a booking. */}
       {prop && (
-        <div className="mt-4 p-4" style={{ border: `1px solid ${prop.can_respond ? GREEN : "#E5E7EB"}` }} data-testid={`proposal-${m.id}`}>
-          <p className="text-sm font-bold mb-1" style={{ color: INK }}>
-            {prop.by_me ? "You proposed" : `${opp.name} ${prop.kind === "reschedule" ? "asked to change the time to" : prop.kind === "counter" ? "suggested" : "proposed"}`}
-            {prop.by_me ? ":" : ":"}
-          </p>
-          <p className="text-sm" style={{ color: INK }}>{fmtDateTime(prop.date, tz)} · {prop.venue}</p>
+        <NextBar tone={prop.can_respond ? "move" : "wait"}
+                 label={prop.can_respond ? `Your move · ${prop.kind === "reschedule" ? `${opp.name} asked to change the time` : prop.kind === "counter" ? `${opp.name} suggested another time` : "Home proposed a time"}` : "Waiting · You proposed"}
+                 testId={`proposal-${m.id}`}>
+          <p className="text-lg font-bold mt-1">{fmtDateTime(prop.date, tz)}</p>
+          <p className="text-sm">{prop.venue}</p>
           {prop.note && <p className="text-sm mt-1" style={{ color: MUTED }}>"{prop.note}"</p>}
-          <p className="text-xs mt-2" style={{ color: MUTED }}>
+          <p className="text-xs mt-1" style={{ color: MUTED }}>
             {prop.by_me ? `Waiting for ${opp.name} to answer.` : "Reply needed."} Expires in {hoursLeft(prop.expires_at)}h.
             {booked ? " Your current booking stays until this is accepted." : ""}
           </p>
           {prop.can_respond && form !== "decline" && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button disabled={busy} onClick={() => call("respond", { action: "confirm" })} className={`${buttonBase} text-white`} style={{ background: GREEN }} data-testid={`confirm-match-${m.id}`}>Confirm</button>
-              <button disabled={busy} onClick={() => { setForm("propose"); setVenue(prop.venue); }} className={buttonBase} style={{ border: `1px solid ${INK}`, color: INK }} data-testid={`suggest-time-${m.id}`}>Suggest another time</button>
-              <button disabled={busy} onClick={() => setForm("decline")} className="px-3 py-2.5 text-sm underline" style={{ color: MUTED }} data-testid={`decline-${m.id}`}>Decline</button>
+            <div className="mt-3 flex flex-col sm:flex-row sm:flex-wrap gap-2">
+              <button disabled={busy} onClick={() => call("respond", { action: "confirm" })} className={bigBtn} style={{ background: GREEN_D, color: "#fff" }} data-testid={`confirm-match-${m.id}`}>Confirm</button>
+              <button disabled={busy} onClick={() => { setForm("propose"); setVenue(prop.venue); }} className={bigBtn} style={{ background: AMBER, color: INK }} data-testid={`suggest-time-${m.id}`}>Suggest another time</button>
+              <button disabled={busy} onClick={() => setForm("decline")} className={bigBtn} style={{ border: `1.5px solid ${INK}`, color: INK, padding: "10.5px 18px" }} data-testid={`decline-${m.id}`}>Decline</button>
             </div>
           )}
           {prop.can_respond && form === "decline" && (
             <div className="mt-3">
               <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`msg-${m.id}`}>Message to {opp.name} (optional)</label>
-              <textarea id={`msg-${m.id}`} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={300} rows={2} className="w-full px-3 py-2 text-sm" style={inputStyle} placeholder="e.g. I can play weekday evenings after 6pm" data-testid={`decline-message-${m.id}`} />
+              <textarea id={`msg-${m.id}`} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={300} rows={2} className="w-full px-3 py-2 text-sm bg-white" style={inputStyle} placeholder="e.g. I can play weekday evenings after 6pm" data-testid={`decline-message-${m.id}`} />
               <div className="mt-2 flex gap-2">
-                <button disabled={busy} onClick={() => call("respond", { action: "decline", message })} className={buttonBase} style={{ background: AMBER, color: INK }} data-testid={`send-decline-${m.id}`}>Send</button>
+                <button disabled={busy} onClick={() => call("respond", { action: "decline", message })} className={bigBtn} style={{ background: AMBER, color: INK }} data-testid={`send-decline-${m.id}`}>Send</button>
                 <button onClick={() => setForm(null)} className="px-4 py-2.5 text-sm underline" style={{ color: MUTED }}>Cancel</button>
               </div>
             </div>
           )}
           {prop.by_me && form !== "propose" && (
-            <button onClick={() => setForm("propose")} className="mt-2 text-sm underline font-semibold" style={{ color: GREEN }} data-testid={`change-proposal-${m.id}`}>Change my proposal</button>
+            <button onClick={() => setForm("propose")} className="mt-2 text-sm underline font-semibold" style={{ color: GREEN_D }} data-testid={`change-proposal-${m.id}`}>Change my proposal</button>
           )}
-        </div>
+        </NextBar>
       )}
 
-      {/* First proposal (Home) */}
-      {open && m.state === "not_scheduled" && isHome && form !== "propose" && (
-        <button onClick={() => setForm("propose")} className={`mt-4 ${buttonBase}`} style={{ background: AMBER, color: INK }} data-testid={`schedule-match-${m.id}`}>Schedule match</button>
+      {/* Confirmed */}
+      {booked && !prop && m.state === "scheduled" && (
+        <NextBar tone="ok" label={`Confirmed · ${fmtDateTime(m.scheduled_date, tz).split(",").slice(0, 2).join(",")}`} testId={`next-${m.id}`}>
+          <p className="text-xl font-bold mt-0.5">{new Date(m.scheduled_date).toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", timeZoneName: "short" })}</p>
+          {m.venue && <p className="text-sm">{m.venue}</p>}
+        </NextBar>
       )}
 
-      {/* Confirmed: change or cancel the time (either player, until 24 hours before) */}
+      {/* Match day or past: report the score */}
+      {(m.state === "in_progress" || m.state === "awaiting_result") && (
+        <NextBar tone="move" label={m.state === "in_progress" ? "Match day" : "Awaiting result · Report the score"} testId={`next-${m.id}`}>
+          <p className="text-lg font-bold mt-1">{fmtDateTime(m.scheduled_date, tz)}</p>
+          {m.venue && <p className="text-sm">{m.venue}</p>}
+          <Link to={`/matches/${m.id}/score`} className={`${bigBtn} mt-3 w-full sm:w-auto inline-flex items-center justify-center gap-2`} style={{ background: AMBER, color: INK }} data-testid={`report-score-${m.id}`}>
+            <CheckCircle className="w-4 h-4" /> Report score
+          </Link>
+        </NextBar>
+      )}
+
+      {m.state === "completed" && (
+        <NextBar tone={m.result === "won" ? "win" : "wait"} label={`Result · ${lostOrWon}`} testId={`match-result-${m.id}`}>
+          {m.forfeit ? (
+            <p className="text-sm mt-1">{m.result === "won" ? "Awarded to you: no time was proposed by the play-by date." : "Awarded to your opponent: no time was proposed by the play-by date."}</p>
+          ) : scored?.scoreStr ? (
+            <p className="text-xl font-semibold mt-1" style={{ fontFamily: MONO }}>{scored.scoreStr}</p>
+          ) : null}
+        </NextBar>
+      )}
+
+      {m.state === "disputed" && <p className="mx-5 sm:mx-6 mt-4 text-sm p-3" style={{ background: GREY, color: INK }}>A dispute is open on this match. The league organizer is reviewing it.</p>}
+      {m.state === "cancelled" && <p className="mx-5 sm:mx-6 mt-4 text-sm p-3" style={{ background: GREY, color: INK }}>This match was cancelled or ended as a walkover.</p>}
+
+      {/* Change or cancel a confirmed time (either player, until 24 hours before) */}
       {open && booked && !prop && (
-        <div className="mt-4 flex flex-wrap items-center gap-4">
+        <div className="mx-5 sm:mx-6 mt-3 flex flex-wrap items-center gap-4">
           {m.can_change ? (
             <>
-              <button onClick={() => setForm("propose")} className="text-sm underline font-semibold" style={{ color: GREEN }} data-testid={`reschedule-${m.id}`}>Reschedule</button>
-              <button onClick={cancelTime} disabled={busy} className="text-sm underline font-semibold disabled:opacity-50" style={{ color: MUTED }} data-testid={`cancel-time-${m.id}`}>Cancel time</button>
+              <span className="text-xs" style={{ color: MUTED }}>Need to change it? You can until 24 hours before.</span>
+              <button onClick={() => setForm("propose")} className="text-sm underline font-bold" style={{ color: GREEN_D }} data-testid={`reschedule-${m.id}`}>Reschedule</button>
+              <button onClick={cancelTime} disabled={busy} className="text-sm underline font-bold disabled:opacity-50" style={{ color: INK }} data-testid={`cancel-time-${m.id}`}>Cancel time</button>
             </>
           ) : (
             <p className="text-xs" style={{ color: MUTED }}>Within 24 hours of the match only the organizer can change the time. Email feedback@venlaxsports.com.</p>
@@ -262,21 +354,24 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
         </div>
       )}
 
-      {/* Match day or past: report the score */}
-      {(m.state === "in_progress" || m.state === "awaiting_result") && (
-        <div className="mt-4">
-          <Link to={`/matches/${m.id}/score`} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white" style={{ background: GREEN }} data-testid={`report-score-${m.id}`}>
-            <CheckCircle className="w-4 h-4" /> Report score
-          </Link>
+      {/* date, venue, deadline: always the same three labels */}
+      {m.state !== "completed" && !m.is_playoff && (
+        <div className="mx-5 sm:mx-6 mt-4 pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" style={{ borderTop: "1px solid #E5E5E5" }}>
+          <DetailRow label="Match date" value={confirmedTime ? fmtDateTime(m.scheduled_date, tz) : prop ? "Not confirmed yet" : "Not scheduled"} testId={`match-when-${m.id}`} />
+          <DetailRow label="Venue / Court" value={m.venue && confirmedTime ? m.venue : "To be confirmed"} />
+          <DetailRow label="Play by" value={m.deadline ? fmtDate(m.deadline) : "—"} />
+        </div>
+      )}
+      {(m.state === "completed" || m.is_playoff) && (
+        <div className="mx-5 sm:mx-6 mt-4 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" style={{ borderTop: "1px solid #E5E5E5" }}>
+          <DetailRow label="Match date" value={confirmedTime ? fmtDateTime(m.scheduled_date, tz) : "Not scheduled"} testId={`match-when-${m.id}`} />
+          <DetailRow label="Venue / Court" value={m.venue && confirmedTime ? m.venue : "To be confirmed"} />
         </div>
       )}
 
-      {m.state === "disputed" && <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>A dispute is open on this match. The league organizer is reviewing it.</p>}
-      {m.state === "cancelled" && <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>This match was cancelled or ended as a walkover.</p>}
-
       {/* Proposal form: first proposal, counter-proposal or change request */}
       {form === "propose" && (
-        <form onSubmit={submitProposal} className="mt-4 p-4 space-y-3" style={{ border: "1px solid #E5E7EB" }} data-testid={`propose-form-${m.id}`}>
+        <form onSubmit={submitProposal} className="mx-5 sm:mx-6 mt-4 p-4 space-y-3" style={{ border: "1px solid #E5E7EB" }} data-testid={`propose-form-${m.id}`}>
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: INK }}>{proposeLabel || "Propose a time"}</p>
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: MUTED }} htmlFor={`when-${m.id}`}>Date and time ({tzAbbr})</label>
@@ -300,10 +395,10 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
         </form>
       )}
 
-      {error && <p className="mt-3 text-sm" style={{ color: "#B42318" }} role="alert" data-testid={`match-error-${m.id}`}>{error}</p>}
+      {error && <p className="mx-5 sm:mx-6 mt-3 text-sm" style={{ color: "#B42318" }} role="alert" data-testid={`match-error-${m.id}`}>{error}</p>}
 
       {m.history?.length > 0 && (
-        <div className="mt-4 pt-3" style={{ borderTop: "1px solid #F1F1F1" }}>
+        <div className="mx-5 sm:mx-6 mt-4 pt-3" style={{ borderTop: "1px solid #F1F1F1" }}>
           <button onClick={() => setShowHistory((v) => !v)} className="text-xs underline" style={{ color: MUTED }} aria-expanded={showHistory} data-testid={`history-toggle-${m.id}`}>
             {showHistory ? "Hide" : "Show"} scheduling history ({m.history.length})
           </button>
