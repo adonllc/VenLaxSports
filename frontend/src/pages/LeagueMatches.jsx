@@ -60,6 +60,33 @@ function Avatar({ person, size = 48 }) {
   );
 }
 
+function PlayerSide({ person, role, label, align, testId }) {
+  const lead = person?.members?.[0] || { name: person?.name };
+  const isHome = role === "home";
+  const level = person?.skill_level ? String(person.skill_level) : null;
+  const right = align === "right";
+  return (
+    <div className={`flex items-center gap-3 min-w-0 ${right ? "sm:flex-row-reverse sm:text-right" : ""}`} data-testid={testId}>
+      <Avatar person={lead} size={52} />
+      <div className="min-w-0">
+        <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: MUTED }}>{label}</p>
+        <h3 className="text-lg font-bold leading-tight break-words" style={{ color: INK }}>{person?.name || "You"}</h3>
+        <div className={`mt-1.5 flex flex-wrap items-center gap-2 ${right ? "sm:justify-end" : ""}`}>
+          {role && (
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5"
+                  style={isHome ? { background: GREEN, color: "#fff" } : { border: `1px solid ${INK}`, color: INK }}>
+              {isHome ? "Home" : "Away"}
+            </span>
+          )}
+          <span className="text-xs" style={{ color: MUTED }}>
+            {person?.rating != null ? `Rating ${person.rating}` : "Rating hidden"}{level ? ` · ${level}` : ""}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MatchCard({ m, tz, tzAbbr, onChanged }) {
   const [form, setForm] = useState(null);   // null | "propose" | "decline"
   const [when, setWhen] = useState("");
@@ -72,7 +99,6 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
   const chip = chipFor(m);
   const isHome = m.role === "home";
   const opp = m.opponent;
-  const first = opp.members?.[0] || { name: opp.name };
   const scored = m.state === "completed" ? buildScoreSummary(m.sport, m.score_data || {}, m.player1_name, m.player2_name) : null;
   const booked = m.schedule_status === "scheduled";
   const confirmedTime = ["scheduled", "in_progress", "awaiting_result", "completed"].includes(m.state);
@@ -105,9 +131,6 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
 
   const inputStyle = { border: "1px solid #D9D9D9", color: INK, fontFamily: "Rubik, sans-serif" };
   const me = m.me || {};
-  const myName = me.name || "You";
-  const level = (p) => (p.skill_level ? String(p.skill_level) : "");
-  const rating = `Rating ${me.rating ?? "—"} vs ${opp.rating ?? "—"}` + (level(me) || level(opp) ? ` · ${level(me) || "—"} vs ${level(opp) || "—"}` : "");
   const buttonBase = "px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50";
   const proposeLabel = !open ? "" : booked ? "Reschedule" : prop && !prop.by_me ? "Suggest another time" : "Schedule match";
 
@@ -122,35 +145,39 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
         </span>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Avatar person={first} />
-        <div className="min-w-0">
-          <h3 className="text-xl font-bold leading-tight" style={{ color: INK }} data-testid={`match-title-${m.id}`}>
-            {myName} <span className="text-sm font-bold" style={{ color: MUTED }}>VS</span> {opp.name}
-          </h3>
-          <p className="text-xs mt-0.5" style={{ color: MUTED }} data-testid={`opponent-rating-${m.id}`}>
-            {!m.is_playoff && <strong className="mr-1.5 px-2 py-0.5 uppercase tracking-wider" style={isHome ? { background: GREEN, color: "#fff" } : { border: `1px solid ${INK}`, color: INK }} data-testid={`match-role-${m.id}`}>{isHome ? "Home" : "Away"}</strong>}
-            {rating}
-          </p>
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-5" data-testid={`match-title-${m.id}`}>
+        <PlayerSide person={me} role={m.is_playoff ? null : m.role} label="You" testId={`match-me-${m.id}`} />
+        <div className="flex items-center gap-3 sm:block" aria-hidden="true">
+          <div className="h-px flex-1 sm:hidden" style={{ background: "#E5E7EB" }} />
+          <span className="text-sm font-bold tracking-widest" style={{ color: MUTED }}>VS</span>
+          <div className="h-px flex-1 sm:hidden" style={{ background: "#E5E7EB" }} />
         </div>
+        <PlayerSide person={opp} role={m.is_playoff ? null : isHome ? "away" : "home"} label="Opponent" align="right" testId={`match-opponent-${m.id}`} />
       </div>
 
-      <ul className="mt-3 space-y-1.5 text-sm" style={{ color: MUTED }}>
+      <div className="mt-4 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm" style={{ borderTop: "1px solid #E5E7EB", color: MUTED }}>
+        <div className="flex items-start gap-2.5" data-testid={`match-when-${m.id}`}>
+          <Calendar className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
+          <div>
+            <p className="font-bold" style={{ color: INK }}>Match date</p>
+            <p>{confirmedTime ? fmtDateTime(m.scheduled_date, tz) : "Not scheduled"}</p>
+            {!confirmedTime && m.deadline && <p className="text-xs">Play by {fmtDate(m.deadline)}</p>}
+          </div>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <MapPin className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
+          <div>
+            <p className="font-bold" style={{ color: INK }}>Venue / Court</p>
+            <p>{m.venue && confirmedTime ? m.venue : "To be confirmed"}</p>
+          </div>
+        </div>
         {opp.email && (
-          <li className="flex items-center gap-2">
-            <Mail className="w-4 h-4 shrink-0" style={{ color: GREEN }} />
-            <a href={`mailto:${opp.email}`} className="underline" style={{ color: GREEN }}>{opp.email}</a>
-          </li>
+          <div className="flex items-start gap-2.5 sm:col-span-2">
+            <Mail className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
+            <a href={`mailto:${opp.email}`} className="underline break-all" style={{ color: GREEN }}>{opp.email}</a>
+          </div>
         )}
-        {confirmedTime ? (
-          <li className="flex items-center gap-2" data-testid={`match-when-${m.id}`}><Calendar className="w-4 h-4 shrink-0" style={{ color: GREEN }} />{fmtDateTime(m.scheduled_date, tz)}</li>
-        ) : m.deadline ? (
-          <li className="flex items-center gap-2"><Clock className="w-4 h-4 shrink-0" style={{ color: GREEN }} />Play by {fmtDate(m.deadline)}</li>
-        ) : null}
-        {m.venue && confirmedTime && (
-          <li className="flex items-center gap-2"><MapPin className="w-4 h-4 shrink-0" style={{ color: GREEN }} />{m.venue}</li>
-        )}
-      </ul>
+      </div>
 
       {m.state === "completed" && (
         <p className="mt-3 text-sm font-semibold" style={{ color: INK }} data-testid={`match-result-${m.id}`}>
