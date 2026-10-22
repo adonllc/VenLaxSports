@@ -97,11 +97,11 @@ async def my_league_matches(league_id: str, request: Request):
     disputed = {d["match_id"] for d in open_disputes}
     now = datetime.now(timezone.utc)
 
-    def opponent_view(m: dict, other: int) -> dict:
+    def opponent_view(m: dict, other: int, own: bool = False) -> dict:
         members = []
         for i in _side_ids(m, other):
             u = users.get(i, {})
-            shown = u.get("profile_public", True)
+            shown = own or u.get("profile_public", True)  # your own details are always visible to you
             members.append({
                 "name": u.get("name", ""),
                 "avatar": u.get("avatar") if shown else None,
@@ -137,6 +137,7 @@ async def my_league_matches(league_id: str, request: Request):
             "role": "home" if mine == 1 else "away",
             "state": match_view.match_state(m, now, disputed),
             "opponent": opponent_view(m, other),
+            "me": opponent_view(m, mine, own=True),
             "partner_name": _side_label(m, mine) if len(_side_ids(m, mine)) > 1 else None,
             "deadline": m.get("deadline"), "schedule_status": m.get("schedule_status"),
             "scheduled_date": m.get("scheduled_date"), "venue": m.get("venue"),

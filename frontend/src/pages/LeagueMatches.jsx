@@ -104,7 +104,10 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
   };
 
   const inputStyle = { border: "1px solid #D9D9D9", color: INK, fontFamily: "Rubik, sans-serif" };
-  const rating = [opp.rating != null ? `Rating ${opp.rating}` : null, opp.skill_level].filter(Boolean).join(" · ");
+  const me = m.me || {};
+  const myName = me.name || "You";
+  const level = (p) => (p.skill_level ? String(p.skill_level) : "");
+  const rating = `Rating ${me.rating ?? "—"} vs ${opp.rating ?? "—"}` + (level(me) || level(opp) ? ` · ${level(me) || "—"} vs ${level(opp) || "—"}` : "");
   const buttonBase = "px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50";
   const proposeLabel = !open ? "" : booked ? "Reschedule" : prop && !prop.by_me ? "Suggest another time" : "Schedule match";
 
@@ -114,15 +117,6 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
         <span className="text-xs font-bold uppercase tracking-wider" style={{ color: MUTED }} data-testid={`match-number-${m.id}`}>
           {m.is_playoff ? "Playoff match" : `Match ${m.match_number || m.round}`}
         </span>
-        {!m.is_playoff && (
-          <span
-            className="text-xs font-bold uppercase tracking-wider px-2.5 py-1"
-            style={isHome ? { background: GREEN, color: "#fff" } : { border: `1px solid ${INK}`, color: INK }}
-            data-testid={`match-role-${m.id}`}
-          >
-            {isHome ? "Home" : "Away"}
-          </span>
-        )}
         <span className="ml-auto text-xs font-bold px-2.5 py-1" style={{ background: chip.bg, color: chip.color }} data-testid={`match-status-${m.id}`}>
           {chip.label}
         </span>
@@ -131,8 +125,13 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
       <div className="flex items-center gap-3">
         <Avatar person={first} />
         <div className="min-w-0">
-          <h3 className="text-xl font-bold leading-tight" style={{ color: INK }}>{m.partner_name ? `${m.partner_name} vs ${opp.name}` : `vs ${opp.name}`}</h3>
-          {rating && <p className="text-xs mt-0.5" style={{ color: MUTED }} data-testid={`opponent-rating-${m.id}`}>{rating}</p>}
+          <h3 className="text-xl font-bold leading-tight" style={{ color: INK }} data-testid={`match-title-${m.id}`}>
+            {myName} <span className="text-sm font-bold" style={{ color: MUTED }}>VS</span> {opp.name}
+          </h3>
+          <p className="text-xs mt-0.5" style={{ color: MUTED }} data-testid={`opponent-rating-${m.id}`}>
+            {!m.is_playoff && <strong className="mr-1.5 px-2 py-0.5 uppercase tracking-wider" style={isHome ? { background: GREEN, color: "#fff" } : { border: `1px solid ${INK}`, color: INK }} data-testid={`match-role-${m.id}`}>{isHome ? "Home" : "Away"}</strong>}
+            {rating}
+          </p>
         </div>
       </div>
 

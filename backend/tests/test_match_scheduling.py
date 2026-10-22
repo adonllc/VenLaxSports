@@ -231,6 +231,8 @@ def test_my_matches_card_shows_time_zone_history_and_who_can_respond(sent, monke
     card = next(c for c in page["matches"] if c["id"] == str(m["_id"]))
     assert card["state"] == "awaiting_confirmation" and card["proposal"]["can_respond"] and not card["proposal"]["by_me"]
     assert card["history"][-1]["action"] == "proposed" and card["history"][-1]["by_name"]
+    assert card["me"]["name"] == next(u for u in db.users.docs if str(u["_id"]) == away)["name"]
+    assert card["me"]["name"] != card["opponent"]["name"]
     as_user(monkeypatch, db, home)
     card_h = next(c for c in run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["matches"] if c["id"] == str(m["_id"]))
     assert card_h["proposal"]["by_me"] and not card_h["proposal"]["can_respond"]
