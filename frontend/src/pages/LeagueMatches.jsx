@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, Calendar, MapPin, Mail, CheckCircle, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, CheckCircle, Clock } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { buildScoreSummary } from "../utils/scoreSummary";
@@ -71,6 +71,13 @@ function PlayerSide({ person, role, label, align, testId }) {
       <div className="min-w-0">
         <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: MUTED }}>{label}</p>
         <h3 className="text-lg font-bold leading-tight break-words" style={{ color: INK }}>{person?.name || "You"}</h3>
+        {person?.email && (
+          right ? (
+            <a href={`mailto:${person.email}`} className="block text-xs underline break-all" style={{ color: GREEN }} data-testid={`${testId}-email`}>{person.email}</a>
+          ) : (
+            <p className="text-xs break-all" style={{ color: MUTED }} data-testid={`${testId}-email`}>{person.email}</p>
+          )
+        )}
         <div className={`mt-1.5 flex flex-wrap items-center gap-2 ${right ? "sm:justify-end" : ""}`}>
           {role && (
             <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5"
@@ -171,12 +178,6 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
             <p>{m.venue && confirmedTime ? m.venue : "To be confirmed"}</p>
           </div>
         </div>
-        {opp.email && (
-          <div className="flex items-start gap-2.5 sm:col-span-2">
-            <Mail className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GREEN }} />
-            <a href={`mailto:${opp.email}`} className="underline break-all" style={{ color: GREEN }}>{opp.email}</a>
-          </div>
-        )}
       </div>
 
       {m.state === "completed" && (
