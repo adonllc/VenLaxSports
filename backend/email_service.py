@@ -104,10 +104,9 @@ def _wrap(title: str, body_html: str, cta_label: Optional[str] = None, cta_url: 
     return f"""
     <div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f7f8;padding:32px">
       <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
-        <div style="background:#000;padding:20px 24px">
-          <div style="color:#fff;font-weight:900;font-size:20px;letter-spacing:-0.5px">
-            VENLAX <span style="color:#10b981">Sports</span>
-          </div>
+        <div style="background:#1D1D1D;padding:12px 18px">
+          <img src="https://venlaxsports.com/email-logo.png" width="220" height="54" alt="VenLax Sports"
+               style="display:block;border:0;width:220px;height:auto;color:#fff;font-weight:900;font-size:20px">
         </div>
         <div style="padding:28px 24px;color:#111">
           <h1 style="font-size:20px;margin:0 0 14px;font-weight:800">{title}</h1>
