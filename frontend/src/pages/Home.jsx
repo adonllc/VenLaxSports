@@ -28,15 +28,15 @@ const fadeUp = {
 
 // ---------------------------------------------------------------- content
 const FEATURES = [
-  { slug: "skill", icon: Target, title: "Skill-matched leagues", body: "A rating from 2.0 to 5.0+ puts you against players at your level, and moves after every result.", to: "/tennis-pickleball-leagues" },
-  { slug: "types", icon: LayoutGrid, title: "Four league types", body: "Flex, Round Robin, Box and Challenge Ladder. Pick the rhythm that suits your week.", to: "/leagues" },
-  { slug: "formats", icon: Users, title: "Singles, doubles and mixed", body: "Play solo or with a partner. Invite your partner by email or search for them in the app.", to: "/leagues" },
-  { slug: "scoring", icon: CalendarCheck, title: "Easy scheduling and scoring", body: "Agree a time with your opponent, play, then report the score. Disputes have a clear process.", to: "/rules" },
-  { slug: "standings", icon: Trophy, title: "Live standings and playoffs", body: "Points update as scores come in. The top players move on to a playoff bracket.", to: "/leagues" },
-  { slug: "profile", icon: UserCircle, title: "Your rating and profile", body: "Track your rating history, follow other players and share a public profile.", to: "/auth" },
-  { slug: "cards", icon: Share2, title: "Shareable match cards", body: "Every result becomes a card with the score and your rating change, ready to post.", to: "/auth" },
-  { slug: "rewards", icon: Gift, title: "Rewards and referrals", body: "Bring a friend and you both get $5 in credit toward your next league.", to: "/rewards" },
-  { slug: "safe", icon: ShieldCheck, title: "Safe and fair play", body: "Digital waiver, parental consent for minors, two-factor sign-in and a dispute process.", to: "/terms" },
+  { slug: "skill", icon: Target, title: "Skill-matched leagues", body: "Your rating matches you with players at your level and updates every match.", to: "/tennis-pickleball-leagues" },
+  { slug: "types", icon: LayoutGrid, title: "Four league types", body: "Flex, Round Robin, Box and Challenge Ladder. Pick the rhythm for your week.", to: "/leagues" },
+  { slug: "formats", icon: Users, title: "Singles, doubles and mixed", body: "Play solo or with a partner. Invite them by email or find them in the app.", to: "/leagues" },
+  { slug: "scoring", icon: CalendarCheck, title: "Easy scheduling and scoring", body: "Agree a time, play, then report the score. Disputes have a clear process.", to: "/rules" },
+  { slug: "standings", icon: Trophy, title: "Live standings and playoffs", body: "Points update as scores come in. Top players advance to a playoff bracket.", to: "/leagues" },
+  { slug: "profile", icon: UserCircle, title: "Your rating and profile", body: "Track your rating history, follow players and share a public profile.", to: "/auth" },
+  { slug: "cards", icon: Share2, title: "Shareable match cards", body: "Every result becomes a card with the score and rating change, ready to post.", to: "/auth" },
+  { slug: "rewards", icon: Gift, title: "Rewards and referrals", body: "Bring a friend and you both get $5 credit toward your next league.", to: "/rewards" },
+  { slug: "safe", icon: ShieldCheck, title: "Safe and fair play", body: "Digital waiver, parental consent for minors, 2FA sign-in and fair disputes.", to: "/terms" },
 ];
 
 const LEAGUE_TYPES = [
@@ -207,16 +207,18 @@ export default function Home() {
         {/* 2. EVERYTHING IN ONE PLACE */}
         <Section tint>
           <Heading eyebrow="The platform" title="Everything you need, in one place" lead="From finding a league to sharing your result, here is what VenLax gives every player." />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {FEATURES.map((f, i) => (
               <motion.div key={f.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }}>
-                <Link to={f.to} className="group block h-full bg-white p-7 transition-shadow hover:shadow-lg" data-testid={`home-feature-${f.slug}`}>
-                  <div className="w-12 h-12 flex items-center justify-center mb-5" style={{ background: GREEN }}>
-                    <f.icon className="w-6 h-6 text-white" aria-hidden="true" />
+                <Link to={f.to} className="group flex flex-col h-full bg-white p-6 transition-shadow hover:shadow-lg" data-testid={`home-feature-${f.slug}`}>
+                  <div className="flex items-center gap-3.5 mb-3">
+                    <div className="w-11 h-11 shrink-0 flex items-center justify-center" style={{ background: GREEN }}>
+                      <f.icon className="w-5 h-5 text-white" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-bold text-xl leading-tight" style={{ color: INK }}>{f.title}</h3>
                   </div>
-                  <h3 className="font-bold text-xl mb-2" style={{ color: INK }}>{f.title}</h3>
-                  <p className="text-base leading-snug">{f.body}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold" style={{ color: GREEN }}>
+                  <p className="text-[15px] leading-snug flex-grow">{f.body}</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold" style={{ color: "#00765C" }}>
                     Learn more <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                   </span>
                 </Link>
