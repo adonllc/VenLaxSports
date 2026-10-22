@@ -92,7 +92,8 @@ def _html_to_text(html: str) -> str:
     return txt.strip()
 
 
-def _wrap(title: str, body_html: str, cta_label: Optional[str] = None, cta_url: Optional[str] = None) -> str:
+def _wrap(title: str, body_html: str, cta_label: Optional[str] = None, cta_url: Optional[str] = None,
+          footer_html: Optional[str] = None) -> str:
     cta_block = ""
     if cta_label and cta_url:
         cta_block = (
@@ -113,7 +114,7 @@ def _wrap(title: str, body_html: str, cta_label: Optional[str] = None, cta_url: 
           <div style="font-size:14px;line-height:1.6;color:#374151">{body_html}</div>
           {cta_block}
           <p style="font-size:12px;color:#9ca3af;margin-top:28px;border-top:1px solid #f3f4f6;padding-top:16px">
-            You received this email from {APP_NAME}. You can disable notifications from your dashboard.
+            {footer_html or f"You received this email from {APP_NAME}. You can disable notifications from your dashboard."}
           </p>
         </div>
       </div>
@@ -548,6 +549,37 @@ async def send_credit_expiry_reminder(to: str, player_name: str, balance: float,
         f"Your ${balance:.2f} credit expires {expiry_label}",
         _wrap("Credit expiring soon", body, "Browse leagues", f"{frontend_url}/leagues"),
     )
+
+
+LAUNCH_ADDRESS = "VenLax Sports, Atlanta, GA 30350, United States"
+
+
+async def send_launch_announcement(to: str, first_name: str, unsubscribe_url: str) -> bool:
+    """One-time 'we are live' email to the waitlist. Returns True when sent."""
+    site = _get_frontend_url() or "https://www.venlaxsports.com"
+    hi = f"Hi {first_name}," if first_name else "Hi there,"
+    body = f"""
+      <p>{hi}</p>
+      <p><strong>The wait is over. VenLax Sports is LIVE!</strong> 🎾🏓</p>
+      <p>You joined our waitlist because you are ready to play, compete, and take your game to the next level. Now it is time to get started!</p>
+      <p>Your next match could be more than just a game. It could be the start of your ranking journey.</p>
+      <p><strong>Here is what you can do on VenLax Sports:</strong></p>
+      <ul style="padding-left:18px;margin:0 0 16px">
+        <li>🎾 Compete in Tennis and Pickleball</li>
+        <li>📊 Track your matches and results</li>
+        <li>🏆 Build your ranking as you play</li>
+        <li>🚀 Keep improving and climb the ranks, on your own time</li>
+      </ul>
+      <p><strong>Your next move? Sign up free.</strong></p>
+      <p>Your account is ready when you are. Complete your sign-up and join the VenLax Sports community today. Season entry from $9.99.</p>
+      <p>No waiting. No excuses. Just you, your game, and your next challenge.</p>
+      <p><strong>VenLax Sports</strong><br>Earn Your Rank on Your Own Time.</p>
+      <p>See you on the court!<br>Team VenLax Sports</p>
+    """
+    footer = (f"You are receiving this because you joined the VenLax Sports waitlist. "
+              f'<a href="{unsubscribe_url}" style="color:#6b7280">Unsubscribe</a><br>{LAUNCH_ADDRESS}')
+    html = _wrap("VenLax Sports is LIVE!", body, "Sign up free", site, footer_html=footer)
+    return await send_email(to, "The wait is over. VenLax Sports is LIVE! 🎾🏓", html)
 
 
 async def send_early_access_confirmed(to: str) -> None:

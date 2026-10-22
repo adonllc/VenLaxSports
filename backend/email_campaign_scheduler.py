@@ -67,7 +67,7 @@ async def send_weekly_campaign(db) -> None:
     # them up 2 spots per referral, floored at #1.
     frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
     waitlist_entries = await db.waitlist.find(
-        {}, {"email": 1, "queue_referrals": 1}
+        {"unsubscribed_at": {"$exists": False}}, {"email": 1, "queue_referrals": 1}
     ).sort("created_at", 1).to_list(None)
 
     sent_waitlist = 0

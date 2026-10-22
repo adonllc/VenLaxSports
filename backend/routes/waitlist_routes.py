@@ -1,4 +1,6 @@
+from bson import ObjectId
 from fastapi import APIRouter, Request, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from auth_utils import get_current_user
@@ -49,6 +51,27 @@ async def join_waitlist(entry: WaitlistEntry, request: Request):
         "already_registered": False,
         "waitlist_id": str(result.inserted_id),
     }
+
+
+@router.get("/unsubscribe", response_class=HTMLResponse)
+async def unsubscribe(request: Request, token: str):
+    """One-click unsubscribe from waitlist emails (linked from the launch announcement)."""
+    import launch_announcement
+    db = request.app.state.db
+    wid = launch_announcement.decode_unsub_token(token)
+    ok = False
+    if wid:
+        try:
+            res = await db.waitlist.update_one({"_id": ObjectId(wid)},
+                                               {"$set": {"unsubscribed_at": datetime.now(timezone.utc).isoformat()}})
+            ok = res.matched_count > 0
+        except Exception:
+            ok = False
+    msg = "You have been unsubscribed. You will not get more waitlist emails from VenLax Sports." if ok else \
+          "This unsubscribe link is not valid. Reply to any of our emails and we will remove you."
+    return HTMLResponse(f"<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
+                        f"<body style='font-family:system-ui,sans-serif;max-width:480px;margin:15vh auto;padding:0 16px;color:#3D3D3D'>"
+                        f"<h2>VenLax Sports</h2><p>{msg}</p></body>")
 
 
 @router.get("/count")
