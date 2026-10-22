@@ -55,8 +55,8 @@ const PRICING = [
 const SEASON = [
   { step: "Join", body: "Pick your sport, city, format and level." },
   { step: "Get matched", body: "You are placed in a league with players near your rating." },
-  { step: "Schedule", body: "Contact your opponent within 48 hours and agree a time." },
-  { step: "Play", body: "Each match has a 7-day window." },
+  { step: "Schedule", body: "Home proposes a date, time and court before the play-by date. Away confirms or suggests another time." },
+  { step: "Play", body: "Play by the date shown on your match." },
   { step: "Report", body: "The winner reports the score. Your rating updates." },
   { step: "Playoffs", body: "Top 4 (or top 8 in bigger leagues) go to the playoffs." },
 ];

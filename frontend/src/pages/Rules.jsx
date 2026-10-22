@@ -26,11 +26,11 @@ const VENLAX_RULES = [
     title: "Season & Scheduling",
     items: [
       "5–7 matches over 6–8 weeks.",
-      "Each match has 7-day window. Contact opponent within 48 hours.",
+      "Home proposes the date, time and court before the play-by date. Away confirms or suggests another time.",
       "Offer 3+ time slots. Higher seed books court & provides balls.",
       "Confirm 24 hours before match.",
       "15+ min late = forfeit. Cancel <2 hrs before = forfeit.",
-      "No response within 48 hours = walkover to opponent.",
+      "If Home has not proposed a time by the play-by date, the match may be awarded to Away.",
     ],
   },
   {
@@ -134,8 +134,8 @@ const FORMAT_CARDS = [
 // so there's nothing here that isn't already stated on the page.
 const RULES_FAQ = [
   { q: "What is the match format?", a: "Best of 3 sets. Sets to 6 games, win by 2. At 6–6 in any set it's a 7-point tiebreak (win by 2)." },
-  { q: "How long does each match round last?", a: "Each match has a 7-day window, and you must contact your opponent within 48 hours to schedule it." },
-  { q: "What happens if my opponent doesn't respond?", a: "No response within 48 hours results in a walkover to the opponent." },
+  { q: "How long does each match round last?", a: "Each match has a play-by date. The Home player proposes a date, time and court before then, and the Away player confirms or suggests another time." },
+  { q: "What happens if my opponent doesn't respond?", a: "If the Home player has not proposed a time by the play-by date, the match may be awarded to the Away player." },
   { q: "How are rankings calculated?", a: "Points = 3(Wins) + 1(Losses) + 0.5(Set Δ) + 0.1(Game Δ) + Bonus, with bonus points for playing every match and for straight-set wins or close 3-set losses." },
   { q: "Who qualifies for playoffs?", a: "The top 4 players qualify in leagues with 12 or fewer players, or the top 8 in leagues with more than 12." },
 ];

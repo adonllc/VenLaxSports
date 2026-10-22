@@ -213,7 +213,7 @@ export default function ScoreReport() {
       <div className="min-h-screen bg-gray-50" data-testid="score-report-page">
         <div className="max-w-xl mx-auto px-4 py-8 space-y-4">
           {/* Result confirmation */}
-          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
+          <div className="bg-white border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-none overflow-hidden">
             <div className={`h-1.5 w-full ${config.accentClass}`} />
             <div className="p-8 text-center">
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${config.accentClass}`}>
@@ -296,7 +296,7 @@ export default function ScoreReport() {
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
+          <div className="bg-white border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-none overflow-hidden">
             <div className={`h-1.5 w-full ${config.accentClass}`} />
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -331,7 +331,7 @@ export default function ScoreReport() {
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
+        <div className="bg-white border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-none overflow-hidden">
           {/* Sport accent bar — T5 */}
           <div className={`h-1.5 w-full ${config.accentClass}`} />
 
@@ -431,7 +431,7 @@ export default function ScoreReport() {
                           key={set}
                           className={`flex items-center gap-3 transition-opacity duration-200 ${disabled ? "opacity-40" : ""}`}
                         >
-                          <span className="text-xs text-gray-500 w-24 shrink-0">
+                          <span className="text-xs font-semibold text-gray-700 w-24 shrink-0">
                             {set === 3 && !set3Enabled ? "Set 3 — if needed" : `Set ${set}`}
                           </span>
                           <input
@@ -443,7 +443,7 @@ export default function ScoreReport() {
                             value={scoreData[`set${set}_p1`] || ""}
                             onChange={(e) => updateScore(`set${set}_p1`, e.target.value)}
                             disabled={disabled}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
                             aria-label={`Set ${set} score for ${match.player1_name}`}
                             data-testid={`set${set}-p1`}
                           />
@@ -457,7 +457,7 @@ export default function ScoreReport() {
                             value={scoreData[`set${set}_p2`] || ""}
                             onChange={(e) => updateScore(`set${set}_p2`, e.target.value)}
                             disabled={disabled}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
                             aria-label={`Set ${set} score for ${match.player2_name}`}
                             data-testid={`set${set}-p2`}
                           />
@@ -484,7 +484,7 @@ export default function ScoreReport() {
                           key={game}
                           className={`flex items-center gap-3 transition-opacity duration-200 ${disabled ? "opacity-40" : ""}`}
                         >
-                          <span className="text-xs text-gray-500 w-24 shrink-0">
+                          <span className="text-xs font-semibold text-gray-700 w-24 shrink-0">
                             {game === 3 && !game3Enabled ? "Game 3 — if needed" : `Game ${game}`}
                           </span>
                           <input
@@ -496,7 +496,7 @@ export default function ScoreReport() {
                             value={scoreData[`game${game}_p1`] || ""}
                             onChange={(e) => updateScore(`game${game}_p1`, e.target.value)}
                             disabled={disabled}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
                             aria-label={`Game ${game} score for ${match.player1_name}`}
                             data-testid={`game${game}-p1`}
                           />
@@ -510,7 +510,7 @@ export default function ScoreReport() {
                             value={scoreData[`game${game}_p2`] || ""}
                             onChange={(e) => updateScore(`game${game}_p2`, e.target.value)}
                             disabled={disabled}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-50 disabled:cursor-not-allowed"
                             aria-label={`Game ${game} score for ${match.player2_name}`}
                             data-testid={`game${game}-p2`}
                           />
@@ -536,36 +536,36 @@ export default function ScoreReport() {
                         {/* T6 — 2-col mobile, 3-col sm+ */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           <div>
-                            <label className="text-xs text-gray-500 block mb-1">Runs</label>
+                            <label className="text-xs font-semibold text-gray-700 block mb-1">Runs</label>
                             <input
                               type="number"
                               min="0"
                               value={scoreData[`${team.prefix}_runs`] || ""}
                               onChange={(e) => updateScore(`${team.prefix}_runs`, e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
+                              className="w-full px-2 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
                               data-testid={`${team.prefix}-runs`}
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-gray-500 block mb-1">Wickets</label>
+                            <label className="text-xs font-semibold text-gray-700 block mb-1">Wickets</label>
                             <input
                               type="number"
                               min="0"
                               max="10"
                               value={scoreData[`${team.prefix}_wickets`] || ""}
                               onChange={(e) => updateScore(`${team.prefix}_wickets`, e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
+                              className="w-full px-2 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
                               data-testid={`${team.prefix}-wickets`}
                             />
                           </div>
                           <div className="col-span-2 sm:col-span-1">
-                            <label className="text-xs text-gray-500 block mb-1">Overs</label>
+                            <label className="text-xs font-semibold text-gray-700 block mb-1">Overs</label>
                             <input
                               type="text"
                               value={scoreData[`${team.prefix}_overs`] || ""}
                               onChange={(e) => updateScore(`${team.prefix}_overs`, e.target.value)}
                               placeholder="20.0"
-                              className="w-full px-2 py-2 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
+                              className="w-full px-2 py-2 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-black"
                               data-testid={`${team.prefix}-overs`}
                             />
                           </div>
@@ -616,7 +616,7 @@ export default function ScoreReport() {
                       ? "e.g. Player retired at 4-3 in first set"
                       : "e.g. Great match, tiebreak in third set"
                   }
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full px-3 py-2.5 border border-gray-400 bg-white text-[#1D1D1D] font-semibold placeholder:font-normal placeholder:text-gray-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
                   data-testid="score-notes"
                 />
               </div>

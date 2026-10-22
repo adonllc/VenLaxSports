@@ -12,7 +12,10 @@ Rules (decided with the product owner)
     of either side (within an hour) is refused.
   * Everything is recorded in the match's scheduling history.
   * A match with no confirmed time 48 hours before its play-by date is flagged for the organizer,
-    who can set the time. Unplayed matches end as walkovers (existing job).
+    who can set the time.
+  * If the play-by date passes and Home never proposed a time, the match is forfeited to Away: it
+    is recorded as a win for Away in the standings; Home earns 0 points (no rating change). If Home did propose, the
+    organizer decides. Other unplayed matches end as walkovers (existing job).
 
 Notifications use the existing email service (and WhatsApp when it is configured).
 """
@@ -307,7 +310,7 @@ async def process_proposals(db, now: datetime | None = None) -> dict:
     """Expire unanswered proposals, remind at 24 hours, flag matches that are running out of time."""
     now = now or _now()
     now_iso = now.isoformat()
-    counts = {"expired": 0, "reminded": 0, "flagged": 0}
+    counts = {"expired": 0, "reminded": 0, "flagged": 0, "forfeited": 0}
     league_cache: dict = {}
 
     async def league_of(m):
@@ -374,4 +377,42 @@ async def process_proposals(db, now: datetime | None = None) -> dict:
                     u["email"], u.get("name", ""), opp, league["name"], m["league_id"], deadline_txt))
         await db.matches.update_one({"_id": m["_id"]}, {"$set": {"needs_help": True, "attention_sent": True}})
         counts["flagged"] += 1
+
+    counts["forfeited"] = await forfeit_unproposed(db, now, league_of)
     return counts
+
+
+async def forfeit_unproposed(db, now: datetime, league_of) -> int:
+    """Play-by date passed and Home never proposed a time: award the match to Away."""
+    from routes.match_routes import _update_standings  # local import: match_routes imports this module
+
+    forfeited = 0
+    late = await db.matches.find({
+        "deadline": {"$ne": None, "$lt": now.isoformat()}, "status": "scheduled",
+        "schedule_status": "unscheduled",
+    }).to_list(500)
+    for m in late:
+        if any(h.get("action") == "proposed" for h in (m.get("schedule_history") or [])):
+            continue  # Home did propose a time; the organizer decides
+        league = await league_of(m)
+        if not league:
+            continue
+        won = await db.matches.find_one_and_update(
+            {"_id": m["_id"], "status": "scheduled"},
+            {"$set": {"status": "walkover", "walkover_reason": "home_no_proposal",
+                      "winner_id": m["player2_id"], "winner_name": m.get("player2_name"),
+                      "needs_help": False, "updated_at": now.isoformat()},
+             "$push": {"schedule_history": {"$each": [_history("forfeited", None, "System")], "$slice": -HISTORY_MAX}}},
+        )
+        if not won:
+            continue  # another run already claimed it
+        await _update_standings(db, m["league_id"], m, m["player2_id"], None, forfeit=True)
+        users = await _users(db, side_ids(m, 1) + side_ids(m, 2))
+        for who in side_ids(m, 1) + side_ids(m, 2):
+            u = users.get(who)
+            if u and u.get("email"):
+                email_service.schedule(email_service.send_match_forfeited(
+                    u["email"], u.get("name", ""), _label(m, 2 if who in side_ids(m, 1) else 1),
+                    league["name"], m["league_id"], who in side_ids(m, 2)))
+        forfeited += 1
+    return forfeited

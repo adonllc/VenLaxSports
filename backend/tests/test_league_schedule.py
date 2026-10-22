@@ -107,12 +107,19 @@ class Coll:
             before = dict(d)
             for k, v in upd.get("$set", {}).items():
                 _set(d, k, v)
+            for k, v in upd.get("$push", {}).items():
+                d.setdefault(k, []).extend(v["$each"] if isinstance(v, dict) else [v])
             return before
         return None
 
-    async def update_one(self, q, upd):
+    async def update_one(self, q, upd, upsert=False):
         d = await self.find_one(q)
+        if not d and upsert:
+            d = {k: v for k, v in q.items() if not k.startswith("$")}
+            self.docs.append(d)
         if d:
+            for k, v in upd.get("$inc", {}).items():
+                d[k] = d.get(k, 0) + v
             for k, v in upd.get("$set", {}).items():
                 _set(d, k, v)
             for k, v in upd.get("$push", {}).items():

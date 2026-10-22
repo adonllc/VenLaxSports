@@ -47,8 +47,8 @@ const STRUCTURES = [
 ];
 
 const MATCH_TIMELINE = [
-  { when: "Within 48 hours", what: "Contact your opponent. No reply in 48 hours means a walkover to the other player." },
-  { when: "Within 7 days", what: "Play your match. Each match has a 7-day window." },
+  { when: "Before the play-by date", what: "Home proposes a date, time and court. Away confirms or suggests another time. If no time is proposed by then, the match may be awarded to Away." },
+  { when: "By the play-by date", what: "Play your match. The date is shown on your match card." },
   { when: "24 hours before", what: "Confirm the time and court. The higher seed books the court and provides the balls." },
   { when: "Match day", what: "Arrive on time. 15+ minutes late, or cancelling less than 2 hours before, is a forfeit." },
   { when: "Within 24 hours after", what: "The winner reports the score. Your opponent confirms within 24 hours, or it is confirmed automatically." },
@@ -74,7 +74,7 @@ const COMPARE = [
 const CHECKLIST = [
   "Choose the rating that honestly matches how you play. It adjusts after your results.",
   "Check the league's city, format and start date before you pay.",
-  "Message your opponent within 48 hours of being matched.",
+  "If you are Home, propose a date, time and court early, before the play-by date.",
   "Offer at least 3 time slots to make scheduling easy.",
   "Read the Rules page once so the score reporting is no surprise.",
 ];
@@ -98,7 +98,7 @@ const FAQS = [
   },
   {
     q: "What if my opponent doesn't reply?",
-    a: "You should contact your opponent within 48 hours. If they don't respond within 48 hours, the match is a walkover to you.",
+    a: "The Home player proposes a time before the play-by date and the Away player confirms or suggests another time. If no time is proposed by the play-by date, the match may be awarded to Away. If you need help, your league organizer can set a time.",
   },
   {
     q: "Can I get a refund?",

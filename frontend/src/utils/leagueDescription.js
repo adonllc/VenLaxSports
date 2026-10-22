@@ -54,7 +54,7 @@ export function leagueDescription(league = {}) {
     const size = league.box_group_size || 6;
     points.push(`Box League: you play in a group of ${size}. The top ${league.box_promote || 2} move up each cycle and the bottom ${league.box_relegate || 2} move down.`);
   } else {
-    points.push("Flex League: you arrange your own match times. Contact your opponent within 48 hours, and each match has a 7-day window.");
+    points.push("Flex League: you arrange your own match times. Home proposes a date, time and court before the play-by date, and Away confirms or suggests another time.");
     points.push("A typical season is 5–7 matches over 6–8 weeks.");
   }
 

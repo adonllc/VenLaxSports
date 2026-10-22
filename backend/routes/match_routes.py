@@ -148,6 +148,7 @@ async def my_league_matches(league_id: str, request: Request):
             "last_decline": m.get("last_decline"),
             "history": [{**h, "by_name": h.get("by_name") or names.get(h.get("by"), "")} for h in (m.get("schedule_history") or [])][-10:],
             "status": m.get("status"), "winner_id": m.get("winner_id"),
+            "forfeit": m.get("walkover_reason") == "home_no_proposal",
             "sport": m.get("sport"), "score_data": m.get("score_data"),
             "player1_name": m.get("player1_name"), "player2_name": m.get("player2_name"),
             "result": (("won" if m.get("winner_id") in _side_ids(m, mine) else "lost") if m.get("winner_id") else None),
@@ -548,7 +549,7 @@ def _parse_score_stats(score_data: dict, sport: str, winner_id: str, player1_id:
     return w_sets, l_sets, w_games, l_games, is_straight, is_close3
 
 
-async def _update_standings(db, league_id: str, match: dict, winner_id: str, score_data: dict = None):
+async def _update_standings(db, league_id: str, match: dict, winner_id: str, score_data: dict = None, forfeit: bool = False):
     """Update standings using formula: 3W + 1L + 0.5(SW-SL) + 0.1(GW-GL) + Bonus."""
     sport = match.get("sport", "")
     loser_id = match["player2_id"] if str(winner_id) == str(match["player1_id"]) else match["player1_id"]
@@ -568,6 +569,8 @@ async def _update_standings(db, league_id: str, match: dict, winner_id: str, sco
 
     winner_pts = round(3.0 + 0.5 * (w_sets - l_sets) + 0.1 * (w_games - l_games) + winner_bonus, 2)
     loser_pts = round(1.0 + 0.5 * (l_sets - w_sets) + 0.1 * (l_games - w_games) + loser_bonus, 2)
+    if forfeit:
+        loser_pts = 0.0  # the forfeiting side earns no participation point
 
     winner_side = _side_ids(match, 1) if str(winner_id) == str(match["player1_id"]) else _side_ids(match, 2)
     loser_side = _side_ids(match, 2) if str(winner_id) == str(match["player1_id"]) else _side_ids(match, 1)

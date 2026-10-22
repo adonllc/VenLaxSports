@@ -392,8 +392,18 @@ async def send_schedule_attention(to: str, name: str, opponent: str, league_name
                                   deadline: str) -> None:
     await _schedule_mail(to, f"Your match is due soon and not scheduled — {league_name}", "Match not scheduled yet",
                          [f"Hi {name},", f"Your {league_name} match against {opponent} must be played by <strong>{deadline}</strong> and has no confirmed time yet.",
-                          "Propose or confirm a time now. If you cannot agree, the league organizer has been alerted and can help. Unplayed matches end as walkovers."],
+                          "Home proposes a date, time and court before the play-by date, and Away confirms or suggests another time. If no time is proposed by then, the match may be awarded to Away. If you cannot agree, the league organizer has been alerted and can help."],
                          league_id, "Schedule now")
+
+
+async def send_match_forfeited(to: str, name: str, opponent: str, league_name: str, league_id: str,
+                               awarded: bool) -> None:
+    if awarded:
+        line = f"No time was proposed for your {league_name} match against {opponent} by the play-by date, so the match has been awarded to you."
+    else:
+        line = (f"No time was proposed for your {league_name} match against {opponent} by the play-by date, so the match has been awarded to "
+                f"{opponent}. If something went wrong, please reply to this email and your league organizer will take a look.")
+    await _schedule_mail(to, f"Match result: {league_name}", "Match awarded", [f"Hi {name},", line], league_id, "View my matches")
 
 
 async def send_organizer_set_time(to: str, name: str, opponent: str, league_name: str, league_id: str,

@@ -183,7 +183,7 @@ def test_proposals_expire_after_48h_with_a_reminder_at_24h(sent):
     propose(db, lg, m, m["player1_id"], when=iso(6))
     assert run(ms.process_proposals(db))["expired"] == 0
     in25 = NOW() + timedelta(hours=25)
-    assert run(ms.process_proposals(db, in25)) == {"expired": 0, "reminded": 1, "flagged": 0}
+    assert run(ms.process_proposals(db, in25)) == {"expired": 0, "reminded": 1, "flagged": 0, "forfeited": 0}
     assert run(ms.process_proposals(db, in25))["reminded"] == 0              # reminded once only
     sent.clear()
     in49 = NOW() + timedelta(hours=49)
@@ -237,3 +237,35 @@ def test_my_matches_card_shows_time_zone_history_and_who_can_respond(sent, monke
     respond(db, lg, m, away, "confirm")
     card_h = next(c for c in run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["matches"] if c["id"] == str(m["_id"]))
     assert card_h["state"] == "scheduled" and card_h["can_change"] is True and card_h["proposal"] is None
+
+
+def test_no_proposal_by_the_play_by_date_forfeits_to_away(sent):
+    db, lg, m = setup()
+    m["deadline"] = (NOW() - timedelta(hours=1)).isoformat()
+    sent.clear()
+    assert run(ms.process_proposals(db))["forfeited"] == 1
+    assert m["status"] == "walkover" and m["walkover_reason"] == "home_no_proposal"
+    assert m["winner_id"] == m["player2_id"]                                   # Away is awarded the match
+    assert "forfeited" in actions(m)
+    assert len([n for n, _ in sent if n == "send_match_forfeited"]) == 2
+    assert run(ms.process_proposals(db))["forfeited"] == 0                     # only once
+    rows = {s["player_id"]: s for s in db.standings.docs}
+    assert rows[m["player2_id"]]["wins"] == 1 and rows[m["player1_id"]]["losses"] == 1
+    assert rows[m["player2_id"]]["points"] == 3.0 and rows[m["player1_id"]]["points"] == 0.0
+    assert match_view_state(m) == "completed"
+
+
+def test_home_who_proposed_is_not_forfeited_and_future_deadlines_are_left_alone(sent):
+    db, lg, m = setup()
+    propose(db, lg, m, m["player1_id"])
+    run(ms.process_proposals(db, NOW() + timedelta(hours=49)))                 # proposal expires, Home had proposed
+    m["deadline"] = (NOW() - timedelta(hours=1)).isoformat()
+    assert run(ms.process_proposals(db))["forfeited"] == 0
+    assert m["status"] == "scheduled"
+    other = db.matches.docs[1]
+    assert other["status"] == "scheduled"                                      # deadline still in the future
+
+
+def match_view_state(m):
+    import match_view
+    return match_view.match_state(m, NOW(), set())

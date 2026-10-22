@@ -23,7 +23,7 @@ JOB_FLAGS = {
     },
     "schedule_housekeeping": {
         "label": "Match Scheduling Housekeeping",
-        "description": "Expires unanswered time proposals after 48h, reminds at 24h, and alerts players and the organizer when a match is 48h from its play-by date with no confirmed time. Hourly.",
+        "description": "Expires unanswered time proposals after 48h, reminds at 24h, alerts players and the organizer when a match is 48h from its play-by date with no confirmed time, and awards a match to Away when the play-by date passes and Home never proposed a time. Hourly.",
     },
     "auto_status_transitions": {
         "label": "League Auto Status Transitions",

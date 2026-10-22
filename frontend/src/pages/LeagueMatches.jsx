@@ -20,7 +20,7 @@ const fmtDateTime = (iso, tz) => (iso ? new Date(iso).toLocaleString("en-US", { 
 const hoursLeft = (iso) => Math.max(0, Math.round((new Date(iso).getTime() - Date.now()) / 3600000));
 const ACTION_TEXT = {
   proposed: "proposed a time", countered: "suggested another time", change_requested: "asked to change the time",
-  confirmed: "confirmed", declined: "declined", time_cancelled: "cancelled the time", expired: "proposal expired", organizer_set: "set the time",
+  confirmed: "confirmed", declined: "declined", time_cancelled: "cancelled the time", expired: "proposal expired", organizer_set: "set the time", forfeited: "match awarded to Away (no time proposed)",
 };
 const ordinal = (n) => `${n}${["th", "st", "nd", "rd"][(n % 100 >> 3) ^ 1 && n % 10 < 4 ? n % 10 : 0]}`;
 
@@ -155,7 +155,9 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
 
       {m.state === "completed" && (
         <p className="mt-3 text-sm font-semibold" style={{ color: INK }} data-testid={`match-result-${m.id}`}>
-          {m.result === "won" ? "You won" : m.result === "lost" ? "You lost" : "Result submitted"}
+          {m.forfeit
+            ? (m.result === "won" ? "Awarded to you: no time was proposed by the play-by date" : "Awarded to your opponent: no time was proposed by the play-by date")
+            : m.result === "won" ? "You won" : m.result === "lost" ? "You lost" : "Result submitted"}
           {scored?.scoreStr ? ` · ${scored.scoreStr}` : ""}
         </p>
       )}
@@ -169,7 +171,7 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
       {/* Waiting on Home to make the first proposal */}
       {m.state === "not_scheduled" && !isHome && (
         <p className="mt-4 text-sm p-3" style={{ background: "#F1F1F1", color: INK }}>
-          {opp.name} is Home and will propose a date, time and court. You will get an email to confirm.
+          {opp.name} is Home and will propose a date, time and court before the play-by date. You will get an email to confirm.
         </p>
       )}
       {m.state === "not_scheduled" && m.last_decline && (
@@ -376,7 +378,7 @@ export default function LeagueMatches() {
       </section>
 
       <p className="mt-5 text-sm p-4" style={{ background: "#F1F1F1", color: INK }}>
-        <strong>Home</strong> proposes the date, time and court. <strong>Away</strong> confirms or suggests another time. Contact your opponent within 48 hours, then report each score after you play.
+        <strong>Home</strong> proposes the date, time and court before the play-by date. <strong>Away</strong> confirms or suggests another time. If no time has been proposed by the play-by date, the match may be awarded to Away. Report each score after you play.
       </p>
 
       {matches.length === 0 ? (

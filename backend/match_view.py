@@ -37,6 +37,8 @@ def match_state(m: dict, now: datetime, disputed_ids: set[str]) -> str:
     """
     if str(m.get("_id")) in disputed_ids or m.get("id") in disputed_ids:
         return "disputed"
+    if m.get("status") == "walkover" and m.get("walkover_reason") == "home_no_proposal":
+        return "completed"
     if m.get("status") in ("cancelled", "walkover"):
         return "cancelled"
     if m.get("status") == "completed":
