@@ -88,9 +88,11 @@ def rank_players(standings: list, matches: list, rule: dict) -> list:
     rows = [dict(r) for r in standings]
     for r in rows:
         r["_m"] = _metric(r, rule)
+        r["_e"] = _eligible(r, rule)
 
     def base(r):
-        return (-r["_m"], -(r.get("wins") or 0))
+        # eligible players rank first, so the rank a player sees always agrees with who is in a qualifying place
+        return (0 if r["_e"] else 1, -r["_m"], -(r.get("wins") or 0))
 
     rows.sort(key=base)
     ordered: list = []
@@ -118,7 +120,7 @@ def rank_players(standings: list, matches: list, rule: dict) -> list:
 
     out, slots = [], rule["top_n"]
     for rank, r in enumerate(ordered, start=1):
-        ok = _eligible(r, rule)
+        ok = r["_e"]
         q = ok and slots > 0
         if q:
             slots -= 1

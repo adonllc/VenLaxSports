@@ -52,7 +52,12 @@ def test_win_percentage_mode_and_minimums_decide_who_qualifies():
     assert not ranked["a"]["eligible"] and not ranked["a"]["qualifies"]      # only 1 match played: needs 3
     assert ranked["b"]["qualifies"] and ranked["d"]["qualifies"]             # 67% and 50%
     assert not ranked["c"]["qualifies"]                                      # 50% but out of the top 2
-    assert ranked["a"]["rank"] == 1                                          # 100% of 1 match still ranks, it just cannot qualify
+    assert ranked["a"]["rank"] == 4                                          # ineligible players rank below everyone eligible
+
+
+def test_players_with_no_matches_never_outrank_players_who_have_played():
+    ranked = q.rank_players([row("idle", 0, 0, 0), row("loser", -1.3, 0, 1)], [], {**RULE, "top_n": 4})
+    assert [r["player_id"] for r in ranked] == ["loser", "idle"] and ranked[0]["qualifies"] and not ranked[1]["qualifies"]
 
 
 def _bracket_league():
