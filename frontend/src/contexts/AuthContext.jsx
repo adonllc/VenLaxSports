@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { analytics } from "@heycatch/sdk";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 const AuthContext = createContext(null);
@@ -41,6 +42,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     fetchMe();
   }, [fetchMe]);
+
+  // Tie analytics to the signed-in user: stable id as identity, email/name as properties
+  useEffect(() => {
+    if (user?.id) analytics.setIdentity(user.id, { email: user.email, name: user.name });
+  }, [user?.id, user?.email, user?.name]);
 
   const login = async (email, password) => {
     const codeVerifier = _randomBase64url();
@@ -114,6 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+    analytics.resetIdentity();
     setUser(null);
   };
 

@@ -52,6 +52,12 @@ const server = createServer((req, res) => {
     pathname = req.url;
   }
 
+    // HeyCatch short links: /a../z and /0../9 -> 302 to /?utm_source=heycatch&utm_campaign=<char>
+  if (/^\/[a-z0-9]$/.test(pathname)) {
+    res.writeHead(302, { Location: `/?utm_source=heycatch&utm_campaign=${pathname[1]}` }).end();
+    return;
+  }
+
   // Prevent path traversal outside dist/.
   const safeRel = path.normalize(pathname).replace(/^(\.\.[/\\])+/, "");
   const candidate = path.join(DIST, safeRel);
