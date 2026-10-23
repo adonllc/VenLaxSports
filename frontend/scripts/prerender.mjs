@@ -98,6 +98,10 @@ async function main() {
   }
 
   const page = await browser.newPage();
+  // The web build can ship with the pre-launch gate on (VITE_PRELAUNCH=true), where "/" renders the
+  // waitlist page until /api/site-status says the site is live. Snapshots must show the launched
+  // site, so answer that call as live here instead of letting crawlers get the waitlist HTML.
+  await page.route("**/api/site-status", (route) => route.fulfill({ json: { live: true } }));
   let ok = 0;
 
   for (const { url: routeUrl, dir: routeDir } of ROUTES) {

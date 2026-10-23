@@ -176,7 +176,16 @@ export default function Footer() {
         {/* Footer Bottom — Copyright */}
         <div className="pt-5">
           <p className="text-xs text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
-            © {new Date().getFullYear()} VENLAX Sports.
+            © {new Date().getFullYear()} VENLAX Sports.{" "}
+            <a
+              href="https://www.instagram.com/venlaxsports/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline hover:text-[#3D3D3D]"
+              data-testid="footer-instagram"
+            >
+              Follow us on Instagram
+            </a>
           </p>
         </div>
       </div>

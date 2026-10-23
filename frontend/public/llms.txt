@@ -1,0 +1,24 @@
+# VENLAX Sports
+
+> Ranked Tennis and Pickleball leagues across the USA. No club membership. Skill-matched opponents, live standings and playoffs.
+
+## What it is
+- Season-based leagues: Flex, Round Robin, Box and Challenge Ladder.
+- Singles, doubles and mixed doubles. Your rating updates after every match.
+- Home player proposes a date, time and court before the play-by date; Away confirms or suggests another time.
+
+## Pricing (per season, USD)
+- Singles: $9.99 per player
+- Doubles: $19.99 per team of two (one payment covers both partners)
+- Mixed doubles: $19.99 per team of two
+- Entry fees are non-refundable once the league starts. Payments are processed by Stripe.
+
+## Pages
+- [Home and pricing](https://venlaxsports.com/)
+- [Tennis & Pickleball league guide](https://venlaxsports.com/tennis-pickleball-leagues)
+- [Find a league](https://venlaxsports.com/leagues)
+- [Ladders](https://venlaxsports.com/ladders)
+- [League rules](https://venlaxsports.com/rules)
+- [Player handbook](https://venlaxsports.com/handbook)
+- [Terms](https://venlaxsports.com/terms)
+- [Privacy](https://venlaxsports.com/privacy)

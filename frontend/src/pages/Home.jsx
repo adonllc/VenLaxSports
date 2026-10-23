@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
@@ -10,6 +10,7 @@ import { activeSports, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
 import Slant from "../components/Slant";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -37,6 +38,13 @@ const FEATURES = [
   { slug: "cards", icon: Share2, title: "Shareable match cards", body: "Every result becomes a card with the score and rating change, ready to post.", to: "/auth" },
   { slug: "rewards", icon: Gift, title: "Rewards and referrals", body: "Bring a friend and you both get $5 credit toward your next league.", to: "/rewards" },
   { slug: "safe", icon: ShieldCheck, title: "Safe and fair play", body: "Digital waiver, parental consent for minors, 2FA sign-in and fair disputes.", to: "/terms" },
+];
+
+// The three problems players told us about, in their words
+const PAINS = [
+  { title: "You're stuck in dead group chats.", body: "Flaky players. Last-minute cancellations. No accountability. You waste hours organizing matches that fall apart." },
+  { title: "You have no proof of your progress.", body: "You keep winning. But nobody knows. No ranking. No record. No way to track how good you've actually become." },
+  { title: "Real competitive leagues? They don't exist.", body: "Expensive clubs gatekeep the game. Pickup courts are chaos. There's nothing between Sunday league and the club." },
 ];
 
 const LEAGUE_TYPES = [
@@ -94,6 +102,32 @@ const FAQ = [
   { q: "Where can I find the rules?", a: "The Rules page and Player Handbook cover formats, scheduling, conduct and playoffs." },
 ];
 
+// Machine-readable copies of the visible FAQ and pricing cards (kept in sync by building them from the same arrays)
+const HOME_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    },
+    {
+      "@type": "Product",
+      name: "VENLAX Sports league entry",
+      description: "Entry to a ranked Tennis or Pickleball league season: skill-matched opponents, live standings and playoffs.",
+      brand: { "@type": "Brand", name: "VENLAX Sports" },
+      offers: PRICING.map((p) => ({
+        "@type": "Offer",
+        name: `${p.format} (${p.who})`,
+        price: p.price.replace("$", ""),
+        priceCurrency: "USD",
+        description: p.unit,
+        url: "https://venlaxsports.com/#pricing",
+        availability: "https://schema.org/InStock",
+      })),
+    },
+  ],
+};
+
 // ---------------------------------------------------------------- bits
 function AmberButton({ children, onClick, testId, className = "" }) {
   return (
@@ -108,8 +142,8 @@ function AmberButton({ children, onClick, testId, className = "" }) {
   );
 }
 
-const Section = ({ tint, children, className = "" }) => (
-  <section className={`px-4 sm:px-6 py-20 md:py-28 ${className}`} style={{ background: tint ? GREY : "#fff" }}>
+const Section = ({ tint, children, className = "", id }) => (
+  <section id={id} className={`px-4 sm:px-6 py-20 md:py-28 ${className}`} style={{ background: tint ? GREY : "#fff" }}>
     <div className="max-w-[1100px] mx-auto">{children}</div>
   </section>
 );
@@ -139,6 +173,17 @@ function SampleChart() {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { hash } = useLocation();
+  useDocumentMeta({
+    title: "Ranked Tennis & Pickleball Leagues | VENLAX Sports",
+    description: "Ranked Tennis and Pickleball leagues across the USA. No club membership. Singles $9.99 a season, doubles $19.99 per team. Skill-matched opponents, live standings and playoffs.",
+    canonicalPath: "/",
+    jsonLd: HOME_JSON_LD,
+  });
+  // Nav "Pricing" link: scroll to the pricing section, also when arriving from another page
+  useEffect(() => {
+    if (hash) document.querySelector(hash)?.scrollIntoView();
+  }, [hash]);
   const [typeId, setTypeId] = useState("flex");
   const type = LEAGUE_TYPES.find((t) => t.id === typeId);
   const [founding, setFounding] = useState(null);
@@ -176,19 +221,22 @@ export default function Home() {
               <motion.p className="mt-2 text-base md:text-lg text-white/90" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.25 }}>
                 Find a league. Play. Rise.
               </motion.p>
-              <motion.div className="mt-8 flex flex-wrap gap-3 justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
-                <AmberButton onClick={() => navigate("/auth")} testId="hero-join-venlax">Join VenLax</AmberButton>
-                {activeSports.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => navigate(`/sport/${s.id}`)}
-                    className="px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border-2 border-white transition-colors hover:bg-white hover:text-[#3D3D3D]"
-                    aria-label={`Explore ${s.label} leagues`}
-                    data-testid={`hero-explore-${s.id}`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+              <motion.p className="mt-4 text-base md:text-xl font-bold text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.28 }} data-testid="hero-offer-line">
+                Competitive leagues in your city. No club membership. $9.99 a season.
+              </motion.p>
+              <motion.div className="mt-8 flex flex-col items-center gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
+                <AmberButton onClick={() => navigate("/auth")} testId="hero-join-venlax">Join a league</AmberButton>
+                <p className="text-sm text-white/90">
+                  Or see{" "}
+                  {activeSports.map((s, i) => (
+                    <span key={s.id}>
+                      {i > 0 && " · "}
+                      <Link to={`/sport/${s.id}`} className="font-bold underline underline-offset-2 hover:text-white" aria-label={`Explore ${s.label} leagues`} data-testid={`hero-explore-${s.id}`}>
+                        {s.label}
+                      </Link>
+                    </span>
+                  ))}
+                </p>
               </motion.div>
             </div>
           </PhotoSlot>
@@ -203,6 +251,19 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* 1b. THE PROBLEM, IN PLAYERS' WORDS */}
+        <Section>
+          <Heading eyebrow="Why leagues" title="Sound familiar?" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {PAINS.map((p, i) => (
+              <motion.div key={p.title} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.08 }} className="p-6 border-t-4" style={{ background: GREY, borderColor: AMBER }} data-testid={`home-pain-${i + 1}`}>
+                <h3 className="font-bold text-xl leading-tight mb-2" style={{ color: INK }}>{p.title}</h3>
+                <p className="text-base">{p.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
 
         {/* 2. EVERYTHING IN ONE PLACE */}
         <Section tint>
@@ -267,19 +328,30 @@ export default function Home() {
         </Section>
 
         {/* 4. PRICING */}
-        <Section tint>
+        <Section tint className="scroll-mt-16" id="pricing">
           <Heading eyebrow="Pricing" title="Simple pricing" lead="One fee per season. No club membership. Doubles is one fee for the whole team." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PRICING.map((p) => (
-              <motion.div key={p.format} {...fadeUp} className="bg-white p-8 border-t-4" style={{ borderColor: AMBER }}>
+            {PRICING.map((p, i) => (
+              <motion.div
+                key={p.format}
+                {...fadeUp}
+                className={`bg-white p-8 border-t-4 relative ${i === 0 ? "ring-2 ring-[#008F70]" : ""}`}
+                style={{ borderColor: AMBER }}
+                data-testid={`home-price-${p.format.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {i === 0 && (
+                  <span className="absolute -top-3 left-6 px-3 py-1 text-xs font-bold uppercase tracking-wider" style={{ background: GREEN, color: "#fff" }} data-testid="home-price-popular-badge">Popular</span>
+                )}
                 <h3 className="font-bold text-xl" style={{ color: INK }}>{p.format}</h3>
                 <p className="text-sm mb-5">{p.who}</p>
                 <div className="font-bold text-5xl leading-none" style={{ color: GREEN }}>{p.price}</div>
                 <p className="mt-2 text-sm">{p.unit}</p>
+                {i === 0 && <p className="mt-4 text-sm font-bold" style={{ color: INK }}>Most players start here.</p>}
               </motion.div>
             ))}
           </div>
-          <p className="mt-5 text-sm">Entry fees are non-refundable once the league starts. See the <Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: GREEN }}>League Guide</Link> for details.</p>
+          <p className="mt-5 text-base font-medium" style={{ color: INK }}>Less than one court-rental split, for a whole season.</p>
+          <p className="mt-2 text-sm">Entry fees are non-refundable once the league starts. Payments are processed by Stripe. See the <Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: GREEN }}>League Guide</Link> for details.</p>
         </Section>
 
         {/* 5. SEASON AT A GLANCE */}
@@ -386,9 +458,9 @@ export default function Home() {
           <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 items-center">
             <motion.div {...fadeUp}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: AMBER }}>Choose your sport</p>
-              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05] mb-6" style={{ color: "#fff" }}>Start building your future today</h2>
+              <h2 className="font-bold text-4xl md:text-6xl leading-[1.05] mb-6" style={{ color: "#fff" }}>Find your league. Start climbing.</h2>
               <p className="text-lg text-white/90 mb-8">Join a league near you and start climbing the standings.</p>
-              <AmberButton onClick={() => navigate("/auth")} testId="home-closing-cta">Join VenLax <ArrowRight className="w-4 h-4" aria-hidden="true" /></AmberButton>
+              <AmberButton onClick={() => navigate("/auth")} testId="home-closing-cta">Join a league <ArrowRight className="w-4 h-4" aria-hidden="true" /></AmberButton>
             </motion.div>
             <div className="grid grid-cols-2 gap-3">
               {activeSports.map((s, i) => (
