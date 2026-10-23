@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin, CheckCircle, Bell } from "lucide-react";
-import { isSportActive } from "../config/platformConfig";
+import platformConfig, { isSportActive } from "../config/platformConfig";
+import { cityPath } from "../utils/citySlug";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import SportHero from "../components/SportHero";
@@ -132,9 +133,9 @@ export default function SportLanding() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
-              <h3 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
+              <h2 className="font-heading font-bold text-sm uppercase tracking-wide mb-3" style={{ color: meta.color }}>
                 {item.title}
-              </h3>
+              </h2>
               {item.isPill ? (
                 <div className="space-y-1.5">
                   {item.content.map((f) => (
@@ -280,6 +281,20 @@ Features
             </motion.div>
           )}
         </div>
+
+        {/* Related pages: the city pages and the guide are linked from here, not only from the sitemap */}
+        <aside aria-label="Related" className="mt-12 pt-8 border-t" style={{ borderColor: BORDER }} data-testid="sport-related">
+          <h2 className="font-heading font-bold text-2xl mb-4" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>{meta.label} by city</h2>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {platformConfig.featuredCities.slice(0, 6).map((c) => (
+              <li key={c.name}>
+                <Link to={cityPath(c.name, sport)} className="font-bold underline" style={{ color: "#00765C" }}>{meta.label} in {c.name}</Link>
+              </li>
+            ))}
+            <li><Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: "#00765C" }}>Tennis &amp; Pickleball league guide</Link></li>
+            <li><Link to="/rules" className="font-bold underline" style={{ color: "#00765C" }}>League rules</Link></li>
+          </ul>
+        </aside>
       </div>
 
       <NotifyMeModal

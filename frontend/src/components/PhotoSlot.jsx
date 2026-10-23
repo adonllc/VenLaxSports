@@ -13,7 +13,7 @@ export default function PhotoSlot({ src, alt = "", tone = "ink", overlay = true,
   return (
     <div className={`relative overflow-hidden ${className}`} style={{ background: TONES[tone] || TONES.ink }}>
       {src ? (
-        <img src={src} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={src} alt={alt} width={1600} height={894} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
       ) : (
         <svg
           aria-hidden="true"

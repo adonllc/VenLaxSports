@@ -6,10 +6,10 @@ import { PHOTOS } from "../config/photos";
  * Italic bold title with a green skewed accent bar, amber eyebrow.
  * title: ReactNode (use <br /> for line breaks). icon: lucide component (optional).
  */
-export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src = PHOTOS.community, tone = "ink", testId, compact = false }) {
+export default function PageHero({ icon: Icon, eyebrow, title, subtitle, src = PHOTOS.community, alt = "Pickleball players on court at sunset", tone = "ink", testId, compact = false }) {
   return (
     <section data-testid={testId}>
-      <PhotoSlot src={src} tone={tone} overlay={false}>
+      <PhotoSlot src={src} alt={alt} tone={tone} overlay={false}>
         <div className="absolute inset-0" style={{ background: src ? "rgba(61,61,61,0.62)" : "transparent" }} />
         <div className={`relative max-w-[1100px] mx-auto px-6 ${compact ? "py-12 sm:py-16" : "py-20 sm:py-28"}`}>
           {eyebrow && (

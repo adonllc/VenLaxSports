@@ -41,8 +41,19 @@ export default function useDocumentMeta({ title, description, canonicalPath, jso
       if (canonicalTag) canonicalTag.setAttribute("href", `https://venlaxsports.com${canonicalPath}`);
     }
 
+    // Every page with its own title gets at least a WebPage block, so no page ships without markup.
+    // Pages that pass their own schema (breadcrumbs, FAQ, product) keep it.
+    const ld = jsonLd || (title ? {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      headline: title,
+      ...(description ? { description } : {}),
+      url: `https://venlaxsports.com${canonicalPath || window.location.pathname}`,
+      isPartOf: { "@type": "WebSite", name: "VENLAX Sports", url: "https://venlaxsports.com" },
+    } : null);
+
     let scriptTag;
-    if (jsonLd) {
+    if (ld) {
       // Remove any script this hook already injected (prior mount, or baked
       // into the prerendered snapshot) so navigating between pages — or
       // hydrating over a prerendered page — never leaves two copies in <head>.
@@ -50,7 +61,7 @@ export default function useDocumentMeta({ title, description, canonicalPath, jso
       scriptTag = document.createElement("script");
       scriptTag.type = "application/ld+json";
       scriptTag.setAttribute("data-page-jsonld", "true");
-      scriptTag.textContent = JSON.stringify(jsonLd);
+      scriptTag.textContent = JSON.stringify(ld);
       document.head.appendChild(scriptTag);
     }
 

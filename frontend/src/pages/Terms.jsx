@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
+import RelatedLinks from "../components/RelatedLinks";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 import { AlertCircle, CheckCircle, FileText, ShieldAlert } from "lucide-react";
 
 export default function Terms() {
+  useDocumentMeta({
+    title: "Terms of Service & Legal Disclaimers | VENLAX Sports",
+    description: "The terms for playing in VENLAX Sports leagues: waiver of liability, fees and refunds, scoring disputes, conduct and your responsibilities as a player.",
+    canonicalPath: "/terms",
+  });
   return (
     <div style={{ background: "#FFFFFF" }} data-testid="terms-page">
 
@@ -321,6 +328,12 @@ export default function Terms() {
         </div>
 
       </div>
+      <RelatedLinks links={[
+        { to: "/waiver", label: "Liability waiver" },
+        { to: "/privacy", label: "Privacy Policy" },
+        { to: "/rules", label: "League rules" },
+        { to: "/handbook", label: "Player handbook" },
+      ]} />
     </div>
   );
 }

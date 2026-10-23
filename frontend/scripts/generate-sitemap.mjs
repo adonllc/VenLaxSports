@@ -34,7 +34,7 @@ const STATIC_ROUTES = [
 const sportRoutes = ACTIVE_SPORTS.map((sport) => `/sport/${sport}`);
 
 const cityRoutes = FEATURED_CITIES.flatMap((city) =>
-  ACTIVE_SPORTS.map((sport) => `/city/${encodeURIComponent(city)}/sport/${sport}`),
+  ACTIVE_SPORTS.map((sport) => `/city/${city.toLowerCase().replace(/\s+/g, "-")}/sport/${sport}`),
 );
 
 const routes = [...STATIC_ROUTES, ...sportRoutes, ...cityRoutes];

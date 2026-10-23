@@ -160,9 +160,10 @@ export default function Rules() {
       <PageHero
         compact
         src={GALLERY.tennis[3]}
+        alt="Tennis doubles players on court"
         eyebrow="Rules & Formats"
         title="Rules"
-        subtitle={<>Quick &amp; clear. We keep only VENLAX-specific rules here. For standard tennis rules &amp; scoring, see{" "}<a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" className="underline font-semibold text-white">USTA Rules of Tennis →</a></>}
+        subtitle={<>The VENLAX rules are the league rules that sit on top of standard play: divisions, scheduling, scoring and playoffs. We keep only VENLAX-specific rules here. For standard tennis rules &amp; scoring, see{" "}<a data-testid="rules-usta-link" href="https://www.usta.com/en/home.html" target="_blank" rel="noopener noreferrer" className="underline font-semibold text-white">USTA Rules of Tennis →</a></>}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

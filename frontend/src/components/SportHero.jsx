@@ -45,7 +45,7 @@ export default function SportHero({
               </span>
             </span>
           </h1>
-          <p className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-white/90">{sportMeta.tagline}</p>
+          <p className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-white/90">{sportMeta.label} on VENLAX is ranked league play: skill-matched opponents, live standings and no club membership. {sportMeta.tagline}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={handlePrimary}

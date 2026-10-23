@@ -2,6 +2,7 @@ import { Children, cloneElement } from "react";
 import { Link } from "react-router-dom";
 import { Check, ArrowRight, Users, User, CalendarDays, Trophy } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import RelatedLinks from "../components/RelatedLinks";
 import PageHero from "../components/PageHero";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
@@ -377,6 +378,13 @@ export default function TennisPickleballLeagues() {
           Find a League <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </Link>
       </section>
+      <RelatedLinks links={[
+        { to: "/sport/tennis", label: "Tennis leagues" },
+        { to: "/sport/pickleball", label: "Pickleball leagues" },
+        { to: "/ladders", label: "Challenge ladders" },
+        { to: "/rules", label: "League rules" },
+        { to: "/waiver", label: "Liability waiver" },
+      ]} />
     </div>
   );
 }

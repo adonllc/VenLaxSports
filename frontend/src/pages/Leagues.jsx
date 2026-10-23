@@ -130,7 +130,8 @@ export default function Leagues() {
 
   return (
     <div className="min-h-screen bg-white" data-testid="leagues-page">
-      <PageHero compact src={GALLERY.tennis[2]} eyebrow="Leagues" title="Browse Leagues" subtitle="Find competitive leagues across all sports and cities" />
+      <PageHero compact src={GALLERY.tennis[2]} alt="Tennis court at dusk" eyebrow="Leagues" title="Browse Leagues" subtitle="A VENLAX league is a ranked season of Tennis or Pickleball matches against players at your level. Find one in your city." />
+      <h2 className="sr-only">Available leagues</h2>
 
       {/* Promo Banner */}
       <div className="sticky top-0 z-10 border-b" style={{ background: "#F2A922", borderColor: "#F2A922" }}>

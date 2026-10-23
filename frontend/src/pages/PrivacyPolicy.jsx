@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 
 const SECTIONS = [
   {
@@ -108,6 +109,11 @@ const SECTIONS = [
 ];
 
 export default function PrivacyPolicy() {
+  useDocumentMeta({
+    title: "Privacy Policy | VENLAX Sports",
+    description: "What personal data VENLAX Sports collects, how it is used and shared, and your privacy rights, including under the CCPA.",
+    canonicalPath: "/privacy",
+  });
   return (
     <div className="min-h-screen bg-white">
       <PageHero

@@ -40,16 +40,14 @@ const STATIC_ROUTES = [
   "/waiver",
 ];
 
-// `url` is what the browser navigates (city names need URL-encoding for the
-// space); `dir` is the on-disk output path, which must use the *decoded*
-// segment — static file servers decode the request URI before matching the
-// filesystem, so a request for `/city/New%20York/...` looks for a directory
-// literally named "New York", not "New%20York".
+// City URLs are lowercase and hyphenated ("new-york"), so the URL and the
+// on-disk directory are the same string and nothing needs encoding. serve-static.mjs
+// 301-redirects the old "/city/New%20York/..." shape to these.
 const cityRoutes = FEATURED_CITIES.flatMap((city) =>
-  ACTIVE_SPORTS.map((sport) => ({
-    url: `/city/${encodeURIComponent(city)}/sport/${sport}`,
-    dir: `/city/${city}/sport/${sport}`,
-  })),
+  ACTIVE_SPORTS.map((sport) => {
+    const slug = city.toLowerCase().replace(/\s+/g, "-");
+    return { url: `/city/${slug}/sport/${sport}`, dir: `/city/${slug}/sport/${sport}` };
+  }),
 );
 
 const ROUTES = [
@@ -110,7 +108,9 @@ async function main() {
       await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
       // useDocumentMeta writes title/description/canonical/JSON-LD on mount — give it a tick.
       await page.waitForTimeout(150);
-      const html = await page.content();
+      // Vite's modulepreload links are absolute while rendering against the local preview server
+      // (http://localhost:4173/assets/...). Make them root-relative so the served HTML has no http:// URLs.
+      const html = (await page.content()).split(base).join("");
 
       const outDir = routeDir === "/" ? path.join(ROOT, "dist") : path.join(ROOT, "dist", routeDir.replace(/^\//, ""));
       mkdirSync(outDir, { recursive: true });

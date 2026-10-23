@@ -1,5 +1,7 @@
 ﻿import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
+import RelatedLinks from "../components/RelatedLinks";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 import { AlertTriangle, CheckCircle } from "lucide-react";
 
 const WAIVER_SECTIONS = [
@@ -70,6 +72,11 @@ const WAIVER_SECTIONS = [
 ];
 
 export default function Waiver() {
+  useDocumentMeta({
+    title: "Liability Waiver & Participation Agreement | VENLAX Sports",
+    description: "The liability waiver every player accepts before joining a VENLAX Sports league: assumed risks, court conditions, player safety and conduct.",
+    canonicalPath: "/waiver",
+  });
   return (
     <div style={{ background: "#FFFFFF" }} data-testid="waiver-page">
       <PageHero
@@ -138,6 +145,12 @@ export default function Waiver() {
           </Link>
         </div>
       </div>
+      <RelatedLinks links={[
+        { to: "/terms", label: "Terms of Service" },
+        { to: "/privacy", label: "Privacy Policy" },
+        { to: "/rules", label: "League rules" },
+        { to: "/tennis-pickleball-leagues", label: "Tennis & Pickleball league guide" },
+      ]} />
     </div>
   );
 }

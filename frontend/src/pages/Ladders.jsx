@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PageHero from "../components/PageHero";
+import RelatedLinks from "../components/RelatedLinks";
 import { GALLERY } from "../config/photos";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -65,7 +66,7 @@ export default function Ladders() {
 
   return (
     <div className="min-h-screen" style={{ background: SAND_PALE }}>
-      <PageHero compact src={GALLERY.pickleball[1]} eyebrow="Ladders" title="Challenge Ladders" subtitle="Always-on ranked play. Challenge anyone above you. No season needed." />
+      <PageHero compact src={GALLERY.pickleball[1]} alt="Pickleball players in an indoor gym" eyebrow="Ladders" title="Challenge Ladders" subtitle="A challenge ladder is an ongoing ranked list: challenge anyone above you, win to swap ranks, and join any time. No season needed." />
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Filters */}
@@ -174,6 +175,12 @@ export default function Ladders() {
           </div>
         )}
       </div>
+      <RelatedLinks links={[
+        { to: "/leagues", label: "Browse seasonal leagues" },
+        { to: "/rules", label: "League rules" },
+        { to: "/tennis-pickleball-leagues", label: "Tennis & Pickleball league guide" },
+        { to: "/sport/pickleball", label: "Pickleball leagues" },
+      ]} />
     </div>
   );
 }

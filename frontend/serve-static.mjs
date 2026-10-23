@@ -35,10 +35,35 @@ const MIME = {
   ".map": "application/json; charset=utf-8",
 };
 
+// Security headers on every response. The CSP is Report-Only on purpose: tighten it to an enforcing
+// Content-Security-Policy after a week without reports, a strict one on day one can break our own scripts.
+const SECURITY_HEADERS = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Content-Security-Policy-Report-Only":
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com https://in.heycatch.ai; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; " +
+    "img-src 'self' data: https:; connect-src 'self' https://*.venlaxsports.com https://*.posthog.com https://in.heycatch.ai; " +
+    "frame-ancestors 'self'",
+};
+
+// First path segments the app actually routes (see src/App.jsx). Anything else answers 404 while still
+// serving the app shell, so people see the friendly not-found page and crawlers see a real 404.
+const KNOWN_ROOTS = new Set([
+  "", "auth", "reset-password", "sport", "leagues", "rules", "handbook", "terms", "waiver", "dashboard", "admin",
+  "matches", "round-robin", "privacy", "city", "players", "verify-email", "profile-setup", "join",
+  "doubles-invite", "ladders", "rewards", "tennis-pickleball-leagues",
+]);
+
+const citySlug = (name) => name.toLowerCase().trim().replace(/\s+/g, "-");
+
 function send(res, status, filePath, extraHeaders = {}) {
   const ext = path.extname(filePath);
   res.writeHead(status, {
     "Content-Type": MIME[ext] || "application/octet-stream",
+    ...SECURITY_HEADERS,
     ...extraHeaders,
   });
   createReadStream(filePath).pipe(res);
@@ -54,7 +79,14 @@ const server = createServer((req, res) => {
 
     // HeyCatch short links: /a../z and /0../9 -> 302 to /?utm_source=heycatch&utm_campaign=<char>
   if (/^\/[a-z0-9]$/.test(pathname)) {
-    res.writeHead(302, { Location: `/?utm_source=heycatch&utm_campaign=${pathname[1]}` }).end();
+    res.writeHead(302, { Location: `/?utm_source=heycatch&utm_campaign=${pathname[1]}`, ...SECURITY_HEADERS }).end();
+    return;
+  }
+
+  // Clean city URLs: /city/New%20York/sport/tennis -> 301 /city/new-york/sport/tennis
+  const cityMatch = pathname.match(/^\/city\/([^/]+)\/sport\/([^/]+)\/?$/);
+  if (cityMatch && citySlug(cityMatch[1]) !== cityMatch[1]) {
+    res.writeHead(301, { Location: `/city/${encodeURIComponent(citySlug(cityMatch[1]))}/sport/${cityMatch[2]}`, ...SECURITY_HEADERS }).end();
     return;
   }
 
@@ -62,7 +94,7 @@ const server = createServer((req, res) => {
   const safeRel = path.normalize(pathname).replace(/^(\.\.[/\\])+/, "");
   const candidate = path.join(DIST, safeRel);
   if (!candidate.startsWith(DIST)) {
-    res.writeHead(400).end("Bad request");
+    res.writeHead(400, SECURITY_HEADERS).end("Bad request");
     return;
   }
 
@@ -96,12 +128,13 @@ const server = createServer((req, res) => {
   if (!hasExtension) {
     const shell = path.join(DIST, "app-shell.html");
     const fallback = existsSync(shell) ? shell : path.join(DIST, "index.html");
-    send(res, 200, fallback, { "Cache-Control": "no-cache" });
+    const known = KNOWN_ROOTS.has(pathname.split("/")[1] || "");
+    send(res, known ? 200 : 404, fallback, { "Cache-Control": "no-cache" });
     return;
   }
 
   // 4. A real static asset request that doesn't exist — genuine 404.
-  res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
+  res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", ...SECURITY_HEADERS }).end("Not found");
 });
 
 server.listen(PORT, "0.0.0.0", () => {

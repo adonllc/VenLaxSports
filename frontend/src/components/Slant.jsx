@@ -10,7 +10,7 @@ const CLIP = {
 export default function Slant({ src, alt = "", dir = "right", className = "" }) {
   return (
     <div className={`overflow-hidden bg-[#00765C] ${className}`} style={{ clipPath: CLIP[dir] }}>
-      {src && <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
+      {src && <img src={src} alt={alt} width={1600} height={894} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import platformConfig, { activeSports } from "../config/platformConfig";
+import { cityFromSlug, cityPath } from "../utils/citySlug";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -15,7 +17,8 @@ const SPORT_CONFIG = {
 };
 
 export default function CityLeaderboard() {
-  const { city, sport } = useParams();
+  const { city: citySegment, sport } = useParams();
+  const city = cityFromSlug(citySegment);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bellOpen, setBellOpen] = useState(false);
@@ -31,15 +34,15 @@ export default function CityLeaderboard() {
 
   useDocumentMeta({
     title: `${city} ${cfg.label} Rankings & Leagues | VENLAX Sports`,
-    description: `See the top ranked ${cfg.label.toLowerCase()} players in ${city} and join a skill-matched VENLAX league in your city.`,
-    canonicalPath: `/city/${encodeURIComponent(city)}/sport/${sport}`,
+    description: `See the top ranked ${cfg.label.toLowerCase()} players in ${city}, then join a skill-matched VENLAX league. No club membership, singles from $9.99 a season.`,
+    canonicalPath: cityPath(city, sport),
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://venlaxsports.com/" },
         { "@type": "ListItem", "position": 2, "name": cfg.label, "item": `https://venlaxsports.com/sport/${sport}` },
-        { "@type": "ListItem", "position": 3, "name": city, "item": `https://venlaxsports.com/city/${encodeURIComponent(city)}/sport/${sport}` },
+        { "@type": "ListItem", "position": 3, "name": city, "item": `https://venlaxsports.com${cityPath(city, sport)}` },
       ],
     },
   });
@@ -64,7 +67,7 @@ export default function CityLeaderboard() {
                 {city} Leaderboard
               </h1>
               <p className="text-gray-500 text-sm">
-                Top ranked {cfg.label.toLowerCase()} players in {city}
+                {city} {cfg.label} on VENLAX is a ranked league: you play skill-matched opponents, your rating updates every match, and there is no club membership.
               </p>
             </div>
             <button
@@ -215,6 +218,24 @@ export default function CityLeaderboard() {
             Join Free · VenLax Sports
           </Link>
         </div>
+        {/* Related pages: every city page is linked from other pages, not only the sitemap */}
+        <aside aria-label="Related" className="mt-8 pt-6 border-t border-gray-200" data-testid="city-related">
+          <h2 className="font-heading font-bold text-heading-dark mb-3">Related</h2>
+          <ul className="grid gap-2 text-sm">
+            {activeSports.filter((s) => s.id !== sport).map((s) => (
+              <li key={s.id}>
+                <Link to={cityPath(city, s.id)} className="font-bold underline" style={{ color: "#00765C" }}>{s.label} in {city}</Link>
+              </li>
+            ))}
+            {platformConfig.featuredCities.filter((c) => c.name !== city).slice(0, 3).map((c) => (
+              <li key={c.name}>
+                <Link to={cityPath(c.name, sport)} className="font-bold underline" style={{ color: "#00765C" }}>{cfg.label} in {c.name}</Link>
+              </li>
+            ))}
+            <li><Link to={`/sport/${sport}`} className="font-bold underline" style={{ color: "#00765C" }}>All {cfg.label.toLowerCase()} leagues</Link></li>
+            <li><Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: "#00765C" }}>Tennis &amp; Pickleball league guide</Link></li>
+          </ul>
+        </aside>
       </div>
       <NotifyMeModal
         isOpen={bellOpen}
