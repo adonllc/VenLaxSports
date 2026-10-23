@@ -41,28 +41,38 @@ export default function useDocumentMeta({ title, description, canonicalPath, jso
       if (canonicalTag) canonicalTag.setAttribute("href", `https://venlaxsports.com${canonicalPath}`);
     }
 
-    // Every page with its own title gets at least a WebPage block, so no page ships without markup.
-    // Pages that pass their own schema (breadcrumbs, FAQ, product) keep it.
-    const ld = jsonLd || (title ? {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      headline: title,
-      ...(description ? { description } : {}),
-      url: `https://venlaxsports.com${canonicalPath || window.location.pathname}`,
-      isPartOf: { "@type": "WebSite", name: "VENLAX Sports", url: "https://venlaxsports.com" },
-    } : null);
+    // Every page with its own title gets a WebPage block (headline = the page title), whether or not it
+    // also passes its own schema (breadcrumbs, FAQ, product), which goes in a separate block beside it.
+    const pageUrl = `https://venlaxsports.com${canonicalPath || window.location.pathname}`;
+    const blocks = [];
+    if (title) {
+      blocks.push({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        headline: title,
+        ...(description ? { description } : {}),
+        url: pageUrl,
+        mainEntityOfPage: pageUrl,
+        image: "https://venlaxsports.com/logo.png",
+        isPartOf: { "@type": "WebSite", name: "VENLAX Sports", url: "https://venlaxsports.com" },
+      });
+    }
+    if (jsonLd) blocks.push(jsonLd);
 
-    let scriptTag;
-    if (ld) {
+    const scriptTags = [];
+    if (blocks.length) {
       // Remove any script this hook already injected (prior mount, or baked
       // into the prerendered snapshot) so navigating between pages — or
       // hydrating over a prerendered page — never leaves two copies in <head>.
       document.querySelectorAll('script[data-page-jsonld]').forEach((el) => el.remove());
-      scriptTag = document.createElement("script");
-      scriptTag.type = "application/ld+json";
-      scriptTag.setAttribute("data-page-jsonld", "true");
-      scriptTag.textContent = JSON.stringify(ld);
-      document.head.appendChild(scriptTag);
+      blocks.forEach((block) => {
+        const tag = document.createElement("script");
+        tag.type = "application/ld+json";
+        tag.setAttribute("data-page-jsonld", "true");
+        tag.textContent = JSON.stringify(block);
+        document.head.appendChild(tag);
+        scriptTags.push(tag);
+      });
     }
 
     return () => {
@@ -73,7 +83,7 @@ export default function useDocumentMeta({ title, description, canonicalPath, jso
       if (twitterTitleTag && prevTwitterTitle != null) twitterTitleTag.setAttribute("content", prevTwitterTitle);
       if (twitterDescTag && prevTwitterDesc != null) twitterDescTag.setAttribute("content", prevTwitterDesc);
       if (canonicalTag) canonicalTag.setAttribute("href", "https://venlaxsports.com");
-      if (scriptTag) document.head.removeChild(scriptTag);
+      scriptTags.forEach((tag) => tag.parentNode?.removeChild(tag));
     };
   }, [title, description, canonicalPath, jsonLd]);
 }

@@ -227,7 +227,7 @@ export default function CityLeaderboard() {
                 <Link to={cityPath(city, s.id)} className="font-bold underline" style={{ color: "#00765C" }}>{s.label} in {city}</Link>
               </li>
             ))}
-            {platformConfig.featuredCities.filter((c) => c.name !== city).slice(0, 3).map((c) => (
+            {platformConfig.featuredCities.filter((c) => c.name !== city).slice(0, 6).map((c) => (
               <li key={c.name}>
                 <Link to={cityPath(c.name, sport)} className="font-bold underline" style={{ color: "#00765C" }}>{cfg.label} in {c.name}</Link>
               </li>

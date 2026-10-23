@@ -3,6 +3,7 @@ import PageHero from "../components/PageHero";
 import { GALLERY } from "../config/photos";
 import { Trophy, TrendingUp } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import RelatedLinks from "../components/RelatedLinks";
 
 const TENNIS_DIVISIONS = [
   { level: "Beginner", range: "2.0 – 2.5", desc: "New to competitive play" },
@@ -249,6 +250,13 @@ export default function Rules() {
           </Link>
         </div>
       </div>
+      <RelatedLinks links={[
+        { to: "/waiver", label: "Liability waiver" },
+        { to: "/terms", label: "Terms of Service" },
+        { to: "/handbook", label: "Player handbook" },
+        { to: "/ladders", label: "Challenge ladders" },
+        { to: "/tennis-pickleball-leagues", label: "Tennis & Pickleball league guide" },
+      ]} />
     </div>
   );
 }

@@ -70,7 +70,7 @@ const SEASON = [
 ];
 
 const SAFETY = [
-  { title: "Waiver and Terms", body: "A digital waiver and clear Terms before you play." },
+  { title: "Waiver and Terms", body: "A digital waiver and clear Terms before you play.", links: [{ to: "/waiver", label: "Read the waiver" }, { to: "/terms", label: "Read the Terms" }] },
   { title: "Players under 18", body: "Parental consent is required. The minimum age is 13." },
   { title: "Fair results", body: "Both players confirm scores. Disputes go to an organizer, with an appeal." },
   { title: "Account security", body: "Two-factor sign-in and Google sign-in are available." },
@@ -410,6 +410,13 @@ export default function Home() {
                 <ShieldCheck className="w-7 h-7 mb-4" style={{ color: GREEN }} aria-hidden="true" />
                 <h3 className="font-bold text-lg mb-1" style={{ color: INK }}>{s.title}</h3>
                 <p className="text-base">{s.body}</p>
+                {s.links && (
+                  <p className="mt-3 text-sm flex flex-wrap gap-x-4">
+                    {s.links.map((l) => (
+                      <Link key={l.to} to={l.to} className="font-bold underline" style={{ color: "#00765C" }}>{l.label}</Link>
+                    ))}
+                  </p>
+                )}
               </motion.div>
             ))}
           </div>
