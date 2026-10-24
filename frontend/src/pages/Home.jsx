@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
@@ -54,12 +54,6 @@ const LEAGUE_TYPES = [
   { id: "ladder", name: "Challenge Ladder", line: "An ongoing ranked list.", points: ["Challenge anyone above you", "Win to swap ranks", "Join any time and climb year-round"], best: "Best for year-round play." },
 ];
 
-const PRICING = [
-  { format: "Singles", who: "1 player", price: "$9.99", unit: "per player, per season" },
-  { format: "Doubles", who: "Team of 2", price: "$19.99", unit: "per team, per season" },
-  { format: "Mixed doubles", who: "1 man + 1 woman", price: "$19.99", unit: "per team, per season" },
-];
-
 const SEASON = [
   { step: "Join", body: "Pick your sport, city, format and level." },
   { step: "Get matched", body: "You are placed in a league with players near your rating." },
@@ -102,7 +96,7 @@ const FAQ = [
   { q: "Where can I find the rules?", a: "The Rules page and Player Handbook cover formats, scheduling, conduct and playoffs." },
 ];
 
-// Machine-readable copies of the visible FAQ and pricing cards (kept in sync by building them from the same arrays)
+// Machine-readable copy of the visible FAQ (built from the same array)
 const HOME_JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -120,7 +114,7 @@ const HOME_JSON_LD = {
       provider: { "@type": "Organization", name: "VENLAX Sports", url: "https://venlaxsports.com" },
       areaServed: { "@type": "Country", name: "United States" },
       // No "offers" here on purpose: Google reads any Offer as a shop listing and asks for shipping and
-      // return policy fields that do not apply to a league entry. Prices live in the pricing cards and FAQ.
+      // return policy fields that do not apply to a league entry.
     },
   ],
 };
@@ -170,17 +164,12 @@ function SampleChart() {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { hash } = useLocation();
   useDocumentMeta({
     title: "Ranked Tennis & Pickleball Leagues | VENLAX Sports",
     description: "Ranked Tennis and Pickleball leagues across the USA. No club membership. Singles $9.99 a season, doubles $19.99 per team. Skill-matched opponents, live standings and playoffs.",
     canonicalPath: "/",
     jsonLd: HOME_JSON_LD,
   });
-  // Nav "Pricing" link: scroll to the pricing section, also when arriving from another page
-  useEffect(() => {
-    if (hash) document.querySelector(hash)?.scrollIntoView();
-  }, [hash]);
   const [typeId, setTypeId] = useState("flex");
   const type = LEAGUE_TYPES.find((t) => t.id === typeId);
   const [founding, setFounding] = useState(null);
@@ -322,33 +311,6 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </Section>
-
-        {/* 4. PRICING */}
-        <Section tint className="scroll-mt-16" id="pricing">
-          <Heading eyebrow="Pricing" title="Simple pricing" lead="One fee per season. No club membership. Doubles is one fee for the whole team." />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PRICING.map((p, i) => (
-              <motion.div
-                key={p.format}
-                {...fadeUp}
-                className={`bg-white p-8 border-t-4 relative ${i === 0 ? "ring-2 ring-[#008F70]" : ""}`}
-                style={{ borderColor: AMBER }}
-                data-testid={`home-price-${p.format.toLowerCase().replace(/\s+/g, "-")}`}
-              >
-                {i === 0 && (
-                  <span className="absolute -top-3 left-6 px-3 py-1 text-xs font-bold uppercase tracking-wider" style={{ background: GREEN, color: "#fff" }} data-testid="home-price-popular-badge">Popular</span>
-                )}
-                <h3 className="font-bold text-xl" style={{ color: INK }}>{p.format}</h3>
-                <p className="text-sm mb-5">{p.who}</p>
-                <div className="font-bold text-5xl leading-none" style={{ color: GREEN }}>{p.price}</div>
-                <p className="mt-2 text-sm">{p.unit}</p>
-                {i === 0 && <p className="mt-4 text-sm font-bold" style={{ color: INK }}>Most players start here.</p>}
-              </motion.div>
-            ))}
-          </div>
-          <p className="mt-5 text-base font-medium" style={{ color: INK }}>Less than one court-rental split, for a whole season.</p>
-          <p className="mt-2 text-sm">Entry fees are non-refundable once the league starts. Payments are processed by Stripe. See the <Link to="/tennis-pickleball-leagues" className="font-bold underline" style={{ color: GREEN }}>League Guide</Link> for details.</p>
         </Section>
 
         {/* 5. SEASON AT A GLANCE */}

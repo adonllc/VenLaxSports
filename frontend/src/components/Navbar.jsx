@@ -146,17 +146,6 @@ export default function Navbar() {
               League Guide
             </Link>
 
-            <Link
-              to="/#pricing"
-              className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={{ color: NAV_MUTED }}
-              onMouseEnter={e => { e.currentTarget.style.color = NAV_TEXT; e.currentTarget.style.background = NAV_HOVER_BG; }}
-              onMouseLeave={e => { e.currentTarget.style.color = NAV_MUTED; e.currentTarget.style.background = "transparent"; }}
-              data-testid="nav-pricing"
-            >
-              Pricing
-            </Link>
-
             {user?.role === "admin" && (
               <Link
                 to="/admin"
@@ -322,13 +311,6 @@ export default function Navbar() {
             data-testid="nav-league-guide-mobile"
           >
             League Guide
-          </Link>
-          <Link
-            to="/#pricing"
-            className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-            data-testid="nav-pricing-mobile"
-          >
-            Pricing
           </Link>
 
           <div className="pt-2 mt-2 border-t border-gray-100 space-y-1">
