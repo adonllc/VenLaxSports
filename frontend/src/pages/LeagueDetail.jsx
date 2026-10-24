@@ -7,6 +7,7 @@ import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
+import { PHOTOS } from "../config/photos";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -282,6 +283,7 @@ export default function LeagueDetail() {
         "@type": "SportsEvent",
         "name": league.name,
         "sport": league.sport,
+        "image": [`https://venlaxsports.com${PHOTOS[league.sport] || PHOTOS.hero}`],
         "startDate": league.start_date,
         "endDate": league.end_date,
         "eventStatus": league.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",

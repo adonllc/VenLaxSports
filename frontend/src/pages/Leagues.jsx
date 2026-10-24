@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PageHero from "../components/PageHero";
-import { GALLERY } from "../config/photos";
+import { GALLERY, PHOTOS } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Trophy } from "lucide-react";
@@ -100,6 +100,7 @@ export default function Leagues() {
         "@type": "SportsEvent",
         "name": l.name,
         "sport": l.sport,
+        "image": [`https://venlaxsports.com${PHOTOS[l.sport] || PHOTOS.hero}`],
         "startDate": l.start_date,
         "endDate": l.end_date,
         "eventStatus": "https://schema.org/EventScheduled",

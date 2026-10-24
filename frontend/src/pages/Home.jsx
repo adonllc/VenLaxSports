@@ -111,23 +111,16 @@ const HOME_JSON_LD = {
       mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
     },
     {
-      // A Service, not a Product: a league season is not a shipped good, and Product markup makes Google
-      // validate it as a shop listing (image, shippingDetails, return policy).
+      // A Service, not a Product: a league season is not a shipped good.
       "@type": "Service",
       name: "VENLAX Sports ranked league season",
       serviceType: "Ranked Tennis and Pickleball league",
+      image: ["https://venlaxsports.com/photos/t2-clay.webp", "https://venlaxsports.com/photos/p1-park.webp"],
       description: "Entry to a ranked Tennis or Pickleball league season: skill-matched opponents, live standings and playoffs.",
       provider: { "@type": "Organization", name: "VENLAX Sports", url: "https://venlaxsports.com" },
       areaServed: { "@type": "Country", name: "United States" },
-      offers: PRICING.map((p) => ({
-        "@type": "Offer",
-        name: `${p.format} (${p.who})`,
-        price: p.price.replace("$", ""),
-        priceCurrency: "USD",
-        description: p.unit,
-        url: "https://venlaxsports.com/#pricing",
-        availability: "https://schema.org/InStock",
-      })),
+      // No "offers" here on purpose: Google reads any Offer as a shop listing and asks for shipping and
+      // return policy fields that do not apply to a league entry. Prices live in the pricing cards and FAQ.
     },
   ],
 };
