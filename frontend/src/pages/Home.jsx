@@ -222,7 +222,7 @@ export default function Home() {
                 Find a league. Play. Rise.
               </motion.p>
               <motion.p className="mt-4 text-base md:text-xl font-bold text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.28 }} data-testid="hero-offer-line">
-                Competitive leagues in your city. No club membership. $9.99 a season.
+                Competitive leagues in your city. No club membership.
               </motion.p>
               <motion.div className="mt-8 flex flex-col items-center gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
                 <AmberButton onClick={() => navigate("/auth")} testId="hero-join-venlax">Join a league</AmberButton>
