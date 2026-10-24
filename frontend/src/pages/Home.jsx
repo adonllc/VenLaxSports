@@ -111,10 +111,14 @@ const HOME_JSON_LD = {
       mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
     },
     {
-      "@type": "Product",
-      name: "VENLAX Sports league entry",
+      // A Service, not a Product: a league season is not a shipped good, and Product markup makes Google
+      // validate it as a shop listing (image, shippingDetails, return policy).
+      "@type": "Service",
+      name: "VENLAX Sports ranked league season",
+      serviceType: "Ranked Tennis and Pickleball league",
       description: "Entry to a ranked Tennis or Pickleball league season: skill-matched opponents, live standings and playoffs.",
-      brand: { "@type": "Brand", name: "VENLAX Sports" },
+      provider: { "@type": "Organization", name: "VENLAX Sports", url: "https://venlaxsports.com" },
+      areaServed: { "@type": "Country", name: "United States" },
       offers: PRICING.map((p) => ({
         "@type": "Offer",
         name: `${p.format} (${p.who})`,
