@@ -7,6 +7,7 @@ Jobs registered in scheduler.py:
   - send_match_reminders       every hour
   - auto_forfeit_stale_matches daily 01:00 UTC
   - send_credit_expiry_reminders daily 10:00 UTC
+  - refund_unpaired_teams      daily 00:20 UTC (off until an admin turns it on)
 """
 from __future__ import annotations
 import logging
@@ -15,10 +16,64 @@ from datetime import datetime, timezone, timedelta
 logger = logging.getLogger(__name__)
 
 
-async def is_job_enabled(db, job_id: str) -> bool:
-    """Admin-toggleable switch for a background job. Defaults to enabled if never set."""
+async def is_job_enabled(db, job_id: str, default: bool = True) -> bool:
+    """Admin-toggleable switch for a background job. Uses `default` if the admin never set it."""
     flag = await db.feature_flags.find_one({"_id": job_id})
-    return flag.get("enabled", True) if flag else True
+    return flag.get("enabled", default) if flag else default
+
+
+def _stripe_refund(session_id: str, idempotency_key: str) -> str:
+    """Refund the full payment behind a Checkout session. Returns the Stripe refund id."""
+    import os
+    import stripe
+    api_key = os.environ.get("STRIPE_API_KEY")
+    if not api_key:
+        raise RuntimeError("STRIPE_API_KEY is not configured")
+    stripe.api_key = api_key
+    session = stripe.checkout.Session.retrieve(session_id)
+    refund = stripe.Refund.create(payment_intent=session.payment_intent, idempotency_key=idempotency_key)
+    return refund.id
+
+
+async def refund_unpaired_teams(db) -> None:
+    """Refund doubles teams whose first player paid but never had a partner by the league's start date.
+
+    Off by default: the admin turns it on in Feature Flags. A team is refunded once (the invite moves to
+    "refunded" and the Stripe call carries an idempotency key). Payments that did not go through Stripe
+    Checkout (Zelle and so on) are left for the admin, who sees them in "Doubles teams waiting for a partner".
+    """
+    if not await is_job_enabled(db, "refund_unpaired_teams", default=False):
+        return
+    import email_service
+    from bson import ObjectId
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    invites = await db.doubles_invites.find({"status": "initiator_paid"}).to_list(500)
+    refunded = 0
+    for inv in invites:
+        try:
+            league = await db.leagues.find_one({"_id": ObjectId(inv["league_id"])}) or {}
+            if str(league.get("start_date", ""))[:10] > today or not league.get("start_date"):
+                continue  # still time to find a partner
+            if inv.get("partner_user_id"):
+                continue  # a partner is attached, the team is not unpaired
+            txn = await db.payment_transactions.find_one({"metadata.invite_token": inv["token"], "payment_status": "paid"})
+            if not txn or not str(txn.get("session_id", "")).startswith("cs_"):
+                logger.warning("refund_unpaired_teams: no Stripe payment found for team %s; left for the admin", inv["token"][-6:])
+                continue
+            refund_id = _stripe_refund(txn["session_id"], f"unpaired-team-{inv['token']}")
+            now = datetime.now(timezone.utc).isoformat()
+            await db.doubles_invites.update_one({"token": inv["token"]}, {"$set": {"status": "refunded", "refunded_at": now, "refund_id": refund_id}})
+            await db.payment_transactions.update_one({"session_id": txn["session_id"]}, {"$set": {"refunded": True, "refunded_at": now, "refund_id": refund_id}})
+            user = await db.users.find_one({"_id": ObjectId(inv["initiator_id"])}, {"email": 1, "name": 1})
+            if user and user.get("email"):
+                email_service.schedule(email_service.send_team_refunded(
+                    user["email"], user.get("name", ""), league.get("name", "the league"), float(txn.get("amount", 0))))
+            refunded += 1
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("refund_unpaired_teams failed for team %s: %s", str(inv.get("token", ""))[-6:], exc)
+    if refunded:
+        logger.info("refund_unpaired_teams: refunded %d teams", refunded)
 
 
 async def auto_open_leagues(db) -> None:

@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import axios from "axios";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -14,7 +13,6 @@ import RouteErrorBoundary from "./components/RouteErrorBoundary";
 
 // Eagerly loaded — always needed on first paint
 import Home from "./pages/Home";
-import PreLaunch from "./pages/PreLaunch";
 
 // Route-split — loaded only when navigated to
 const Auth = lazy(() => import("./pages/Auth"));
@@ -49,9 +47,6 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
 const TennisPickleballLeagues = lazy(() => import("./pages/TennisPickleballLeagues"));
 const LeagueMatches = lazy(() => import("./pages/LeagueMatches"));
-
-const IS_PRELAUNCH = import.meta.env.VITE_PRELAUNCH === "true";
-const IS_LAUNCH_LIVE = import.meta.env.VITE_LAUNCH_LIVE === "true";
 
 function PageFallback() {
   return (
@@ -108,8 +103,7 @@ function AppRouter() {
 function AppShell() {
   const location = useLocation();
 
-  // Capture ?ref= from any page so a referral (registered-user code or
-  // waitlist share link) survives until the visitor actually registers.
+  // Capture ?ref= from any page so a referral (a registered user's code) survives until the visitor actually registers.
   useEffect(() => {
     const ref = new URLSearchParams(location.search).get("ref");
     if (ref) localStorage.setItem("pending_ref", ref);
@@ -125,21 +119,6 @@ function AppShell() {
     trackPageView(location.pathname + location.search);
   }, [location.pathname, location.search, settingsLoaded]);
 
-  // Runtime launch switch (admin Flags tab). null = still asking the API.
-  const [siteLive, setSiteLive] = useState(null);
-  const gated = IS_PRELAUNCH && !IS_LAUNCH_LIVE;
-  useEffect(() => {
-    if (!gated) return;
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URL}/api/site-status`, { timeout: 4000 })
-      .then((r) => setSiteLive(!!r.data.live))
-      .catch(() => setSiteLive(false)); // API down: stay on the waitlist page
-  }, [gated]);
-
-  if (gated && location.pathname === "/") {
-    if (siteLive === null) return <PageFallback />;
-    if (!siteLive) return <PreLaunch />;
-  }
   return (
     <div className="min-h-screen bg-[var(--vl-bg)] flex flex-col font-body overflow-x-hidden">
       <Navbar />

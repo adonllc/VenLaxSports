@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Trophy, Check } from "lucide-react";
 import { activeSportIds, FOUNDING_DISPLAY_FLOOR, indexedCities } from "../config/platformConfig";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { useAuth } from "../contexts/AuthContext";
 import PhotoSlot from "./PhotoSlot";
 
 const GREEN = "#008F70";
@@ -29,7 +30,8 @@ export default function SportHero({
   const openText = openCities === null ? `Now open in ${indexedCities.length} cities` : openCities.length ? `Now open in ${openCities.join(", ")}` : "Opening soon";
   const handlePrimary = onPrimary ?? (() => navigate(`/join?sport=${sportMeta.id}`));
   const handleSecondary = onSecondary ?? (() => navigate("/auth?mode=register"));
-  const showStats = foundingStats.count >= FOUNDING_DISPLAY_FLOOR;
+  const { user } = useAuth();
+  const showStats = user?.role === "admin" && foundingStats.count >= FOUNDING_DISPLAY_FLOOR; // member counts: admin only
   const spotsPercent = foundingStats.limit > 0 ? Math.round((foundingStats.count / foundingStats.limit) * 100) : 0;
 
   return (

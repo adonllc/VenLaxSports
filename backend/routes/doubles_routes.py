@@ -12,10 +12,35 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from auth_utils import get_current_user, get_optional_user
 from models import DoublesConfirmRequest
+from pydantic import BaseModel
+from typing import Optional
 import email_service
 import os
 
 router = APIRouter(redirect_slashes=False)
+
+GENDERS = ("male", "female")
+
+
+def invite_expiry(league: dict, now: datetime) -> str:
+    """A doubles invite stays open until the league starts and stays visible to admin 30 more days.
+
+    Never shorter: a team whose first player has paid must not lose its record while the partner is still unknown."""
+    from datetime import timedelta
+    try:
+        start = datetime.fromisoformat(str(league.get("start_date", ""))[:10]).replace(tzinfo=timezone.utc)
+    except ValueError:
+        start = now + timedelta(days=30)
+    return (max(start, now) + timedelta(days=30)).isoformat()
+
+
+def mixed_gender_error(gender_a, gender_b) -> Optional[str]:
+    """Mixed doubles is one male and one female. Returns the reason a pair is not allowed, or None."""
+    if gender_a not in GENDERS or gender_b not in GENDERS:
+        return "Mixed doubles needs both players to have a gender (male or female) on their profile."
+    if gender_a == gender_b:
+        return "Mixed doubles requires one male and one female player."
+    return None
 
 
 # ── GET /status ───────────────────────────────────────────────────────────────
@@ -121,9 +146,15 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
 
     # ── DECLINE ───────────────────────────────────────────────────────────────
     if body.action == "decline":
-        await db.doubles_invites.update_one(
-            {"token": body.token}, {"$set": {"status": "declined"}}
-        )
+        if invite.get("status") == "initiator_paid":
+            # The first player has paid: keep the team open so they can name another partner
+            await db.doubles_invites.update_one(
+                {"token": body.token}, {"$set": {"partner_email": "", "partner_user_id": None}}
+            )
+        else:
+            await db.doubles_invites.update_one(
+                {"token": body.token}, {"$set": {"status": "declined"}}
+            )
         # Notify initiator
         initiator_id = invite["initiator_id"]
         try:
@@ -155,6 +186,12 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
     if p2_existing:
         raise HTTPException(status_code=409, detail="You are already registered in this league")
 
+    if league.get("format") == "mixed_doubles":
+        p1 = await db.users.find_one({"_id": ObjectId(invite["initiator_id"])}, {"gender": 1})
+        reason = mixed_gender_error((p1 or {}).get("gender"), current_user.get("gender"))
+        if reason:
+            raise HTTPException(status_code=400, detail=reason)
+
     # Atomic spot reservation — TOCTOU guard
     result = await db.leagues.find_one_and_update(
         {
@@ -178,15 +215,7 @@ async def confirm_doubles_invite(body: DoublesConfirmRequest, request: Request):
 
     entry_fee = float(league.get("entry_fee", 0))
 
-    # Soft gender check for mixed_doubles
-    gender_warning = None
-    if league.get("format") == "mixed_doubles":
-        p1 = await db.users.find_one({"_id": ObjectId(invite["initiator_id"])}, {"gender": 1})
-        p2 = await db.users.find_one({"_id": ObjectId(current_user["_id"])}, {"gender": 1})
-        p1_gender = p1.get("gender") if p1 else None
-        p2_gender = p2.get("gender") if p2 else None
-        if p1_gender and p2_gender and p1_gender == p2_gender:
-            gender_warning = "Mixed doubles requires one male and one female player. Please verify your team composition."
+    gender_warning = None  # kept in the response for older clients; the gender rule is now enforced above
 
     if entry_fee == 0 or invite_status_before == "initiator_paid":
         # Free league OR initiator already paid — create both PlayerLeague records now
@@ -285,27 +314,122 @@ async def my_doubles_invites(request: Request):
     user = await get_current_user(request, db)
 
     invites = await db.doubles_invites.find(
-        {"initiator_id": user["_id"], "status": "pending"}
+        {"initiator_id": user["_id"], "status": {"$in": ["pending", "initiator_paid"]}}
     ).sort("created_at", -1).to_list(50)
 
     result = []
     for inv in invites:
         league_name = "Unknown League"
+        entry_fee = 0.0
         try:
             league = await db.leagues.find_one({"_id": ObjectId(inv["league_id"])})
             if league:
                 league_name = league["name"]
+                entry_fee = float(league.get("entry_fee", 0))
         except Exception:
             pass
         result.append({
             "token": inv["token"],
             "league_name": league_name,
+            "league_id": inv.get("league_id", ""),
+            "entry_fee": entry_fee,
             "partner_email": inv.get("partner_email", ""),
+            "partner_later": bool(inv.get("partner_later")),
+            "paid": inv.get("status") == "initiator_paid",
             "expires_at": inv.get("expires_at", ""),
             "status": inv.get("status", "pending"),
         })
 
     return {"invites": result}
+
+
+# ── POST /{token}/partner ─────────────────────────────────────────────────────
+
+class AddPartnerRequest(BaseModel):
+    partner_id: Optional[str] = None
+    partner_email: Optional[str] = None
+
+
+@router.post("/{token}/partner")
+async def add_partner(token: str, body: AddPartnerRequest, request: Request):
+    """Initiator (P1) names the partner of a team that registered first: a VenLax player (team is
+    completed now) or an email (the partner gets the invite and confirms). Allowed until the league starts."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite not found")
+    if invite["initiator_id"] != user["_id"]:
+        raise HTTPException(status_code=403, detail="Only the initiator can add a partner")
+    if invite.get("status") not in ("pending", "initiator_paid"):
+        raise HTTPException(status_code=409, detail=f"This team is already {invite.get('status')}")
+    if not body.partner_id and not (body.partner_email or "").strip():
+        raise HTTPException(status_code=400, detail="Select a partner or enter a partner email")
+
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])})
+    except Exception:
+        league = None
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    if league.get("status") != "registration":
+        raise HTTPException(status_code=400, detail="League registration is closed")
+
+    league_name = league.get("name", "the league")
+    entry_fee = float(league.get("entry_fee", 0))
+    initiator_name = invite.get("initiator_name", user.get("name", ""))
+
+    # Partner is a VenLax player: complete the team now
+    if body.partner_id:
+        if entry_fee > 0 and invite.get("status") != "initiator_paid":
+            raise HTTPException(status_code=400, detail="Complete your payment first, then add your partner")
+        try:
+            partner = await db.users.find_one({"_id": ObjectId(body.partner_id)})
+        except Exception:
+            partner = None
+        if not partner:
+            raise HTTPException(status_code=404, detail="Partner not found")
+        partner_id = str(partner["_id"])
+        if partner_id == str(user["_id"]):
+            raise HTTPException(status_code=400, detail="Cannot partner with yourself")
+        if await db.player_leagues.find_one({"league_id": invite["league_id"], "player_id": partner_id}):
+            raise HTTPException(status_code=409, detail="Partner already registered in this league")
+        if league.get("format") == "mixed_doubles":
+            reason = mixed_gender_error(user.get("gender"), partner.get("gender"))
+            if reason:
+                raise HTTPException(status_code=400, detail=reason)
+
+        reserved = await db.leagues.find_one_and_update(
+            {"_id": league["_id"], "$expr": {"$lte": [{"$add": ["$current_players", 2]}, "$max_players"]}},
+            {"$inc": {"current_players": 2}},
+        )
+        if not reserved:
+            raise HTTPException(status_code=409, detail="Not enough spots — league is full")
+
+        await db.doubles_invites.update_one({"token": token}, {"$set": {
+            "partner_user_id": partner_id, "partner_email": partner.get("email", ""), "partner_added_by_initiator": True,
+        }})
+        invite["partner_user_id"] = partner_id
+        partner_doc = {
+            "_id": partner_id, "id": partner_id, "email": partner.get("email", ""), "name": partner.get("name", ""),
+            "first_name": partner.get("first_name", ""), "last_name": partner.get("last_name", ""),
+        }
+        await _create_doubles_pair(db, invite, league, partner_doc, notify_partner_as_added=True)
+        await db.doubles_invites.update_one({"token": token}, {"$set": {"status": "accepted"}})
+        return {"registered": True, "partner_name": partner.get("name", "")}
+
+    # Partner is invited by email
+    partner_email = body.partner_email.lower().strip()
+    if partner_email == (user.get("email") or "").lower():
+        raise HTTPException(status_code=400, detail="Cannot invite yourself as partner")
+    await db.doubles_invites.update_one({"token": token}, {"$set": {"partner_email": partner_email}})
+    frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
+    email_service.schedule(email_service.send_partner_invite(
+        partner_email, initiator_name, league_name, league.get("sport", "tennis"), entry_fee,
+        f"{frontend_url}/doubles-invite/confirm?token={token}",
+    ))
+    return {"invited": True, "partner_email": partner_email}
 
 
 # ── Shared helper ─────────────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ import notification_dispatch
 import qualification
 from launch_city import require_city_open
 import secrets
+from routes.doubles_routes import invite_expiry, mixed_gender_error, GENDERS
 
 router = APIRouter(redirect_slashes=False)
 
@@ -137,6 +138,9 @@ class JoinLeagueRequest(BaseModel):
     waiver_accepted: bool = False
     partner_email: Optional[str] = None
     partner_id: Optional[str] = None
+    partner_later: bool = False
+
+
 
 
 @router.post("/{league_id}/join")
@@ -160,18 +164,22 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         raise HTTPException(status_code=400, detail="League is full")
 
     # ── Doubles branch ────────────────────────────────────────────────────────
-    if league.get("format") == "doubles":
+    if league.get("format") in ("doubles", "mixed_doubles"):
         partner_id = getattr(body, "partner_id", None)
         partner_email_raw = getattr(body, "partner_email", None)
 
-        if not partner_id and not partner_email_raw:
-            raise HTTPException(status_code=400, detail="Select a partner or enter partner email")
+        if not partner_id and not partner_email_raw and not body.partner_later:
+            raise HTTPException(status_code=400, detail="Select a partner, enter a partner email, or choose to add your partner later")
 
         already_reg = await db.player_leagues.find_one(
             {"league_id": league_id, "player_id": user["_id"]}
         )
         if already_reg:
             raise HTTPException(status_code=409, detail="Already registered in this league")
+
+        is_mixed = league.get("format") == "mixed_doubles"
+        if is_mixed and user.get("gender") not in GENDERS:
+            raise HTTPException(status_code=400, detail="Set your gender (male or female) to join a Mixed Doubles league.")
 
         now = datetime.now(timezone.utc)
         league_name = league.get("name", "the league")
@@ -181,6 +189,53 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
             f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
             or user.get("name", "")
         )
+
+        if not partner_id and not partner_email_raw:
+            # ── Register now, add the partner later (before the league starts) ──
+            available = league.get("max_players", 0) - league.get("current_players", 0)
+            if available < 2:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Not enough spots — only {available} remaining (need 2 for doubles)",
+                )
+            existing_invite = await db.doubles_invites.find_one(
+                {"initiator_id": user["_id"], "league_id": league_id, "status": {"$in": ["pending", "initiator_paid"]}}
+            )
+            if existing_invite:
+                resp = {
+                    "has_pending_invite": True,
+                    "partner_later": bool(existing_invite.get("partner_later")),
+                    "invite_token": existing_invite["token"],
+                    "partner_email": existing_invite.get("partner_email", ""),
+                    "expires_at": existing_invite.get("expires_at", ""),
+                }
+                if entry_fee > 0 and existing_invite.get("status") == "pending":
+                    resp["requires_payment"] = True
+                    resp["entry_fee"] = float(entry_fee)
+                return resp
+
+            token = secrets.token_hex(32)
+            expires_at = invite_expiry(league, now)
+            await db.doubles_invites.insert_one({
+                "league_id": league_id,
+                "initiator_id": user["_id"],
+                "initiator_name": initiator_name,
+                "partner_email": "",
+                "partner_user_id": None,
+                "partner_added_by_initiator": False,
+                "partner_later": True,
+                "token": token,
+                "status": "pending",
+                "waiver_p1_at": now.isoformat(),
+                "created_at": now.isoformat(),
+                "expires_at": expires_at,
+            })
+            resp = {"pending_partner": True, "partner_later": True, "invite_token": token, "expires_at": expires_at}
+            if entry_fee > 0:
+                resp.update(requires_payment=True, entry_fee=float(entry_fee))
+            else:
+                resp["message"] = "You are in. Add your partner any time before the league starts."
+            return resp
 
         if partner_id:
             # ── Direct registration — partner found in system ─────────────────
@@ -192,6 +247,10 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 raise HTTPException(status_code=404, detail="Partner not found")
             if str(partner["_id"]) == str(user["_id"]):
                 raise HTTPException(status_code=400, detail="Cannot partner with yourself")
+            if is_mixed:
+                reason = mixed_gender_error(user.get("gender"), partner.get("gender"))
+                if reason:
+                    raise HTTPException(status_code=400, detail=reason)
 
             partner_reg = await db.player_leagues.find_one(
                 {"league_id": league_id, "player_id": str(partner["_id"])}
@@ -241,7 +300,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     "status": "pending",
                     "waiver_p1_at": now.isoformat(),
                     "created_at": now.isoformat(),
-                    "expires_at": (now + timedelta(hours=72)).isoformat(),
+                    "expires_at": invite_expiry(league, now),
                 }
                 await db.doubles_invites.insert_one(invite_doc)
 
@@ -321,7 +380,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "status": "pending",
                 "waiver_p1_at": now.isoformat(),
                 "created_at": now.isoformat(),
-                "expires_at": (now + timedelta(hours=72)).isoformat(),
+                "expires_at": invite_expiry(league, now),
             }
             await db.doubles_invites.insert_one(invite_doc)
 
@@ -394,7 +453,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
     }
     if max_p > 0:
         if new_count >= max_p:
-            asyncio.create_task(notification_dispatch.dispatch_waitlist_open(db, _league_info))
+            asyncio.create_task(notification_dispatch.dispatch_league_full(db, _league_info))
         elif old_count < int(max_p * 0.8) and new_count >= int(max_p * 0.8):
             spots_left = max_p - new_count
             asyncio.create_task(notification_dispatch.dispatch_last_spots(db, _league_info, spots_left))

@@ -268,7 +268,6 @@ export default function AdminDashboard() {
     { id: "playoffs", label: "Playoffs" },
     { id: "disputes", label: "Disputes" },
     { id: "zelle", label: "Zelle Queue" },
-    { id: "waitlist", label: "Waitlist" },
     { id: "referrals", label: "Referrals" },
     { id: "marketing", label: "Marketing" },
     { id: "flags", label: "Feature Flags" },
@@ -544,6 +543,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Manage Leagues Tab */}
+        {tab === "leagues" && <IncompleteTeamsCard />}
         {tab === "leagues" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
@@ -805,7 +805,6 @@ export default function AdminDashboard() {
           </div>
         )}
         {tab === "zelle" && <ZelleQueueTab />}
-        {tab === "waitlist" && <WaitlistTab />}
         {tab === "referrals" && <ReferralsTab />}
         {tab === "flags" && <FlagsTab />}
         {tab === "marketing" && <MarketingTab />}
@@ -1354,176 +1353,6 @@ function ZelleQueueTab() {
   );
 }
 
-// ─────────── Waitlist Tab ───────────
-function WaitlistTab() {
-  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [deleting, setDeleting] = useState(null);
-  const [deleteMsg, setDeleteMsg] = useState("");
-
-  const fetchWaitlist = async () => {
-    try {
-      const res = await axios.get(`${API}/waitlist/list`, { withCredentials: true });
-      setData(res.data);
-    } catch {
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWaitlist();
-  }, []);
-
-  const handleDelete = async (email) => {
-    if (!window.confirm(`Remove ${email} from waitlist?`)) return;
-    setDeleting(email);
-    setDeleteMsg("");
-    try {
-      await axios.delete(`${API}/waitlist`, { data: { email }, withCredentials: true });
-      setDeleteMsg(`Removed ${email}`);
-      fetchWaitlist();
-    } catch (err) {
-      setDeleteMsg(err.response?.data?.detail || "Failed to delete");
-    } finally {
-      setDeleting(null);
-    }
-  };
-
-  const copyCSV = () => {
-    if (!data) return;
-    const rows = [["Email", "City", "Sport", "Signed Up"], ...data.entries.map((e) => [e.email, e.city, e.sport, e.created_at])];
-    navigator.clipboard.writeText(rows.map((r) => r.join(",")).join("\n"));
-  };
-
-  if (loading) return <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>;
-  if (!data) return <div className="text-sm text-red-500 py-8 text-center">Failed to load waitlist.</div>;
-
-  const filtered = data.entries.filter(
-    (e) => !search || e.email.includes(search.toLowerCase()) || e.city.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-6" data-testid="waitlist-tab">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
-          <div className="text-3xl font-bold text-heading-dark">{data.total}</div>
-          <div className="text-xs text-gray-500 mt-1">Total signups</div>
-        </div>
-        {data.by_sport.tennis !== undefined && (
-          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-emerald-700">{data.by_sport.tennis || 0}</div>
-            <div className="text-xs text-gray-500 mt-1">Tennis</div>
-          </div>
-        )}
-        {data.by_sport.pickleball !== undefined && (
-          <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-orange-600">{data.by_sport.pickleball || 0}</div>
-            <div className="text-xs text-gray-500 mt-1">Pickleball</div>
-          </div>
-        )}
-        {data.by_sport.both !== undefined && (
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-gray-700">{data.by_sport.both || 0}</div>
-            <div className="text-xs text-gray-500 mt-1">Both sports</div>
-          </div>
-        )}
-      </div>
-
-      {data.by_city.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">By City</p>
-          <div className="flex flex-wrap gap-2">
-            {data.by_city.map(([city, count]) => (
-              <span key={city} className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
-                {city} <span className="font-semibold text-heading-dark">{count}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {deleteMsg && (
-        <div className={`text-sm px-4 py-3 rounded-xl border ${deleteMsg.startsWith("Removed") ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`} data-testid="waitlist-delete-msg">
-          {deleteMsg}
-        </div>
-      )}
-
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border-b border-gray-100">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search email or city..."
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            data-testid="waitlist-search"
-          />
-          <button
-            onClick={copyCSV}
-            className="text-xs bg-[#008F70] text-white px-3 py-2 rounded-none hover:bg-[#00765C] transition-colors whitespace-nowrap"
-            data-testid="waitlist-copy-csv"
-          >
-            Copy CSV
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-max sm:min-w-full">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
-              <tr>
-                <th className="px-3 sm:px-4 py-3 text-left">#</th>
-                <th className="px-3 sm:px-4 py-3 text-left">Email</th>
-                <th className="hidden sm:table-cell px-3 sm:px-4 py-3 text-left">City</th>
-                <th className="px-3 sm:px-4 py-3 text-left">Sport</th>
-                <th className="hidden md:table-cell px-3 sm:px-4 py-3 text-left">Signed Up</th>
-                <th className="px-3 sm:px-4 py-3 text-left">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {filtered.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-xs">No entries found.</td></tr>
-              ) : (
-                filtered.map((e, i) => (
-                  <tr key={e.email} className="hover:bg-gray-50">
-                    <td className="px-3 sm:px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
-                    <td className="px-3 sm:px-4 py-3 font-medium text-heading-dark text-xs sm:text-sm max-w-[150px] sm:max-w-none truncate">{e.email}</td>
-                    <td className="hidden sm:table-cell px-3 sm:px-4 py-3 text-gray-600 text-sm">{e.city}</td>
-                    <td className="px-3 sm:px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
-                        e.sport === "tennis" ? "bg-emerald-100 text-emerald-700" :
-                        e.sport === "pickleball" ? "bg-orange-100 text-orange-700" :
-                        "bg-gray-100 text-gray-700"
-                      }`}>
-                        {e.sport}
-                      </span>
-                    </td>
-                    <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-gray-400 text-xs">
-                      {e.created_at ? new Date(e.created_at).toLocaleDateString() : "—"}
-                    </td>
-                    <td className="px-3 sm:px-4 py-3">
-                      <button
-                        onClick={() => handleDelete(e.email)}
-                        disabled={deleting === e.email}
-                        className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50 transition-colors font-medium"
-                        data-testid={`waitlist-delete-${e.email}`}
-                      >
-                        {deleting === e.email ? "Deleting..." : "Delete"}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
 function ReferralsTab() {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [data, setData] = useState(null);
@@ -1645,8 +1474,6 @@ function ReferralsTab() {
 // Frontend build-time env flags — read directly from this bundle's own
 // import.meta.env, since that's the exact build currently deployed.
 const FRONTEND_ENV_FLAGS = [
-  { name: "VITE_PRELAUNCH", value: String(import.meta.env.VITE_PRELAUNCH ?? "false"), controls: "Shows waitlist landing page instead of Home at /" },
-  { name: "VITE_LAUNCH_LIVE", value: String(import.meta.env.VITE_LAUNCH_LIVE ?? "false"), controls: "Forces real Home even if VITE_PRELAUNCH is true" },
   { name: "VITE_PHASE", value: String(import.meta.env.VITE_PHASE ?? "1"), controls: "Active sports/country/pricing shown in the UI" },
   { name: "VITE_CRICKET_ENABLED", value: String(import.meta.env.VITE_CRICKET_ENABLED ?? "false"), controls: "Adds Cricket regardless of phase" },
   { name: "VITE_VAPID_PUBLIC_KEY", value: import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "not set", controls: "Push notification opt-in UI" },
@@ -1658,29 +1485,10 @@ function FlagsTab() {
   const [envFlags, setEnvFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(null);
-  const [siteLive, setSiteLive] = useState(false);
-  const [launchBusy, setLaunchBusy] = useState(false);
-
-  const setLaunch = async (live) => {
-    const msg = live
-      ? "Go LIVE? Visitors at / will see the full site instead of the waitlist page."
-      : "Return to the pre-launch waitlist page?";
-    if (!window.confirm(msg)) return;
-    setLaunchBusy(true);
-    try {
-      await axios.patch(`${API}/admin/site-live`, { live }, { withCredentials: true });
-      setSiteLive(live);
-    } catch {
-      /* leave state unchanged */
-    } finally {
-      setLaunchBusy(false);
-    }
-  };
 
   const fetchFlags = () => {
     axios.get(`${API}/admin/flags`, { withCredentials: true })
       .then((res) => {
-        setSiteLive(!!res.data.site_live);
         setJobs(res.data.jobs);
         setEnvFlags(res.data.env_flags);
       })
@@ -1709,26 +1517,6 @@ function FlagsTab() {
 
   return (
     <div className="space-y-6" data-testid="flags-tab">
-      <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4" data-testid="launch-switch">
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-heading-dark">
-            Site launch: {siteLive ? "LIVE" : "pre-launch (waitlist page)"}
-          </h3>
-          <p className="text-xs text-gray-500 mt-1">
-            Switches what visitors see at / instantly, no rebuild. Only applies while VITE_PRELAUNCH=true in the web build.
-          </p>
-        </div>
-        <button
-          onClick={() => setLaunch(!siteLive)}
-          disabled={launchBusy}
-          className="shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-50"
-          style={{ background: siteLive ? "#F1F1F1" : "#F2A922", color: "#3D3D3D" }}
-          data-testid="launch-switch-button"
-        >
-          {siteLive ? "Return to pre-launch" : "Go live"}
-        </button>
-      </div>
-
       <SiteSettingsCard />
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -2128,6 +1916,45 @@ function SiteSettingsCard() {
 }
 
 // Which marketing channel produced registrations: new accounts grouped by where the visitor came from.
+function IncompleteTeamsCard() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [teams, setTeams] = useState(null);
+  useEffect(() => {
+    axios.get(`${API}/admin/incomplete-teams`, { withCredentials: true })
+      .then((r) => setTeams(r.data.teams))
+      .catch(() => setTeams([]));
+  }, []);
+  if (!teams || teams.length === 0) return null;
+  return (
+    <div className="mb-6 bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }} data-testid="incomplete-teams">
+      <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
+        <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Doubles teams waiting for a partner ({teams.length})</h2>
+        <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Paid teams with no partner by the start date need a refund decision.</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
+              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Starts</th><th className="px-5 py-2">Paid</th><th className="px-5 py-2">Partner invited</th>
+            </tr>
+          </thead>
+          <tbody>
+            {teams.map((t) => (
+              <tr key={t.token_tail + t.league_id} style={{ borderTop: "1px solid #F3F4F6" }}>
+                <td className="px-5 py-2">{t.player_name}<div className="text-xs" style={{ color: "#6B7280" }}>{t.player_email}</div></td>
+                <td className="px-5 py-2">{t.league_name}</td>
+                <td className="px-5 py-2">{t.league_start}</td>
+                <td className="px-5 py-2">{t.paid ? "Yes" : "No"}</td>
+                <td className="px-5 py-2">{t.partner_email || "Not yet"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function MarketingTab() {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [days, setDays] = useState(30);

@@ -6,6 +6,7 @@ import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, 
 import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
 import useReferralCode from "../hooks/useReferralCode";
+import AddPartnerPanel from "../components/AddPartnerPanel";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -28,6 +29,7 @@ export default function PlayerDashboard() {
   const [copiedId, setCopiedId] = useState(null);
   const [removingInterest, setRemovingInterest] = useState(null);
   const [pendingInvites, setPendingInvites] = useState([]);
+  const [addPartnerFor, setAddPartnerFor] = useState(null);
   const [boxStatuses, setBoxStatuses] = useState({});
   const [ladderEntries, setLadderEntries] = useState([]);
   const [followFeed, setFollowFeed] = useState([]);
@@ -354,39 +356,58 @@ export default function PlayerDashboard() {
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3" style={{ color: "#3D3D3D" }}>Pending Doubles Invites</h2>
+            <h2 className="text-lg font-semibold mb-3" style={{ color: "#3D3D3D" }}>Doubles teams waiting for a partner</h2>
             <div className="space-y-2">
               {pendingInvites.map((invite) => (
-                <div key={invite.token} className="rounded-md p-4 bg-white flex items-center justify-between" style={{ border: "1px solid #E5E7EB" }}>
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: "#3D3D3D" }}>{invite.league_name}</p>
-                    <p className="text-xs" style={{ color: "#6B7280" }}>
-                      Invited {invite.partner_email} · expires {new Date(invite.expires_at).toLocaleDateString()}
-                    </p>
+                <div key={invite.token} className="rounded-md p-4 bg-white" style={{ border: "1px solid #E5E7EB" }}>
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: "#3D3D3D" }}>{invite.league_name}</p>
+                      <p className="text-xs" style={{ color: "#6B7280" }}>
+                        {invite.partner_email ? `Invited ${invite.partner_email}` : "No partner yet"}
+                        {invite.paid ? " · paid" : ""} · add your partner before the league starts
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
+                      <button
+                        onClick={() => setAddPartnerFor(addPartnerFor === invite.token ? null : invite.token)}
+                        className="text-xs text-white rounded px-2 py-1"
+                        style={{ background: "#008F70" }}
+                        data-testid={`add-partner-${invite.token}`}
+                      >
+                        {addPartnerFor === invite.token ? "Close" : invite.partner_email ? "Change partner" : "Add partner"}
+                      </button>
+                      {!invite.paid && (
+                        <button
+                          onClick={async () => {
+                            if (!window.confirm("Cancel this invite?")) return;
+                            await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/${invite.token}`, {
+                              method: "DELETE", credentials: "include",
+                            });
+                            setPendingInvites(prev => prev.filter(i => i.token !== invite.token));
+                          }}
+                          className="text-xs text-red-500 border border-red-200 rounded px-2 py-1 hover:bg-red-50"
+                          data-testid={`cancel-invite-${invite.token}`}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Awaiting partner</span>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${invite.token}`)}
-                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#B7791F", border: "1px solid #E5A885" }}
-                      data-testid={`copy-invite-${invite.token}`}
-                    >
-                      Copy link
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (!window.confirm("Cancel this invite?")) return;
-                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/doubles-invite/${invite.token}`, {
-                          method: "DELETE", credentials: "include",
-                        });
-                        setPendingInvites(prev => prev.filter(i => i.token !== invite.token));
-                      }}
-                      className="text-xs text-red-500 border border-red-200 rounded px-2 py-1 hover:bg-red-50"
-                      data-testid={`cancel-invite-${invite.token}`}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  {addPartnerFor === invite.token && (
+                    <div className="mt-4">
+                      <AddPartnerPanel
+                        token={invite.token}
+                        paid={invite.paid || !(invite.entry_fee > 0)}
+                        onDone={(res) => {
+                          if (res.registered) setPendingInvites(prev => prev.filter(i => i.token !== invite.token));
+                          else setPendingInvites(prev => prev.map(i => i.token === invite.token ? { ...i, partner_email: res.partner_email } : i));
+                          setAddPartnerFor(null);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

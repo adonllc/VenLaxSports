@@ -38,20 +38,13 @@ async def _apply_referral_credit(db, referral_code: str, referee_id: str):
     Nothing is credited here. referral_release.release_pending_referral_credit pays both sides once the
     referred player completes their first confirmed match (stops throwaway-account farming).
 
-    Falls back to matching a waitlist entry's own id (its share code, per the
-    prelaunch referral-link convention) — a waitlist entry has no account to
-    credit, so that case just tracks a queue_referrals counter instead.
+    An unknown code (including old pre-launch share links) is ignored.
     """
     try:
         code = referral_code.strip().upper()
         referrer = await db.users.find_one({"referral_code": code})
 
         if not referrer:
-            if ObjectId.is_valid(referral_code.strip()):
-                await db.waitlist.update_one(
-                    {"_id": ObjectId(referral_code.strip())},
-                    {"$inc": {"queue_referrals": 1}},
-                )
             return
 
         if str(referrer["_id"]) == referee_id:

@@ -15,7 +15,7 @@ router = APIRouter()
 JOB_FLAGS = {
     "weekly_referral_campaign": {
         "label": "Weekly Referral Campaign",
-        "description": "Emails all users + waitlist every Monday to refer friends for $5/$5 credit.",
+        "description": "Emails all registered users every Monday to refer friends for $5/$5 credit.",
     },
     "auto_open_leagues": {
         "label": "Auto-Open Leagues to Play",
@@ -41,6 +41,11 @@ JOB_FLAGS = {
         "label": "Credit Expiry Reminders",
         "description": "Nudges users whose credit balance expires within 30 days. Daily 10:00 UTC.",
     },
+    "refund_unpaired_teams": {
+        "label": "Auto-Refund Doubles Teams Without a Partner",
+        "description": "On the league start date, refunds the full entry fee (Stripe) of any doubles team whose first player paid but has no partner, and emails them. OFF until you turn it on. Zelle payments are never refunded automatically. Daily 00:20 UTC.",
+        "default": False,
+    },
 }
 
 
@@ -58,7 +63,7 @@ async def get_flags(request: Request):
             "id": flag_id,
             "label": meta["label"],
             "description": meta["description"],
-            "enabled": state.get(flag_id, {}).get("enabled", True),
+            "enabled": state.get(flag_id, {}).get("enabled", meta.get("default", True)),
             "updated_at": state.get(flag_id, {}).get("updated_at"),
         }
         for flag_id, meta in JOB_FLAGS.items()
@@ -73,8 +78,42 @@ async def get_flags(request: Request):
         {"name": "STRIPE_API_KEY", "value": "configured" if os.environ.get("STRIPE_API_KEY") else "not set", "controls": "Payment processing"},
     ]
 
-    site_live = await db.feature_flags.find_one({"_id": "site_live"})
-    return {"jobs": jobs, "env_flags": env_flags, "site_live": bool(site_live and site_live.get("enabled"))}
+    return {"jobs": jobs, "env_flags": env_flags}
+
+
+@router.get("/incomplete-teams")
+async def incomplete_teams(request: Request):
+    """Doubles teams still missing a partner (admin only). Paid ones may need a refund if no partner is found."""
+    db = request.app.state.db
+    await require_admin(request, db)
+    invites = await db.doubles_invites.find({"status": {"$in": ["pending", "initiator_paid"]}}).sort("created_at", 1).to_list(500)
+    leagues = {}
+    rows = []
+    for inv in invites:
+        lid = inv.get("league_id", "")
+        if lid not in leagues:
+            try:
+                leagues[lid] = await db.leagues.find_one({"_id": ObjectId(lid)}) or {}
+            except Exception:
+                leagues[lid] = {}
+        lg = leagues[lid]
+        user = None
+        try:
+            user = await db.users.find_one({"_id": ObjectId(inv["initiator_id"])}, {"email": 1, "name": 1})
+        except Exception:
+            pass
+        rows.append({
+            "token_tail": inv["token"][-6:],
+            "league_id": lid,
+            "league_name": lg.get("name", ""),
+            "league_start": lg.get("start_date", ""),
+            "player_name": inv.get("initiator_name", ""),
+            "player_email": (user or {}).get("email", ""),
+            "paid": inv.get("status") == "initiator_paid",
+            "partner_email": inv.get("partner_email", ""),
+            "created_at": inv.get("created_at", ""),
+        })
+    return {"teams": rows}
 
 
 @router.get("/marketing-report")
@@ -137,24 +176,6 @@ async def set_site_settings(request: Request, body: dict = Body(...)):
         )
     invalidate_cache()
     return {"ok": True}
-
-
-@router.patch("/site-live")
-async def set_site_live(request: Request, body: dict = Body(...)):
-    """Launch switch: true shows the real Home at /, false shows the pre-launch waitlist page."""
-    db = request.app.state.db
-    admin = await require_admin(request, db)
-    live = bool(body.get("live"))
-    await db.feature_flags.update_one(
-        {"_id": "site_live"},
-        {"$set": {
-            "enabled": live,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-            "updated_by": str(admin.get("_id", "")),
-        }},
-        upsert=True,
-    )
-    return {"live": live}
 
 
 @router.patch("/flags/{flag_id}")

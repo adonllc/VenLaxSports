@@ -112,7 +112,7 @@ export default function DoublesInviteConfirm() {
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-4xl mb-4">&#128336;</div>
           <h1 className="text-xl font-semibold text-heading-dark mb-2">Invite Expired</h1>
-          <p className="text-sm text-gray-600">This invite link expired after 72 hours. Ask your partner to send a new invite.</p>
+          <p className="text-sm text-gray-600">This invite link has expired. Ask your partner to send a new invite.</p>
         </div>
       </div>
     );

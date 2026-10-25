@@ -13,7 +13,7 @@ export default function RRScheduleView({ rounds = [], currentUserId }) {
   if (rounds.length === 0) {
     return (
       <div className="text-center text-gray-400 py-12">
-        Schedule not yet generated. Waiting for minimum players to register.
+        Schedule not yet generated. It appears here once the league starts.
       </div>
     );
   }

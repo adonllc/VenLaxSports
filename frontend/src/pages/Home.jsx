@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
@@ -91,7 +92,7 @@ const FAQ = [
   { q: "Do I need a partner?", a: "Not for singles. For doubles and mixed leagues you register with a partner and invite them by email. One partner pays the team fee." },
   { q: "How do I report a score?", a: "After the match, open it from your dashboard and submit the result. Your opponent confirms, and standings and ratings update automatically." },
   { q: "What if there is a score dispute?", a: "Either player can raise a dispute. The process and timelines are in the League Rules and Terms." },
-  { q: "Can I get a refund?", a: "Entry fees are non-refundable once the league starts." },
+  { q: "Can I get a refund?", a: "Yes, until the league starts. Once it has started, entry fees are non-refundable." },
   { q: "Is there an age limit?", a: "The minimum age is 13. Players under 18 need parental consent." },
   { q: "Where can I find the rules?", a: "The Rules page and Player Handbook cover formats, scheduling, conduct and playoffs." },
 ];
@@ -178,7 +179,8 @@ export default function Home() {
   useEffect(() => {
     axios.get(`${API}/founding-members`).then((r) => setFounding(r.data)).catch(() => {});
   }, []);
-  const showFounding = founding && founding.limit > 0 && founding.spots_left > 0 && founding.count >= FOUNDING_DISPLAY_FLOOR;
+  const { user } = useAuth();
+  const showFounding = user?.role === "admin" && founding && founding.limit > 0 && founding.spots_left > 0 && founding.count >= FOUNDING_DISPLAY_FLOOR; // member counts: admin only
 
   return (
     <MotionConfig reducedMotion="user">

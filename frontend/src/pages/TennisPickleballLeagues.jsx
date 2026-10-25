@@ -103,7 +103,7 @@ const FAQS = [
   },
   {
     q: "Can I get a refund?",
-    a: "Entry fees are non-refundable once the league starts.",
+    a: "Yes, until the league starts. Once it has started, entry fees are non-refundable.",
   },
   {
     q: "Should I start with tennis or pickleball?",
@@ -251,7 +251,7 @@ export default function TennisPickleballLeagues() {
         </Table>
         <ul className="mt-5 grid gap-2 text-base">
           <li className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> The price is for the whole season, with no club membership needed.</li>
-          <li className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> Entry fees are non-refundable once the league starts.</li>
+          <li className="flex gap-2"><Check className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" /> Entry fees are refundable until the league starts.</li>
         </ul>
       </Section>
 

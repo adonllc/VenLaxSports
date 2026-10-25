@@ -60,8 +60,7 @@ export function leagueDescription(league = {}) {
 
   const max = Number(league.max_players) || 0;
   if (max > 0) {
-    const full = (Number(league.current_players) || 0) >= max;
-    points.push(`Up to ${max} players${full ? ", currently full" : ""}.`);
+    points.push(`Up to ${max} players.`);
   }
   points.push(price(league));
   points.push("Report each score after the match. Standings and your skill rating update automatically.");

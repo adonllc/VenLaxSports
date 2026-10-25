@@ -221,7 +221,7 @@ async def send_partner_invite(to: str, inviter_name: str, league_name: str,
         <li><strong>Sport:</strong> {sport.title()}</li>
         {fee_line}
       </ul>
-      <p>Click below to accept and confirm your spot. This invite expires in 72 hours.</p>
+      <p>Click below to accept and confirm your spot. This invite stays open until the league starts.</p>
     """
     await send_email(
         to,
@@ -437,16 +437,24 @@ async def send_last_spots(to: str, player_name: str, city: str, sport: str,
     await send_email(to, subject, _wrap(f"{sport_emoji} Last Spots Remaining", body, "Claim Your Spot", join_url))
 
 
-async def send_waitlist_open(to: str, player_name: str, city: str, sport: str,
-                              waitlist_url: str) -> None:
+async def send_league_full(to: str, player_name: str, city: str, sport: str, league_url: str) -> None:
     sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")
     body = f"""
       <p>Hi {player_name},</p>
       <p>The {city} {sport.title()} league you were interested in is now full.</p>
-      <p>Join the waitlist below — we'll notify you the moment a spot opens.</p>
+      <p>You asked to hear about {city} {sport.title()} leagues, so we will email you as soon as a new one opens.</p>
     """
-    subject = f"{city} {sport.title()} is full — you're on the waitlist"
-    await send_email(to, subject, _wrap(f"{sport_emoji} You're on the Waitlist", body, "View League", waitlist_url))
+    subject = f"{city} {sport.title()} is full"
+    await send_email(to, subject, _wrap(f"{sport_emoji} This league is full", body, "See the league", league_url))
+
+
+async def send_team_refunded(to: str, player_name: str, league_name: str, amount: float) -> None:
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>{league_name} has started and your doubles team did not have a partner, so we refunded your entry fee of ${amount:.2f}. Your bank may take a few business days to show it.</p>
+      <p>You are welcome to join a future season with a partner.</p>
+    """
+    await send_email(to, f"Your {league_name} entry fee was refunded", _wrap("Entry fee refunded", body))
 
 
 async def send_partner_declined(initiator_email: str, initiator_name: str, league_name: str) -> None:
@@ -488,35 +496,6 @@ async def send_weekly_referral_nudge(to: str, player_name: str, referral_code: s
     )
 
 
-async def send_weekly_waitlist_nudge(to: str, position: int, referral_count: int, share_link: str) -> None:
-    frontend_url = _get_frontend_url() or "https://venlaxsports.com"
-    signup_url = f"{frontend_url}/auth?mode=register"
-    referral_line = (
-        f"<p>You've brought <strong>{referral_count}</strong> friend{'s' if referral_count != 1 else ''} along so far — "
-        f"keep sharing your link and you'll move up faster.</p>"
-        if referral_count > 0 else
-        "<p>Refer 2 friends with your link below and jump ahead in line.</p>"
-    )
-    body = f"""
-      <p>You're <strong>#{position}</strong> on the VENLAX Sports waitlist. Here's what's waiting for you:</p>
-      <ul style="padding-left:18px;margin:0 0 16px">
-        <li>🎾 Ranked Tennis &amp; Pickleball leagues, matched to your skill level</li>
-        <li>📈 A rating that tracks your progress every match</li>
-        <li>🤝 Doubles partner registration built in</li>
-        <li>📸 Shareable match cards for your wins</li>
-      </ul>
-      {referral_line}
-      <p style="font-size:13px;color:#6b7280;word-break:break-all">{share_link}</p>
-      <p>Or join now — once you're in, you'll get your own referral code and start
-         earning $5 credit for every friend or playing partner you bring along.</p>
-    """
-    await send_email(
-        to,
-        f"You're #{position} on the VENLAX Sports waitlist",
-        _wrap("Move up the list", body, "Join VENLAX Sports", signup_url),
-    )
-
-
 async def send_referral_tier_bonus(to: str, player_name: str, referral_count: int, bonus_amount: float, tier_every: int = 3) -> None:
     body = f"""
       <p>Hi {player_name},</p>
@@ -553,58 +532,11 @@ async def send_credit_expiry_reminder(to: str, player_name: str, balance: float,
 LAUNCH_ADDRESS = "VenLax Sports, Atlanta, GA 30350, United States"
 
 
-async def send_launch_announcement(to: str, first_name: str, unsubscribe_url: str) -> bool:
-    """One-time 'we are live' email to the waitlist. Returns True when sent."""
-    site = _get_frontend_url() or "https://www.venlaxsports.com"
-    hi = f"Hi {first_name}," if first_name else "Hi there,"
-    body = f"""
-      <p>{hi}</p>
-      <p><strong>The wait is over. VenLax Sports is LIVE!</strong> 🎾🏓</p>
-      <p>You joined our waitlist because you are ready to play, compete, and take your game to the next level. Now it is time to get started!</p>
-      <p>Your next match could be more than just a game. It could be the start of your ranking journey.</p>
-      <p><strong>Here is what you can do on VenLax Sports:</strong></p>
-      <ul style="padding-left:18px;margin:0 0 16px">
-        <li>🎾 Compete in Tennis and Pickleball</li>
-        <li>📊 Track your matches and results</li>
-        <li>🏆 Build your ranking as you play</li>
-        <li>🚀 Keep improving and climb the ranks, on your own time</li>
-      </ul>
-      <p><strong>Your next move? Sign up free.</strong></p>
-      <p>Your account is ready when you are. Complete your sign-up and join the VenLax Sports community today.</p>
-      <p>No waiting. No excuses. Just you, your game, and your next challenge.</p>
-      <p><strong>VenLax Sports</strong><br>Earn Your Rank on Your Own Time.</p>
-      <p>See you on the court!<br>Team VenLax Sports</p>
-    """
-    footer = (f"You are receiving this because you joined the VenLax Sports waitlist. "
+async def send_campaign_email(to: str, subject: str, title: str, body_html: str, cta_label: str, cta_url: str, unsubscribe_url: str) -> bool:
+    """A marketing email with an unsubscribe link and the sender address. Returns True when sent."""
+    footer = (f"You are receiving this because you asked to hear when VenLax Sports launched. "
               f'<a href="{unsubscribe_url}" style="color:#6b7280">Unsubscribe</a><br>{LAUNCH_ADDRESS}')
-    html = _wrap("VenLax Sports is LIVE!", body, "Sign up free", site, footer_html=footer)
-    return await send_email(to, "The wait is over. VenLax Sports is LIVE! 🎾🏓", html)
-
-
-async def send_early_access_confirmed(to: str) -> None:
-    body = """
-      <p>Welcome to VENLAX Sports! 🎉</p>
-      <p>You're officially on the VENLAX Sports waitlist.</p>
-      <p>Thanks for joining us at the beginning of our journey. As one of our first members, you'll hear about new features, previews, and launch updates before everyone else.</p>
-      <p>We're building more than just another sports app—we're creating a platform that makes it easier for players to connect, compete, and grow their local sports communities.</p>
-      <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">What to expect</h2>
-      <ul style="padding-left:18px;margin:0 0 16px">
-        <li>🎾 First look at new features</li>
-        <li>🏓 Multiple play formats including Singles, Doubles, Round Robin, Social Games, and Tournaments</li>
-        <li>📍 City-wide player matchmaking</li>
-        <li>🚀 Invitations to launch events and special leagues</li>
-        <li>💡 Opportunities to help shape the future of VENLAX Sports</li>
-      </ul>
-      <h2 style="font-size:16px;font-weight:700;margin:20px 0 12px">Help Us Build Something Players Love</h2>
-      <p>The best ideas come from the community.</p>
-      <p>Whether you have a suggestion for a new feature, a different tournament format, a sport you'd like us to support, improvements to matchmaking, ideas for your city, or anything that would make the experience better for players—we'd love to hear from you.</p>
-      <p>📧 Email us anytime at: <strong>feedback@venlaxsports.com</strong></p>
-      <p>Every piece of feedback is read by our team, and many of our upcoming features will be driven directly by community suggestions.</p>
-      <p>Thank you for being one of our earliest supporters. We can't wait to share what's coming next.</p>
-      <p>See you on the court!</p>
-      <p><strong>The VENLAX Sports Team</strong></p>
-    """
-    await send_email(to, "Welcome to the VENLAX Sports waitlist", _wrap("Welcome to VENLAX Sports", body))
+    return await send_email(to, subject, _wrap(title, body_html, cta_label, cta_url, footer_html=footer))
 
 
 async def send_generic(to: str, subject: str, body: str) -> None:

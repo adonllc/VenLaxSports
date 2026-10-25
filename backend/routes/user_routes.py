@@ -124,6 +124,8 @@ async def update_profile(data: UserProfileUpdate, request: Request):
     payload = data.model_dump(exclude_unset=True)
     if not payload:
         raise HTTPException(status_code=400, detail="No fields to update")
+    if payload.get("gender") not in (None, "male", "female"):
+        raise HTTPException(status_code=400, detail="gender must be male or female")
     set_fields = {k: v for k, v in payload.items() if v is not None}
     unset_fields = {k: "" for k, v in payload.items() if v is None}
     ops: dict = {}

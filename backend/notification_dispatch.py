@@ -221,13 +221,13 @@ async def dispatch_last_spots(db, league: dict, spots_left: int) -> None:
             logger.exception("dispatch_last_spots: error processing interest %s", interest.get("_id"))
 
 
-async def dispatch_waitlist_open(db, league: dict) -> None:
-    """Trigger 4 — fires when league hits max_players. Email + push."""
+async def dispatch_league_full(db, league: dict) -> None:
+    """Trigger 4 — fires when league hits max_players. Tells people who asked about this city and sport. Email + push."""
     city = league.get("city", "")
     sport = league.get("sport", "")
     league_id = str(league.get("id") or league.get("_id", ""))
     league_name = league.get("name", "")
-    waitlist_url = f"{_fe_url()}/leagues/{league_id}"
+    league_url = f"{_fe_url()}/leagues/{league_id}"
 
     sport_emoji = {"tennis": "🎾", "pickleball": "🏓", "cricket": "🏏"}.get(sport, "🏆")
     city_short = city.split(",")[0]
@@ -235,7 +235,7 @@ async def dispatch_waitlist_open(db, league: dict) -> None:
     try:
         interests = await _get_interests(db, city, sport)
     except Exception:
-        logger.exception("dispatch_waitlist_open: failed to query interests")
+        logger.exception("dispatch_league_full: failed to query interests")
         return
 
     for interest in interests:
@@ -248,16 +248,16 @@ async def dispatch_waitlist_open(db, league: dict) -> None:
             channels = interest.get("channels", ["email"])
 
             if "email" in channels:
-                email_service.schedule(email_service.send_waitlist_open(
-                    email, name, city, sport, waitlist_url
+                email_service.schedule(email_service.send_league_full(
+                    email, name, city, sport, league_url
                 ))
 
             if "push" in channels and interest.get("user_id"):
                 push_payload = {
                     "title": f"🔔 {city_short} {sport.title()} is full",
-                    "body": "You're on the waitlist →",
-                    "url": waitlist_url,
+                    "body": "We will tell you when a new one opens →",
+                    "url": league_url,
                 }
                 asyncio.create_task(_send_push_to_user(db, interest["user_id"], push_payload))
         except Exception:
-            logger.exception("dispatch_waitlist_open: error processing interest %s", interest.get("_id"))
+            logger.exception("dispatch_league_full: error processing interest %s", interest.get("_id"))

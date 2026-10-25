@@ -296,9 +296,14 @@ async def _register_paid_player(db, txn: dict, session_id: str, session_meta: di
             return {"status": "paid", "payment_status": "paid", "is_doubles": True}
         # Email invite: the partner has not confirmed yet, so mark the initiator as paid
         if invite and invite.get("status") != "initiator_paid":
+            from routes.doubles_routes import invite_expiry
+            try:
+                league_doc = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])}) or {}
+            except Exception:
+                league_doc = {}
             await db.doubles_invites.update_one(
                 {"token": invite_token},
-                {"$set": {"status": "initiator_paid"}},
+                {"$set": {"status": "initiator_paid", "expires_at": invite_expiry(league_doc, datetime.now(timezone.utc))}},
             )
         return {"status": "paid", "payment_status": "paid", "is_doubles": True, "invite_pending": True}
     # -- End doubles paid path -----------------------------------------------

@@ -145,19 +145,11 @@ export default function Terms() {
               <div className="space-y-3">
                 <div className="bg-white rounded-lg p-3 border border-emerald-100">
                   <p className="text-sm font-semibold text-emerald-900">✓ Full Refund</p>
-                  <p className="text-xs text-emerald-700 mt-1">League canceled before start. Organizer fails to reach minimum player count (announced pre-season).</p>
+                  <p className="text-xs text-emerald-700 mt-1">Request made before the league starts.</p>
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-emerald-100">
                   <p className="text-sm font-semibold text-emerald-900">✗ No Refund</p>
-                  <p className="text-xs text-emerald-700 mt-1">Player-initiated withdrawal after registration closes (48 hours before league start). Removal due to conduct violation.</p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                  <p className="text-sm font-semibold text-emerald-900">⟳ Partial Refund (50%)</p>
-                  <p className="text-xs text-emerald-700 mt-1">Withdrawal within first 2 matches played (at organizer discretion).</p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                  <p className="text-sm font-semibold text-emerald-900">⟳ Prorated Refund</p>
-                  <p className="text-xs text-emerald-700 mt-1">Organizer cancellation mid-season: (remaining matches ÷ total matches) × fee.</p>
+                  <p className="text-xs text-emerald-700 mt-1">Once the league has started, including withdrawal after that point and removal for a conduct violation.</p>
                 </div>
               </div>
             </div>

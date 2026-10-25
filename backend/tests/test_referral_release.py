@@ -70,7 +70,6 @@ class FakeDb:
     def __init__(self):
         self.users = Coll()
         self.referral_credits = Coll()
-        self.waitlist = Coll()
         self.rating_history = Coll()
 
 
@@ -120,20 +119,10 @@ def test_unknown_code_does_not_raise_and_records_nothing():
     assert db.referral_credits.docs == []
 
 
-def test_waitlist_share_code_still_counts_a_queue_referral():
+def test_old_prelaunch_share_code_is_ignored():
     db = FakeDb()
-    entry_id = ObjectId()
-    db.waitlist.docs.append({"_id": entry_id, "queue_referrals": 0})
-
-    async def fake_update_one(q, update):
-        for d in db.waitlist.docs:
-            if d["_id"] == q["_id"]:
-                d["queue_referrals"] += update["$inc"]["queue_referrals"]
-
-    db.waitlist.update_one = fake_update_one
     user = make_user(db)
-    run(auth_routes._apply_referral_credit(db, str(entry_id), str(user["_id"])))
-    assert db.waitlist.docs[0]["queue_referrals"] == 1
+    run(auth_routes._apply_referral_credit(db, str(ObjectId()), str(user["_id"])))
     assert db.referral_credits.docs == []
 
 

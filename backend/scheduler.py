@@ -20,6 +20,7 @@ from scheduler_jobs import (
     send_match_reminders,
     auto_forfeit_stale_matches,
     send_credit_expiry_reminders,
+    refund_unpaired_teams,
 )
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,15 @@ def start_scheduler(db):
             max_instances=1,
         )
         scheduler.add_job(
+            refund_unpaired_teams,
+            trigger=CronTrigger(hour=0, minute=20),
+            args=[db],
+            id="refund_unpaired_teams",
+            name="Refund Doubles Teams Without a Partner",
+            replace_existing=True,
+            max_instances=1,
+        )
+        scheduler.add_job(
             send_match_reminders,
             trigger=IntervalTrigger(hours=1),
             args=[db],
@@ -96,7 +106,7 @@ def start_scheduler(db):
 
         if not scheduler.running:
             scheduler.start()
-            logger.info("Scheduler started — 7 background jobs registered")
+            logger.info("Scheduler started — 8 background jobs registered")
         else:
             logger.info("Scheduler already running")
 

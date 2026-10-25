@@ -206,7 +206,7 @@ export default function RoundRobinDetail() {
                 <li><strong>Scoring:</strong> {rr.scoring_format || (league.sport === "tennis" ? "Fast-4" : "Games to 11")}</li>
                 <li><strong>Division:</strong> {isDoubles ? "Fixed-Partner Doubles" : "Singles"}</li>
                 <li><strong>Playoff qualifiers:</strong> Top {rr.playoff_threshold || 4}</li>
-                <li><strong>Match pairings:</strong> Platform-generated on {rr.min_players}+ registrations — organizer handles times &amp; venues</li>
+                <li><strong>Match pairings:</strong> Platform-generated when the league starts — organizer handles times &amp; venues</li>
               </ul>
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">

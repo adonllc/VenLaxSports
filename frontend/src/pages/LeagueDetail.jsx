@@ -5,10 +5,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { MapPin, Users, Calendar, Trophy, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
+import AddPartnerPanel from "../components/AddPartnerPanel";
+import GenderPicker from "../components/GenderPicker";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
 import { PHOTOS } from "../config/photos";
-import SeasonStartLine from "../components/SeasonStartLine";
 import { trackEvent } from "../utils/googleAnalytics";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
@@ -32,7 +33,7 @@ export default function LeagueDetail() {
   const { isCityOpen, openCities } = useSiteSettings();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, fetchMe } = useAuth();
   const [league, setLeague] = useState(null);
   const [matches, setMatches] = useState([]);
   const [standings, setStandings] = useState([]);
@@ -54,6 +55,10 @@ export default function LeagueDetail() {
   const [partnerEmail, setPartnerEmail] = useState("");
   const [inviteSent, setInviteSent] = useState(false);
   const [inviteToken, setInviteToken] = useState(null);
+  const [partnerMode, setPartnerMode] = useState("have"); // "have" = pick or invite a partner now, "later" = add partner after registering
+  const [partnerLater, setPartnerLater] = useState(false);
+  const [teamPaid, setTeamPaid] = useState(false);
+  const [teamDone, setTeamDone] = useState("");
   const [boxStandings, setBoxStandings] = useState(null);
   const [activeBox, setActiveBox] = useState("A");
   const [networkError, setNetworkError] = useState(null);
@@ -70,6 +75,22 @@ export default function LeagueDetail() {
       pollPaymentStatus(sessionId);
     }
   }, [sessionId, user]);
+
+  // A team that registered first and is still waiting for its partner: show it instead of the join form
+  useEffect(() => {
+    if (!user || !league) return;
+    axios.get(`${API}/doubles-invite/my-invites`, { withCredentials: true })
+      .then(({ data }) => {
+        const mine = (data.invites || []).find((i) => i.league_id === league.id);
+        if (!mine) return;
+        setInviteSent(true);
+        setInviteToken(mine.token);
+        setPartnerEmail(mine.partner_email || "");
+        setPartnerLater(!mine.partner_email);
+        setTeamPaid(!!mine.paid);
+      })
+      .catch(() => {});
+  }, [user, league?.id]);
 
   useEffect(() => {
     if (tab === "matches") fetchMatches();
@@ -122,7 +143,8 @@ export default function LeagueDetail() {
       setPaymentStatus(data);
       if (data.payment_status === "paid") {
         if (data.invite_pending) {
-          setJoinMsg("Payment complete! Invite sent — registration finalizes when your partner confirms.");
+          setJoinMsg("Payment complete! Your place is held. Registration finalizes when your partner joins. Add or invite your partner below.");
+          setTeamPaid(true);
         } else {
           setIsRegistered(true);
           setJoinMsg("Payment successful! You have joined the league.");
@@ -158,12 +180,16 @@ export default function LeagueDetail() {
     }
   };
 
+  const needsGender = league?.format === "mixed_doubles" && !!user && !["male", "female"].includes(user.gender);
+
   const handleDoublesJoin = async () => {
     if (!user) { navigate("/auth"); return; }
     setJoining(true);
     try {
       const body = { waiver_accepted: waiverAccepted };
-      if (selectedPartner) {
+      if (partnerMode === "later") {
+        body.partner_later = true;
+      } else if (selectedPartner) {
         body.partner_id = selectedPartner.id;
       } else {
         body.partner_email = partnerEmail.trim().toLowerCase();
@@ -179,6 +205,7 @@ export default function LeagueDetail() {
         alert(data.detail || "Failed to register. Please try again.");
         return;
       }
+      if (data.partner_later) setPartnerLater(true);
       if (data.requires_payment) {
         setDoublesInviteToken(data.invite_token || null);
         if (data.pending_partner) setDoublesEmailInvite(true);
@@ -196,7 +223,11 @@ export default function LeagueDetail() {
         setInviteSent(true);
         setInviteToken(data.invite_token || null);
       } else if (data.has_pending_invite) {
-        setJoinMsg(`Pending invite already sent to ${data.partner_email}. Ask your partner to check their email.`);
+        setInviteSent(true);
+        setInviteToken(data.invite_token || null);
+        setPartnerLater(!data.partner_email);
+        setPartnerEmail(data.partner_email || "");
+        setTeamPaid(!data.requires_payment);
       }
     } catch {
       alert("Network error. Please try again.");
@@ -437,7 +468,6 @@ export default function LeagueDetail() {
 
             {/* Join Card */}
             <div className="bg-white rounded-lg p-6 w-full" style={{ border: "1px solid #E5E7EB" }}>
-              {!opensSoon && <SeasonStartLine league={league} />}
               {opensSoon ? (
                 <div data-testid="league-opens-soon-panel">
                   <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#5C5C5C", fontFamily: "Rubik, sans-serif" }}>Opens soon</p>
@@ -497,15 +527,40 @@ export default function LeagueDetail() {
 
                   {!isRegistered && league.status === "registration" && (
                     <>
-                      {league.format === "doubles" ? (
+                      {league.format === "doubles" || league.format === "mixed_doubles" ? (
                         /* Doubles registration flow */
                         <>
                           {!inviteSent ? (
                             <div className="space-y-3">
-                              <PartnerSearch
-                                onPartnerSelect={(p) => { setSelectedPartner(p); setPartnerEmail(""); }}
-                                onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
-                              />
+                              {needsGender && <GenderPicker onSaved={fetchMe} />}
+                              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Partner">
+                                {[["have", "I have a partner"], ["later", "Add my partner later"]].map(([mode, label]) => (
+                                  <button
+                                    key={mode}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={partnerMode === mode}
+                                    onClick={() => setPartnerMode(mode)}
+                                    className="px-3 py-2.5 text-sm font-semibold text-left"
+                                    style={partnerMode === mode
+                                      ? { border: "2px solid #008F70", background: "#E8F6F2", color: "#00765C", fontFamily: "Rubik, sans-serif" }
+                                      : { border: "2px solid #E5E7EB", background: "#fff", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+                                    data-testid={`partner-mode-${mode}`}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                              {partnerMode === "have" ? (
+                                <PartnerSearch
+                                  onPartnerSelect={(p) => { setSelectedPartner(p); setPartnerEmail(""); }}
+                                  onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
+                                />
+                              ) : (
+                                <p className="text-sm" style={{ color: "#4C4C4C", fontFamily: "Rubik, sans-serif" }} data-testid="partner-later-note">
+                                  Register and pay now to hold your place. Add your partner any time before the league starts: search for a player, invite by email, or share a link.
+                                </p>
+                              )}
                               {league.format === "mixed_doubles" && (
                                 <p className="text-xs text-gray-400 mt-2">
                                   Mixed Doubles requires one male and one female player. Gender shown as (M) or (F) in search results.
@@ -528,43 +583,49 @@ export default function LeagueDetail() {
                               </label>
                               <button
                                 onClick={handleDoublesJoin}
-                                disabled={(!selectedPartner && !partnerEmail) || !waiverAccepted || joining}
+                                disabled={needsGender || (partnerMode === "have" && !selectedPartner && !partnerEmail) || !waiverAccepted || joining}
                                 className="w-full text-white rounded-lg py-3 text-sm font-medium disabled:opacity-50 transition-all hover:shadow-md"
                                 style={{ background: config.accent || "#008F70", fontFamily: "Rubik, sans-serif" }}
                                 data-testid="send-doubles-invite-btn"
                               >
                                 {joining
                                   ? "Registering…"
+                                  : partnerMode === "later"
+                                  ? "Register and add partner later"
                                   : selectedPartner
                                   ? `Register Team with ${selectedPartner.name}`
                                   : "Send Partner Invite"}
                               </button>
                             </div>
                           ) : (
-                            <div className="rounded-md p-4 space-y-2" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }}>
-                              <p className="text-sm font-medium" style={{ color: "#B7791F" }}>
-                                Invite sent to {partnerEmail}
-                              </p>
-                              <p className="text-xs" style={{ color: "#374151" }}>
-                                Registration completes once your partner confirms. Invite expires in 72 hours.
-                              </p>
-                              {inviteToken && (
-                                <div className="mt-2">
-                                  <p className="text-xs mb-1" style={{ color: "#6B7280" }}>Share confirm link directly:</p>
-                                  <div className="flex gap-2 items-center">
-                                    <input
-                                      readOnly
-                                      value={`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`}
-                                      className="flex-1 text-xs rounded px-2 py-1 bg-white" style={{ border: "1px solid #E5E7EB" }}
+                            <div className="rounded-md p-4 space-y-3" style={{ background: "#FFEDD5", border: "1px solid #E5A885" }} data-testid="team-waiting">
+                              {teamDone ? (
+                                <p className="text-sm font-medium" style={{ color: "#B7791F" }}>{teamDone}</p>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-medium" style={{ color: "#B7791F" }}>
+                                    {partnerEmail ? `Invite sent to ${partnerEmail}` : "Your place is held. Add your partner."}
+                                  </p>
+                                  <p className="text-xs" style={{ color: "#374151" }}>
+                                    Your team is complete once your partner joins. You can add or change your partner any time before the league starts.
+                                  </p>
+                                  {inviteToken && (
+                                    <AddPartnerPanel
+                                      token={inviteToken}
+                                      paid={teamPaid || !(Number(league.entry_fee) > 0)}
+                                      onDone={(res) => {
+                                        if (res.registered) {
+                                          setIsRegistered(true);
+                                          fetchLeague();
+                                          setTeamDone(`Team registered with ${res.partner_name || "your partner"}.`);
+                                        } else if (res.invited) {
+                                          setPartnerEmail(res.partner_email);
+                                          setTeamDone(`Invite sent to ${res.partner_email}. Your team is complete once they accept.`);
+                                        }
+                                      }}
                                     />
-                                    <button
-                                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/doubles-invite/confirm?token=${inviteToken}`)}
-                                      className="text-xs rounded px-2 py-1 transition-colors" style={{ color: "#B7791F", border: "1px solid #E5A885" }}
-                                    >
-                                      Copy
-                                    </button>
-                                  </div>
-                                </div>
+                                  )}
+                                </>
                               )}
                             </div>
                           )}
