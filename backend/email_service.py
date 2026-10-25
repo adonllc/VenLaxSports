@@ -532,11 +532,17 @@ async def send_credit_expiry_reminder(to: str, player_name: str, balance: float,
 LAUNCH_ADDRESS = "VenLax Sports, Atlanta, GA 30350, United States"
 
 
-async def send_campaign_email(to: str, subject: str, title: str, body_html: str, cta_label: str, cta_url: str, unsubscribe_url: str) -> bool:
+def campaign_html(title: str, body_html: str, cta_label, cta_url, unsubscribe_url: str, reason=None) -> str:
+    """The full HTML of a marketing email: unsubscribe link and the sender address in the footer."""
+    reason = reason or "You are receiving this because you asked to hear when VenLax Sports launched."
+    footer = f'{reason} <a href="{unsubscribe_url}" style="color:#6b7280">Unsubscribe</a><br>{LAUNCH_ADDRESS}'
+    return _wrap(title, body_html, cta_label, cta_url, footer_html=footer)
+
+
+async def send_campaign_email(to: str, subject: str, title: str, body_html: str, cta_label, cta_url,
+                              unsubscribe_url: str, reason=None) -> bool:
     """A marketing email with an unsubscribe link and the sender address. Returns True when sent."""
-    footer = (f"You are receiving this because you asked to hear when VenLax Sports launched. "
-              f'<a href="{unsubscribe_url}" style="color:#6b7280">Unsubscribe</a><br>{LAUNCH_ADDRESS}')
-    return await send_email(to, subject, _wrap(title, body_html, cta_label, cta_url, footer_html=footer))
+    return await send_email(to, subject, campaign_html(title, body_html, cta_label, cta_url, unsubscribe_url, reason))
 
 
 async def send_generic(to: str, subject: str, body: str) -> None:

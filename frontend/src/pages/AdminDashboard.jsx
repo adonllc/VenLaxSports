@@ -1,5 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
@@ -270,6 +271,7 @@ export default function AdminDashboard() {
     { id: "zelle", label: "Zelle Queue" },
     { id: "referrals", label: "Referrals" },
     { id: "marketing", label: "Marketing" },
+    { id: "email", label: "Email" },
     { id: "flags", label: "Feature Flags" },
   ];
 
@@ -808,6 +810,7 @@ export default function AdminDashboard() {
         {tab === "referrals" && <ReferralsTab />}
         {tab === "flags" && <FlagsTab />}
         {tab === "marketing" && <MarketingTab />}
+        {tab === "email" && <EmailCampaignsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}

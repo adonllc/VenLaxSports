@@ -38,6 +38,7 @@ from routes.social_auth_routes import router as social_auth_router
 from routes.notification_routes import router as notification_router
 from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
+from routes.admin_email_routes import router as admin_email_router, public_router as email_unsub_router
 from routes.box_league_routes import router as box_league_router
 from routes.ladder_routes import router as ladder_router
 from routes.legal_routes import router as legal_router
@@ -59,6 +60,8 @@ api_router.include_router(wa_router, prefix="/webhook/whatsapp", tags=["whatsapp
 api_router.include_router(notification_router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(doubles_router, prefix="/doubles-invite", tags=["doubles"])
 api_router.include_router(waitlist_router, prefix="/waitlist", tags=["waitlist"])
+api_router.include_router(admin_email_router, prefix="/admin/email", tags=["admin-email"])
+api_router.include_router(email_unsub_router, prefix="/email", tags=["email"])
 api_router.include_router(box_league_router, prefix="/box-leagues", tags=["box-leagues"])
 api_router.include_router(ladder_router, prefix="/ladders", tags=["ladders"])
 api_router.include_router(legal_router)  # /api/legal/* endpoints
