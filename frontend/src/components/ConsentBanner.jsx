@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { initGoogleAnalytics, trackPageView } from "../utils/googleAnalytics";
 
 const CONSENT_KEY = "venlax_analytics_consent";
 
@@ -15,8 +16,12 @@ export default function ConsentBanner() {
   const accept = () => {
     localStorage.setItem(CONSENT_KEY, "accepted");
     setVisible(false);
-    if (window.posthog) {
-      window.posthog.startSessionRecording();
+    // Start Google first: a problem in one analytics tool must not stop another from starting.
+    if (initGoogleAnalytics()) trackPageView(window.location.pathname + window.location.search);
+    try {
+      window.posthog?.startSessionRecording();
+    } catch (err) {
+      console.warn("PostHog session recording did not start:", err);
     }
   };
 
@@ -35,7 +40,7 @@ export default function ConsentBanner() {
     >
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-sm text-gray-700 flex-1 leading-relaxed">
-          We use analytics to improve this platform. Session recording is only enabled with your consent.{" "}
+          We use analytics (including Google Analytics, which loads only if you accept) to improve this platform. Session recording is only enabled with your consent.{" "}
           <Link to="/privacy" className="underline text-[#3D3D3D] hover:text-[#008F70]">
             Privacy Policy
           </Link>

@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./App.css";
 import ConsentBanner from "./components/ConsentBanner";
+import { initGoogleAnalytics, trackPageView } from "./utils/googleAnalytics";
 import RouteErrorBoundary from "./components/RouteErrorBoundary";
 
 // Eagerly loaded — always needed on first paint
@@ -111,6 +112,13 @@ function AppShell() {
     const ref = new URLSearchParams(location.search).get("ref");
     if (ref) localStorage.setItem("pending_ref", ref);
   }, [location.search]);
+
+  // Google Analytics: starts only after consent. A returning visitor who already accepted starts here;
+  // a new visitor starts from the banner's Accept button. Either way, every route change is one page view.
+  useEffect(() => {
+    initGoogleAnalytics();
+    trackPageView(location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   // Runtime launch switch (admin Flags tab). null = still asking the API.
   const [siteLive, setSiteLive] = useState(null);

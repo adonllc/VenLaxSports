@@ -9,6 +9,8 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
 import { PHOTOS } from "../config/photos";
 import SeasonStartLine from "../components/SeasonStartLine";
+import NotifyMeBanner from "../components/NotifyMeBanner";
+import { isLaunchCity, launchCity } from "../config/platformConfig";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -351,6 +353,8 @@ export default function LeagueDetail() {
   const config = SPORT_CONFIG[league.sport] || {};
   const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
+  // League in a city that is not open yet: visible, but nobody can join. Offer Notify Me instead.
+  const opensSoon = league.status === "registration" && !isLaunchCity(league.city);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const SPORT_HEADER_BG = { tennis: "bg-tennis-bg", pickleball: "bg-pickleball-bg", cricket: "bg-cricket-bg" };
   const headerBg = SPORT_HEADER_BG[league.sport] || "bg-white";
@@ -420,8 +424,17 @@ export default function LeagueDetail() {
 
             {/* Join Card */}
             <div className="bg-white rounded-lg p-6 w-full" style={{ border: "1px solid #E5E7EB" }}>
-              <SeasonStartLine league={league} />
-              {(league.status === "completed" || league.status === "cancelled") ? (
+              {!opensSoon && <SeasonStartLine league={league} />}
+              {opensSoon ? (
+                <div data-testid="league-opens-soon-panel">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#5C5C5C", fontFamily: "Rubik, sans-serif" }}>Opens soon</p>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}>{league.city} opens after {launchCity}</h3>
+                  <p className="text-sm mb-4" style={{ color: "#5C5C5C", fontFamily: "Rubik, sans-serif" }}>
+                    We are starting in {launchCity}. Leave your email and we will tell you when {league.city} {league.sport} opens.
+                  </p>
+                  <NotifyMeBanner city={league.city} sport={league.sport} />
+                </div>
+              ) : (league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
                   <p className="font-semibold text-base" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>Season Completed</p>

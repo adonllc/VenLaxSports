@@ -4,7 +4,8 @@ import { GALLERY, PHOTOS } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Trophy } from "lucide-react";
-import platformConfig, { activeSports } from "../config/platformConfig";
+import platformConfig, { activeSports, isLaunchCity } from "../config/platformConfig";
+import NotifyMeModal from "../components/NotifyMeModal";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 
@@ -285,6 +286,9 @@ function LeagueCard({ league, onClick }) {
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const isEnded = league.status === "completed" || league.status === "cancelled";
   const isFull = league.status === "registration" && spotsLeft <= 0;
+  // Leagues outside the launch city are visible but cannot be joined yet; offer Notify Me instead.
+  const opensSoon = league.status === "registration" && !isLaunchCity(league.city);
+  const [notifyOpen, setNotifyOpen] = useState(false);
 
   return (
     <div
@@ -319,6 +323,15 @@ function LeagueCard({ league, onClick }) {
           >
             {config.icon} {config.label}
           </span>
+          {opensSoon && (
+            <span
+              className="text-xs font-semibold px-2 py-1 rounded-md"
+              style={{ background: "#F1F1F1", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+              data-testid={`league-opens-soon-${league.id}`}
+            >
+              Opens soon
+            </span>
+          )}
           {isEnded && (
             <span
               className="text-xs font-semibold px-2 py-1 rounded-md"
@@ -380,21 +393,33 @@ function LeagueCard({ league, onClick }) {
           <span className="text-sm font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? "#F2A922" : "#008F70", fontFamily: "Rubik, system-ui, sans-serif" }}>
             {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
           </span>
-          <button
-            onClick={onClick}
-            className="text-sm font-bold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 hover:scale-110"
-            style={{
-              background: isFull ? "#E5E7EB" : "#008F70",
-              color: isFull ? "#6B7280" : "white",
-              fontFamily: "Rubik, sans-serif",
-            }}
-            disabled={isFull}
-            data-testid={`league-join-${league.id}`}
-          >
-            {isFull ? "Full" : "Join"}
-          </button>
+          {opensSoon ? (
+            <button
+              onClick={(ev) => { ev.stopPropagation(); setNotifyOpen(true); }}
+              className="text-sm font-bold px-4 py-2 transition-colors hover:bg-[#3D3D3D] hover:text-white"
+              style={{ background: "#F2A922", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+              data-testid={`league-notify-${league.id}`}
+            >
+              Notify me
+            </button>
+          ) : (
+            <button
+              onClick={onClick}
+              className="text-sm font-bold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 hover:scale-110"
+              style={{
+                background: isFull ? "#E5E7EB" : "#008F70",
+                color: isFull ? "#6B7280" : "white",
+                fontFamily: "Rubik, sans-serif",
+              }}
+              disabled={isFull}
+              data-testid={`league-join-${league.id}`}
+            >
+              {isFull ? "Full" : "Join"}
+            </button>
+          )}
         </div>
       </div>
+      <NotifyMeModal isOpen={notifyOpen} onClose={() => setNotifyOpen(false)} city={league.city} sport={league.sport} />
     </div>
   );
 }

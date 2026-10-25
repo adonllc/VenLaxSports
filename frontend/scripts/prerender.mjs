@@ -31,6 +31,7 @@ const FEATURED_CITIES = JSON.parse(readFileSync(path.join(ROOT, "src", "config",
 const STATIC_ROUTES = [
   "/",
   "/tennis-pickleball-leagues",
+  "/about",
   "/leagues",
   "/sport/tennis",
   "/sport/pickleball",

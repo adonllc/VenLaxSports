@@ -3,6 +3,7 @@ from bson import ObjectId
 from datetime import datetime, timezone
 from pydantic import BaseModel
 from auth_utils import get_current_user
+from launch_city import require_city_open
 
 router = APIRouter(redirect_slashes=False)
 
@@ -282,6 +283,7 @@ async def join_rr_league(league_id: str, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
+    require_city_open(league)
 
     rr = league.get("rr_config", {})
     if rr.get("division_type") != "singles":
@@ -392,6 +394,7 @@ async def invite_partner(league_id: str, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
+    require_city_open(league)
 
     rr = league.get("rr_config", {})
     if rr.get("division_type") != "doubles":
@@ -550,6 +553,7 @@ async def accept_invite(token: str, body: AcceptInviteBody, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
+    require_city_open(league)
 
     rr = league.get("rr_config", {})
     if rr.get("schedule_generated"):

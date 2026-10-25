@@ -191,6 +191,16 @@ export default function Footer() {
             >
               Follow us on Instagram
             </a>
+            {" · "}
+            <a
+              href="https://www.facebook.com/people/VenlaXsports/61592737988462/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline hover:text-[#3D3D3D]"
+              data-testid="footer-facebook"
+            >
+              Follow us on Facebook
+            </a>
           </p>
         </div>
       </div>

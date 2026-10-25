@@ -10,6 +10,7 @@ import email_service
 import asyncio
 import notification_dispatch
 import qualification
+from launch_city import require_city_open
 import secrets
 
 router = APIRouter(redirect_slashes=False)
@@ -152,6 +153,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
+    require_city_open(league)
     if league["status"] != "registration":
         raise HTTPException(status_code=400, detail="League registration is closed")
     if league["current_players"] >= league["max_players"]:

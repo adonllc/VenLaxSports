@@ -43,9 +43,9 @@ const SECURITY_HEADERS = {
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Content-Security-Policy-Report-Only":
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com https://in.heycatch.ai; " +
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com https://in.heycatch.ai https://www.googletagmanager.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; " +
-    "img-src 'self' data: https:; connect-src 'self' https://*.venlaxsports.com https://*.posthog.com https://in.heycatch.ai; " +
+    "img-src 'self' data: https:; connect-src 'self' https://*.venlaxsports.com https://*.posthog.com https://in.heycatch.ai https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; " +
     "frame-ancestors 'self'",
 };
 
