@@ -111,6 +111,40 @@ async def _has_conflict(db, match: dict, when: datetime) -> bool:
     return other is not None
 
 
+def league_open_error(league: dict, now: datetime | None = None) -> str | None:
+    """Why nobody can schedule matches in this league yet, or None when it has officially opened.
+
+    A league is open to play only when its status is "active" (the organizer published the schedule) AND its
+    start date has arrived, in the league's own time zone. Before that the match cards exist but are read-only.
+    """
+    status = league.get("status")
+    start_raw = (league.get("start_date") or "")[:10]
+    day = _fmt_day(start_raw)
+    opens = f" It opens on {day}." if day else ""
+    not_yet = f"This league is not open to play yet.{opens} You can schedule matches once it opens."
+
+    if status in ("registration", "upcoming"):
+        return not_yet
+    if status != "active":
+        return "This league is not open for scheduling."
+    try:
+        start = tz_utils.parse_instant(f"{start_raw}T00:00", tz_utils.league_tz_name(league)) if start_raw else None
+    except Exception:
+        start = None
+    if start and (now or _now()) < start:
+        return not_yet
+    return None
+
+
+def _fmt_day(day: str) -> str:
+    """"2026-11-08" -> "Nov 8" (no platform-specific strftime flags)."""
+    try:
+        d = datetime.strptime(day[:10], "%Y-%m-%d")
+        return f"{d.strftime('%b')} {d.day}"
+    except Exception:
+        return ""
+
+
 def _check_open(match: dict) -> None:
     if match.get("schedule_status") is None:
         raise SchedulingError(400, "This match is not part of a generated schedule")
@@ -129,6 +163,9 @@ def _check_cutoff(match: dict) -> None:
 async def propose(db, match: dict, league: dict, uid: str, date: str, venue: str, note: str | None) -> dict:
     """Propose (or counter, or ask to change) a time. Returns the stored proposal."""
     _check_open(match)
+    closed = league_open_error(league)
+    if closed:
+        raise SchedulingError(400, closed)
     me = _side_of(match, uid)
     if me is None:
         raise SchedulingError(403, "You are not a player in this match")
@@ -192,6 +229,9 @@ async def propose(db, match: dict, league: dict, uid: str, date: str, venue: str
 
 async def respond(db, match: dict, league: dict, uid: str, action: str, message: str | None) -> dict:
     """The other side accepts or declines the pending proposal."""
+    closed = league_open_error(league)
+    if closed:
+        raise SchedulingError(400, closed)
     prop = match.get("proposal")
     if not prop:
         raise SchedulingError(400, "There is no proposal to respond to")

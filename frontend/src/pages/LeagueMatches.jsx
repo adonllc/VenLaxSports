@@ -163,7 +163,7 @@ function DetailRow({ label, value, testId }) {
   );
 }
 
-function MatchCard({ m, tz, tzAbbr, onChanged }) {
+function MatchCard({ m, tz, tzAbbr, onChanged, leagueOpen = true, closedReason = "" }) {
   const [form, setForm] = useState(null);   // null | "propose" | "decline"
   const [when, setWhen] = useState("");
   const [venue, setVenue] = useState(m.venue || "");
@@ -179,7 +179,8 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
   const booked = m.schedule_status === "scheduled";
   const confirmedTime = ["scheduled", "in_progress", "awaiting_result", "completed"].includes(m.state);
   const prop = m.proposal;
-  const open = m.status === "scheduled" && !m.is_playoff && m.schedule_status; // schedulable generated match
+  const schedulable = m.status === "scheduled" && !m.is_playoff && m.schedule_status; // a generated match
+  const open = schedulable && leagueOpen; // nobody can propose or confirm a time until the league has officially opened
 
   const call = async (path, body) => {
     setBusy(true);
@@ -261,7 +262,12 @@ function MatchCard({ m, tz, tzAbbr, onChanged }) {
           )}
         </NextBar>
       )}
-      {m.state === "not_scheduled" && !isHome && (
+      {m.state === "not_scheduled" && schedulable && !leagueOpen && (
+        <NextBar tone="wait" label="Not open yet" testId={`league-not-open-${m.id}`}>
+          <p className="text-sm mt-1">{closedReason || "This league is not open to play yet."}</p>
+        </NextBar>
+      )}
+      {m.state === "not_scheduled" && !isHome && leagueOpen && (
         <NextBar tone="wait" label="Waiting · Home goes first" testId={`next-${m.id}`}>
           <p className="text-sm mt-1">{opp.name} is Home and proposes the date, time and court before <strong>{fmtDate(m.deadline)}</strong>. You will get an email to confirm.</p>
           {m.last_decline && (
@@ -600,6 +606,12 @@ export default function LeagueMatches() {
         <Link to={`/leagues/${league.id}/standings`} className="underline" style={{ color: GREEN }}>Standings</Link>
       </p>
 
+      {league.open_to_play === false && (
+        <p className="mt-5 p-4 text-sm font-medium" style={{ background: AMBER_TINT, color: INK }} role="status" data-testid="league-not-open-banner">
+          {league.not_open_reason || "This league is not open to play yet."} Your opponents are shown below. Times can be proposed once the league opens.
+        </p>
+      )}
+
       <section aria-label="Your progress" className="mt-6" style={{ background: GREEN, color: "#fff" }} data-testid="match-progress">
         <div className="grid grid-cols-4 text-center">
           {[["Required", summary.total], ["Scheduled", summary.scheduled], ["Completed", summary.completed], ["Remaining", summary.remaining]].map(([label, n]) => (
@@ -635,7 +647,7 @@ export default function LeagueMatches() {
               {g.title} <span style={{ color: MUTED }}>({g.items.length})</span>
             </h2>
             <div className="space-y-4">
-              {g.items.map((m) => <MatchCard key={m.id} m={m} tz={league.tz} tzAbbr={league.tz_abbr} onChanged={load} />)}
+              {g.items.map((m) => <MatchCard key={m.id} m={m} tz={league.tz} tzAbbr={league.tz_abbr} onChanged={load} leagueOpen={league.open_to_play !== false} closedReason={league.not_open_reason} />)}
             </div>
           </section>
         ))

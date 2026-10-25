@@ -67,6 +67,7 @@ async def my_league_matches(league_id: str, request: Request):
     the opponent's profile is public; the name and contact email are always shared with an
     assigned opponent, as the Privacy Policy states.
     """
+    import match_scheduling as match_scheduling_mod
     import match_view
     import playoff_view
     import qualification
@@ -176,7 +177,10 @@ async def my_league_matches(league_id: str, request: Request):
         "league": {"id": league_id, "name": league["name"], "status": league.get("status"), "sport": sport,
                    "format": league.get("format"), "start_date": league.get("start_date"), "end_date": league.get("end_date"),
                    "matches_per_player": league.get("matches_per_player"),
-                   "tz": tzname, "tz_abbr": tz_utils.tz_abbr(tzname)},
+                   "tz": tzname, "tz_abbr": tz_utils.tz_abbr(tzname),
+                   # False until the organizer opened the league AND its start date has arrived: cards are read-only
+                   "open_to_play": match_scheduling_mod.league_open_error(league) is None,
+                   "not_open_reason": match_scheduling_mod.league_open_error(league)},
         "user_id": uid,
         "summary": summary,
         "matches": cards,
@@ -261,6 +265,14 @@ async def create_match(data: MatchCreate, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
+
+    # Matches are scheduled from the generated match cards, and only once the league has officially opened.
+    import match_scheduling
+    closed = match_scheduling.league_open_error(league)
+    if closed:
+        raise HTTPException(status_code=400, detail=closed)
+    if league.get("league_type", "flex") == "flex":
+        raise HTTPException(status_code=400, detail="Matches in this league are scheduled from your match cards. Open My Matches for this league.")
 
     in_league = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": data.league_id})
     if not in_league:

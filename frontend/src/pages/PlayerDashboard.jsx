@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff, Share2 } from "lucide-react";
-import OpponentSearch from "../components/OpponentSearch";
 import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
 import useReferralCode from "../hooks/useReferralCode";
@@ -22,12 +21,6 @@ export default function PlayerDashboard() {
   const referralCode = useReferralCode();
   const [leagues, setLeagues] = useState([]);
   const [matches, setMatches] = useState([]);
-  const [scheduleLeagueId, setScheduleLeagueId] = useState("");
-  const [opponent, setOpponent] = useState("");
-  const [schedDate, setSchedDate] = useState("");
-  const [scheduling, setScheduling] = useState(false);
-  const [schedMsg, setSchedMsg] = useState("");
-  const [leaguePlayers, setLeaguePlayers] = useState([]);
   const [togglingNotif, setTogglingNotif] = useState(false);
   const [togglingPrivacy, setTogglingPrivacy] = useState(false);
   const [interests, setInterests] = useState([]);
@@ -103,34 +96,6 @@ export default function PlayerDashboard() {
         setLadderEntries(myEntries);
       })
       .catch(() => {});
-  };
-
-  const fetchLeaguePlayers = async (lid) => {
-    try {
-      const { data } = await axios.get(`${API}/leagues/${lid}/players`);
-      setLeaguePlayers(data.filter((p) => p.player_id !== (user?.id || user?._id)));
-    } catch (e) { console.error(e); }
-  };
-
-  const handleSchedule = async (e) => {
-    e.preventDefault();
-    setScheduling(true);
-    setSchedMsg("");
-    try {
-      await axios.post(`${API}/matches`, {
-        league_id: scheduleLeagueId,
-        player2_id: opponent,
-        scheduled_date: schedDate,
-      }, { withCredentials: true });
-      setSchedMsg("Match scheduled. Both players will receive a confirmation email.");
-      setOpponent(""); setSchedDate(""); setScheduleLeagueId("");
-      fetchData();
-    } catch (err) {
-      const d = err.response?.data?.detail;
-      setSchedMsg(typeof d === "string" ? d : "Failed to schedule match");
-    } finally {
-      setScheduling(false);
-    }
   };
 
   const toggleNotifications = async () => {
@@ -559,61 +524,16 @@ export default function PlayerDashboard() {
           {/* Rating History */}
           <RatingHistoryChart user={user} />
 
-          {/* Schedule a Match */}
-          <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+          {/* Matches are scheduled from the generated match cards, and only once the league has officially opened. */}
+          <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }} data-testid="schedule-from-cards">
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Schedule a Match</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Schedule your matches</h2>
             </div>
-            <div className="p-5">
-              {leagues.length === 0 ? (
-                <p className="text-sm" style={{ color: "#6B7280" }}>Join a league first to schedule matches.</p>
-              ) : (
-                <form onSubmit={handleSchedule} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Select League</label>
-                    <select
-                      value={scheduleLeagueId}
-                      onChange={(e) => { setScheduleLeagueId(e.target.value); fetchLeaguePlayers(e.target.value); }}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm bg-white focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#3D3D3D" }}
-                      required
-                      data-testid="schedule-league-select"
-                    >
-                      <option value="">Choose a league...</option>
-                      {leagues.filter((l) => !l.matches_per_player).map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Opponent</label>
-                    <OpponentSearch
-                      leagueId={scheduleLeagueId}
-                      value={opponent}
-                      onSelect={(u) => setOpponent(u?.id || "")}
-                      testId="schedule-opponent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Match Date & Time</label>
-                    <input
-                      type="datetime-local"
-                      value={schedDate}
-                      onChange={(e) => setSchedDate(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none"
-                      style={{ border: "1px solid #E5E7EB", color: "#3D3D3D" }}
-                      required
-                      data-testid="schedule-date-input"
-                    />
-                  </div>
-                  {schedMsg && (
-                    <p className="text-sm px-3 py-2 rounded-xl" style={schedMsg.includes("success") ? { background: "#FFEDD5", color: "#7C2D12" } : { background: "#FEF2F2", color: "#DC2626" }} data-testid="schedule-message">
-                      {schedMsg}
-                    </p>
-                  )}
-                  <button type="submit" disabled={scheduling} className="w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60" style={{ background: "#008F70" }} data-testid="schedule-submit-btn">
-                    {scheduling ? "Scheduling..." : "Schedule Match"}
-                  </button>
-                </form>
-              )}
+            <div className="p-5 text-sm" style={{ color: "#4C4C4C" }}>
+              <p>
+                Your opponents are assigned for you. Open <strong>My Matches</strong> for a league, find the match card, and propose a date, time and court.
+                You can schedule once the league has officially opened.
+              </p>
             </div>
           </div>
 

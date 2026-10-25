@@ -284,3 +284,71 @@ def test_a_finished_match_shows_no_pending_proposal_and_is_ignored_by_housekeepi
     sent.clear()
     assert run(ms.process_proposals(db, NOW() + timedelta(hours=60)))["expired"] == 0
     assert sent == [] and m["proposal"] is not None                                # nobody emailed about a finished match
+
+
+# ------------------------------------------------------------------ not open to play yet
+def _lg(status, start):
+    return {"league_type": "flex", "status": status, "start_date": start, "city": "Atlanta"}
+
+
+def test_league_open_error_before_and_after_opening():
+    now = datetime(2026, 10, 25, 12, 0, tzinfo=timezone.utc)
+    assert "opens on Nov 8" in ms.league_open_error(_lg("registration", "2026-11-08"), now)
+    assert "opens on Nov 8" in ms.league_open_error(_lg("active", "2026-11-08"), now)  # published but not started
+    assert ms.league_open_error(_lg("active", "2026-10-20"), now) is None
+    assert ms.league_open_error(_lg("completed", "2026-10-01"), now) == "This league is not open for scheduling."
+    assert ms.league_open_error(_lg("cancelled", "2026-10-01"), now) == "This league is not open for scheduling."
+
+
+def test_start_date_is_midnight_in_the_league_time_zone_not_utc():
+    # Atlanta midnight on Oct 26 is 04:00 UTC: at 03:00 UTC it is still Oct 25 there
+    lg = _lg("active", "2026-10-26")
+    assert ms.league_open_error(lg, datetime(2026, 10, 26, 3, 0, tzinfo=timezone.utc)) is not None
+    assert ms.league_open_error(lg, datetime(2026, 10, 26, 5, 0, tzinfo=timezone.utc)) is None
+
+
+def test_missing_start_date_does_not_block_an_active_league():
+    assert ms.league_open_error({"status": "active", "city": "Atlanta"}) is None
+
+
+def test_propose_and_respond_are_refused_until_the_league_has_opened(sent):
+    db, lg, m = setup()
+    lg["start_date"] = (NOW() + timedelta(days=14)).strftime("%Y-%m-%d")
+    when = (NOW() + timedelta(days=20)).isoformat()
+    with pytest.raises(ms.SchedulingError) as e:
+        run(ms.propose(db, m, lg, m["player1_id"], when, "Court 3", None))
+    assert e.value.status == 400 and "not open to play yet" in e.value.detail
+    m["proposal"] = {"proposer_side": 1, "date": when, "venue": "Court 3"}
+    with pytest.raises(ms.SchedulingError) as e:
+        run(ms.respond(db, m, lg, m["player2_id"], "confirm", None))
+    assert "not open to play yet" in e.value.detail
+
+
+def test_free_form_match_creation_is_closed(monkeypatch, sent):
+    from fastapi import HTTPException
+    db, lg, m = setup()
+    as_user(monkeypatch, db, m["player1_id"])
+    body = match_routes.MatchCreate(league_id=str(lg["_id"]), player2_id=m["player2_id"], scheduled_date=(NOW() + timedelta(days=3)).isoformat())
+
+    lg["status"] = "registration"
+    lg["start_date"] = (NOW() + timedelta(days=14)).strftime("%Y-%m-%d")
+    with pytest.raises(HTTPException) as e:
+        run(match_routes.create_match(body, request_for(db)))
+    assert e.value.status_code == 400 and "not open to play yet" in e.value.detail
+
+    lg["status"] = "active"
+    lg["start_date"] = NOW().strftime("%Y-%m-%d")
+    with pytest.raises(HTTPException) as e:
+        run(match_routes.create_match(body, request_for(db)))
+    assert e.value.status_code == 400 and "scheduled from your match cards" in e.value.detail
+
+
+def test_match_cards_say_whether_the_league_is_open(monkeypatch, sent):
+    db, lg, m = setup()
+    as_user(monkeypatch, db, m["player1_id"])
+    lg["start_date"] = (NOW() + timedelta(days=14)).strftime("%Y-%m-%d")
+    closed = run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["league"]
+    assert closed["open_to_play"] is False and "not open to play yet" in closed["not_open_reason"]
+    lg["start_date"] = NOW().strftime("%Y-%m-%d")
+    opened = run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["league"]
+    assert opened["open_to_play"] is True and opened["not_open_reason"] is None

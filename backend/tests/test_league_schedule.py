@@ -276,6 +276,7 @@ def test_both_dashboards_show_the_same_match_and_roles(sent, monkeypatch):
 def test_home_proposes_away_confirms_or_declines(sent, monkeypatch):
     db, lid, ids = make_league(8)
     run(league_schedule.open_league_to_play(db, league_of(db)))
+    league_of(db)["start_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")  # the season has started: cards are live
     m = db.matches.docs[0]
     mid, home, away = str(m["_id"]), m["player1_id"], m["player2_id"]
     when = "2026-12-01T18:00:00+00:00"
