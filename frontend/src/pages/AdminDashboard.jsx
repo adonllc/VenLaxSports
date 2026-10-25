@@ -2045,7 +2045,7 @@ function SiteSettingsCard() {
         setGoogle(r.data.google_analytics !== false);
         setLoaded(true);
       })
-      .catch(() => setMsg("Could not load the current settings."));
+      .catch((err) => setMsg(`Could not load the current settings${err.response?.status ? ` (error ${err.response.status})` : ""}. Reload the page; if it keeps happening, check the backend is running the latest version.`));
   }, []);
 
   // Cities that are open but not in the featured list (added by hand earlier) still show up so they can be closed.
@@ -2069,6 +2069,7 @@ function SiteSettingsCard() {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-5" data-testid="site-settings-card">
+      <h2 className="text-base font-bold text-heading-dark">Site settings</h2>
       <div>
         <h3 className="text-sm font-semibold text-heading-dark">Open cities</h3>
         <p className="text-xs text-gray-500 mt-1">
@@ -2077,7 +2078,9 @@ function SiteSettingsCard() {
       </div>
 
       {!loaded ? (
-        <p className="text-sm text-gray-500">Loading...</p>
+        <p className="text-sm text-gray-600" role={msg ? "alert" : undefined}>
+          {msg || "Loading..."}
+        </p>
       ) : (
         <>
           <label className="flex items-center gap-2 text-sm font-medium text-heading-dark">
