@@ -56,3 +56,31 @@ def rating_field_for(sport: str) -> str | None:
 
 def clamp(v: float, lo: float = 1.0, hi: float = 7.0) -> float:
     return max(lo, min(hi, round(v, 2)))
+
+
+def starting_rating_for(skill_level: str | None) -> float | None:
+    """Starting rating for a self-reported USTA/USAPA level ("2.0" ... "5.5", "6.0+"), or None if unusable."""
+    if not skill_level:
+        return None
+    try:
+        return clamp(float(str(skill_level).strip().rstrip("+")))
+    except ValueError:
+        return None
+
+
+async def seed_starting_rating(db, user_id: str, skill_level: str | None) -> bool:
+    """Set tennis and pickleball ratings from the self-reported level, but only before the player's first
+    rated match. After that the level is just a label and earned ratings are never touched, so editing the
+    level cannot reset a rating. Returns True when ratings were changed."""
+    from bson import ObjectId
+
+    rating = starting_rating_for(skill_level)
+    if rating is None:
+        return False
+    if await db.rating_history.count_documents({"user_id": user_id}, limit=1) > 0:
+        return False
+    await db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {"tennis_rating": rating, "pickleball_rating": rating}},
+    )
+    return True

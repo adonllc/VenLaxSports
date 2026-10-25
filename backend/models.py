@@ -117,6 +117,7 @@ class League(BaseDocument):
     currency: str = "USD"
     max_players: int = 16
     current_players: int = 0
+    min_players_to_start: Optional[int] = None  # shown as "Starts when N players have joined"; None = no claim
     start_date: str
     end_date: str
     status: str = "registration"  # registration, active, completed, cancelled
@@ -147,6 +148,7 @@ class LeagueCreate(BaseModel):
     entry_fee: float = 0.0
     currency: str = "USD"
     max_players: int = 16
+    min_players_to_start: Optional[int] = None
     start_date: str
     end_date: str
     description: Optional[str] = None
@@ -167,6 +169,7 @@ class LeagueUpdate(BaseModel):
     description: Optional[str] = None
     venue: Optional[str] = None
     max_players: Optional[int] = None
+    min_players_to_start: Optional[int] = None
     entry_fee: Optional[float] = None
     season_id: Optional[str] = None
     rules: Optional[str] = None

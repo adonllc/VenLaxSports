@@ -71,7 +71,7 @@ const SAFETY = [
 ];
 
 const GROW = [
-  { slug: "referral", icon: Gift, title: "Share your code", body: "Get your referral code on the Rewards page. You both get $5 credit when your friend joins.", cta: "Get my code", to: "/rewards" },
+  { slug: "referral", icon: Gift, title: "Share your code", body: "Get your referral code on the Rewards page. You both get $5 credit once your friend plays their first match.", cta: "Get my code", to: "/rewards" },
   { slug: "partner", icon: UserPlus, title: "Bring a doubles partner", body: "Register for doubles and invite your partner by email. One team fee covers both of you.", cta: "Play doubles", to: "/leagues" },
   { slug: "challenge", icon: Swords, title: "Challenge a friend", body: "Join a ladder and challenge anyone above you. Win to swap ranks.", cta: "See ladders", to: "/ladders" },
   { slug: "share", icon: Share2, title: "Share your result", body: "Post your match card with the score and your rating change, and let your friends chase it.", cta: "Join to share", to: "/auth" },
@@ -383,7 +383,7 @@ export default function Home() {
 
         {/* GROW FASTER TOGETHER */}
         <Section tint>
-          <Heading eyebrow="Grow faster together" title="Invite friends, climb the ranks." lead="Every friend who joins with your code earns you both $5 in credit toward your next league. Play with people you know and the season gets better." />
+          <Heading eyebrow="Grow faster together" title="Invite friends, climb the ranks." lead="Every friend who joins with your code and plays a first match earns you both $5 in credit toward your next league. Play with people you know and the season gets better." />
           {showFounding && (
             <motion.div {...fadeUp} className="mb-8 p-6 text-white flex flex-col md:flex-row md:items-center gap-4 md:gap-8" style={{ background: GREEN }} data-testid="home-founding-strip">
               <div className="font-bold text-xl md:text-2xl">Founding member spots are limited</div>

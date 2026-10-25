@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Trophy, Check } from "lucide-react";
-import platformConfig, { activeSportIds, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
+import { activeSportIds, FOUNDING_DISPLAY_FLOOR, launchCity } from "../config/platformConfig";
 import PhotoSlot from "./PhotoSlot";
 
 const GREEN = "#008F70";
@@ -77,7 +77,7 @@ export default function SportHero({
               </div>
             ) : (
               <p className="text-lg font-bold">
-                {platformConfig.featuredCities.length}+ cities · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
+                Now open in {launchCity} · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
               </p>
             )}
           </div>
@@ -92,7 +92,7 @@ export default function SportHero({
                 <div className="h-full transition-all duration-700" style={{ width: `${spotsPercent}%`, background: AMBER }} />
               </div>
               <p className="mt-3 text-sm text-white/90">
-                {platformConfig.featuredCities.length}+ cities · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
+                Now open in {launchCity} · {activeSportIds.length} sports{sportMeta.rating ? ` · ${sportMeta.rating}` : ""}
               </p>
             </div>
           )}

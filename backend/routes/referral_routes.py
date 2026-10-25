@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request, Body
 from bson import ObjectId
-from models import User, ReferralCredit
+from models import User
 from auth_utils import get_current_user
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import secrets
 import string
 import email_service
@@ -14,65 +14,6 @@ def generate_referral_code():
     chars = string.ascii_uppercase + string.digits
     random_part = ''.join(secrets.choice(chars) for _ in range(6))
     return f"REF_{random_part}"
-
-@router.post("/referral/redeem/{code}")
-async def redeem_referral_code(code: str, request: Request):
-    """Apply referral credit when user signs up with referral code"""
-    db = request.app.state.db
-
-    # Find referral credit record by code
-    ref_credit = await db.referral_credits.find_one({"referral_code": code})
-    if not ref_credit:
-        raise HTTPException(status_code=404, detail="Invalid referral code")
-
-    # Get current user (must be logged in)
-    user_id = request.headers.get("X-User-ID")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    # Check if already redeemed
-    if ref_credit.get("referee_id"):
-        raise HTTPException(status_code=400, detail="Referral code already redeemed")
-
-    # Check if expired
-    expires_at = datetime.fromisoformat(ref_credit.get("expires_at"))
-    if datetime.now(timezone.utc) > expires_at:
-        raise HTTPException(status_code=400, detail="Referral code expired")
-
-    # Update referral credit: set referee_id, apply credit to referee's account
-    referee = await db.users.find_one({"_id": user_id})
-    if not referee:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    # Add credit to referee's account
-    new_balance = (referee.get("credits_balance", 0.0) or 0.0) + ref_credit.get("credit_amount", 0.0)
-    await db.users.update_one(
-        {"_id": user_id},
-        {
-            "$set": {
-                "credits_balance": new_balance,
-                "credits_expiry": (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
-            }
-        }
-    )
-
-    # Mark referral as applied
-    await db.referral_credits.update_one(
-        {"_id": ref_credit.get("_id")},
-        {
-            "$set": {
-                "referee_id": user_id,
-                "status": "applied",
-                "applied_at": datetime.now(timezone.utc).isoformat()
-            }
-        }
-    )
-
-    return {
-        "status": "success",
-        "message": f"${ref_credit.get('credit_amount', 0)} credit applied!",
-        "new_balance": new_balance
-    }
 
 @router.get("/me/referral-code")
 async def get_my_referral_code(request: Request):
@@ -105,9 +46,15 @@ async def get_my_credits(request: Request):
     current_user = await get_current_user(request, db)
 
     # Get referral earnings history
-    referrals = await db.referral_credits.find({"referrer_id": str(current_user["_id"])}).to_list(None)
+    me = str(current_user["_id"])
+    referrals = await db.referral_credits.find({"referrer_id": me}).to_list(None)
+    # Credit that exists but is not spendable yet: waiting for a referred player's first confirmed match,
+    # whether this user is the one who referred or the one who was referred.
+    as_referee = await db.referral_credits.find({"referee_id": me, "status": "pending"}).to_list(None)
+    pending_credits = sum(r.get("credit_amount", 0) for r in referrals if r.get("status") == "pending") +         sum(r.get("credit_amount", 0) for r in as_referee if r.get("referrer_id") != me)
 
     return {
+        "pending_credits": pending_credits,
         "credits_balance": current_user.get("credits_balance", 0.0),
         "credits_expiry": current_user.get("credits_expiry"),
         "total_referrals": len([r for r in referrals if r.get("type", "referral") == "referral"]),

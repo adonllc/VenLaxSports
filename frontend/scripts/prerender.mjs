@@ -13,7 +13,7 @@
 // To activate it in CI/deploy, run `npx playwright install --with-deps chromium`
 // as part of the build image before `yarn build`.
 import { preview } from "vite";
-import { mkdirSync, writeFileSync, copyFileSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -21,7 +21,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 
 const ACTIVE_SPORTS = ["tennis", "pickleball"];
-const FEATURED_CITIES = ["New York", "Los Angeles", "Chicago", "San Francisco", "Atlanta", "Houston"];
+// One city list for the site, the sitemap and prerender: src/config/cities.json
+const FEATURED_CITIES = JSON.parse(readFileSync(path.join(ROOT, "src", "config", "cities.json"), "utf8"))
+  .featured.filter((c) => c.seo).map((c) => c.name);
 
 // /join excluded: it's gated behind auth (redirects guests to /auth on mount
 // before useDocumentMeta's cleanup ever settles), so prerendering it captured

@@ -1,0 +1,13 @@
+{
+  "launchCity": "Atlanta",
+  "featured": [
+    { "name": "Atlanta",       "icon": "🏟️", "sports": ["Pickleball", "Tennis"], "desc": "The South's fastest-rising pickleball scene.", "seo": true },
+    { "name": "New York",      "icon": "🏙️", "sports": ["Tennis", "Pickleball"], "desc": "Ranked circuits at premier indoor & outdoor courts.", "seo": true },
+    { "name": "Los Angeles",   "icon": "🌴", "sports": ["Pickleball", "Tennis"], "desc": "Year-round competition at LA's top venues.", "seo": true },
+    { "name": "Chicago",       "icon": "🌆", "sports": ["Tennis", "Pickleball"], "desc": "Seasons running across Chicago's best courts.", "seo": true },
+    { "name": "San Francisco", "icon": "🌉", "sports": ["Tennis"],               "desc": "Competitive singles & doubles. Join the circuit.", "seo": true },
+    { "name": "Houston",       "icon": "🤠", "sports": ["Tennis", "Pickleball"], "desc": "Ranked leagues at Houston's elite clubs.", "seo": true },
+    { "name": "Dallas",        "icon": "⭐", "sports": ["Tennis", "Pickleball"], "desc": "Singles and doubles seasons across the Dallas area.", "seo": false },
+    { "name": "Charlotte",     "icon": "🏀", "sports": ["Tennis", "Pickleball"], "desc": "Ranked seasons for Charlotte players.", "seo": false }
+  ]
+}

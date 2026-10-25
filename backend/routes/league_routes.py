@@ -116,6 +116,8 @@ async def create_league(data: LeagueCreate, request: Request):
         raise HTTPException(status_code=400, detail="Sport not active in the current phase")
     if data.country != ACTIVE_COUNTRY:
         raise HTTPException(status_code=400, detail="Country not active in the current phase")
+    if data.min_players_to_start is not None and not 2 <= data.min_players_to_start <= data.max_players:
+        raise HTTPException(status_code=400, detail="min_players_to_start must be between 2 and max_players")
     league = League(
         **data.model_dump(),
         admin_id=user["_id"],

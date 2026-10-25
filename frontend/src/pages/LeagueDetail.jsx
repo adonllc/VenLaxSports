@@ -8,6 +8,7 @@ import PartnerSearch from "../components/PartnerSearch";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
 import { PHOTOS } from "../config/photos";
+import SeasonStartLine from "../components/SeasonStartLine";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -419,6 +420,7 @@ export default function LeagueDetail() {
 
             {/* Join Card */}
             <div className="bg-white rounded-lg p-6 w-full" style={{ border: "1px solid #E5E7EB" }}>
+              <SeasonStartLine league={league} />
               {(league.status === "completed" || league.status === "cancelled") ? (
                 <div className="text-center py-6">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />

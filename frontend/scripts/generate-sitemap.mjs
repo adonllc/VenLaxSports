@@ -6,7 +6,7 @@
 // src/config/platformConfig.js rather than imported, because that file reads
 // import.meta.env and isn't loadable outside Vite. Keep both in sync manually
 // if Phase 1's active sports or featured cities change.
-import { writeFileSync } from "fs";
+import { writeFileSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -14,7 +14,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SITE = "https://venlaxsports.com";
 
 const ACTIVE_SPORTS = ["tennis", "pickleball"];
-const FEATURED_CITIES = ["New York", "Los Angeles", "Chicago", "San Francisco", "Atlanta", "Houston"];
+// One city list for the site, the sitemap and prerender: src/config/cities.json
+const FEATURED_CITIES = JSON.parse(readFileSync(new URL("../src/config/cities.json", import.meta.url), "utf8"))
+  .featured.filter((c) => c.seo).map((c) => c.name);
 
 // /join is excluded: it's gated behind auth (redirects guests to /auth before
 // any content renders), so it has no unique indexable content and the prior

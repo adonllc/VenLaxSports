@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import platformConfig, { activeSports } from "../config/platformConfig";
+import platformConfig, { activeSports, indexedCities, isLaunchCity } from "../config/platformConfig";
+import { cityPath } from "../utils/citySlug";
+import CityStatusTag from "./CityStatusTag";
+import { hasFounderPage } from "../config/founderConfig";
 import BRAND from "../config/brandConfig";
 import Logo from "./Logo";
 import ContactForm from "./ContactForm";
@@ -105,6 +108,7 @@ export default function Footer() {
                 </h3>
                 <ul className="space-y-2">
                   {[
+                    ...(hasFounderPage ? [{ to: "/about", label: "About" }] : []),
                     { to: "/terms",     label: "Terms" },
                     { to: "/privacy",   label: "Privacy" },
                     { to: "/waiver",    label: "Waiver" },
@@ -160,14 +164,15 @@ export default function Footer() {
             Browse by City
           </h3>
           <div className="flex flex-wrap gap-5">
-            {platformConfig.featuredCities.slice(0, 6).map((city) => (
+            {indexedCities.map((city) => (
               <Link
                 key={city.name}
-                to={`/leagues?city=${encodeURIComponent(city.name)}`}
-                className="text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
+                to={isLaunchCity(city.name) ? `/leagues?city=${encodeURIComponent(city.name)}` : cityPath(city.name, city.sports[0].toLowerCase())}
+                className="inline-flex items-center gap-2 text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                 style={{ fontFamily: "Rubik, sans-serif" }}
+                data-testid={`footer-city-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                {city.icon} {city.name}
+                {city.name} <CityStatusTag city={city.name} />
               </Link>
             ))}
           </div>

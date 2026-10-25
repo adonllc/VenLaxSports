@@ -250,11 +250,15 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     await require_admin(request, db)
 
     # Capture previous status to detect activation
-    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1})
+    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1})
     if not prev:
         raise HTTPException(status_code=404, detail="League not found")
 
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if "min_players_to_start" in update_data:
+        effective_max = update_data.get("max_players", prev.get("max_players", 16))
+        if not 2 <= update_data["min_players_to_start"] <= effective_max:
+            raise HTTPException(status_code=400, detail="min_players_to_start must be between 2 and max_players")
     if "qualification" in update_data:
         import qualification
         try:

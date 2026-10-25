@@ -475,7 +475,7 @@ async def send_weekly_referral_nudge(to: str, player_name: str, referral_code: s
         <li>📸 Shareable match cards for your wins</li>
       </ul>
       <p>Know a friend, family member, or regular playing partner who'd love this?
-         Send them your code — <strong>you both get $5 credit</strong> when they join.</p>
+         Send them your code — <strong>you both get $5 credit</strong> once they play their first match.</p>
       <p style="font-size:24px;font-weight:900;letter-spacing:4px;text-align:center;
                 background:#f3f4f6;border-radius:12px;padding:14px 0;margin:20px 0">
         {referral_code}

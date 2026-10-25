@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from bson import ObjectId
 from datetime import datetime, timezone
 from auth_utils import get_current_user
+from rating_utils import seed_starting_rating
 from models import UserFollow
 
 router = APIRouter()
@@ -94,6 +95,8 @@ async def profile_setup(body: ProfileSetupIn, request: Request):
     if body.city is not None:
         update["city"] = body.city
     await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
+    if body.skill_level is not None:
+        await seed_starting_rating(db, str(user["_id"]), body.skill_level)
     return {"message": "Profile updated", "profile_complete": True}
 
 

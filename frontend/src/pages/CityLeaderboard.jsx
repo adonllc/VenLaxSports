@@ -5,7 +5,8 @@ import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import useDocumentMeta from "../hooks/useDocumentMeta";
-import platformConfig, { activeSports } from "../config/platformConfig";
+import { activeSports, indexedCities, isLaunchCity } from "../config/platformConfig";
+import CityStatusTag from "../components/CityStatusTag";
 import { cityFromSlug, cityPath } from "../utils/citySlug";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -84,6 +85,14 @@ export default function CityLeaderboard() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        {/* A city that is not open yet leads with the notify-me form instead of an empty leaderboard */}
+        {!isLaunchCity(city) && (
+          <div className="bg-white border border-gray-200 rounded-none p-4" data-testid="city-coming-soon">
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#5C5C5C" }}>Coming soon</p>
+            <h2 className="font-heading font-bold text-heading-dark mb-3">{city} {cfg.label} is not open yet</h2>
+            <NotifyMeBanner city={city} sport={sport} />
+          </div>
+        )}
         {/* Top Players */}
         <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-2">
@@ -227,9 +236,10 @@ export default function CityLeaderboard() {
                 <Link to={cityPath(city, s.id)} className="font-bold underline" style={{ color: "#00765C" }}>{s.label} in {city}</Link>
               </li>
             ))}
-            {platformConfig.featuredCities.filter((c) => c.name !== city).slice(0, 6).map((c) => (
+            {indexedCities.filter((c) => c.name !== city).map((c) => (
               <li key={c.name}>
-                <Link to={cityPath(c.name, sport)} className="font-bold underline" style={{ color: "#00765C" }}>{cfg.label} in {c.name}</Link>
+                <Link to={cityPath(c.name, sport)} className="font-bold underline" style={{ color: "#00765C" }}>{cfg.label} in {c.name}</Link>{" "}
+                <CityStatusTag city={c.name} />
               </li>
             ))}
             <li><Link to={`/sport/${sport}`} className="font-bold underline" style={{ color: "#00765C" }}>All {cfg.label.toLowerCase()} leagues</Link></li>

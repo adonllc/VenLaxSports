@@ -363,7 +363,7 @@ export default function Auth() {
 
           {mode === "register" && form.referral_code && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-xl mb-6" data-testid="referral-banner">
-              You've got a $5 credit waiting — sign up to claim it.
+              You've got a $5 credit waiting. It unlocks after you play your first match.
             </div>
           )}
 

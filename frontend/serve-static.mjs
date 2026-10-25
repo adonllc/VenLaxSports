@@ -54,7 +54,7 @@ const SECURITY_HEADERS = {
 const KNOWN_ROOTS = new Set([
   "", "auth", "reset-password", "sport", "leagues", "rules", "handbook", "terms", "waiver", "dashboard", "admin",
   "matches", "round-robin", "privacy", "city", "players", "verify-email", "profile-setup", "join",
-  "doubles-invite", "ladders", "rewards", "tennis-pickleball-leagues",
+  "doubles-invite", "ladders", "rewards", "tennis-pickleball-leagues", "about",
 ]);
 
 const citySlug = (name) => name.toLowerCase().trim().replace(/\s+/g, "-");

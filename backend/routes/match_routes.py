@@ -7,6 +7,7 @@ from models import Match, MatchCreate, MatchScore, MatchCard
 from auth_utils import get_current_user
 from rating_utils import delta_for, rating_field_for, clamp, k_factor_for
 import email_service
+from referral_release import release_pending_referral_credit
 from card_generation import generate_match_card, save_card_image
 import os
 
@@ -382,6 +383,15 @@ async def report_score(match_id: str, score_data: MatchScore, request: Request):
         },
     )
     await _update_standings(db, match["league_id"], match, score_data.winner_id, score_data.score_data)
+
+    # A played, confirmed match unlocks any pending referral credit for these players. Forfeits never get here.
+    # Money must not break score entry, but a failure must be visible: log it with the match id.
+    for _uid in set(_side_ids(match, 1) + _side_ids(match, 2)):
+        try:
+            await release_pending_referral_credit(db, _uid)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("referral release failed: match=%s user=%s", match_id, _uid)
 
     # Rating updates (tennis / pickleball only — cricket is team-based)
     rating_change = None

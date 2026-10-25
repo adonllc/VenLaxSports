@@ -126,6 +126,17 @@ export default function RewardsCredits() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Use credits to reduce league entry fees. Apply at checkout.
               </p>
+
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700" data-testid="pending-credits">
+                <p className="text-sm font-semibold text-heading-dark dark:text-white">
+                  Pending: ${credits?.pending_credits?.toFixed(2) || '0.00'}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {credits?.pending_credits > 0
+                    ? "Unlocks when the first confirmed match is played."
+                    : "Credit appears here after a friend plays their first match."}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -170,8 +181,8 @@ export default function RewardsCredits() {
           </div>
 
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Share your code with friends. They get $5 off their first league, you get $5 credit —
-            plus a $10 bonus every 3rd friend you bring in.
+            Share your code with friends. Once your friend plays their first match, you both get $5 credit.
+            Every 3rd friend who does earns you a $10 bonus.
           </p>
 
           {error && (
@@ -286,15 +297,15 @@ export default function RewardsCredits() {
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">2</div>
               <p className="font-semibold text-heading-dark dark:text-white mb-2">They Sign Up</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                They register using your code and get $5 off their first league
+                They register using your code and play their first match
               </p>
             </div>
 
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">3</div>
-              <p className="font-semibold text-heading-dark dark:text-white mb-2">You Earn $5</p>
+              <p className="font-semibold text-heading-dark dark:text-white mb-2">You Both Earn $5</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Get $5 credit instantly when they sign up
+                You both get $5 credit once that first match is confirmed
               </p>
             </div>
           </div>

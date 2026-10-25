@@ -18,6 +18,8 @@
 // ─────────────────────────────────────────────────────────────────────
 // ALL AVAILABLE SPORTS (used across all phases)
 // ─────────────────────────────────────────────────────────────────────
+import CITIES from "./cities.json";
+
 export const ALL_SPORTS = {
   tennis: {
     id: "tennis", label: "Tennis", icon: "🎾",
@@ -64,16 +66,7 @@ const PHASE_1 = {
   statsRegion: "All US Cities",
 
   // City highlights shown on Home page
-  featuredCities: [
-    { name: "New York",      icon: "🏙️", sports: ["Tennis", "Pickleball"], desc: "Ranked circuits at premier indoor & outdoor courts." },
-    { name: "Los Angeles",   icon: "🌴", sports: ["Pickleball", "Tennis"], desc: "Year-round competition at LA's top venues." },
-    { name: "Chicago",       icon: "🌆", sports: ["Tennis", "Pickleball"], desc: "Seasons running across Chicago's best courts." },
-    { name: "San Francisco", icon: "🌉", sports: ["Tennis"],               desc: "Competitive singles & doubles. Join the circuit." },
-    { name: "Atlanta",       icon: "🏟️", sports: ["Pickleball", "Tennis"], desc: "The South's fastest-rising pickleball scene." },
-    { name: "Houston",       icon: "🤠", sports: ["Tennis", "Pickleball"], desc: "Ranked leagues at Houston's elite clubs." },
-    { name: "Dallas",        icon: "⭐", sports: ["Tennis", "Pickleball"], desc: "Singles and doubles seasons across the Dallas area." },
-    { name: "Charlotte",     icon: "🏀", sports: ["Tennis", "Pickleball"], desc: "Ranked seasons for Charlotte players." },
-  ],
+  featuredCities: CITIES.featured,
   citySectionTitle: "Pick Your City. Enter Your Season.",
   citySectionDesc: "Ranked Tennis & Pickleball leagues running across the USA. New seasons open year-round.",
 };
@@ -178,5 +171,12 @@ export const activeCountry = platformConfig.country;
 
 // Founding-member numbers are real; hide them until the count is big enough to read as social proof.
 export const FOUNDING_DISPLAY_FLOOR = 25;
+
+// The one city that is open for play right now (see cities.json). Others show "Coming soon".
+export const launchCity = CITIES.launchCity;
+export const isLaunchCity = (name) => String(name).toLowerCase() === launchCity.toLowerCase();
+
+// Cities that get their own indexable pages (sitemap, prerender, footer, internal links).
+export const indexedCities = platformConfig.featuredCities.filter((c) => c.seo);
 
 export default platformConfig;

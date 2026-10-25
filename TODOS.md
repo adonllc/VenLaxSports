@@ -57,3 +57,14 @@
 - [ ] T3.3 — Health dashboard
 
 **Phase 3 ETA: 1 month after Phase 1**
+
+## Growth Wave 2: after the first launch-city league fills (added 2026-10-25, from /plan-ceo-review + /plan-eng-review)
+
+**Why it waits:** these need real players and a completed season. Wave 1 (launch-city flag, rating seed, start-threshold line, referral credit gating, About page) ships first. Plan: `~/.gstack/projects/adonllc-VenLaxSports/ceo-plans/2026-10-25-density-first-city-launch.md`.
+
+- [ ] **Season 1 public page + consent (A4/F2).** Players listed only with opt-in (default off), first name + last initial, withdrawable any time. Reuse `LeagueSpectator.jsx` and `public_routes.py /league/{id}`. Replace the "sample" cards on Home once real data exists.
+- [ ] **Local comparison page (A5).** Honest "VENLAX vs team leagues (ALTA/USTA) in Atlanta". Verify every competitor fact before publishing.
+- [ ] **Court and venue guide (E4).** One page per open city, address + booking link, "suggest a court" form. Needs real venue facts from the owner.
+- [ ] **Ambassadors (E2).** Plain referral codes for 3 to 5 local people or clubs; no new attribution system. Depends on the Wave 1 credit fix so credit pays only after a first completed match.
+- [ ] **Season recap card + badges (E3).** Reuse `card_generation.py`. Needs a season that has ended. Skip a player's card on failure and log it; never fail the batch.
+- [ ] **Season-start guarantee (E1).** Minimum players + automatic refund. Business policy decision first.

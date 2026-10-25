@@ -33,7 +33,7 @@ const DIVISION_RANGES = {
 const DEFAULT_FORM = {
   name: "", sport: SPORTS[0] || "tennis", country: activeCountry, city: "",
   format: (FORMATS[SPORTS[0]] || ["singles"])[0],
-  entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16,
+  entry_fee: 0, currency: CURRENCIES[activeCountry] || "USD", max_players: 16, min_players_to_start: "",
   start_date: "", end_date: "", description: "", venue: "", season: "Season 1", season_id: "",
   division_label: "", division_ntrp_min: null, division_ntrp_max: null,
   league_type: "flex",
@@ -162,6 +162,7 @@ export default function AdminDashboard() {
         ...form,
         entry_fee: Number(form.entry_fee),
         max_players: Number(form.max_players),
+        min_players_to_start: form.min_players_to_start ? Number(form.min_players_to_start) : null,
         season_id: form.season_id || null,
       };
       await axios.post(`${API}/leagues`, payload, { withCredentials: true });
@@ -492,6 +493,11 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Max Players</label>
                     <input type="number" min="2" max="100" value={form.max_players} onChange={update("max_players")} className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D" }} data-testid="create-league-max-players" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Minimum to start (optional)</label>
+                    <input type="number" min="2" max="100" value={form.min_players_to_start} onChange={update("min_players_to_start")} placeholder="e.g. 8" className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none bg-white" style={{ border: "1px solid #E5E7EB", color: "#3D3D3D" }} data-testid="create-league-min-players" />
+                    <p className="text-xs mt-1" style={{ color: "#5C5C5C" }}>Players see "Starts when N players have joined" (no counts). Leave empty to show nothing.</p>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#374151" }}>Start Date *</label>
