@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
+import { getAttribution } from "../utils/attribution";
+import { trackEvent } from "../utils/googleAnalytics";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -24,10 +26,18 @@ export default function OAuthCallback() {
 
     (async () => {
       try {
-        await axios.post(`${API}/auth/google/callback`, { code, state }, {
+        const { data } = await axios.post(`${API}/auth/google/callback`, {
+          code, state,
+          attribution: getAttribution(),
+          referral_code: localStorage.getItem("pending_ref") || undefined,
+        }, {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
         });
+        if (data.new_user) {
+          localStorage.removeItem("pending_ref");
+          trackEvent("sign_up", { method: "google" });
+        }
         await fetchMe();
         navigate("/dashboard", { replace: true });
       } catch (err) {

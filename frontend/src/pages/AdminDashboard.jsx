@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
-import { activeSportIds, activeCountry } from "../config/platformConfig";
+import platformConfig, { activeSportIds, activeCountry } from "../config/platformConfig";
 import DisputeEscalationPanel from "../components/DisputeEscalationPanel";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -209,6 +209,7 @@ export default function AdminDashboard() {
 
   const [adjustLeague, setAdjustLeague] = useState(null);
   const [rulesLeague, setRulesLeague] = useState(null);
+  const [startMinLeague, setStartMinLeague] = useState(null);
 
   const handleOpenToPlay = async (l, regenerate = false) => {
     const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/open-to-play`, { regenerate, ...body }, { withCredentials: true });
@@ -269,6 +270,7 @@ export default function AdminDashboard() {
     { id: "zelle", label: "Zelle Queue" },
     { id: "waitlist", label: "Waitlist" },
     { id: "referrals", label: "Referrals" },
+    { id: "marketing", label: "Marketing" },
     { id: "flags", label: "Feature Flags" },
   ];
 
@@ -638,6 +640,16 @@ export default function AdminDashboard() {
                               Playoff rules
                             </button>
                           )}
+                          {l.status === "registration" && (
+                            <button
+                              onClick={() => setStartMinLeague(l)}
+                              className="text-xs font-bold" style={{ color: "#008F70" }}
+                              data-testid={`start-min-${l.id}`}
+                              title='Shows players "Starts when N players have joined"'
+                            >
+                              Start minimum{l.min_players_to_start ? ` (${l.min_players_to_start})` : ""}
+                            </button>
+                          )}
                           {l.status !== "completed" && (
                             <button
                               onClick={() => handleCloseLeague(l.id, l.name)}
@@ -796,7 +808,9 @@ export default function AdminDashboard() {
         {tab === "waitlist" && <WaitlistTab />}
         {tab === "referrals" && <ReferralsTab />}
         {tab === "flags" && <FlagsTab />}
+        {tab === "marketing" && <MarketingTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
+        {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}
       </div>
 
@@ -1715,6 +1729,8 @@ function FlagsTab() {
         </button>
       </div>
 
+      <SiteSettingsCard />
+
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-gray-200">
           <h3 className="text-sm font-semibold text-heading-dark">Background Jobs</h3>
@@ -1959,6 +1975,241 @@ function PlayoffRulesModal({ league, onClose, onSaved }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StartMinimumModal({ league, onClose, onSaved }) {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [value, setValue] = useState(league.min_players_to_start || "");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    const n = Number(value);
+    if (!Number.isInteger(n) || n < 2 || n > league.max_players) {
+      setMsg(`Enter a whole number from 2 to ${league.max_players}.`);
+      return;
+    }
+    setBusy(true);
+    setMsg("");
+    try {
+      await axios.put(`${API}/admin/leagues/${league.id}`, { min_players_to_start: n }, { withCredentials: true });
+      onSaved();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="start-min-modal">
+      <div className="bg-white w-full max-w-md p-5">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Start minimum</h3>
+            <p className="text-xs" style={{ color: "#5C5C5C" }}>{league.name}. Players see "Starts when N players have joined", then "Season confirmed" once N have. They never see how many have joined.</p>
+          </div>
+          <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }}>Close</button>
+        </div>
+        <label className="block text-xs font-bold uppercase tracking-wider mb-1" htmlFor="start-min-input" style={{ color: "#5C5C5C" }}>Players needed to start (2 to {league.max_players})</label>
+        <input id="start-min-input" type="number" min="2" max={league.max_players} value={value} onChange={(e) => setValue(e.target.value)} placeholder="e.g. 8"
+          style={{ border: "1px solid #B5B5B5", color: "#3D3D3D", background: "#fff", padding: "6px 8px", fontSize: "14px", width: "100%" }} data-testid="start-min-input" />
+        {msg && <p className="text-sm p-2 mt-3" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="alert">{msg}</p>}
+        <button onClick={save} disabled={busy} className="mt-4 px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="start-min-save">
+          {busy ? "Saving..." : "Save"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Switches an admin can flip at any time, no deploy: which cities players can join, and Google tracking.
+function SiteSettingsCard() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const allCities = platformConfig.featuredCities.map((c) => c.name);
+  const [allOpen, setAllOpen] = useState(false);
+  const [open, setOpen] = useState([]);
+  const [google, setGoogle] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    axios.get(`${API}/admin/site-settings`, { withCredentials: true })
+      .then((r) => {
+        setAllOpen(!!r.data.all_open);
+        setOpen(r.data.open_cities || []);
+        setGoogle(r.data.google_analytics !== false);
+        setLoaded(true);
+      })
+      .catch(() => setMsg("Could not load the current settings."));
+  }, []);
+
+  // Cities that are open but not in the featured list (added by hand earlier) still show up so they can be closed.
+  const cityList = [...allCities, ...open.filter((c) => !allCities.includes(c))];
+  const toggleCity = (name) => setOpen((prev) => (prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]));
+
+  const save = async () => {
+    if (!allOpen && open.length === 0 && !window.confirm("No city is open. Players will not be able to join any league. Save anyway?")) return;
+    setBusy(true);
+    setMsg("");
+    try {
+      await axios.put(`${API}/admin/site-settings`, { all_open: allOpen, open_cities: open, google_analytics: google }, { withCredentials: true });
+      setMsg("Saved. Visitors see it on their next page load.");
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-5" data-testid="site-settings-card">
+      <div>
+        <h3 className="text-sm font-semibold text-heading-dark">Open cities</h3>
+        <p className="text-xs text-gray-500 mt-1">
+          Players can join leagues only in open cities. Other cities keep their leagues visible as "Opens soon" with a Notify Me button.
+        </p>
+      </div>
+
+      {!loaded ? (
+        <p className="text-sm text-gray-500">Loading...</p>
+      ) : (
+        <>
+          <label className="flex items-center gap-2 text-sm font-medium text-heading-dark">
+            <input type="checkbox" checked={allOpen} onChange={(e) => setAllOpen(e.target.checked)} data-testid="all-cities-open" />
+            Open every city (no restriction)
+          </label>
+          <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 ${allOpen ? "opacity-40 pointer-events-none" : ""}`} data-testid="city-checkboxes">
+            {cityList.map((name) => (
+              <label key={name} className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={allOpen || open.includes(name)} onChange={() => toggleCity(name)} data-testid={`open-city-${name.toLowerCase().replace(/\s+/g, "-")}`} />
+                {name}
+              </label>
+            ))}
+          </div>
+
+          <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-heading-dark">Google tracking (Tag Manager and Analytics)</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Off: Google's script never loads for anyone. On: it loads only for visitors who accept analytics in the consent banner.
+              </p>
+            </div>
+            <button
+              onClick={() => setGoogle((g) => !g)}
+              role="switch"
+              aria-checked={google}
+              aria-label="Google tracking"
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${google ? "bg-emerald-500" : "bg-gray-300"}`}
+              data-testid="google-tracking-toggle"
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${google ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button onClick={save} disabled={busy} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="site-settings-save">
+              {busy ? "Saving..." : "Save settings"}
+            </button>
+            {msg && <span className="text-sm text-gray-600" role="status">{msg}</span>}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Which marketing channel produced registrations: new accounts grouped by where the visitor came from.
+function MarketingTab() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [days, setDays] = useState(30);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setData(null);
+    setError("");
+    axios.get(`${API}/admin/marketing-report`, { params: { days }, withCredentials: true })
+      .then((r) => setData(r.data))
+      .catch(() => setError("Could not load the report."));
+  }, [days]);
+
+  const t = data?.totals;
+  return (
+    <div className="space-y-4" data-testid="marketing-tab">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h3 className="text-sm font-semibold text-heading-dark">Registrations by source</h3>
+          <p className="text-xs text-gray-500 mt-1">
+            New accounts grouped by the first marketing link, friend code or website that brought the visitor. Tag every link with
+            utm_source, utm_medium and utm_campaign (for example utm_source=instagram&amp;utm_medium=social&amp;utm_campaign=atlanta-launch).
+          </p>
+        </div>
+        <div className="flex gap-2" role="group" aria-label="Period">
+          {[7, 30, 90].map((d) => (
+            <button key={d} onClick={() => setDays(d)} className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
+              style={days === d ? { background: "#F2A922", color: "#3D3D3D" } : { background: "#F1F1F1", color: "#3D3D3D" }}
+              data-testid={`marketing-days-${d}`} aria-pressed={days === d}>
+              {d} days
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-gray-600" role="alert">{error}</p>}
+      {!data && !error && <p className="text-sm text-gray-500">Loading...</p>}
+
+      {data && (
+        <>
+          <div className="grid grid-cols-3 gap-3">
+            {[["Signups", t.signups], ["Joined a league", t.joined], ["Played a match", t.played]].map(([label, value]) => (
+              <div key={label} className="bg-white border border-gray-200 rounded-xl p-4">
+                <div className="text-xs text-gray-500">{label}</div>
+                <div className="text-2xl font-bold text-heading-dark" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto">
+            <table className="w-full text-sm" data-testid="marketing-table">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                  <th className="px-4 py-3">Source</th><th className="px-4 py-3">Medium</th><th className="px-4 py-3">Campaign</th>
+                  <th className="px-4 py-3 text-right">Signups</th><th className="px-4 py-3 text-right">Joined</th>
+                  <th className="px-4 py-3 text-right">Played</th><th className="px-4 py-3 text-right">Join rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.rows.length === 0 && (
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No new accounts in this period.</td></tr>
+                )}
+                {data.rows.map((r) => (
+                  <tr key={`${r.source}|${r.medium}|${r.campaign}`} className="border-b border-gray-100">
+                    <td className="px-4 py-3 font-medium text-heading-dark">{r.source}</td>
+                    <td className="px-4 py-3 text-gray-600">{r.medium}</td>
+                    <td className="px-4 py-3 text-gray-600">{r.campaign}</td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{r.signups}</td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{r.joined}</td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{r.played}</td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{r.join_rate}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data.untracked > 0 && (
+            <p className="text-xs text-gray-500">
+              "(direct)" means no marketing link, friend code or referring site was recorded: typed the address, used a bookmark, or the visit
+              happened before source tracking began. {data.untracked} of {t.signups} signups.
+            </p>
+          )}
+        </>
+      )}
     </div>
   );
 }

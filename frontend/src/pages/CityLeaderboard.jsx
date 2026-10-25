@@ -5,7 +5,8 @@ import { Trophy, Users, ChevronRight, Bell } from "lucide-react";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import useDocumentMeta from "../hooks/useDocumentMeta";
-import { activeSports, indexedCities, isLaunchCity } from "../config/platformConfig";
+import { activeSports, indexedCities } from "../config/platformConfig";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import CityStatusTag from "../components/CityStatusTag";
 import { cityFromSlug, cityPath } from "../utils/citySlug";
 
@@ -19,6 +20,7 @@ const SPORT_CONFIG = {
 
 export default function CityLeaderboard() {
   const { city: citySegment, sport } = useParams();
+  const { isCityOpen } = useSiteSettings();
   const city = cityFromSlug(citySegment);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,7 +88,7 @@ export default function CityLeaderboard() {
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* A city that is not open yet leads with the notify-me form instead of an empty leaderboard */}
-        {!isLaunchCity(city) && (
+        {!isCityOpen(city) && (
           <div className="bg-white border border-gray-200 rounded-none p-4" data-testid="city-coming-soon">
             <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#5C5C5C" }}>Coming soon</p>
             <h2 className="font-heading font-bold text-heading-dark mb-3">{city} {cfg.label} is not open yet</h2>

@@ -172,9 +172,9 @@ export const activeCountry = platformConfig.country;
 // Founding-member numbers are real; hide them until the count is big enough to read as social proof.
 export const FOUNDING_DISPLAY_FLOOR = 25;
 
-// The one city that is open for play right now (see cities.json). Others show "Coming soon".
-export const launchCity = CITIES.launchCity;
-export const isLaunchCity = (name) => String(name).toLowerCase() === launchCity.toLowerCase();
+// Cities open for play until the server answers (see cities.json). Admins change the live list from
+// Admin > Feature Flags; components read it through useSiteSettings(), never from here.
+export const defaultOpenCities = [CITIES.launchCity];
 
 // Cities that get their own indexable pages (sitemap, prerender, footer, internal links).
 export const indexedCities = platformConfig.featuredCities.filter((c) => c.seo);

@@ -6,7 +6,9 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel
 import httpx
 from bson import ObjectId
+from typing import Optional
 from models import User
+from attribution import sanitize_attribution
 from auth_utils import create_access_token, create_refresh_token, COOKIE_DOMAIN
 
 router = APIRouter()
@@ -63,6 +65,8 @@ async def google_auth_url(request: Request):
 class OAuthCallbackIn(BaseModel):
     code: str
     state: str
+    attribution: Optional[dict] = None   # marketing source, only used when this sign-in creates a new account
+    referral_code: Optional[str] = None  # friend's code, only used when this sign-in creates a new account
 
 
 @router.post("/google/callback")
@@ -109,6 +113,7 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
     if claims.get("email_verified") != "true":
         raise HTTPException(status_code=400, detail="Google account email not verified")
 
+    is_new_user = False
     google_sub = claims["sub"]
     email = claims.get("email", "").lower()
     name = claims.get("name", "")
@@ -141,6 +146,7 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
             await db.users.update_one({"_id": user["_id"]}, {"$set": {"avatar": avatar}})
     else:
         # New account via Google
+        is_new_user = True
         founding_count = await db.users.count_documents({"founding_member": True})
         new_user = User(
             email=email,
@@ -149,9 +155,13 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
             email_verified=True,
             oauth_providers=[{"provider": "google", "subject": google_sub}],
             founding_member=founding_count < FOUNDING_MEMBER_LIMIT,
+            attribution=sanitize_attribution(body.attribution),
         )
         result = await db.users.insert_one(new_user.to_mongo())
         user = await db.users.find_one({"_id": result.inserted_id})
+        if body.referral_code:
+            from routes.auth_routes import _apply_referral_credit  # same pending-credit rule as email signup
+            await _apply_referral_credit(db, body.referral_code, str(result.inserted_id))
 
     user_id = str(user["_id"])
     role = user.get("role", "player")
@@ -166,4 +176,5 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
         "city": user.get("city"),
         "founding_member": user.get("founding_member", False),
         "email_verified": True,
+        "new_user": is_new_user,
     }

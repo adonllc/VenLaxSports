@@ -13,6 +13,13 @@ const GTM_ID = import.meta.env.VITE_GTM_ID || "GTM-W3PK96GG";
 const CONSENT_KEY = "venlax_analytics_consent";
 
 let started = false;
+// Admin switch (Admin > Feature Flags). Unknown until /site-status answers; until then nothing starts.
+let settings = { loaded: false, enabled: false };
+
+/** Called once by SiteSettingsProvider with the admin's choice. */
+export function configureAnalytics({ enabled }) {
+  settings = { loaded: true, enabled: Boolean(enabled) };
+}
 
 const hasConsent = () => {
   try {
@@ -29,7 +36,7 @@ const push = (event) => {
 
 /** Load GTM once, if the visitor has accepted. Safe to call many times. Returns true the first time it starts. */
 export function initGoogleAnalytics() {
-  if (started || !GTM_ID || !hasConsent()) return false;
+  if (started || !GTM_ID || !settings.loaded || !settings.enabled || !hasConsent()) return false;
   started = true;
 
   push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
@@ -47,6 +54,15 @@ export function initGoogleAnalytics() {
 export function trackPageView(path) {
   if (!started) return;
   push({ event: "virtual_page_view", page_path: path, page_location: window.location.href, page_title: document.title });
+}
+
+/**
+ * Conversion events for Tag Manager (sign_up, begin_checkout, join_league, purchase).
+ * Pass only non-personal values: sport, city, league id, price. Never names, emails or ids of people.
+ */
+export function trackEvent(name, params = {}) {
+  if (!started) return;
+  push({ event: name, ...params });
 }
 
 /** Message only, truncated, no user data. */

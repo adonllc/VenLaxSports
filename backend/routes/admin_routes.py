@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Body
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 import os
 from auth_utils import require_admin
@@ -75,6 +75,68 @@ async def get_flags(request: Request):
 
     site_live = await db.feature_flags.find_one({"_id": "site_live"})
     return {"jobs": jobs, "env_flags": env_flags, "site_live": bool(site_live and site_live.get("enabled"))}
+
+
+@router.get("/marketing-report")
+async def marketing_report(request: Request, days: int = 30):
+    """New accounts in the last N days grouped by where they came from, with how many joined a league and played."""
+    from attribution import build_report
+    db = request.app.state.db
+    await require_admin(request, db)
+    days = max(1, min(int(days), 365))
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    users = await db.users.find({"created_at": {"$gte": since}, "role": {"$ne": "admin"}}, {"attribution": 1}).to_list(5000)
+    ids = [str(u["_id"]) for u in users]
+    joined = {r["player_id"] for r in await db.player_leagues.find(
+        {"player_id": {"$in": ids}, "payment_status": {"$in": ["paid", "free"]}}, {"player_id": 1}).to_list(20000)}
+    played = {r["user_id"] for r in await db.rating_history.find({"user_id": {"$in": ids}}, {"user_id": 1}).to_list(20000)}
+    rows = build_report(users, joined, played)
+    signups = sum(r["signups"] for r in rows)
+    return {
+        "days": days,
+        "rows": rows,
+        "totals": {"signups": signups, "joined": sum(r["joined"] for r in rows), "played": sum(r["played"] for r in rows)},
+        "untracked": sum(r["signups"] for r in rows if r["source"] == "(direct)"),
+    }
+
+
+@router.get("/site-settings")
+async def get_site_settings(request: Request):
+    """Runtime switches an admin can change without a deploy: which cities are open, and Google tracking."""
+    from launch_city import get_open_cities, get_google_analytics_enabled, invalidate_cache
+    db = request.app.state.db
+    await require_admin(request, db)
+    invalidate_cache()
+    open_cities = await get_open_cities(db)
+    return {
+        "all_open": open_cities is None,
+        "open_cities": open_cities or [],
+        "google_analytics": await get_google_analytics_enabled(db),
+    }
+
+
+@router.put("/site-settings")
+async def set_site_settings(request: Request, body: dict = Body(...)):
+    from launch_city import invalidate_cache
+    db = request.app.state.db
+    admin = await require_admin(request, db)
+    stamp = {"updated_at": datetime.now(timezone.utc).isoformat(), "updated_by": str(admin.get("_id", ""))}
+
+    if "open_cities" in body or "all_open" in body:
+        cities = body.get("open_cities") or []
+        if not isinstance(cities, list) or len(cities) > 100 or any(not isinstance(c, str) or not c.strip() for c in cities):
+            raise HTTPException(status_code=400, detail="open_cities must be a list of city names")
+        await db.feature_flags.update_one(
+            {"_id": "open_cities"},
+            {"$set": {"cities": [c.strip() for c in cities], "all_open": bool(body.get("all_open")), **stamp}},
+            upsert=True,
+        )
+    if "google_analytics" in body:
+        await db.feature_flags.update_one(
+            {"_id": "google_analytics"}, {"$set": {"enabled": bool(body["google_analytics"]), **stamp}}, upsert=True,
+        )
+    invalidate_cache()
+    return {"ok": True}
 
 
 @router.patch("/site-live")

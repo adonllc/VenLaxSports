@@ -118,7 +118,7 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
-    require_city_open(league)  # before any promo or payment
+    await require_city_open(db, league)  # before any promo or payment
 
     entry_fee = float(league.get("entry_fee", 0))
     if entry_fee <= 0:

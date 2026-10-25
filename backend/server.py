@@ -98,8 +98,13 @@ async def founding_members_count():
 async def site_status():
     """Public — runtime launch switch. live=true makes the frontend show the real Home
     instead of the pre-launch waitlist page, without a rebuild."""
+    from launch_city import get_open_cities, get_google_analytics_enabled
     doc = await db.feature_flags.find_one({"_id": "site_live"})
-    return {"live": bool(doc and doc.get("enabled"))}
+    return {
+        "live": bool(doc and doc.get("enabled")),
+        "open_cities": await get_open_cities(db),            # list of open city names, or null = every city is open
+        "google_analytics": await get_google_analytics_enabled(db),
+    }
 
 
 @api_router.get("/phase")

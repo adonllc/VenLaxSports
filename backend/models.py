@@ -64,6 +64,7 @@ class User(BaseDocument):
     dupr_rating: Optional[str] = None           # "2.0-3.0"|"3.0-3.5"|"3.5-4.5"|"4.5+"
     gender: Optional[str] = None                # "male"|"female" — used for mixed doubles
     oauth_providers: List[dict] = []
+    attribution: Optional[Dict] = None  # where the signup came from (first/last marketing touch), see attribution.py
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     # Referral & Credits ─────────────────────────────
@@ -99,6 +100,7 @@ class UserCreate(BaseModel):
     parental_consent: bool = False
     parental_consent_guardian_name: Optional[str] = None
     referral_code: Optional[str] = None
+    attribution: Optional[Dict] = None  # marketing source captured by the frontend, see attribution.py
 
 
 class UserLogin(BaseModel):

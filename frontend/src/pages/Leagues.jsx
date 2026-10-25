@@ -4,7 +4,8 @@ import { GALLERY, PHOTOS } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Search, MapPin, Trophy } from "lucide-react";
-import platformConfig, { activeSports, isLaunchCity } from "../config/platformConfig";
+import platformConfig, { activeSports } from "../config/platformConfig";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import NotifyMeModal from "../components/NotifyMeModal";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
@@ -287,7 +288,8 @@ function LeagueCard({ league, onClick }) {
   const isEnded = league.status === "completed" || league.status === "cancelled";
   const isFull = league.status === "registration" && spotsLeft <= 0;
   // Leagues outside the launch city are visible but cannot be joined yet; offer Notify Me instead.
-  const opensSoon = league.status === "registration" && !isLaunchCity(league.city);
+  const { isCityOpen } = useSiteSettings();
+  const opensSoon = league.status === "registration" && !isCityOpen(league.city);
   const [notifyOpen, setNotifyOpen] = useState(false);
 
   return (

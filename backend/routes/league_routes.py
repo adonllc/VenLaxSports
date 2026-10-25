@@ -153,7 +153,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
         raise HTTPException(status_code=404, detail="League not found")
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
-    require_city_open(league)
+    await require_city_open(db, league)
     if league["status"] != "registration":
         raise HTTPException(status_code=400, detail="League registration is closed")
     if league["current_players"] >= league["max_players"]:

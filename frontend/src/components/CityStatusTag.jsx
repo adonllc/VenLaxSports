@@ -1,11 +1,12 @@
-import { isLaunchCity } from "../config/platformConfig";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 
 /**
  * Open / coming-soon marker next to a city name. Always text, never color alone.
  * Open: amber square tag. Not open yet: plain muted text.
  */
 export default function CityStatusTag({ city, className = "" }) {
-  if (isLaunchCity(city)) {
+  const { isCityOpen } = useSiteSettings();
+  if (isCityOpen(city)) {
     return (
       <span
         className={`inline-block px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider align-middle ${className}`}

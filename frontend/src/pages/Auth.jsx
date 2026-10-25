@@ -8,6 +8,8 @@ import ForgotPasswordModal from "../components/ForgotPasswordModal";
 import WaiverModal from "../components/WaiverModal";
 import ParentalConsentModal from "../components/ParentalConsentModal";
 import axios from "axios";
+import { getAttribution } from "../utils/attribution";
+import { trackEvent } from "../utils/googleAnalytics";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -132,7 +134,8 @@ export default function Auth() {
         navigate("/dashboard");
       } else {
         if (!form.name.trim()) { setError("Name is required"); setLoading(false); return; }
-        await register(form);
+        await register({ ...form, attribution: getAttribution() });
+        trackEvent("sign_up", { method: "email" });
         localStorage.removeItem("pending_ref");
         const pendingToken = localStorage.getItem("doubles_invite_token");
         if (pendingToken) {

@@ -3,11 +3,13 @@ import axios from "axios";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { SiteSettingsProvider, useSiteSettings } from "./contexts/SiteSettingsContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./App.css";
 import ConsentBanner from "./components/ConsentBanner";
 import { initGoogleAnalytics, trackPageView } from "./utils/googleAnalytics";
+import { captureAttribution } from "./utils/attribution";
 import RouteErrorBoundary from "./components/RouteErrorBoundary";
 
 // Eagerly loaded — always needed on first paint
@@ -115,10 +117,13 @@ function AppShell() {
 
   // Google Analytics: starts only after consent. A returning visitor who already accepted starts here;
   // a new visitor starts from the banner's Accept button. Either way, every route change is one page view.
+  // It waits for the admin's on/off answer (settings.loaded) before it may start.
+  const { loaded: settingsLoaded } = useSiteSettings();
   useEffect(() => {
+    captureAttribution(location.search, location.pathname); // where did this visitor come from (see utils/attribution.js)
     initGoogleAnalytics();
     trackPageView(location.pathname + location.search);
-  }, [location.pathname, location.search]);
+  }, [location.pathname, location.search, settingsLoaded]);
 
   // Runtime launch switch (admin Flags tab). null = still asking the API.
   const [siteLive, setSiteLive] = useState(null);
@@ -151,9 +156,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <AppShell />
-        </BrowserRouter>
+        <SiteSettingsProvider>
+          <BrowserRouter>
+            <AppShell />
+          </BrowserRouter>
+        </SiteSettingsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

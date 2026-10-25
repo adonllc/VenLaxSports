@@ -283,7 +283,7 @@ async def join_rr_league(league_id: str, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
-    require_city_open(league)
+    await require_city_open(db, league)
 
     rr = league.get("rr_config", {})
     if rr.get("division_type") != "singles":
@@ -394,7 +394,7 @@ async def invite_partner(league_id: str, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
-    require_city_open(league)
+    await require_city_open(db, league)
 
     rr = league.get("rr_config", {})
     if rr.get("division_type") != "doubles":
@@ -553,7 +553,7 @@ async def accept_invite(token: str, body: AcceptInviteBody, request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     _require_rr(league)
-    require_city_open(league)
+    await require_city_open(db, league)
 
     rr = league.get("rr_config", {})
     if rr.get("schedule_generated"):

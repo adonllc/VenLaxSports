@@ -4,6 +4,7 @@ from typing import Optional
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from models import User, UserCreate, UserLogin, ReferralCredit
+from attribution import sanitize_attribution
 from auth_utils import (
     hash_password, verify_password,
     create_access_token, create_refresh_token,
@@ -113,6 +114,7 @@ async def register(user_data: UserCreate, response: Response, request: Request):
         email=user_data.email.lower(),
         name=user_data.name,
         password_hash=hash_password(user_data.password),
+        attribution=sanitize_attribution(user_data.attribution),
         country=user_data.country,
         city=user_data.city,
         phone=user_data.phone,

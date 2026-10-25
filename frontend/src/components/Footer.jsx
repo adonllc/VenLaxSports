@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import platformConfig, { activeSports, indexedCities, isLaunchCity } from "../config/platformConfig";
+import platformConfig, { activeSports, indexedCities } from "../config/platformConfig";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import { cityPath } from "../utils/citySlug";
 import CityStatusTag from "./CityStatusTag";
 import { hasFounderPage } from "../config/founderConfig";
@@ -16,6 +17,7 @@ const SPORT_DOT = {
 
 export default function Footer() {
   const [contactOpen, setContactOpen] = useState(false);
+  const { isCityOpen } = useSiteSettings();
 
   return (
     <>
@@ -167,7 +169,7 @@ export default function Footer() {
             {indexedCities.map((city) => (
               <Link
                 key={city.name}
-                to={isLaunchCity(city.name) ? `/leagues?city=${encodeURIComponent(city.name)}` : cityPath(city.name, city.sports[0].toLowerCase())}
+                to={isCityOpen(city.name) ? `/leagues?city=${encodeURIComponent(city.name)}` : cityPath(city.name, city.sports[0].toLowerCase())}
                 className="inline-flex items-center gap-2 text-[13px] text-[#5C5C5C] hover:text-[#3D3D3D] transition-colors"
                 style={{ fontFamily: "Rubik, sans-serif" }}
                 data-testid={`footer-city-${city.name.toLowerCase().replace(/\s+/g, "-")}`}

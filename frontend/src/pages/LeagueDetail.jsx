@@ -9,8 +9,9 @@ import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
 import { PHOTOS } from "../config/photos";
 import SeasonStartLine from "../components/SeasonStartLine";
+import { trackEvent } from "../utils/googleAnalytics";
 import NotifyMeBanner from "../components/NotifyMeBanner";
-import { isLaunchCity, launchCity } from "../config/platformConfig";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -28,6 +29,7 @@ const SPORT_CONFIG = {
 
 export default function LeagueDetail() {
   const { id } = useParams();
+  const { isCityOpen, openCities } = useSiteSettings();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -125,6 +127,7 @@ export default function LeagueDetail() {
           setIsRegistered(true);
           setJoinMsg("Payment successful! You have joined the league.");
           fetchLeague();
+          trackJoin(true);
         }
         return;
       }
@@ -242,6 +245,13 @@ export default function LeagueDetail() {
     return new Uint8Array([...rawData].map((c) => c.charCodeAt(0)));
   };
 
+  // Conversion events for Tag Manager. Only non-personal values: sport, city, league id, price.
+  const trackJoin = (paid) => {
+    const base = { sport: league?.sport, city: league?.city, league_id: id };
+    trackEvent("join_league", { ...base, paid });
+    if (paid) trackEvent("purchase", { ...base, value: league?.entry_fee, currency: league?.currency || "USD" });
+  };
+
   const handleJoin = async () => {
     if (!user) { navigate("/auth"); return; }
     setJoining(true);
@@ -257,6 +267,7 @@ export default function LeagueDetail() {
         if (data.free) {
           setJoinMsg("Promo applied — you're registered!");
           setIsRegistered(true);
+          trackJoin(false);
           fetchLeague();
           requestPushNotificationAfterJoin();
           return;
@@ -264,10 +275,12 @@ export default function LeagueDetail() {
       }
       const { data } = await axios.post(`${API}/leagues/${id}/join`, { waiver_accepted: waiverAccepted }, { withCredentials: true });
       if (data.requires_payment) {
+        trackEvent("begin_checkout", { sport: league.sport, city: league.city, league_id: id, value: league.entry_fee, currency: league.currency || "USD" });
         setPaymentModalOpen(true);
       } else {
         setJoinMsg(data.message || "Joined successfully!");
         setIsRegistered(true);
+        trackJoin(false);
         fetchLeague();
         requestPushNotificationAfterJoin();
       }
@@ -354,7 +367,7 @@ export default function LeagueDetail() {
   const isFree = !league.entry_fee || league.entry_fee === 0;
   const spotsLeft = league.max_players - (league.current_players || 0);
   // League in a city that is not open yet: visible, but nobody can join. Offer Notify Me instead.
-  const opensSoon = league.status === "registration" && !isLaunchCity(league.city);
+  const opensSoon = league.status === "registration" && !isCityOpen(league.city);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const SPORT_HEADER_BG = { tennis: "bg-tennis-bg", pickleball: "bg-pickleball-bg", cricket: "bg-cricket-bg" };
   const headerBg = SPORT_HEADER_BG[league.sport] || "bg-white";
@@ -428,9 +441,9 @@ export default function LeagueDetail() {
               {opensSoon ? (
                 <div data-testid="league-opens-soon-panel">
                   <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#5C5C5C", fontFamily: "Rubik, sans-serif" }}>Opens soon</p>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}>{league.city} opens after {launchCity}</h3>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}>{league.city} is not open yet</h3>
                   <p className="text-sm mb-4" style={{ color: "#5C5C5C", fontFamily: "Rubik, sans-serif" }}>
-                    We are starting in {launchCity}. Leave your email and we will tell you when {league.city} {league.sport} opens.
+                    {openCities && openCities.length > 0 ? `We are starting in ${openCities.join(", ")}. ` : ""}Leave your email and we will tell you when {league.city} {league.sport} opens.
                   </p>
                   <NotifyMeBanner city={league.city} sport={league.sport} />
                 </div>
@@ -867,6 +880,7 @@ export default function LeagueDetail() {
           } else {
             setIsRegistered(true);
             fetchLeague();
+            trackJoin(false);
             setJoinMsg("Registration complete!");
             requestPushNotificationAfterJoin();
           }
