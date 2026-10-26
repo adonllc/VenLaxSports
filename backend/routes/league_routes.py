@@ -492,7 +492,12 @@ def standing_sort_key(s: dict):
 
 @router.get("/{league_id}/standings")
 async def get_league_standings(league_id: str, request: Request):
+    """Standings are private: a signed-in player gets only their own row, an admin gets every row,
+    and a visitor who is not signed in gets nothing."""
     db = request.app.state.db
+    viewer = await get_optional_user(request, db)
+    if not viewer:
+        return []
     standings = await db.standings.find(
         {"league_id": league_id}, {"_id": 0}
     ).to_list(100)
@@ -503,7 +508,9 @@ async def get_league_standings(league_id: str, request: Request):
     rule = qualification.rule_for(league or {}, len(standings))
     order = {r["player_id"]: r["rank"] for r in qualification.rank_players(standings, played, rule)}
     standings.sort(key=lambda s: order.get(s.get("player_id"), 10**6))
-    return standings
+    if viewer.get("role") in ("admin", "city_admin"):
+        return standings
+    return [s for s in standings if str(s.get("player_id")) == str(viewer["_id"])]
 
 
 @router.get("/{league_id}/matches")

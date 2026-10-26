@@ -79,15 +79,9 @@ async def league_spectator(league_id: str, request: Request):
     if not league or not league.get("is_public", True):
         raise HTTPException(status_code=404, detail="League not found")
 
-    standings = await db.standings.find(
-        {"league_id": league_id},
-        {"player_id": 1, "player_name": 1, "wins": 1, "losses": 1, "points": 1, "matches_played": 1, "_id": 0},
-    ).sort("points", -1).to_list(50)
-
-    recent_matches = await db.matches.find(
-        {"league_id": league_id, "status": "completed"},
-        {"player1_name": 1, "player2_name": 1, "winner_name": 1, "score_data": 1, "scheduled_date": 1, "sport": 1, "_id": 0},
-    ).sort("updated_at", -1).limit(10).to_list(10)
+    # Players' names and results are private to each player (see league standings), so this public page lists none.
+    standings: list = []
+    recent_matches: list = []
 
     return {
         "id": league_id,

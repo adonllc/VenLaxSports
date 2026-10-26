@@ -3,12 +3,16 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Trophy } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import { useAuth } from "../contexts/AuthContext";
+import MyStandingCard from "../components/MyStandingCard";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 export default function Standings() {
   const { id: leagueId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "city_admin";
   const [standings, setStandings] = useState([]);
   const [league, setLeague] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +20,7 @@ export default function Standings() {
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/leagues/${leagueId}`),
-      axios.get(`${API}/leagues/${leagueId}/standings`),
+      axios.get(`${API}/leagues/${leagueId}/standings`, { withCredentials: true }),
     ]).then(([lRes, sRes]) => {
       setLeague(lRes.data);
       setStandings(sRes.data);
@@ -25,7 +29,7 @@ export default function Standings() {
 
   useDocumentMeta({
     title: league ? `${league.name} Standings | VENLAX Sports` : undefined,
-    description: league ? `Live standings for ${league.name} — wins, losses, and points for every player in this VENLAX league.` : undefined,
+    description: league ? `Your standing in ${league.name}: wins, losses, matches played and points in this VENLAX league.` : undefined,
     canonicalPath: `/leagues/${leagueId}/standings`,
     jsonLd: league ? {
       "@context": "https://schema.org",
@@ -57,7 +61,14 @@ export default function Standings() {
             {league && <p className={`text-sm font-medium mt-1 ${accentClass}`}>{league.name}</p>}
           </div>
 
-          {standings.length === 0 ? (
+          {!isAdmin ? (
+            user ? <MyStandingCard row={standings[0]} leagueName={league?.name} /> : (
+              <div className="text-center py-16 px-6" data-testid="standings-signin">
+                <p className="text-gray-600">Sign in to see your own standing in this league.</p>
+                <Link to="/auth" className="inline-block mt-4 font-bold underline" style={{ color: "#00765C" }}>Sign in</Link>
+              </div>
+            )
+          ) : standings.length === 0 ? (
             <div className="text-center py-16">
               <Trophy className="w-12 h-12 text-gray-200 mx-auto mb-4" />
               <p className="text-gray-500">No standings yet — play some matches!</p>

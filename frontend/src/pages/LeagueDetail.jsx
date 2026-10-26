@@ -7,6 +7,7 @@ import PaymentMethodModal from "../components/PaymentMethodModal";
 import PartnerSearch from "../components/PartnerSearch";
 import AddPartnerPanel from "../components/AddPartnerPanel";
 import GenderPicker from "../components/GenderPicker";
+import MyStandingCard from "../components/MyStandingCard";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
 import { PHOTOS } from "../config/photos";
@@ -128,7 +129,7 @@ export default function LeagueDetail() {
 
   const fetchStandings = async () => {
     try {
-      const { data } = await axios.get(`${API}/leagues/${id}/standings`);
+      const { data } = await axios.get(`${API}/leagues/${id}/standings`, { withCredentials: true });
       setStandings(data);
     } catch (e) { console.error(e); }
   };
@@ -833,7 +834,13 @@ export default function LeagueDetail() {
             <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
               <h3 className="font-heading font-bold text-lg">Standings</h3>
             </div>
-            {standings.length === 0 ? (
+            {!(user?.role === "admin" || user?.role === "city_admin") ? (
+              user ? <MyStandingCard row={standings[0]} leagueName={league?.name} /> : (
+                <div className="text-center py-12" style={{ color: "#6B7280" }}>
+                  <Link to="/auth" className="font-bold underline" style={{ color: "#00765C" }}>Sign in</Link> to see your own standing in this league.
+                </div>
+              )
+            ) : standings.length === 0 ? (
               <div className="text-center py-12" style={{ color: "#6B7280" }}>No standings yet — matches haven't been played</div>
             ) : (
               <div className="overflow-x-auto">
