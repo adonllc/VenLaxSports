@@ -559,6 +559,12 @@ async def close_league(league_id: str, request: Request):
         {"_id": ObjectId(league_id)},
         {"$set": {"status": "completed", "updated_at": now}},
     )
+    try:
+        import season_recap
+        await season_recap.generate_for_league(db, {**league, "id": league_id})
+    except Exception:  # noqa: BLE001  recap cards must never block closing a league
+        import logging
+        logging.getLogger(__name__).exception("season recap generation failed for league %s", league_id)
 
     return {
         "message": "League closed",

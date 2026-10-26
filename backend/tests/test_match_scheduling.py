@@ -31,7 +31,7 @@ def setup(n=8, city="Atlanta"):
     db, lid, ids = make_league(n)
     lg = league_of(db)
     lg["city"] = city
-    lg["start_date"] = NOW().strftime("%Y-%m-%d")
+    lg["start_date"] = (NOW() - timedelta(days=1)).strftime("%Y-%m-%d")  # started yesterday: open in every US time zone, whatever the UTC hour
     lg["end_date"] = (NOW() + timedelta(days=60)).strftime("%Y-%m-%d")
     run(league_schedule.open_league_to_play(db, lg))
     m = db.matches.docs[0]
@@ -337,7 +337,7 @@ def test_free_form_match_creation_is_closed(monkeypatch, sent):
     assert e.value.status_code == 400 and "not open to play yet" in e.value.detail
 
     lg["status"] = "active"
-    lg["start_date"] = NOW().strftime("%Y-%m-%d")
+    lg["start_date"] = (NOW() - timedelta(days=1)).strftime("%Y-%m-%d")  # started yesterday: open in every US time zone, whatever the UTC hour
     with pytest.raises(HTTPException) as e:
         run(match_routes.create_match(body, request_for(db)))
     assert e.value.status_code == 400 and "scheduled from your match cards" in e.value.detail
@@ -349,6 +349,6 @@ def test_match_cards_say_whether_the_league_is_open(monkeypatch, sent):
     lg["start_date"] = (NOW() + timedelta(days=14)).strftime("%Y-%m-%d")
     closed = run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["league"]
     assert closed["open_to_play"] is False and "not open to play yet" in closed["not_open_reason"]
-    lg["start_date"] = NOW().strftime("%Y-%m-%d")
+    lg["start_date"] = (NOW() - timedelta(days=1)).strftime("%Y-%m-%d")  # started yesterday: open in every US time zone, whatever the UTC hour
     opened = run(match_routes.my_league_matches(str(lg["_id"]), request_for(db)))["league"]
     assert opened["open_to_play"] is True and opened["not_open_reason"] is None

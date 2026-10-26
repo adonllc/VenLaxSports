@@ -7,6 +7,7 @@ import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
 import useReferralCode from "../hooks/useReferralCode";
 import AddPartnerPanel from "../components/AddPartnerPanel";
+import SeasonRecaps from "../components/SeasonRecaps";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -352,6 +353,8 @@ export default function PlayerDashboard() {
             )}
           </div>
         )}
+
+        <SeasonRecaps />
 
         {/* Pending Doubles Invites */}
         {pendingInvites.length > 0 && (

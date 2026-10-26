@@ -42,7 +42,7 @@ async def _apply_referral_credit(db, referral_code: str, referee_id: str):
     """
     try:
         code = referral_code.strip().upper()
-        referrer = await db.users.find_one({"referral_code": code})
+        referrer = await db.users.find_one({"referral_code": code}) or await db.users.find_one({"referral_code_aliases": code})
 
         if not referrer:
             return

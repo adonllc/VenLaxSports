@@ -141,6 +141,15 @@ async def auto_status_transitions(db) -> None:
     if result.modified_count:
         logger.info("auto_status_transitions: %d leagues → completed", result.modified_count)
 
+    # Recap cards for leagues that finished and have none yet (also catches ones closed by hand elsewhere)
+    import season_recap
+    for lg in await db.leagues.find({"status": "completed", "recaps_generated_at": {"$exists": False}}).to_list(20):
+        try:
+            await season_recap.generate_for_league(db, {**lg, "id": str(lg["_id"])})
+            await db.leagues.update_one({"_id": lg["_id"]}, {"$set": {"recaps_generated_at": now.isoformat()}})
+        except Exception:  # noqa: BLE001
+            logger.exception("season recap generation failed for league %s", lg.get("name"))
+
 
 async def send_match_reminders(db) -> None:
     """Send email + WA reminder for matches starting in ~24 h (window: 23–25 h out).

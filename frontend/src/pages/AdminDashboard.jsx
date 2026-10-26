@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import EmailCampaignsTab from "../components/EmailCampaignsTab";
+import AmbassadorsCard from "../components/AmbassadorsCard";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
@@ -1382,6 +1383,7 @@ function ReferralsTab() {
 
   return (
     <div className="space-y-6" data-testid="referrals-tab">
+      <AmbassadorsCard />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
           <div className="text-3xl font-bold text-heading-dark">{data.total_referrals}</div>
