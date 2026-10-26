@@ -38,6 +38,7 @@ from routes.social_auth_routes import router as social_auth_router
 from routes.notification_routes import router as notification_router
 from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
+from routes.admin_players_routes import router as admin_players_router
 from routes.recap_routes import router as recap_router
 from routes.admin_ambassador_routes import router as ambassador_router
 from routes.admin_email_routes import router as admin_email_router, public_router as email_unsub_router
@@ -62,6 +63,7 @@ api_router.include_router(wa_router, prefix="/webhook/whatsapp", tags=["whatsapp
 api_router.include_router(notification_router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(doubles_router, prefix="/doubles-invite", tags=["doubles"])
 api_router.include_router(waitlist_router, prefix="/waitlist", tags=["waitlist"])
+api_router.include_router(admin_players_router, prefix="/admin/players", tags=["admin-players"])
 api_router.include_router(recap_router, prefix="/recaps", tags=["recaps"])
 api_router.include_router(ambassador_router, prefix="/admin/ambassadors", tags=["ambassadors"])
 api_router.include_router(admin_email_router, prefix="/admin/email", tags=["admin-email"])

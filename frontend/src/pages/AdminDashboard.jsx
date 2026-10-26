@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
+import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
@@ -262,6 +263,7 @@ export default function AdminDashboard() {
   const TABS = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
+    { id: "players", label: "Players" },
     { id: "create", label: "Create League" },
     { id: "auto", label: "Auto-Generate" },
     { id: "leagues", label: "Manage Leagues" },
@@ -812,6 +814,7 @@ export default function AdminDashboard() {
         {tab === "flags" && <FlagsTab />}
         {tab === "marketing" && <MarketingTab />}
         {tab === "email" && <EmailCampaignsTab />}
+        {tab === "players" && <PlayerInsightsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}
