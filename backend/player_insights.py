@@ -187,7 +187,8 @@ def promo_summary(promo_uses, codes) -> list[dict]:
     for c in codes:
         code = c.get("code", "")
         if c.get("restricted_user_id"):
-            g = personal.setdefault(c.get("campaign_key", ""), {"code": f"Personal coupons ({c.get('description') or c.get('campaign_key', '')})",
+            key = "test emails" if str(c.get("campaign_key", "")).startswith("test_") else c.get("campaign_key", "")
+            g = personal.setdefault(key, {"code": f"Personal coupons ({'admin test emails' if key == 'test emails' else c.get('description') or key})",
                                                                 "description": "", "type": c.get("type", ""), "used": 0, "max_uses": 0, "players": 0, "active": True})
             g["max_uses"] += 1
             g["used"] += c.get("used_count", 0)

@@ -181,7 +181,7 @@ export default function EmailCampaignsTab() {
               )}
               {template === "thank_you" && (
                 <p className="mt-3 text-xs" style={{ color: "#4C4C4C" }} data-testid="email-coupon-note">
-                  Each person gets their own $10 code, made when you send. It works once, only for them, and expires 12 months after it is made. The preview and the test email show an example code that works nowhere.
+                  Each person gets their own $10 code, made when you send. It works once, only for them, and expires 12 months after it is made. The preview shows a sample code that works nowhere. The test email carries a real code made just for your own account, so you can try it at checkout.
                 </p>
               )}
             </div>

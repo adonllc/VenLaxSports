@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import secrets
 import html
 import logging
 import os
@@ -247,8 +248,12 @@ async def build_audience(db, payload: dict) -> dict:
 async def send_to(db, payload: dict, rec: dict, record: bool = True, admin_id: str = "") -> bool:
     coupon = None
     template = TEMPLATES.get(payload.get("template"))
+    if template and template.get("coupon"):
+        # A test email carries a real coupon too, made for the admin's own account only, so the admin can try
+        # redeeming it. Its key is new every time, so every test gets its own code.
+        key = campaign_key(payload) if record else f"test_{campaign_key(payload)}_{secrets.token_hex(4)}"
+        coupon = await thank_you_coupon.get_or_create(db, rec["id"], key, admin_id)
     if template and template.get("coupon") and record:
-        coupon = await thank_you_coupon.get_or_create(db, rec["id"], campaign_key(payload), admin_id)
         if not rec.get("referral_code"):
             from routes.referral_routes import generate_referral_code
             rec = {**rec, "referral_code": generate_referral_code()}

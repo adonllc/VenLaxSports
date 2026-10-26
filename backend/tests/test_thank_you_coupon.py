@@ -1,4 +1,5 @@
 """Thank-you email with a personal one-time $10 coupon valid for 12 months."""
+import re
 import sys
 import types
 from datetime import datetime, timezone
@@ -120,11 +121,13 @@ def test_paying_for_a_doubles_team_with_a_coupon_records_its_use(monkeypatch):
 
 # ── the email ─────────────────────────────────────────────────────────────────
 
-def test_preview_shows_an_example_code_and_creates_nothing():
+def test_preview_shows_a_different_random_code_every_time_and_creates_nothing():
     db = Db()
-    m = bulk_email.render(THANKS, {"id": "u", "email": "a@x.com", "first_name": "Ann"})
-    assert "THANKS-EXAMPLE" in m["body"] and "Hi Ann," in m["body"] and "$10 credit" in m["body"]
-    assert db.promo_codes.docs == []
+    rec = {"id": "u", "email": "a@x.com", "first_name": "Ann"}
+    bodies = [bulk_email.render(THANKS, rec)["body"] for _ in range(3)]
+    codes = {re.search(r"THANKS-[A-Z2-9]{8}", b).group(0) for b in bodies}
+    assert len(codes) == 3 and "THANKS-EXAMPLE" not in bodies[0]
+    assert "Hi Ann," in bodies[0] and "$10 credit" in bodies[0] and db.promo_codes.docs == []
 
 
 def test_a_real_send_makes_each_player_their_own_coupon_and_a_referral_link(monkeypatch):
@@ -149,16 +152,26 @@ def test_a_real_send_makes_each_player_their_own_coupon_and_a_referral_link(monk
     assert run(bulk_email.build_audience(db, THANKS))["send"] == []                                   # nobody gets a second coupon
 
 
-def test_a_test_email_uses_the_example_code_and_makes_no_coupon(monkeypatch):
+def test_each_test_email_carries_its_own_real_coupon_that_only_the_admin_can_use(monkeypatch):
     db = Db()
     uid = db.user("Admin", "admin@x.com")
+    other = db.user("Ann", "ann@x.com")
     out = []
 
     async def fake(to, subject, title, body, *a, **k):
         out.append(body); return True
     monkeypatch.setattr(email_service, "send_campaign_email", fake)
-    assert run(bulk_email.send_to(db, THANKS, {"id": uid, "email": "admin@x.com", "first_name": "Admin"}, record=False))
-    assert "THANKS-EXAMPLE" in out[0] and db.promo_codes.docs == [] and db.email_campaigns.docs == []
+    rec = {"id": uid, "email": "admin@x.com", "first_name": "Admin"}
+    assert run(bulk_email.send_to(db, THANKS, rec, record=False)) and run(bulk_email.send_to(db, THANKS, rec, record=False))
+    codes = [re.search(r"THANKS-[A-Z2-9]{8}", b).group(0) for b in out]
+    assert codes[0] != codes[1] and {d["code"] for d in db.promo_codes.docs} == set(codes)      # real, saved, different each time
+    assert all(d["restricted_user_id"] == uid and d["max_uses"] == 1 for d in db.promo_codes.docs)
+    league = {"sport": "tennis", "format": "singles"}
+    assert run(payment_routes._validate_promo(db, codes[0], uid, league)) is not None
+    assert run(payment_routes._validate_promo(db, codes[0], other, league)) is None               # nobody else can use it
+    assert db.email_campaigns.docs == []                                                         # a test never counts as a real send
+    # and a real send for the same admin account is still allowed afterwards
+    assert run(bulk_email.send_to(db, THANKS, rec))
 
 
 def test_pick_one_several_or_everyone():

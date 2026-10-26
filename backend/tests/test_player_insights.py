@@ -105,10 +105,11 @@ def test_league_rows_show_revenue_promo_use_and_city_players_not_joined():
 def test_personal_coupons_are_one_summary_row_not_one_row_each():
     codes = [{"code": f"THANKS-{i}", "restricted_user_id": str(i), "campaign_key": "tpl_thank_you", "description": "$10 thank-you credit",
               "used_count": 1 if i == 0 else 0, "max_uses": 1, "type": "amount_off"} for i in range(40)]
+    codes += [{"code": f"THANKS-T{i}", "restricted_user_id": "adm", "campaign_key": f"test_tpl_thank_you_{i}", "used_count": 0, "type": "amount_off"} for i in range(5)]
     codes.append({"code": "PLAY1FREE", "used_count": 3})
     out = pi.promo_summary([{"code": "THANKS-0", "user_id": "0"}], codes)
-    assert len(out) == 2
-    group = next(r for r in out if r["code"].startswith("Personal coupons"))
+    assert len(out) == 3                                                       # PLAY1FREE, the 40 real coupons, the 5 test ones
+    group = next(r for r in out if r["code"].startswith("Personal coupons") and "test" not in r["code"])
     assert (group["max_uses"], group["used"], group["players"]) == (40, 1, 1)
 
 

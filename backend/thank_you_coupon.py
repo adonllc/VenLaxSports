@@ -33,10 +33,10 @@ def expiry_text(expires_at: str) -> str:
 
 
 def example(now: datetime | None = None) -> dict:
-    """What a coupon looks like, for previews and test emails. Nothing is saved and the code works nowhere."""
+    """What a coupon looks like in an on-screen preview: a different random code every time. Nothing is saved, so the code works nowhere."""
     now = now or datetime.now(timezone.utc)
     exp = add_months(now, 12).isoformat()
-    return {"code": "THANKS-EXAMPLE", "amount": AMOUNT, "expires_at": exp, "expires_text": expiry_text(exp)}
+    return {"code": new_code(), "amount": AMOUNT, "expires_at": exp, "expires_text": expiry_text(exp)}
 
 
 async def get_or_create(db, user_id: str, campaign_key: str, admin_id: str = "", now: datetime | None = None) -> dict:
