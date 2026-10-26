@@ -28,6 +28,10 @@ export default function EmailCampaignsTab() {
   const [audience, setAudience] = useState("early_1");
   const [template, setTemplate] = useState("season_starts");
   const [segment, setSegment] = useState("all");
+  const [who, setWho] = useState("segment"); // "segment" = everyone matching, "pick" = chosen players only
+  const [picked, setPicked] = useState([]);
+  const [find, setFind] = useState("");
+  const [found, setFound] = useState([]);
   const [city, setCity] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -45,7 +49,7 @@ export default function EmailCampaignsTab() {
 
   const payload = () => {
     if (!registered) return { audience: "early_list", step: Number(audience.split("_")[1]) };
-    const base = { audience: "registered", segment, city: city.trim() || null };
+    const base = { audience: "registered", segment, city: city.trim() || null, user_ids: who === "pick" ? picked.map((p) => p.id) : null };
     if (!custom) return { ...base, template };
     return { ...base, subject, body, cta_label: ctaLabel.trim() || null, cta_url: ctaUrl.trim() || null };
   };
@@ -59,7 +63,17 @@ export default function EmailCampaignsTab() {
   }, []);
 
   // any edit makes the previous preview stale: it must be shown again before sending
-  useEffect(() => { setPreview(null); }, [audience, template, segment, city, subject, body, ctaLabel, ctaUrl]);
+  useEffect(() => { setPreview(null); }, [audience, template, segment, city, subject, body, ctaLabel, ctaUrl, who, picked]);
+
+  // search for players to pick
+  useEffect(() => {
+    if (who !== "pick" || find.trim().length < 2) { setFound([]); return undefined; }
+    const t = setTimeout(() => {
+      axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/players`, { params: { q: find.trim(), limit: 8 }, withCredentials: true })
+        .then((r) => setFound(r.data.players)).catch(() => setFound([]));
+    }, 250);
+    return () => clearTimeout(t);
+  }, [find, who]);
 
   const call = async (name, path, extra = {}) => {
     setBusy(name);
@@ -131,6 +145,49 @@ export default function EmailCampaignsTab() {
           )}
 
           {registered && (
+            <div className="sm:col-span-2">
+              <Label>Send to</Label>
+              <div className="flex flex-wrap gap-4 text-sm" role="radiogroup" aria-label="Send to">
+                {[["segment", "Everyone matching the segment and city below"], ["pick", "Only players I pick"]].map(([v, label]) => (
+                  <label key={v} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="who" checked={who === v} onChange={() => setWho(v)} data-testid={`email-who-${v}`} /> {label}
+                  </label>
+                ))}
+              </div>
+              {who === "pick" && (
+                <div className="mt-3">
+                  <input className={field} style={fieldStyle} value={find} onChange={(e) => setFind(e.target.value)} placeholder="Search a player by name or email" data-testid="email-find" />
+                  {found.length > 0 && (
+                    <ul className="mt-1 bg-white" style={{ border: "1px solid #E5E7EB" }}>
+                      {found.filter((f) => !picked.some((p) => p.id === f.id)).map((f) => (
+                        <li key={f.id}>
+                          <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50" onClick={() => { setPicked([...picked, { id: f.id, name: f.name, email: f.email }]); setFind(""); }} data-testid={`email-pick-${f.id}`}>
+                            {f.name} <span style={{ color: "#6B7280" }}>{f.email}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="flex flex-wrap gap-2 mt-2" data-testid="email-picked">
+                    {picked.map((p) => (
+                      <span key={p.id} className="text-xs px-2 py-1" style={{ background: "#E8F6F2", color: "#00765C" }}>
+                        {p.name}
+                        <button type="button" className="ml-2" aria-label={`Remove ${p.name}`} onClick={() => setPicked(picked.filter((x) => x.id !== p.id))}>✕</button>
+                      </span>
+                    ))}
+                    {picked.length === 0 && <span className="text-xs" style={{ color: "#6B7280" }}>Nobody picked yet. Search above and click a name.</span>}
+                  </div>
+                </div>
+              )}
+              {template === "thank_you" && (
+                <p className="mt-3 text-xs" style={{ color: "#4C4C4C" }} data-testid="email-coupon-note">
+                  Each person gets their own $10 code, made when you send. It works once, only for them, and expires 12 months after it is made. The preview and the test email show an example code that works nowhere.
+                </p>
+              )}
+            </div>
+          )}
+
+          {registered && (
             <>
               <div>
                 <Label>Segment</Label>
@@ -173,7 +230,7 @@ export default function EmailCampaignsTab() {
         )}
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <button onClick={doPreview} disabled={!!busy} className="px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: GREEN }} data-testid="email-preview">
+          <button onClick={doPreview} disabled={!!busy || (registered && who === "pick" && picked.length === 0)} className="px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: GREEN }} data-testid="email-preview">
             {busy === "preview" ? "Checking…" : "Preview"}
           </button>
           <button onClick={doTest} disabled={!!busy} className="px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ border: `1px solid ${GREEN}`, color: GREEN }} data-testid="email-test">

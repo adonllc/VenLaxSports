@@ -102,6 +102,16 @@ def test_league_rows_show_revenue_promo_use_and_city_players_not_joined():
     assert list(by)[0] != "ATL Mixed"                                     # open leagues first
 
 
+def test_personal_coupons_are_one_summary_row_not_one_row_each():
+    codes = [{"code": f"THANKS-{i}", "restricted_user_id": str(i), "campaign_key": "tpl_thank_you", "description": "$10 thank-you credit",
+              "used_count": 1 if i == 0 else 0, "max_uses": 1, "type": "amount_off"} for i in range(40)]
+    codes.append({"code": "PLAY1FREE", "used_count": 3})
+    out = pi.promo_summary([{"code": "THANKS-0", "user_id": "0"}], codes)
+    assert len(out) == 2
+    group = next(r for r in out if r["code"].startswith("Personal coupons"))
+    assert (group["max_uses"], group["used"], group["players"]) == (40, 1, 1)
+
+
 def test_promo_summary():
     out = pi.promo_summary(PROMOS, [{"code": "PLAY1FREE", "used_count": 1, "max_uses": 100, "active": True}, {"code": "UNUSED", "used_count": 0}])
     assert out[0]["code"] == "PLAY1FREE" and out[0]["players"] == 1 and out[1]["used"] == 0

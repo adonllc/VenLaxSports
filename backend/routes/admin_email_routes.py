@@ -30,6 +30,7 @@ class EmailPayload(BaseModel):
     body: Optional[str] = None
     cta_label: Optional[str] = None
     cta_url: Optional[str] = None
+    user_ids: Optional[list[str]] = None   # registered: only these players (one, several, or leave out for everyone matching)
 
 
 class SendRequest(EmailPayload):
@@ -116,7 +117,7 @@ async def send(body: SendRequest, request: Request):
         "started_by": str(admin["_id"]), "started_at": datetime.now(timezone.utc).isoformat(),
     }
     job_id = (await db.email_jobs.insert_one(job)).inserted_id
-    asyncio.create_task(bulk_email.run_job(db, job_id, payload, audience["send"]))
+    asyncio.create_task(bulk_email.run_job(db, job_id, payload, audience["send"], admin_id=str(admin["_id"])))
     return {"job_id": str(job_id), "total": count}
 
 

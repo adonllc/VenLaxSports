@@ -177,13 +177,26 @@ def league_summary(leagues, regs, txns, promo_uses, users, invites) -> list[dict
 
 
 def promo_summary(promo_uses, codes) -> list[dict]:
-    """Per promo code: how many times it was used, by whom (count), and its limit."""
+    """Per promo code: how many times it was used, by whom (count), and its limit.
+
+    Personal coupons (one per player, like the thank-you $10) are one row per campaign: how many were made and used."""
     used = defaultdict(set)
     for p in promo_uses:
         used[p["code"]].add(str(p["user_id"]))
-    rows = [{"code": c.get("code", ""), "description": c.get("description", ""), "type": c.get("type", ""),
-             "used": c.get("used_count", len(used.get(c.get("code", ""), ()))), "max_uses": c.get("max_uses"),
-             "players": len(used.get(c.get("code", ""), ())), "active": bool(c.get("active", True))} for c in codes]
+    rows, personal = [], {}
+    for c in codes:
+        code = c.get("code", "")
+        if c.get("restricted_user_id"):
+            g = personal.setdefault(c.get("campaign_key", ""), {"code": f"Personal coupons ({c.get('description') or c.get('campaign_key', '')})",
+                                                                "description": "", "type": c.get("type", ""), "used": 0, "max_uses": 0, "players": 0, "active": True})
+            g["max_uses"] += 1
+            g["used"] += c.get("used_count", 0)
+            g["players"] += len(used.get(code, ()))
+            continue
+        rows.append({"code": code, "description": c.get("description", ""), "type": c.get("type", ""),
+                     "used": c.get("used_count", len(used.get(code, ()))), "max_uses": c.get("max_uses"),
+                     "players": len(used.get(code, ())), "active": bool(c.get("active", True))})
+    rows += list(personal.values())
     rows.sort(key=lambda r: -r["used"])
     return rows
 

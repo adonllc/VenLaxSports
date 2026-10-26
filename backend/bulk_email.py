@@ -19,9 +19,11 @@ from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 import jwt as pyjwt
+from bson import ObjectId
 
 import conversion_campaign as cc
 import email_service
+import thank_you_coupon
 from auth_utils import JWT_ALGORITHM, get_jwt_secret
 
 logger = logging.getLogger(__name__)
@@ -29,6 +31,7 @@ logger = logging.getLogger(__name__)
 USER_UNSUB_TYPE = "user_marketing_unsub"
 SITE = cc.SITE
 MAX_RECIPIENTS = 2000
+MAX_SELECTED = 500
 SEGMENTS = ("all", "no_league", "in_league")
 REGISTERED_REASON = "You are receiving this because you have a VenLax Sports account."
 
@@ -56,6 +59,23 @@ TEMPLATES: dict[str, dict] = {
           <p>Your referral code is on your Rewards page. When a friend signs up with it and plays their first confirmed match, you both get $5 credit.</p>
           <p>Every third friend earns you an extra $10. Three friends is $25 for you. Credit expires 12 months after it is issued.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
+    "thank_you": {
+        "label": "Thank you + $10 coupon",
+        "coupon": True,    # each recipient gets their own one-time $10 code, made when the email is really sent
+        "subject": "Thank you for joining VenLax Sports",
+        "title": "Thank you",
+        "cta": ("Share your referral link", "/rewards"),
+        "body": """
+          <p>Hi {name},</p>
+          <p>Thank you for registering with VenLax Sports. We truly appreciate having you in our community.</p>
+          <p>To celebrate, we have a reward ready for you: <strong>$10 credit</strong> toward a future league.</p>
+          <p style="background:#F1F1F1;padding:14px 16px;margin:16px 0">Your code: <strong style="font-size:20px;letter-spacing:1px">{coupon_code}</strong><br>
+          Enter it at checkout when you join a league. It works once and expires on {coupon_expires}.</p>
+          <p>You can earn even more by inviting friends. Share your referral link, and when a friend signs up and plays their first confirmed match, you both get $5 credit. Every third friend adds a $10 bonus.</p>
+          <p>Your link: {referral_link}</p>
+          <p>Thanks again for being part of VenLax Sports.</p>
+          <p>See you in the game,<br>The VenLax Sports Team</p>""",
     },
     "add_partner": {
         "label": "Doubles: add your partner",
@@ -134,6 +154,10 @@ def validate(payload: dict) -> None:
         raise PayloadError("audience must be early_list or registered")
     if payload.get("segment", "all") not in SEGMENTS:
         raise PayloadError("Unknown segment")
+    ids = payload.get("user_ids")
+    if ids is not None:
+        if not isinstance(ids, list) or not 1 <= len(ids) <= MAX_SELECTED or not all(isinstance(i, str) and ObjectId.is_valid(i) for i in ids):
+            raise PayloadError(f"Pick between 1 and {MAX_SELECTED} players")
     if payload.get("template") in TEMPLATES:
         return
     subject, body = (payload.get("subject") or "").strip(), (payload.get("body") or "").strip()
@@ -147,8 +171,10 @@ def validate(payload: dict) -> None:
         _safe_link(payload["cta_url"])
 
 
-def render(payload: dict, recipient: dict) -> dict:
-    """The message for one recipient: {subject, title, body, cta_label, cta_url, unsubscribe_url, reason}."""
+def render(payload: dict, recipient: dict, coupon: dict | None = None) -> dict:
+    """The message for one recipient: {subject, title, body, cta_label, cta_url, unsubscribe_url, reason}.
+
+    coupon: this recipient's real coupon for a template that has one; None shows a clearly fake example code."""
     validate(payload)
     key = campaign_key(payload)
     name = html.escape(recipient.get("first_name") or "there")
@@ -158,7 +184,13 @@ def render(payload: dict, recipient: dict) -> dict:
     template = TEMPLATES.get(payload.get("template"))
     if template:
         label, path = template["cta"]
-        return {"subject": template["subject"], "title": template["title"], "body": template["body"].replace("{name}", name),
+        body = template["body"].replace("{name}", name)
+        if template.get("coupon"):
+            c = coupon or thank_you_coupon.example()
+            code = recipient.get("referral_code")
+            link = f'<a href="{SITE}/auth?ref={code}">{SITE}/auth?ref={code}</a>' if code else "shown on your Rewards page"
+            body = body.replace("{coupon_code}", c["code"]).replace("{coupon_expires}", c["expires_text"]).replace("{referral_link}", link)
+        return {"subject": template["subject"], "title": template["title"], "body": body,
                 "cta_label": label, "cta_url": _tag(path, key), "unsubscribe_url": user_unsub_url(recipient["id"]), "reason": REGISTERED_REASON}
     body = f"<p>Hi {name},</p>" + _paragraphs(payload["body"].replace("{name}", recipient.get("first_name") or "there"))
     url = _tag(_safe_link(payload["cta_url"]), key) if payload.get("cta_url") else None
@@ -186,6 +218,7 @@ async def build_audience(db, payload: dict) -> dict:
     key = campaign_key(payload)
     sent_ids = {d["user_id"] for d in await db.email_campaigns.find({"campaign": key}).to_list(None)}
     users = await db.users.find({}).to_list(None)
+    chosen = set(payload["user_ids"]) if payload.get("user_ids") else None
     in_league = {d["player_id"] for d in await db.player_leagues.find({"payment_status": {"$in": ["paid", "free"]}}).to_list(None)}
     city = (payload.get("city") or "").strip().lower()
     segment = payload.get("segment", "all")
@@ -193,7 +226,7 @@ async def build_audience(db, payload: dict) -> dict:
     for u in users:
         email = (u.get("email") or "").strip().lower()
         uid = str(u["_id"])
-        if not email or u.get("is_active") is False:
+        if not email or u.get("is_active") is False or (chosen is not None and uid not in chosen):
             continue
         if u.get("email_notifications") is False or u.get("marketing_unsubscribed_at"):
             skipped["opted out"] += 1
@@ -205,14 +238,22 @@ async def build_audience(db, payload: dict) -> dict:
            (segment == "in_league" and uid not in in_league) or (segment == "no_league" and uid in in_league):
             skipped["outside filter"] += 1
             continue
-        send.append({"id": uid, "email": email, "first_name": _first_name(u)})
+        send.append({"id": uid, "email": email, "first_name": _first_name(u), "referral_code": u.get("referral_code")})
     return {"send": send, "skipped": skipped}
 
 
 # ── sending ───────────────────────────────────────────────────────────────────
 
-async def send_to(db, payload: dict, rec: dict, record: bool = True) -> bool:
-    m = render(payload, rec)
+async def send_to(db, payload: dict, rec: dict, record: bool = True, admin_id: str = "") -> bool:
+    coupon = None
+    template = TEMPLATES.get(payload.get("template"))
+    if template and template.get("coupon") and record:
+        coupon = await thank_you_coupon.get_or_create(db, rec["id"], campaign_key(payload), admin_id)
+        if not rec.get("referral_code"):
+            from routes.referral_routes import generate_referral_code
+            rec = {**rec, "referral_code": generate_referral_code()}
+            await db.users.update_one({"_id": ObjectId(rec["id"])}, {"$set": {"referral_code": rec["referral_code"]}})
+    m = render(payload, rec, coupon)
     ok = await email_service.send_campaign_email(
         rec["email"], m["subject"], m["title"], m["body"], m["cta_label"], m["cta_url"], m["unsubscribe_url"], reason=m["reason"])
     if ok and record:
@@ -224,11 +265,11 @@ async def send_to(db, payload: dict, rec: dict, record: bool = True) -> bool:
     return bool(ok)
 
 
-async def run_job(db, job_id, payload: dict, recipients: list[dict], delay: float = 0.5) -> None:
+async def run_job(db, job_id, payload: dict, recipients: list[dict], delay: float = 0.5, admin_id: str = "") -> None:
     sent = failed = 0
     for rec in recipients:
         try:
-            ok = await send_to(db, payload, rec)
+            ok = await send_to(db, payload, rec, admin_id=admin_id)
         except Exception:  # noqa: BLE001
             logger.exception("bulk email failed for one recipient")
             ok = False

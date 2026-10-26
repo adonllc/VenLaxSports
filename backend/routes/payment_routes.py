@@ -28,6 +28,8 @@ async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | N
     promo = await db.promo_codes.find_one({"code": code.upper(), "active": True})
     if not promo:
         return None
+    if promo.get("restricted_user_id") and str(promo["restricted_user_id"]) != str(user_id):
+        return None   # a personal coupon (for example the thank-you $10) only works for the person it was made for
     now = datetime.now(timezone.utc)
     if promo.get("expires_at"):
         try:
@@ -50,6 +52,18 @@ async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | N
     if formats and league.get("format") not in formats:
         return None
     return promo
+
+
+STRIPE_MIN_CHARGE = 0.50
+
+
+def amount_off_fee(entry_fee: float, off: float, is_doubles: bool = False) -> float:
+    """Fee after a fixed-amount coupon. Stripe cannot charge under $0.50, so a coupon that leaves less than that
+    makes a singles entry free; a doubles team is never registered without its payment flow, so it pays the minimum."""
+    fee = round(entry_fee - off, 2)
+    if fee >= STRIPE_MIN_CHARGE:
+        return fee
+    return STRIPE_MIN_CHARGE if is_doubles else 0.0
 
 
 async def _record_promo_use(db, code: str, user_id: str, league_id: str) -> None:
@@ -89,7 +103,7 @@ async def validate_promo_code(code: str, league_id: str, request: Request):
         final_fee = round(entry_fee * (1 - discount_value / 100), 2)
         savings = round(entry_fee - final_fee, 2)
     elif discount_type == "amount_off":
-        final_fee = max(0.0, round(entry_fee - discount_value, 2))
+        final_fee = amount_off_fee(entry_fee, discount_value, is_doubles=league.get("format") in ("doubles", "mixed_doubles"))
         savings = round(entry_fee - final_fee, 2)
     else:
         final_fee = entry_fee
@@ -148,7 +162,15 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         elif discount_type == "percent_off":
             entry_fee = max(0.01, round(entry_fee * (1 - discount_value / 100), 2))
         elif discount_type == "amount_off":
-            entry_fee = max(0.01, round(entry_fee - discount_value, 2))
+            entry_fee = amount_off_fee(entry_fee, discount_value, is_doubles=bool(data.invite_token))
+            if entry_fee == 0:   # the coupon covers the whole fee: register without a payment
+                await _confirm_player_registered(
+                    db, league, data.league_id, user,
+                    f"promo:{data.promo_code.upper()}", 0.0,
+                    {"promo_code": data.promo_code.upper()},
+                )
+                await _record_promo_use(db, data.promo_code, user["_id"], data.league_id)
+                return {"free": True, "message": "Promo applied — you're registered!"}
 
     import stripe
 
@@ -267,6 +289,8 @@ async def _register_paid_player(db, txn: dict, session_id: str, session_meta: di
 
     # -- Doubles paid path ---------------------------------------------------
     if is_doubles and invite_token:
+        if meta.get("promo_code"):
+            await _record_promo_use(db, meta["promo_code"], user_id, league_id)
         invite = await db.doubles_invites.find_one({"token": invite_token})
         if invite and invite.get("partner_user_id"):
             try:

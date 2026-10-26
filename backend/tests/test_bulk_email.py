@@ -209,7 +209,7 @@ def test_send_needs_the_confirmed_count_and_starts_one_job(monkeypatch):
     req = request_as(db, monkeypatch)
     started = []
 
-    async def fake_job(database, job_id, payload, recipients, delay=0.5):
+    async def fake_job(database, job_id, payload, recipients, delay=0.5, admin_id=""):
         started.append(len(recipients))
     monkeypatch.setattr(bulk_email, "run_job", fake_job)
     body = dict(REG)
