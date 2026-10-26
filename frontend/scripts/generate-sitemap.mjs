@@ -25,7 +25,7 @@ const STATIC_ROUTES = [
   "/",
   "/tennis-pickleball-leagues",
   "/about",
-  "/compare/team-leagues-atlanta",
+  "/compare",
   "/leagues",
   "/ladders",
   "/rules",

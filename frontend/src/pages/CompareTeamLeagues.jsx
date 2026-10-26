@@ -25,7 +25,7 @@ export default function CompareTeamLeagues() {
   useDocumentMeta({
     title: "VENLAX vs team leagues in Atlanta | Which fits you?",
     description: "An honest comparison of VENLAX Sports individual leagues with captain-led team leagues in Atlanta: how you join, match times, season length and cost.",
-    canonicalPath: "/compare/team-leagues-atlanta",
+    canonicalPath: "/compare",
   });
 
   return (

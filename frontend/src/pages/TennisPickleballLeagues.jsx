@@ -382,7 +382,7 @@ export default function TennisPickleballLeagues() {
         { to: "/sport/tennis", label: "Tennis leagues" },
         { to: "/sport/pickleball", label: "Pickleball leagues" },
         { to: "/ladders", label: "Challenge ladders" },
-        { to: "/compare/team-leagues-atlanta", label: "VENLAX vs team leagues" },
+        { to: "/compare", label: "VENLAX vs team leagues" },
         { to: "/rules", label: "League rules" },
         { to: "/waiver", label: "Liability waiver" },
       ]} />

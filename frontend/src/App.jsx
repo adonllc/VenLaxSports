@@ -94,7 +94,7 @@ function AppRouter() {
           <Route path="/rewards" element={<RewardsCredits />} />
           <Route path="/tennis-pickleball-leagues" element={<TennisPickleballLeagues />} />
           <Route path="/about" element={<About />} />
-          <Route path="/compare/team-leagues-atlanta" element={<CompareTeamLeagues />} />
+          <Route path="/compare" element={<CompareTeamLeagues />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
