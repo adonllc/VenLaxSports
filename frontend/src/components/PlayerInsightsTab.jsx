@@ -29,6 +29,7 @@ export default function PlayerInsightsTab() {
   const [q, setQ] = useState("");
   const [leagueId, setLeagueId] = useState("");
   const [notInLeague, setNotInLeague] = useState("");
+  const [leagueMode, setLeagueMode] = useState("in");   // only used while no league is picked yet
   const [skip, setSkip] = useState(0);
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
@@ -75,6 +76,13 @@ export default function PlayerInsightsTab() {
 
   const pick = (fn) => (...a) => { setSkip(0); fn(...a); };
   const leagueName = (id) => overview?.leagues.find((l) => l.league_id === id)?.name || "";
+  const pickedLeague = leagueId || notInLeague;
+  const mode = notInLeague ? "not" : leagueId ? "in" : leagueMode;
+  const setLeagueFilter = (id, m) => {
+    setSegmentId("");
+    setLeagueId(id && m === "in" ? id : "");
+    setNotInLeague(id && m === "not" ? id : "");
+  };
 
   const applySegment = (id) => {
     setSegmentId(id);
@@ -222,8 +230,16 @@ export default function PlayerInsightsTab() {
             className="px-3 py-2 text-sm w-64 bg-white text-gray-900 placeholder:text-gray-400" style={{ border: "1px solid #E5E7EB" }} placeholder="Search name or email"
             value={q} onChange={pick((e) => setQ(e.target.value))} data-testid="players-search"
           />
-          {leagueId && <button className="text-xs px-2 py-1" style={{ border: "1px solid #E5E7EB" }} onClick={pick(() => setLeagueId(""))}>Joined {leagueName(leagueId)} ✕</button>}
-          {notInLeague && <button className="text-xs px-2 py-1" style={{ border: "1px solid #E5E7EB" }} onClick={pick(() => setNotInLeague(""))}>Not in {leagueName(notInLeague)} ✕</button>}
+          <select className="px-3 py-2 text-sm bg-white text-gray-900 max-w-[220px]" style={{ border: "1px solid #E5E7EB" }} value={pickedLeague} onChange={pick((e) => setLeagueFilter(e.target.value, mode))} data-testid="players-league-filter" aria-label="Filter by league">
+            <option value="">Any league</option>
+            {(overview?.leagues || []).map((l) => <option key={l.league_id} value={l.league_id}>{l.name}</option>)}
+          </select>
+          <select className="px-3 py-2 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} value={mode}
+                  onChange={pick((e) => { setLeagueMode(e.target.value); if (pickedLeague) setLeagueFilter(pickedLeague, e.target.value); })}
+                  data-testid="players-league-mode" aria-label="Joined or not joined" title="Not joined lists players in the same city as the league who have not joined it">
+            <option value="in">Joined</option>
+            <option value="not">Not joined (same city)</option>
+          </select>
           <select className="px-3 py-2 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} value={tag} onChange={pick((e) => { setTag(e.target.value); setSegmentId(""); })} data-testid="players-tag-filter" aria-label="Filter by tag">
             <option value="">Any tag</option>
             {tagList.map((t) => <option key={t.tag} value={t.tag}>{t.tag} ({t.count})</option>)}
