@@ -88,6 +88,142 @@ TEMPLATES: dict[str, dict] = {
           <p>If you registered a doubles team, you can add or change your partner from your dashboard any time before the league starts: search for a player, invite by email, or share a link. One team fee of $19.99 covers both of you.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
+    # ── Lifecycle campaign set. Facts used: Atlanta season, real prices, the real $5 referral credit. No rankings,
+    #    deadlines or rewards beyond those. Registered users only (this tool never emails strangers).
+    "m01_launch": {
+        "label": "01 Launch: VenLax Sports is live",
+        "subject": "VenLax Sports is LIVE. Time to play 🎾",
+        "title": "VenLax Sports is live",
+        "cta": ("See open leagues", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>It is official: VenLax Sports is live. Earn your rank on your own time.</p>
+          <p>Here is what you get:</p>
+          <ul>
+            <li>Tennis and Pickleball leagues, Singles or Doubles.</li>
+            <li>5 to 7 matches over 6 to 8 weeks. You and your opponent pick the time and court.</li>
+            <li>A rating that updates after every match, and a shareable match card for every result.</li>
+            <li>No club membership needed.</li>
+          </ul>
+          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}.</p>
+          <p>Your game. Your time. Your rank.</p>""",
+    },
+    "m02_acquisition": {
+        "label": "02 Player acquisition: your next match",
+        "subject": "Your next match is calling. Will you answer?",
+        "title": "Your next match is waiting",
+        "cta": ("Find my league", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>Somewhere in {_S['city']}, a player at your level is looking for a match. No standing court time, no club dues, no group chat to organize.</p>
+          <p>Join a league, get matched into your division, and play when it works for you. Singles is $9.99 per player. Doubles is $19.99 per team, one payment covers you and your partner.</p>
+          <p>Entry fees are refundable until the league starts.</p>""",
+    },
+    "m03_league_open": {
+        "label": "03 League registration is open",
+        "subject": f"{_S['city']} league registration is open",
+        "title": "Find your competition",
+        "cta": ("Join a league", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>Registration is open for the {_S['name']} season in {_S['city']}, starting {_S['start']}.</p>
+          <p><strong>Pick your lane</strong></p>
+          <ul>
+            <li>Tennis or Pickleball.</li>
+            <li>Singles ($9.99 per player) or Doubles ($19.99 per team).</li>
+            <li>Top 4 (top 8 in bigger leagues) go to the playoffs.</li>
+          </ul>
+          <p>Registration for a season closes once it opens. Questions? Write to {cc.SUPPORT}.</p>""",
+    },
+    "m04_rival": {
+        "label": "04 Competition: your next rival",
+        "subject": "Your next rival might already be registered",
+        "title": "Your rival is signing up",
+        "cta": ("See the leagues", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>Good rivalries start with a rating and a schedule. Players are joining {_S['city']} leagues now, and every match you play moves your rating.</p>
+          <p>Pick a league, play your five to seven matches, and see where you finish. The top of each league goes to the playoffs.</p>
+          <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
+    "m05_referral": {
+        "label": "05 Referral: great matches start with friends",
+        "subject": "Great matches start with great friends. You both get $5",
+        "title": "Bring a friend to the court",
+        "cta": ("Get my referral link", "/rewards"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>Your tennis partner, your pickleball crew, the neighbor who always says "we should play." Send them your link.</p>
+          <p>When a friend signs up with your code and plays their first confirmed match, you both get $5 credit. Every third friend earns you an extra $10. Credit expires 12 months after it is issued.</p>
+          <p>Your link and code are on your Rewards page. Questions? Write to {cc.SUPPORT}.</p>""",
+    },
+    "m06_brand": {
+        "label": "06 Brand: your game, your schedule, your rank",
+        "subject": "Your game. Your schedule. Your rank.",
+        "title": "Earn your rank on your own time",
+        "cta": ("Explore leagues", "/leagues?city=Atlanta"),
+        "body": """
+          <p>Hi {name},</p>
+          <p>Competition should fit your life, not the other way around.</p>
+          <ul>
+            <li><strong>Your game:</strong> Tennis or Pickleball, Singles or Doubles.</li>
+            <li><strong>Your schedule:</strong> you and your opponent agree on the time and court.</li>
+            <li><strong>Your rank:</strong> your rating updates after every match.</li>
+          </ul>
+          <p>Ready when you are.</p>""",
+    },
+    "m07_reminder": {
+        "label": "07 Reminder: still thinking about joining",
+        "subject": "Still thinking about joining? Here is your sign",
+        "title": "Still on the fence?",
+        "cta": ("Pick your league", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>You created your account. The next step is one league.</p>
+          <ul>
+            <li>Entry fees are refundable until the league starts.</li>
+            <li>Singles $9.99 per player. Doubles $19.99 per team.</li>
+            <li>Not sure about your level? Pick the division closest to your skill rating. Your rating adjusts after every match.</li>
+          </ul>
+          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Registration for a season closes once it opens.</p>""",
+    },
+    "m08_sport_discovery": {
+        "label": "08 Sport discovery: tennis or pickleball",
+        "subject": "Tennis or Pickleball? Pick your challenge",
+        "title": "Which court is yours?",
+        "cta": ("Compare the sports", "/leagues?city=Atlanta"),
+        "body": """
+          <p>Hi {name},</p>
+          <p><strong>🎾 Tennis</strong><br>Best-of-3 sets with a match tiebreak at 6-6. Singles, Doubles and Mixed Doubles.</p>
+          <p><strong>🏓 Pickleball</strong><br>Rally scoring to 11, win by 2. Singles, Doubles and Mixed Doubles.</p>
+          <p>Both use a skill rating, both have weekly scheduling, both end in playoffs. Not sure? Start with the one you already own a racquet or paddle for.</p>""",
+    },
+    "m09_activation": {
+        "label": "09 Activation: you're registered, get ready",
+        "subject": "You are registered. Let's get you ready to play",
+        "title": "Welcome to VenLax Sports",
+        "cta": ("Open my dashboard", "/dashboard"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>Your account is ready. Three steps to your first match:</p>
+          <ol>
+            <li>Finish your profile.</li>
+            <li>Join a Tennis or Pickleball league in {_S['city']}.</li>
+            <li>When your league starts, schedule your match with your opponent from your dashboard.</li>
+          </ol>
+          <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
+    "m10_reengage": {
+        "label": "10 Re-engagement: ready to get back in the game",
+        "subject": "It has been a while. Ready to get back in the game?",
+        "title": "We saved you a spot on the court",
+        "cta": ("See what is open", "/leagues?city=Atlanta"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>It has been a while since we saw you on VenLax Sports. Your account and rating are still here.</p>
+          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Pick a league and play at your own pace.</p>
+          <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
 }
 
 
