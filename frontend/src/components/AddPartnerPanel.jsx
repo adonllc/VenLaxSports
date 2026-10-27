@@ -66,7 +66,7 @@ export default function AddPartnerPanel({ token, paid = true, onDone }) {
       <div className="pt-1">
         <p className="text-xs mb-1" style={{ color: "#6B7280" }}>Or send this link to anyone. The first person to open it and accept becomes your partner:</p>
         <div className="flex gap-2 items-center">
-          <input readOnly value={link} className="flex-1 text-xs px-2 py-1 bg-white" style={{ border: "1px solid #E5E7EB" }} data-testid="partner-link" />
+          <input readOnly value={link} className="flex-1 text-xs px-2 py-1 bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} data-testid="partner-link" />
           <button type="button" onClick={copy} className="text-xs px-2 py-1" style={{ color: "#B7791F", border: "1px solid #E5A885" }} data-testid="partner-link-copy">
             {copied ? "Copied" : "Copy"}
           </button>

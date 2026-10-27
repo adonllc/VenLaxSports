@@ -92,7 +92,7 @@ export default function PartnerSearch({ onPartnerSelect, onEmailChange }) {
           value={email}
           onChange={(e) => { setEmail(e.target.value); onEmailChange(e.target.value); }}
           placeholder="partner@example.com"
-          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           data-testid="partner-email-input"
         />
       </div>
@@ -109,7 +109,7 @@ export default function PartnerSearch({ onPartnerSelect, onEmailChange }) {
           value={query}
           onChange={handleQueryChange}
           placeholder="Search by name or email…"
-          className="w-full border border-gray-200 rounded-md pl-8 pr-8 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="w-full border border-gray-200 rounded-md pl-8 pr-8 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           data-testid="partner-search-input"
         />
         {(query || selected) && (
