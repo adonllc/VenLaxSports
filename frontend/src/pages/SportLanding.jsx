@@ -10,6 +10,7 @@ import NotifyMeBanner from "../components/NotifyMeBanner";
 import NotifyMeModal from "../components/NotifyMeModal";
 import SportHero from "../components/SportHero";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -64,6 +65,7 @@ export default function SportLanding() {
   const [error, setError] = useState(null);
   const [bellOpen, setBellOpen] = useState(false);
   const [foundingStats, setFoundingStats] = useState({ count: 0, limit: 200, spots_left: 200 });
+  const { isCityOpen } = useSiteSettings();
 
   const meta = SPORT_META[sport];
 
@@ -256,9 +258,15 @@ Features
                     <span className="text-xs px-2.5 py-1 rounded-md font-semibold" style={{ fontFamily: "Rubik, sans-serif", background: meta.palePill, color: meta.pillText }}>
                       {meta.icon} {meta.label}
                     </span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "Rubik, sans-serif", background: l.status === "registration" ? "#D1FAE5" : "#F3F4F6", color: l.status === "registration" ? "#00765C" : TEXT_MUTED }}>
-                      {l.status === "registration" ? "Open" : l.status === "active" ? "Active" : "Ended"}
-                    </span>
+                    {(() => {
+                      const isOpen = l.status === "registration" && isCityOpen(l.city);
+                      const opensSoon = l.status === "registration" && !isOpen;
+                      return (
+                        <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: "Rubik, sans-serif", background: isOpen ? "#D1FAE5" : opensSoon ? "#FEF3C7" : "#F3F4F6", color: isOpen ? "#00765C" : opensSoon ? "#92400E" : TEXT_MUTED }}>
+                          {isOpen ? "Open" : opensSoon ? "Opens soon" : l.status === "active" ? "Active" : "Ended"}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <h3 className="font-heading font-bold mb-2 line-clamp-2 leading-snug text-base tracking-[-0.5px]" style={{ color: "#3D3D3D" }}>{l.name}</h3>
                   <p className="text-xs flex items-center gap-1.5 mb-3" style={{ color: TEXT_MUTED, fontFamily: "Rubik, sans-serif" }}>
