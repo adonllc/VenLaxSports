@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import PlayerProfilePanel from "./PlayerProfilePanel";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api/admin/players`;
 const PAGE = 50;
@@ -31,15 +32,37 @@ export default function PlayerInsightsTab() {
   const [skip, setSkip] = useState(0);
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [tag, setTag] = useState("");
+  const [status, setStatus] = useState("");
+  const [tagList, setTagList] = useState([]);
+  const [segments, setSegments] = useState([]);
+  const [segmentId, setSegmentId] = useState("");
+  const [selected, setSelected] = useState(new Set());
+  const [bulkTag, setBulkTag] = useState("");
+  const [openId, setOpenId] = useState("");
+  const [dups, setDups] = useState(null);
+  const [perms, setPerms] = useState([]);
+  const [refresh, setRefresh] = useState(0);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     axios.get(`${API}/overview`, { withCredentials: true }).then((r) => setOverview(r.data)).catch(() => setError("Could not load the player overview."));
   }, []);
 
   const params = useCallback(() => {
-    const p = { segment, q: q.trim() || undefined, league_id: leagueId || undefined, not_in_league: notInLeague || undefined };
+    const p = { segment, q: q.trim() || undefined, league_id: leagueId || undefined, not_in_league: notInLeague || undefined,
+      tag: tag || undefined, status: status || undefined };
     return p;
-  }, [segment, q, leagueId, notInLeague]);
+  }, [segment, q, leagueId, notInLeague, tag, status]);
+
+  const loadSidebars = useCallback(() => {
+    axios.get(`${API}/tags`, { withCredentials: true }).then((r) => setTagList(r.data.tags)).catch(() => {});
+    axios.get(`${API}/segments`, { withCredentials: true }).then((r) => setSegments(r.data.segments)).catch(() => {});
+  }, []);
+  useEffect(() => {
+    loadSidebars();
+    axios.get(`${API.replace("/players", "")}/me/permissions`, { withCredentials: true }).then((r) => setPerms(r.data.permissions)).catch(() => {});
+  }, [loadSidebars]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -48,10 +71,53 @@ export default function PlayerInsightsTab() {
         .catch(() => setError("Could not load players."));
     }, 250);
     return () => clearTimeout(t);
-  }, [params, skip]);
+  }, [params, skip, refresh]);
 
   const pick = (fn) => (...a) => { setSkip(0); fn(...a); };
   const leagueName = (id) => overview?.leagues.find((l) => l.league_id === id)?.name || "";
+
+  const applySegment = (id) => {
+    setSegmentId(id);
+    const seg = segments.find((x) => x.id === id);
+    if (!seg) return;
+    const f = seg.filters;
+    setSkip(0);
+    setSegment(f.segment || "all"); setQ(f.q || ""); setLeagueId(f.league_id || ""); setNotInLeague(f.not_in_league || "");
+    setTag(f.tag || ""); setStatus(f.status || "");
+  };
+  const saveSegment = async () => {
+    const name = window.prompt("Name this segment (it saves the filters you have set now):");
+    if (!name?.trim()) return;
+    try {
+      const { data: d } = await axios.post(`${API}/segments`, { name, filters: { ...params(), q: q.trim() } }, { withCredentials: true });
+      loadSidebars();
+      setSegmentId(d.id);
+    } catch (e) { setError(e.response?.data?.detail || "Could not save the segment"); }
+  };
+  const deleteSegment = async () => {
+    const seg = segments.find((x) => x.id === segmentId);
+    if (!seg || !window.confirm(`Delete the saved segment "${seg.name}"?`)) return;
+    try { await axios.delete(`${API}/segments/${segmentId}`, { withCredentials: true }); setSegmentId(""); loadSidebars(); }
+    catch (e) { setError(e.response?.data?.detail || "Could not delete the segment"); }
+  };
+  const toggle = (id) => setSelected((cur) => { const n = new Set(cur); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const bulk = async (mode) => {
+    if (!bulkTag.trim() || selected.size === 0) return;
+    if (!window.confirm(`${mode === "add" ? "Add" : "Remove"} the tag "${bulkTag.trim()}" ${mode === "add" ? "to" : "from"} ${selected.size} selected players?`)) return;
+    try {
+      const { data: d } = await axios.post(`${API}/bulk/tags`, { user_ids: [...selected], add: mode === "add" ? [bulkTag] : [], remove: mode === "remove" ? [bulkTag] : [] }, { withCredentials: true });
+      setNotice(`${d.changed} of ${d.selected} players changed.`);
+      setSelected(new Set()); setBulkTag(""); setRefresh((n) => n + 1); loadSidebars();
+    } catch (e) { setError(e.response?.data?.detail || "Could not change the tags"); }
+  };
+  const findDuplicates = async () => {
+    try { setDups((await axios.get(`${API}/duplicates`, { withCredentials: true })).data); }
+    catch (e) { setError(e.response?.data?.detail || "Could not check for duplicates"); }
+  };
+  const canTag = perms.includes("players.write");
+  const pageIds = (data?.players || []).map((p) => p.id);
+  const allOnPage = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
+  const selectPage = () => setSelected((cur) => { const n = new Set(cur); pageIds.forEach((id) => (allOnPage ? n.delete(id) : n.add(id))); return n; });
 
   const exportCsv = async () => {
     const res = await axios.get(`${API}/export.csv`, { params: params(), withCredentials: true, responseType: "blob" });
@@ -153,29 +219,81 @@ export default function PlayerInsightsTab() {
       <div className="bg-white" style={{ border: "1px solid #E5E7EB" }}>
         <div className="p-5 flex flex-wrap items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
           <input
-            className="px-3 py-2 text-sm w-64" style={{ border: "1px solid #E5E7EB" }} placeholder="Search name or email"
+            className="px-3 py-2 text-sm w-64 bg-white text-gray-900 placeholder:text-gray-400" style={{ border: "1px solid #E5E7EB" }} placeholder="Search name or email"
             value={q} onChange={pick((e) => setQ(e.target.value))} data-testid="players-search"
           />
           {leagueId && <button className="text-xs px-2 py-1" style={{ border: "1px solid #E5E7EB" }} onClick={pick(() => setLeagueId(""))}>Joined {leagueName(leagueId)} ✕</button>}
           {notInLeague && <button className="text-xs px-2 py-1" style={{ border: "1px solid #E5E7EB" }} onClick={pick(() => setNotInLeague(""))}>Not in {leagueName(notInLeague)} ✕</button>}
+          <select className="px-3 py-2 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} value={tag} onChange={pick((e) => { setTag(e.target.value); setSegmentId(""); })} data-testid="players-tag-filter" aria-label="Filter by tag">
+            <option value="">Any tag</option>
+            {tagList.map((t) => <option key={t.tag} value={t.tag}>{t.tag} ({t.count})</option>)}
+          </select>
+          <select className="px-3 py-2 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} value={status} onChange={pick((e) => { setStatus(e.target.value); setSegmentId(""); })} data-testid="players-status-filter" aria-label="Filter by account status">
+            <option value="">Any status</option>
+            <option value="active">Active</option><option value="suspended">Suspended</option><option value="deactivated">Deactivated</option>
+          </select>
+          <select className="px-3 py-2 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} value={segmentId} onChange={(e) => applySegment(e.target.value)} data-testid="players-saved-segments" aria-label="Saved segments">
+            <option value="">Saved segments…</option>
+            {segments.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+          </select>
+          <button className="text-xs px-2 py-2 bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={saveSegment} data-testid="players-save-segment">Save filters</button>
+          {segmentId && <button className="text-xs px-2 py-2 bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={deleteSegment} data-testid="players-delete-segment">Delete segment</button>}
+          <button className="text-xs px-2 py-2 bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={findDuplicates} data-testid="players-find-duplicates">Find duplicates</button>
           <div className="ml-auto flex items-center gap-3">
             <span className="text-sm" style={{ color: "#6B7280" }}>{data ? `${data.total} players` : "Loading…"}</span>
             <button onClick={exportCsv} className="text-xs font-semibold px-3 py-2 text-white" style={{ background: GREEN }} data-testid="players-export">Export CSV</button>
           </div>
         </div>
 
+        {notice && <p className="px-5 py-2 text-sm" style={{ background: "#E8F6F2", color: "#00765C" }} role="status">{notice}</p>}
+        {selected.size > 0 && (
+          <div className="px-5 py-3 flex flex-wrap items-center gap-2" style={{ background: "#F9FAFB", borderBottom: "1px solid #F3F4F6" }} data-testid="players-bulk-bar">
+            <span className="text-sm font-semibold">{selected.size} selected</span>
+            {canTag ? (
+              <>
+                <input className="px-3 py-1.5 text-sm bg-white text-gray-900 placeholder:text-gray-400" style={{ border: "1px solid #E5E7EB" }} placeholder="Tag" value={bulkTag} onChange={(e) => setBulkTag(e.target.value)} data-testid="players-bulk-tag" />
+                <button className="px-3 py-1.5 text-sm text-white" style={{ background: GREEN }} onClick={() => bulk("add")} data-testid="players-bulk-add">Add tag</button>
+                <button className="px-3 py-1.5 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={() => bulk("remove")} data-testid="players-bulk-remove">Remove tag</button>
+              </>
+            ) : <span className="text-xs" style={{ color: "#6B7280" }}>Your role cannot change tags.</span>}
+            <button className="px-3 py-1.5 text-sm bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={() => setSelected(new Set())}>Clear</button>
+          </div>
+        )}
+        {dups && (
+          <div className="p-5 space-y-3" style={{ borderBottom: "1px solid #F3F4F6" }} data-testid="players-duplicates">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">{dups.total_groups === 0 ? "No likely duplicates found." : `${dups.total_groups} possible duplicate groups`}</p>
+              <button className="text-xs px-2 py-1 bg-white text-gray-900" style={{ border: "1px solid #E5E7EB" }} onClick={() => setDups(null)}>Hide</button>
+            </div>
+            <p className="text-xs" style={{ color: "#6B7280" }}>Report only. Accounts are never merged automatically; a merge needs a separate, reviewed step.</p>
+            {dups.groups.map((g, i) => (
+              <div key={i} className="p-3 text-sm" style={{ border: "1px solid #E5E7EB" }}>
+                <p className="text-xs font-semibold uppercase" style={{ color: g.confidence === "high" ? "#B45309" : "#6B7280" }}>{g.confidence} · {g.reasons.join(", ")}</p>
+                {g.players.map((x) => <button key={x.id} className="block underline text-left" onClick={() => setOpenId(x.id)}>{x.name} · {x.email} · {x.created_at?.slice(0, 10)} · {x.status}</button>)}
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
-                <th className="px-5 py-2">Player</th><th className="px-3 py-2">Signed up</th><th className="px-3 py-2">Source</th><th className="px-3 py-2">Stage</th>
+                <th className="pl-5 py-2 w-8"><input type="checkbox" aria-label="Select all on this page" checked={allOnPage} onChange={selectPage} data-testid="players-select-all" /></th>
+                <th className="px-3 py-2">Player</th><th className="px-3 py-2">Signed up</th><th className="px-3 py-2">Source</th><th className="px-3 py-2">Stage</th>
                 <th className="px-3 py-2">Leagues and how they joined</th><th className="px-3 py-2">Paid</th><th className="px-3 py-2">Matches</th><th className="px-3 py-2">Open leagues not joined</th>
               </tr>
             </thead>
             <tbody>
               {(data?.players || []).map((p) => (
                 <tr key={p.id} style={{ borderTop: "1px solid #F3F4F6" }} className="align-top">
-                  <td className="px-5 py-2">{p.name}<div className="text-xs" style={{ color: "#6B7280" }}>{p.email}{p.city ? ` · ${p.city}` : ""}</div></td>
+                  <td className="pl-5 py-2"><input type="checkbox" aria-label={`Select ${p.name}`} checked={selected.has(p.id)} onChange={() => toggle(p.id)} data-testid={`players-select-${p.id}`} /></td>
+                  <td className="px-3 py-2">
+                    <button className="font-semibold underline text-left" onClick={() => setOpenId(p.id)} data-testid={`players-open-${p.id}`}>{p.name}</button>
+                    {p.status && p.status !== "active" && <span className="ml-2 text-xs px-1.5 py-0.5" style={{ background: p.status === "suspended" ? "#FEF3C7" : "#F3F4F6", color: p.status === "suspended" ? "#92400E" : "#4C4C4C" }}>{p.status}</span>}
+                    <div className="text-xs" style={{ color: "#6B7280" }}>{p.email}{p.city ? ` · ${p.city}` : ""}</div>
+                    {(p.tags || []).length > 0 && <div className="flex flex-wrap gap-1 mt-1">{p.tags.map((t) => <span key={t} className="text-xs px-1.5 py-0.5" style={{ background: "#F1F1F1" }}>{t}</span>)}</div>}
+                  </td>
                   <td className="px-3 py-2 whitespace-nowrap">{day(p.signed_up)}</td>
                   <td className="px-3 py-2">{p.source}</td>
                   <td className="px-3 py-2"><Stage stage={p.stage} />{p.waiting_for_partner && <div className="text-xs mt-1" style={{ color: "#B45309" }}>waiting for partner</div>}</td>
@@ -202,6 +320,7 @@ export default function PlayerInsightsTab() {
           </div>
         )}
       </div>
+      {openId && <PlayerProfilePanel playerId={openId} onClose={() => setOpenId("")} onChanged={() => { setRefresh((n) => n + 1); loadSidebars(); }} />}
     </div>
   );
 }

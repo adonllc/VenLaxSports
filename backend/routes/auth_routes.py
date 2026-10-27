@@ -6,6 +6,7 @@ from bson import ObjectId
 from models import User, UserCreate, UserLogin, ReferralCredit
 from attribution import sanitize_attribution
 from auth_utils import (
+    check_account_allowed,
     hash_password, verify_password,
     create_access_token, create_refresh_token,
     get_current_user, get_jwt_secret, JWT_ALGORITHM,
@@ -173,6 +174,7 @@ async def login(credentials: UserLogin, response: Response, request: Request):
         await record_attempt(db, rate_key)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     await clear_attempts(db, rate_key)
+    check_account_allowed(user)
 
     user_id = str(user["_id"])
     role = user.get("role", "player")

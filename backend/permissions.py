@@ -10,7 +10,9 @@ from fastapi import HTTPException
 ALL_PERMISSIONS = (
     "dashboard.read",
     "players.read",      # names, emails, activity: personal data
-    "players.write",
+    "players.write",     # tags
+    "players.notes",     # read and write private admin notes about a player
+    "players.suspend",   # suspend, reactivate, deactivate an account
     "players.delete",
     "players.export",
     "leagues.read",
@@ -38,7 +40,7 @@ ROLES: dict[str, dict] = {
         "label": "Marketing administrator",
         "perms": {"dashboard.read", "players.read", "marketing.read", "marketing.send", "reports.read"},
     },
-    "support": {"label": "Customer support administrator", "perms": {"dashboard.read", "players.read", "players.write"}},
+    "support": {"label": "Customer support administrator", "perms": {"dashboard.read", "players.read", "players.write", "players.notes"}},
     "analytics_viewer": {
         "label": "Analytics viewer",
         "perms": {"dashboard.read", "leagues.read", "marketing.read", "reports.read"},

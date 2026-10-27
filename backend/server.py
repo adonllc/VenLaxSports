@@ -40,6 +40,7 @@ from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
 from routes.admin_players_routes import router as admin_players_router
 from routes.admin_team_routes import router as admin_team_router
+from routes.admin_player_crm_routes import router as admin_player_crm_router
 from routes.event_routes import router as event_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.recap_routes import router as recap_router
@@ -70,6 +71,7 @@ api_router.include_router(notification_router, prefix="/notifications", tags=["n
 api_router.include_router(doubles_router, prefix="/doubles-invite", tags=["doubles"])
 api_router.include_router(waitlist_router, prefix="/waitlist", tags=["waitlist"])
 api_router.include_router(admin_players_router, prefix="/admin/players", tags=["admin-players"])
+api_router.include_router(admin_player_crm_router, prefix="/admin/players", tags=["admin-player-crm"])   # after the list routes: its /{player_id} must not shadow them
 api_router.include_router(recap_router, prefix="/recaps", tags=["recaps"])
 api_router.include_router(ambassador_router, prefix="/admin/ambassadors", tags=["ambassadors"])
 api_router.include_router(admin_email_router, prefix="/admin/email", tags=["admin-email"])

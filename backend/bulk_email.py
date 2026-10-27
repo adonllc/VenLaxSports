@@ -363,7 +363,7 @@ async def build_audience(db, payload: dict) -> dict:
     for u in users:
         email = (u.get("email") or "").strip().lower()
         uid = str(u["_id"])
-        if not email or u.get("is_active") is False or (chosen is not None and uid not in chosen):
+        if not email or u.get("is_active") is False or u.get("suspended_at") or (chosen is not None and uid not in chosen):
             continue
         if u.get("email_notifications") is False or u.get("marketing_unsubscribed_at"):
             skipped["opted out"] += 1

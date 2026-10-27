@@ -103,6 +103,14 @@ async def _is_token_blacklisted(token: str, db) -> bool:
     return blacklisted is not None
 
 
+def check_account_allowed(user: dict) -> None:
+    """403 for a deactivated or suspended account. Called wherever a signed-in user is loaded, so it cannot be skipped."""
+    if user.get("is_active") is False:
+        raise HTTPException(status_code=403, detail="This account has been deactivated. Write to support@venlaxsports.com.")
+    if user.get("suspended_at"):
+        raise HTTPException(status_code=403, detail="This account is suspended. Write to support@venlaxsports.com.")
+
+
 async def get_current_user(request: Request, db) -> dict:
     token = request.cookies.get("access_token")
     if not token:
@@ -126,6 +134,7 @@ async def get_current_user(request: Request, db) -> dict:
             user = None
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
+        check_account_allowed(user)
         user["_id"] = str(user["_id"])
         user.pop("password_hash", None)
         return user
@@ -157,7 +166,7 @@ async def get_optional_user(request: Request, db) -> Optional[dict]:
             user = await db.users.find_one({"_id": ObjectId(user_id)})
         except Exception:
             return None
-        if not user:
+        if not user or user.get("is_active") is False or user.get("suspended_at"):
             return None
         user["_id"] = str(user["_id"])
         user.pop("password_hash", None)

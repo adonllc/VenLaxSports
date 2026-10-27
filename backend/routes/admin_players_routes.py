@@ -9,6 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
+import player_crm as crm
 import player_insights as pi
 import audit_log
 import permissions
@@ -24,10 +25,14 @@ async def _admin(request: Request, permission: str = "players.read") -> dict:
     return permissions.ensure(user, permission)
 
 
-async def _load(db):
+async def _load(db, include_deactivated=False):
+    base = {"role": {"$nin": ["admin", "city_admin"]}}
+    if not include_deactivated:
+        base["is_active"] = {"$ne": False}
     users = await db.users.find(
-        {"role": {"$ne": "admin"}, "is_active": {"$ne": False}},
-        {"name": 1, "email": 1, "city": 1, "created_at": 1, "email_verified": 1, "profile_complete": 1, "attribution": 1},
+        base,
+        {"name": 1, "email": 1, "city": 1, "created_at": 1, "email_verified": 1, "profile_complete": 1, "attribution": 1,
+         "tags": 1, "suspended_at": 1, "is_active": 1},
     ).to_list(10000)
     leagues = await db.leagues.find({}).to_list(2000)
     regs = await db.player_leagues.find({}).to_list(50000)
@@ -42,9 +47,24 @@ async def _load(db):
     return users, leagues, regs, txns, promo_uses, invites, played
 
 
-def _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues):
+def _attach_crm(rows, users):
+    by_id = {str(u["_id"]): u for u in users}
+    for r in rows:
+        u = by_id.get(r["id"], {})
+        r["tags"] = sorted(u.get("tags") or [])
+        r["status"] = crm.status_of(u)
+    return rows
+
+
+def _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues, tag=None, status=None):
     if segment not in pi.SEGMENTS:
         raise HTTPException(status_code=400, detail="Unknown segment")
+    if status and status not in crm.STATUSES:
+        raise HTTPException(status_code=400, detail="Unknown status")
+    if tag:
+        rows = [r for r in rows if tag.strip().lower() in r.get("tags", [])]
+    if status:
+        rows = [r for r in rows if r.get("status") == status]
     rows = [r for r in rows if pi.in_segment(r, segment)]
     if q:
         needle = q.strip().lower()
@@ -82,12 +102,13 @@ async def overview(request: Request):
 
 @router.get("")
 async def players(request: Request, segment: str = "all", q: Optional[str] = None, city: Optional[str] = None,
-                  league_id: Optional[str] = None, not_in_league: Optional[str] = None, skip: int = 0, limit: int = 50):
+                  league_id: Optional[str] = None, not_in_league: Optional[str] = None, tag: Optional[str] = None,
+                  status: Optional[str] = None, skip: int = 0, limit: int = 50):
     await _admin(request)
     db = request.app.state.db
-    users, leagues, regs, txns, promo_uses, invites, played = await _load(db)
-    rows = pi.build_player_rows(users, regs, leagues, txns, promo_uses, played, invites)
-    rows = _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues)
+    users, leagues, regs, txns, promo_uses, invites, played = await _load(db, include_deactivated=status == "deactivated")
+    rows = _attach_crm(pi.build_player_rows(users, regs, leagues, txns, promo_uses, played, invites), users)
+    rows = _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues, tag, status)
     limit = max(1, min(limit, MAX_PAGE))
     return {"total": len(rows), "players": rows[max(0, skip):max(0, skip) + limit]}
 
@@ -99,12 +120,13 @@ def _cell(v):
 
 @router.get("/export.csv")
 async def export(request: Request, segment: str = "all", q: Optional[str] = None, city: Optional[str] = None,
-                 league_id: Optional[str] = None, not_in_league: Optional[str] = None):
+                 league_id: Optional[str] = None, not_in_league: Optional[str] = None, tag: Optional[str] = None,
+                 status: Optional[str] = None):
     admin = await _admin(request, "players.export")
     db = request.app.state.db
-    users, leagues, regs, txns, promo_uses, invites, played = await _load(db)
-    rows = pi.build_player_rows(users, regs, leagues, txns, promo_uses, played, invites)
-    rows = _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues)[:MAX_EXPORT]
+    users, leagues, regs, txns, promo_uses, invites, played = await _load(db, include_deactivated=status == "deactivated")
+    rows = _attach_crm(pi.build_player_rows(users, regs, leagues, txns, promo_uses, played, invites), users)
+    rows = _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues, tag, status)[:MAX_EXPORT]
     await audit_log.record(db, admin, "player.export", "players", segment, "players CSV",
                            meta={"rows": len(rows), "segment": segment, "q": q, "city": city, "league_id": league_id}, request=request)
     buf = io.StringIO()
