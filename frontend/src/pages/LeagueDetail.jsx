@@ -14,6 +14,7 @@ import { PHOTOS } from "../config/photos";
 import { trackEvent } from "../utils/googleAnalytics";
 import NotifyMeBanner from "../components/NotifyMeBanner";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { reportFunnelEvent } from "../utils/funnelEvents";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -70,6 +71,10 @@ export default function LeagueDetail() {
   useEffect(() => {
     fetchLeague();
   }, [id]);
+
+  useEffect(() => {
+    if (league?.id) reportFunnelEvent("league_viewed", { sport: league.sport, leagueId: league.id });
+  }, [league?.id]);
 
   useEffect(() => {
     if (sessionId && user) {
@@ -185,6 +190,7 @@ export default function LeagueDetail() {
 
   const handleDoublesJoin = async () => {
     if (!user) { navigate("/auth"); return; }
+    reportFunnelEvent("league_registration_started", { sport: league?.sport, leagueId: id });
     setJoining(true);
     try {
       const body = { waiver_accepted: waiverAccepted };
@@ -286,6 +292,7 @@ export default function LeagueDetail() {
 
   const handleJoin = async () => {
     if (!user) { navigate("/auth"); return; }
+    reportFunnelEvent("league_registration_started", { sport: league?.sport, leagueId: id });
     setJoining(true);
     setJoinMsg("");
     try {

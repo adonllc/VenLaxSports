@@ -40,6 +40,8 @@ from routes.doubles_routes import router as doubles_router
 from routes.waitlist_routes import router as waitlist_router
 from routes.admin_players_routes import router as admin_players_router
 from routes.admin_team_routes import router as admin_team_router
+from routes.event_routes import router as event_router
+from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.recap_routes import router as recap_router
 from routes.admin_ambassador_routes import router as ambassador_router
 from routes.admin_email_routes import router as admin_email_router, public_router as email_unsub_router
@@ -55,6 +57,8 @@ api_router.include_router(match_router, prefix="/matches", tags=["matches"])
 api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
 api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 api_router.include_router(admin_team_router, prefix="/admin", tags=["admin-team"])
+api_router.include_router(event_router, prefix="/events", tags=["events"])
+api_router.include_router(admin_dashboard_router, prefix="/admin", tags=["admin-dashboard"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
 api_router.include_router(season_router, prefix="/seasons", tags=["seasons"])
 api_router.include_router(playoffs_router, prefix="/playoffs", tags=["playoffs"])

@@ -4,6 +4,7 @@ import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
+import DashboardTab from "../components/DashboardTab";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [leagues, setLeagues] = useState([]);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("dashboard");
   const [perms, setPerms] = useState(null);   // null until known; the server enforces regardless
   const [form, setForm] = useState(DEFAULT_FORM);
   const [creating, setCreating] = useState(false);
@@ -267,6 +268,7 @@ export default function AdminDashboard() {
   ] : [];
 
   const TABS = [
+    { id: "dashboard", label: "Dashboard" },
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
     { id: "players", label: "Players" },
@@ -287,7 +289,7 @@ export default function AdminDashboard() {
   ];
   // What each tab needs. A convenience only: the server checks every request. Unlisted tabs are open to any admin.
   const TAB_NEEDS = {
-    users: "players.read", players: "players.read", email: "marketing.read", marketing: "marketing.read",
+    dashboard: "dashboard.read", users: "players.read", players: "players.read", email: "marketing.read", marketing: "marketing.read",
     flags: "settings.write", zelle: "payments.read", create: "leagues.write", auto: "leagues.write",
     leagues: "leagues.read", ladders: "leagues.read", seasons: "leagues.read", playoffs: "leagues.read",
     team: "roles.manage", audit: "audit.read",
@@ -326,6 +328,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {tab === "dashboard" && <DashboardTab />}
         {/* Overview Tab */}
         {tab === "overview" && (
           <div className="space-y-6">

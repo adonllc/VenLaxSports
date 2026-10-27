@@ -10,6 +10,7 @@ import ParentalConsentModal from "../components/ParentalConsentModal";
 import axios from "axios";
 import { getAttribution } from "../utils/attribution";
 import { trackEvent } from "../utils/googleAnalytics";
+import { reportFunnelEvent } from "../utils/funnelEvents";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -20,6 +21,7 @@ const COUNTRIES = [activeCountry];
 export default function Auth() {
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.get("mode") === "register" ? "register" : "login");
+  useEffect(() => { if (mode === "register") reportFunnelEvent("registration_started"); }, [mode]);
   const [form, setForm] = useState({
     email: "",
     password: "",
