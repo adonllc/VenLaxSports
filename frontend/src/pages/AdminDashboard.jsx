@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
+import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [leagues, setLeagues] = useState([]);
   const [tab, setTab] = useState("overview");
+  const [perms, setPerms] = useState(null);   // null until known; the server enforces regardless
   const [form, setForm] = useState(DEFAULT_FORM);
   const [creating, setCreating] = useState(false);
   const [msg, setMsg] = useState("");
@@ -64,6 +66,10 @@ export default function AdminDashboard() {
     rr_config: { min_players: 6, max_players: 12, division_type: "singles", playoff_threshold: 4 }
   });
   const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${API}/admin/me/permissions`, { withCredentials: true }).then((r) => setPerms(r.data.permissions)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -276,7 +282,17 @@ export default function AdminDashboard() {
     { id: "marketing", label: "Marketing" },
     { id: "email", label: "Email" },
     { id: "flags", label: "Feature Flags" },
+    { id: "team", label: "Team" },
+    { id: "audit", label: "Audit Log" },
   ];
+  // What each tab needs. A convenience only: the server checks every request. Unlisted tabs are open to any admin.
+  const TAB_NEEDS = {
+    users: "players.read", players: "players.read", email: "marketing.read", marketing: "marketing.read",
+    flags: "settings.write", zelle: "payments.read", create: "leagues.write", auto: "leagues.write",
+    leagues: "leagues.read", ladders: "leagues.read", seasons: "leagues.read", playoffs: "leagues.read",
+    team: "roles.manage", audit: "audit.read",
+  };
+  const VISIBLE_TABS = TABS.filter((t) => !perms || !TAB_NEEDS[t.id] || perms.includes(TAB_NEEDS[t.id]));
 
   return (
     <div className="min-h-screen" style={{ background: "#FFFFFF" }} data-testid="admin-dashboard">
@@ -294,7 +310,7 @@ export default function AdminDashboard() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-x-1">
-            {TABS.map((t) => (
+            {VISIBLE_TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
@@ -814,6 +830,8 @@ export default function AdminDashboard() {
         {tab === "flags" && <FlagsTab />}
         {tab === "marketing" && <MarketingTab />}
         {tab === "email" && <EmailCampaignsTab />}
+        {tab === "team" && <TeamTab />}
+        {tab === "audit" && <AuditLogTab />}
         {tab === "players" && <PlayerInsightsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}

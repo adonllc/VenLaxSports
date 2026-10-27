@@ -10,6 +10,8 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
 import player_insights as pi
+import audit_log
+import permissions
 from auth_utils import get_current_user
 
 router = APIRouter()
@@ -17,11 +19,9 @@ MAX_PAGE = 200
 MAX_EXPORT = 5000
 
 
-async def _admin(request: Request) -> dict:
+async def _admin(request: Request, permission: str = "players.read") -> dict:
     user = await get_current_user(request, request.app.state.db)
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin only")
-    return user
+    return permissions.ensure(user, permission)
 
 
 async def _load(db):
@@ -100,11 +100,13 @@ def _cell(v):
 @router.get("/export.csv")
 async def export(request: Request, segment: str = "all", q: Optional[str] = None, city: Optional[str] = None,
                  league_id: Optional[str] = None, not_in_league: Optional[str] = None):
-    await _admin(request)
+    admin = await _admin(request, "players.export")
     db = request.app.state.db
     users, leagues, regs, txns, promo_uses, invites, played = await _load(db)
     rows = pi.build_player_rows(users, regs, leagues, txns, promo_uses, played, invites)
     rows = _filter(rows, segment, q, city, league_id, not_in_league, regs, leagues)[:MAX_EXPORT]
+    await audit_log.record(db, admin, "player.export", "players", segment, "players CSV",
+                           meta={"rows": len(rows), "segment": segment, "q": q, "city": city, "league_id": league_id}, request=request)
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(pi.CSV_COLUMNS)

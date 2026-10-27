@@ -1,4 +1,8 @@
 async def create_indexes(db) -> None:
+    await db.audit_log.create_index([("at", -1)])
+    await db.audit_log.create_index([("action", 1), ("at", -1)])
+    await db.audit_log.create_index([("admin_id", 1), ("at", -1)])
+    await db.audit_log.create_index([("target_type", 1), ("target_id", 1)])
     await db.users.create_index("email", unique=True)
     await db.player_leagues.create_index([("player_id", 1), ("league_id", 1)])
     await db.matches.create_index([("league_id", 1), ("scheduled_date", 1)])

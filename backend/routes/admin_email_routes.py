@@ -14,6 +14,8 @@ from pydantic import BaseModel
 
 import bulk_email
 import email_service
+import audit_log
+import permissions
 from auth_utils import get_current_user
 
 router = APIRouter()
@@ -37,11 +39,9 @@ class SendRequest(EmailPayload):
     confirm_count: int
 
 
-async def _admin(request: Request) -> dict:
+async def _admin(request: Request, permission: str = "marketing.send") -> dict:
     user = await get_current_user(request, request.app.state.db)
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin only")
-    return user
+    return permissions.ensure(user, permission)
 
 
 def _payload(p: EmailPayload) -> dict:
@@ -55,7 +55,7 @@ def _payload(p: EmailPayload) -> dict:
 
 @router.get("/templates")
 async def templates(request: Request):
-    await _admin(request)
+    await _admin(request, "marketing.read")
     return {"templates": [{"id": k, "label": v["label"]} for k, v in bulk_email.TEMPLATES.items()],
             "segments": list(bulk_email.SEGMENTS), "max_recipients": bulk_email.MAX_RECIPIENTS}
 
@@ -117,13 +117,16 @@ async def send(body: SendRequest, request: Request):
         "started_by": str(admin["_id"]), "started_at": datetime.now(timezone.utc).isoformat(),
     }
     job_id = (await db.email_jobs.insert_one(job)).inserted_id
+    await audit_log.record(db, admin, "email.send", "campaign", key, job["subject"],
+                           after={"recipients": count, "audience": payload["audience"], "template": payload.get("template"),
+                                  "segment": payload.get("segment")}, request=request)
     asyncio.create_task(bulk_email.run_job(db, job_id, payload, audience["send"], admin_id=str(admin["_id"])))
     return {"job_id": str(job_id), "total": count}
 
 
 @router.get("/jobs/{job_id}")
 async def job_status(job_id: str, request: Request):
-    await _admin(request)
+    await _admin(request, "marketing.read")
     db = request.app.state.db
     try:
         job = await db.email_jobs.find_one({"_id": ObjectId(job_id)})
@@ -137,7 +140,7 @@ async def job_status(job_id: str, request: Request):
 
 @router.get("/jobs")
 async def recent_jobs(request: Request):
-    await _admin(request)
+    await _admin(request, "marketing.read")
     db = request.app.state.db
     jobs = await db.email_jobs.find({}).sort("started_at", -1).to_list(20)
     for j in jobs:

@@ -27,6 +27,7 @@ class Flags:
 class FakeDb:
     def __init__(self):
         self.feature_flags = Flags()
+        self.audit_log = Flags()
 
 
 def run(coro):
@@ -111,8 +112,9 @@ def _admin_request(db):
 
 def test_admin_can_save_and_read_back_settings(monkeypatch):
     async def fake_admin(request, db):
-        return {"_id": "admin1"}
+        return {"_id": "admin1", "role": "admin"}
 
+    monkeypatch.setattr(admin_routes, "get_current_user", fake_admin)
     monkeypatch.setattr(admin_routes, "require_admin", fake_admin)
     db = FakeDb()
     req = _admin_request(db)
@@ -128,9 +130,9 @@ def test_admin_can_save_and_read_back_settings(monkeypatch):
 
 def test_admin_rejects_a_bad_city_list(monkeypatch):
     async def fake_admin(request, db):
-        return {"_id": "admin1"}
+        return {"_id": "admin1", "role": "admin"}
 
-    monkeypatch.setattr(admin_routes, "require_admin", fake_admin)
+    monkeypatch.setattr(admin_routes, "get_current_user", fake_admin)
     with pytest.raises(HTTPException) as e:
         run(admin_routes.set_site_settings(_admin_request(FakeDb()), {"open_cities": ["Atlanta", 5]}))
     assert e.value.status_code == 400

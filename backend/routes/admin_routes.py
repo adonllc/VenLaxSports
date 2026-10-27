@@ -2,12 +2,19 @@ from fastapi import APIRouter, HTTPException, Request, Body
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 import os
-from auth_utils import require_admin
+from auth_utils import require_admin, get_current_user
+import audit_log
+import permissions
 from models import LeagueUpdate, PlayerLeague, Standing
 import email_service
 import league_schedule
 
 router = APIRouter()
+
+
+async def _need(request: Request, permission: str) -> dict:
+    """Signed-in admin holding `permission`, else 401/403. Server-side check for sensitive routes."""
+    return permissions.ensure(await get_current_user(request, request.app.state.db), permission)
 
 
 # Background jobs that can be individually enabled/disabled at runtime (no redeploy).
@@ -158,7 +165,7 @@ async def get_site_settings(request: Request):
 async def set_site_settings(request: Request, body: dict = Body(...)):
     from launch_city import invalidate_cache
     db = request.app.state.db
-    admin = await require_admin(request, db)
+    admin = await _need(request, "settings.write")
     stamp = {"updated_at": datetime.now(timezone.utc).isoformat(), "updated_by": str(admin.get("_id", ""))}
 
     if "open_cities" in body or "all_open" in body:
@@ -175,13 +182,14 @@ async def set_site_settings(request: Request, body: dict = Body(...)):
             {"_id": "google_analytics"}, {"$set": {"enabled": bool(body["google_analytics"]), **stamp}}, upsert=True,
         )
     invalidate_cache()
+    await audit_log.record(db, admin, "settings.site", "feature_flags", "site-settings", after=body, request=request)
     return {"ok": True}
 
 
 @router.patch("/flags/{flag_id}")
 async def set_flag(flag_id: str, request: Request, body: dict = Body(...)):
     db = request.app.state.db
-    admin = await require_admin(request, db)
+    admin = await _need(request, "settings.write")
 
     if flag_id not in JOB_FLAGS:
         raise HTTPException(status_code=404, detail="Unknown flag")
@@ -196,6 +204,7 @@ async def set_flag(flag_id: str, request: Request, body: dict = Body(...)):
         }},
         upsert=True,
     )
+    await audit_log.record(db, admin, "settings.flag", "feature_flags", flag_id, JOB_FLAGS[flag_id]["label"], after={"enabled": enabled}, request=request)
     return {"id": flag_id, "enabled": enabled}
 
 
@@ -239,7 +248,7 @@ async def get_stats(request: Request):
 @router.get("/users")
 async def get_users(request: Request, skip: int = 0, limit: int = 50):
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "players.read")
     users = await db.users.find({}, {"password_hash": 0}).skip(skip).limit(limit).to_list(limit)
     result = []
     for u in users:
@@ -330,7 +339,7 @@ async def get_all_leagues(request: Request, skip: int = 0, limit: int = 50):
 @router.put("/leagues/{league_id}")
 async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "leagues.write")
 
     # Capture previous status to detect activation
     prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1})
@@ -349,6 +358,7 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
         except (ValueError, TypeError) as e:
             raise HTTPException(status_code=400, detail=str(e))
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    before_doc = await db.leagues.find_one({"_id": ObjectId(league_id)}, {k: 1 for k in update_data}) or {}
     try:
         result = await db.leagues.update_one({"_id": ObjectId(league_id)}, {"$set": update_data})
     except Exception:
@@ -359,6 +369,11 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     # Flex leagues have no pre-built schedule: players are told their opponent when the admin
     # creates a round (POST /leagues/{id}/pairings), so no generic "schedule released" email here.
 
+    changed_before, changed_after = audit_log.diff(before_doc, update_data)
+    changed_before.pop("updated_at", None)
+    changed_after.pop("updated_at", None)
+    await audit_log.record(db, admin, "league.update", "league", league_id, prev.get("name", ""),
+                           before=changed_before, after=changed_after, request=request)
     return {"message": "League updated"}
 
 
@@ -412,7 +427,7 @@ async def league_schedule_overview(league_id: str, request: Request):
 async def adjust_match(match_id: str, request: Request, body: dict = Body(...)):
     """Swap Home/Away or change opponents of one generated match, before it is scheduled or played."""
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "matches.write")
     try:
         match = await db.matches.find_one({"_id": ObjectId(match_id)})
     except Exception:
@@ -421,11 +436,16 @@ async def adjust_match(match_id: str, request: Request, body: dict = Body(...)):
         raise HTTPException(status_code=404, detail="Match not found")
     league = await _get_league_or_404(db, match["league_id"])
     try:
-        return await league_schedule.adjust_match(
+        result = await league_schedule.adjust_match(
             db, league, match,
             body.get("home_id") or match["player1_id"],
             body.get("away_id") or match["player2_id"],
         )
+        await audit_log.record(db, admin, "match.adjust", "match", match_id, league.get("name", ""),
+                               before={"home_id": match.get("player1_id"), "away_id": match.get("player2_id")},
+                               after={"home_id": body.get("home_id") or match["player1_id"], "away_id": body.get("away_id") or match["player2_id"]},
+                               request=request)
+        return result
     except league_schedule.ScheduleLocked as e:
         raise HTTPException(status_code=409, detail=str(e))
     except ValueError as e:
@@ -437,7 +457,7 @@ async def set_match_time(match_id: str, request: Request, body: dict = Body(...)
     """Organizer books a match directly, for pairs who could not agree. Both players are notified."""
     import match_scheduling
     db = request.app.state.db
-    admin = await require_admin(request, db)
+    admin = await _need(request, "matches.write")
     try:
         match = await db.matches.find_one({"_id": ObjectId(match_id)})
     except Exception:
@@ -446,8 +466,11 @@ async def set_match_time(match_id: str, request: Request, body: dict = Body(...)
         raise HTTPException(status_code=404, detail="Match not found")
     league = await _get_league_or_404(db, match["league_id"])
     try:
-        return await match_scheduling.organizer_set_time(
+        result = await match_scheduling.organizer_set_time(
             db, match, league, str(admin.get("_id", "")), body.get("date", ""), body.get("venue", ""))
+        await audit_log.record(db, admin, "match.set_time", "match", match_id, league.get("name", ""),
+                               after={"date": body.get("date", ""), "venue": body.get("venue", "")}, request=request)
+        return result
     except match_scheduling.SchedulingError as e:
         raise HTTPException(status_code=e.status, detail=e.detail)
 
@@ -465,20 +488,23 @@ async def _get_league_or_404(db, league_id: str) -> dict:
 @router.delete("/leagues/{league_id}")
 async def delete_league(league_id: str, request: Request):
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "leagues.delete")
     try:
+        before_doc = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"name": 1, "city": 1, "sport": 1, "status": 1}) or {}
         result = await db.leagues.delete_one({"_id": ObjectId(league_id)})
     except Exception:
         raise HTTPException(status_code=404, detail="League not found")
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="League not found")
+    await audit_log.record(db, admin, "league.delete", "league", league_id, before_doc.get("name", ""),
+                           before={k: v for k, v in before_doc.items() if k != "_id"}, request=request)
     return {"message": "League deleted"}
 
 
 @router.get("/payments")
 async def get_payments(request: Request, skip: int = 0, limit: int = 50):
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "payments.read")
     txns = await db.payment_transactions.find({}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     result = []
     for t in txns:
@@ -532,7 +558,7 @@ async def list_pending_zelle(request: Request):
 async def approve_zelle(session_id: str, request: Request):
     """Admin approves Zelle deposit — registers player and marks transaction paid."""
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "payments.write")
 
     txn = await db.payment_transactions.find_one({"session_id": session_id})
     if not txn:
@@ -587,6 +613,7 @@ async def approve_zelle(session_id: str, request: Request):
         {"session_id": session_id},
         {"$set": {"status": "complete", "payment_status": "paid", "admin_approved": True, "updated_at": now}},
     )
+    await audit_log.record(db, admin, "payment.zelle_approve", "payment", session_id, after={"user_id": user_id, "league_id": league_id}, request=request)
     return {"message": "Approved", "user_id": user_id, "league_id": league_id}
 
 
@@ -594,7 +621,7 @@ async def approve_zelle(session_id: str, request: Request):
 async def reject_zelle(session_id: str, request: Request):
     """Admin rejects Zelle — marks transaction rejected, player NOT registered."""
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "payments.write")
 
     txn = await db.payment_transactions.find_one({"session_id": session_id})
     if not txn:
@@ -623,6 +650,7 @@ async def reject_zelle(session_id: str, request: Request):
             ),
         ))
 
+    await audit_log.record(db, admin, "payment.zelle_reject", "payment", session_id, request=request)
     return {"message": "Rejected", "session_id": session_id}
 
 
@@ -630,7 +658,7 @@ async def reject_zelle(session_id: str, request: Request):
 async def delete_user(user_id: str, request: Request):
     """Delete a user and all related data (matches, player_leagues, ratings, etc)."""
     db = request.app.state.db
-    await require_admin(request, db)
+    admin = await _need(request, "players.delete")
 
     try:
         oid = ObjectId(user_id)
@@ -640,7 +668,13 @@ async def delete_user(user_id: str, request: Request):
     user = await db.users.find_one({"_id": oid})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user_id == str(admin.get("_id", "")):
+        raise HTTPException(status_code=400, detail="You cannot delete your own account")
 
+    # Written first: the deletion cannot be undone, so the record exists even if a cleanup step below fails.
+    await audit_log.record(db, admin, "player.delete", "user", user_id, user.get("email", ""),
+                           before={"email": user.get("email"), "name": user.get("name"), "role": user.get("role"), "city": user.get("city")},
+                           request=request)
     # Delete user
     await db.users.delete_one({"_id": oid})
 
