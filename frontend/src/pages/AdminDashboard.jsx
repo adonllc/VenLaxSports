@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import EmailCampaignsTab from "../components/EmailCampaignsTab";
+import AutomationsTab from "../components/AutomationsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
@@ -283,13 +284,14 @@ export default function AdminDashboard() {
     { id: "referrals", label: "Referrals" },
     { id: "marketing", label: "Marketing" },
     { id: "email", label: "Email" },
+    { id: "automations", label: "Automations" },
     { id: "flags", label: "Feature Flags" },
     { id: "team", label: "Team" },
     { id: "audit", label: "Audit Log" },
   ];
   // What each tab needs. A convenience only: the server checks every request. Unlisted tabs are open to any admin.
   const TAB_NEEDS = {
-    dashboard: "dashboard.read", users: "players.read", players: "players.read", email: "marketing.read", marketing: "marketing.read",
+    dashboard: "dashboard.read", users: "players.read", players: "players.read", email: "marketing.read", automations: "marketing.read", marketing: "marketing.read",
     flags: "settings.write", zelle: "payments.read", create: "leagues.write", auto: "leagues.write",
     leagues: "leagues.read", ladders: "leagues.read", seasons: "leagues.read", playoffs: "leagues.read",
     team: "roles.manage", audit: "audit.read",
@@ -833,6 +835,7 @@ export default function AdminDashboard() {
         {tab === "flags" && <FlagsTab />}
         {tab === "marketing" && <MarketingTab />}
         {tab === "email" && <EmailCampaignsTab />}
+        {tab === "automations" && <AutomationsTab />}
         {tab === "team" && <TeamTab />}
         {tab === "audit" && <AuditLogTab />}
         {tab === "players" && <PlayerInsightsTab />}

@@ -4,6 +4,8 @@ async def create_indexes(db) -> None:
     await db.email_events.create_index([("campaign", 1), ("type", 1)])
     await db.email_events.create_index("at", expireAfterSeconds=60 * 60 * 24 * 730)
     await db.scheduled_emails.create_index([("status", 1), ("run_at", 1)])
+    await db.workflow_runs.create_index([("workflow_id", 1), ("user_id", 1)], unique=True)
+    await db.workflow_runs.create_index([("status", 1), ("at", -1)])
     await db.audit_log.create_index([("at", -1)])
     await db.audit_log.create_index([("action", 1), ("at", -1)])
     await db.audit_log.create_index([("admin_id", 1), ("at", -1)])

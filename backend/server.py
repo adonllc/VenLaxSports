@@ -45,6 +45,7 @@ from routes.event_routes import router as event_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.recap_routes import router as recap_router
 from routes.admin_ambassador_routes import router as ambassador_router
+from routes.admin_automation_routes import router as admin_automation_router
 from routes.admin_email_routes import router as admin_email_router, public_router as email_unsub_router
 from routes.box_league_routes import router as box_league_router
 from routes.ladder_routes import router as ladder_router
@@ -75,6 +76,7 @@ api_router.include_router(admin_player_crm_router, prefix="/admin/players", tags
 api_router.include_router(recap_router, prefix="/recaps", tags=["recaps"])
 api_router.include_router(ambassador_router, prefix="/admin/ambassadors", tags=["ambassadors"])
 api_router.include_router(admin_email_router, prefix="/admin/email", tags=["admin-email"])
+api_router.include_router(admin_automation_router, prefix="/admin/automations", tags=["admin-automations"])
 api_router.include_router(email_unsub_router, prefix="/email", tags=["email"])
 api_router.include_router(box_league_router, prefix="/box-leagues", tags=["box-leagues"])
 api_router.include_router(ladder_router, prefix="/ladders", tags=["ladders"])
