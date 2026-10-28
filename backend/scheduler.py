@@ -12,6 +12,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 import logging
 
+import email_schedule
 from email_campaign_scheduler import send_weekly_campaign
 from scheduler_jobs import (
     auto_status_transitions,
@@ -104,9 +105,19 @@ def start_scheduler(db):
             max_instances=1,
         )
 
+        scheduler.add_job(
+            email_schedule.run_due,
+            trigger=IntervalTrigger(minutes=1),
+            args=[db],
+            id="run_scheduled_emails",
+            name="Send scheduled marketing emails",
+            replace_existing=True,
+            max_instances=1,
+        )
+
         if not scheduler.running:
             scheduler.start()
-            logger.info("Scheduler started — 8 background jobs registered")
+            logger.info("Scheduler started — 9 background jobs registered")
         else:
             logger.info("Scheduler already running")
 

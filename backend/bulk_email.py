@@ -24,6 +24,7 @@ from bson import ObjectId
 
 import conversion_campaign as cc
 import email_service
+import email_tracking
 import thank_you_coupon
 from auth_utils import JWT_ALGORITHM, get_jwt_secret
 
@@ -395,6 +396,9 @@ async def send_to(db, payload: dict, rec: dict, record: bool = True, admin_id: s
             rec = {**rec, "referral_code": generate_referral_code()}
             await db.users.update_one({"_id": ObjectId(rec["id"])}, {"$set": {"referral_code": rec["referral_code"]}})
     m = render(payload, rec, coupon)
+    if record and m["cta_url"]:
+        # real sends only: a test or preview click must not count as a player's click
+        m["cta_url"] = email_tracking.click_url(campaign_key(payload), rec["id"], m["cta_url"])
     ok = await email_service.send_campaign_email(
         rec["email"], m["subject"], m["title"], m["body"], m["cta_label"], m["cta_url"], m["unsubscribe_url"], reason=m["reason"])
     if ok and record:
@@ -404,6 +408,20 @@ async def send_to(db, payload: dict, rec: dict, record: bool = True, admin_id: s
             "sent_at": datetime.now(timezone.utc).isoformat(),
         })
     return bool(ok)
+
+
+async def launch(db, payload: dict, recipients: list[dict], started_by: str, delay: float = 0.5, scheduled_id=None):
+    """Create the job row and start sending in the background. Used by an immediate send and by a scheduled one."""
+    job = {
+        "campaign_key": campaign_key(payload), "audience": payload["audience"], "total": len(recipients), "sent": 0, "failed": 0,
+        "status": "running", "subject": render(payload, recipients[0])["subject"],
+        "started_by": started_by, "started_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if scheduled_id is not None:
+        job["scheduled_id"] = str(scheduled_id)
+    job_id = (await db.email_jobs.insert_one(job)).inserted_id
+    asyncio.create_task(run_job(db, job_id, payload, recipients, delay=delay, admin_id=started_by))
+    return job_id, job
 
 
 async def run_job(db, job_id, payload: dict, recipients: list[dict], delay: float = 0.5, admin_id: str = "") -> None:

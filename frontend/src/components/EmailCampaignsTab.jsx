@@ -42,6 +42,9 @@ export default function EmailCampaignsTab() {
   const [msg, setMsg] = useState(null); // { ok, text }
   const [job, setJob] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [runAt, setRunAt] = useState("");
+  const [queued, setQueued] = useState([]);
+  const [results, setResults] = useState([]);
   const timer = useRef(null);
 
   const registered = audience === "registered";
@@ -55,10 +58,15 @@ export default function EmailCampaignsTab() {
   };
 
   const loadJobs = () => axios.get(`${API}/jobs`, { withCredentials: true }).then((r) => setJobs(r.data.jobs)).catch(() => {});
+  const loadQueue = () => {
+    axios.get(`${API}/scheduled`, { withCredentials: true }).then((r) => setQueued(r.data.scheduled)).catch(() => {});
+    axios.get(`${API}/results`, { withCredentials: true }).then((r) => setResults(r.data.campaigns)).catch(() => {});
+  };
 
   useEffect(() => {
     axios.get(`${API}/templates`, { withCredentials: true }).then((r) => setTemplates(r.data.templates)).catch(() => {});
     loadJobs();
+    loadQueue();
     return () => clearTimeout(timer.current);
   }, []);
 
@@ -117,6 +125,31 @@ export default function EmailCampaignsTab() {
       poll(data.job_id);
     }
   };
+
+  const doSchedule = async () => {
+    if (!preview || !runAt) return;
+    const when = new Date(runAt);
+    if (!window.confirm(`Send "${preview.subject}" to ${preview.recipients} people on ${when.toLocaleString()}? The list is checked again at send time, so people who unsubscribe before then are skipped.`)) return;
+    const data = await call("schedule", "schedule", { confirm_count: preview.recipients, run_at: when.toISOString() });
+    if (data) {
+      setPreview(null);
+      setRunAt("");
+      setMsg({ ok: true, text: `Scheduled for ${new Date(data.run_at).toLocaleString()}.` });
+      loadQueue();
+    }
+  };
+
+  const changeQueued = async (id, action) => {
+    try {
+      await axios.post(`${API}/scheduled/${id}/${action}`, {}, { withCredentials: true });
+      loadQueue();
+    } catch (e) {
+      setMsg({ ok: false, text: e.response?.data?.detail || "That did not work" });
+    }
+  };
+
+  const QUEUE_ACTIONS = { scheduled: [["pause", "Pause"], ["cancel", "Cancel"]], paused: [["resume", "Resume"], ["cancel", "Cancel"]], needs_review: [["release", "Send anyway"], ["cancel", "Cancel"]] };
+  const STATUS_TEXT = { scheduled: "Scheduled", paused: "Paused", sending: "Sending", sent: "Sent", cancelled: "Cancelled", needs_review: "Held for review", nobody_left: "Nobody left to send to", failed: "Failed" };
 
   return (
     <div className="space-y-6" data-testid="email-tab">
@@ -273,6 +306,17 @@ export default function EmailCampaignsTab() {
               {busy === "send" ? "Starting…" : `Send to ${preview.recipients} people`}
             </button>
           )}
+          {!preview.over_limit && preview.recipients > 0 && (
+            <div className="mt-4 flex flex-wrap items-end gap-2">
+              <div>
+                <Label>Or send later (your local time)</Label>
+                <input type="datetime-local" className={`${field} text-gray-900`} style={fieldStyle} value={runAt} onChange={(e) => setRunAt(e.target.value)} data-testid="email-run-at" />
+              </div>
+              <button onClick={doSchedule} disabled={!!busy || !runAt} className="px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ border: `1px solid ${GREEN}`, color: GREEN }} data-testid="email-schedule">
+                {busy === "schedule" ? "Scheduling…" : "Schedule"}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -284,6 +328,65 @@ export default function EmailCampaignsTab() {
           {job.status !== "running" && job.failed > 0 && (
             <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Failed ones were not recorded. Preview and send again to retry only them.</p>
           )}
+        </div>
+      )}
+
+      {queued.length > 0 && (
+        <div className="bg-white" style={{ border: "1px solid #E5E7EB" }} data-testid="email-queue">
+          <h3 className="font-heading font-bold text-base p-5 pb-3" style={{ color: "#3D3D3D" }}>Scheduled sends</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
+                  <th className="px-5 py-2">Goes out</th><th className="px-5 py-2">Email</th><th className="px-5 py-2">People</th><th className="px-5 py-2">Status</th><th className="px-5 py-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {queued.map((q) => (
+                  <tr key={q.id} style={{ borderTop: "1px solid #F3F4F6" }}>
+                    <td className="px-5 py-2 whitespace-nowrap">{new Date(q.run_at).toLocaleString()}</td>
+                    <td className="px-5 py-2">{q.subject}</td>
+                    <td className="px-5 py-2">{q.recipients ?? q.confirm_count}</td>
+                    <td className="px-5 py-2">{STATUS_TEXT[q.status] || q.status}{q.held_reason && <span className="block text-xs" style={{ color: "#92400E" }}>{q.held_reason}</span>}</td>
+                    <td className="px-5 py-2 whitespace-nowrap">
+                      {(QUEUE_ACTIONS[q.status] || []).map(([a, label]) => (
+                        <button key={a} onClick={() => changeQueued(q.id, a)} className="mr-2 text-xs font-semibold underline" style={{ color: GREEN }} data-testid={`email-queue-${a}-${q.id}`}>{label}</button>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div className="bg-white" style={{ border: "1px solid #E5E7EB" }} data-testid="email-results">
+          <h3 className="font-heading font-bold text-base p-5 pb-1" style={{ color: "#3D3D3D" }}>Results</h3>
+          <p className="px-5 pb-3 text-xs" style={{ color: "#6B7280" }}>
+            Sent means the mail server accepted it. Clicks count each person once. Opens and bounces are not tracked: mail apps hide opens, and our email provider does not report bounces.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
+                  <th className="px-5 py-2">Email</th><th className="px-5 py-2">Sent</th><th className="px-5 py-2">Failed</th><th className="px-5 py-2">Clicked</th><th className="px-5 py-2">Click rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((r) => (
+                  <tr key={r.campaign} style={{ borderTop: "1px solid #F3F4F6" }}>
+                    <td className="px-5 py-2">{r.subject}</td>
+                    <td className="px-5 py-2">{r.sent}</td>
+                    <td className="px-5 py-2">{r.failed}</td>
+                    <td className="px-5 py-2">{r.clicked}</td>
+                    <td className="px-5 py-2">{r.click_rate === null ? "n/a" : `${r.click_rate}%`}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

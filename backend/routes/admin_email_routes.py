@@ -3,21 +3,23 @@
 Admin only (not city admins). Nothing is sent by preview or test-to-self; a real send needs the recipient
 count the admin was shown.
 """
-import asyncio
-from datetime import datetime, timezone
+import logging
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 import bulk_email
 import email_service
+import email_tracking
 import audit_log
 import permissions
 from auth_utils import get_current_user
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 public_router = APIRouter()
 
@@ -111,17 +113,110 @@ async def send(body: SendRequest, request: Request):
     if await db.email_jobs.find_one({"campaign_key": key, "status": "running"}):
         raise HTTPException(status_code=409, detail="This email is already being sent")
 
-    job = {
-        "campaign_key": key, "audience": payload["audience"], "total": count, "sent": 0, "failed": 0, "status": "running",
-        "subject": bulk_email.render(payload, audience["send"][0])["subject"],
-        "started_by": str(admin["_id"]), "started_at": datetime.now(timezone.utc).isoformat(),
-    }
-    job_id = (await db.email_jobs.insert_one(job)).inserted_id
+    job_id, job = await bulk_email.launch(db, payload, audience["send"], str(admin["_id"]))
     await audit_log.record(db, admin, "email.send", "campaign", key, job["subject"],
                            after={"recipients": count, "audience": payload["audience"], "template": payload.get("template"),
                                   "segment": payload.get("segment")}, request=request)
-    asyncio.create_task(bulk_email.run_job(db, job_id, payload, audience["send"], admin_id=str(admin["_id"])))
     return {"job_id": str(job_id), "total": count}
+
+
+# ── scheduling ────────────────────────────────────────────────────────────────
+
+class ScheduleRequest(SendRequest):
+    run_at: str                        # ISO 8601 with offset, e.g. 2026-11-02T14:00:00Z
+
+
+def _parse_run_at(raw: str) -> datetime:
+    try:
+        when = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="That date and time is not valid")
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=timezone.utc)
+    now = datetime.now(timezone.utc)
+    if when < now + timedelta(minutes=2):
+        raise HTTPException(status_code=400, detail="Pick a time at least 2 minutes from now")
+    if when > now + timedelta(days=90):
+        raise HTTPException(status_code=400, detail="You can schedule up to 90 days ahead")
+    return when.astimezone(timezone.utc)
+
+
+def _row(d: dict) -> dict:
+    d = {**d, "id": str(d.pop("_id"))}
+    for k in ("run_at", "created_at"):
+        if isinstance(d.get(k), datetime):
+            d[k] = d[k].isoformat()
+    d.pop("payload", None)
+    return d
+
+
+@router.post("/schedule")
+async def schedule(body: ScheduleRequest, request: Request):
+    """Queue a send for later. The audience is rebuilt when it runs, so people who unsubscribe in between are skipped."""
+    admin = await _admin(request)
+    db = request.app.state.db
+    payload = _payload(body)
+    when = _parse_run_at(body.run_at)
+    audience = await bulk_email.build_audience(db, payload)
+    count = len(audience["send"])
+    if count == 0:
+        raise HTTPException(status_code=400, detail="Nobody to send to")
+    if count > bulk_email.MAX_RECIPIENTS:
+        raise HTTPException(status_code=400, detail=f"Too many recipients ({count}). The limit per send is {bulk_email.MAX_RECIPIENTS}.")
+    if count != body.confirm_count:
+        raise HTTPException(status_code=409, detail=f"The audience changed (now {count} people). Preview again before scheduling.")
+    doc = {
+        "payload": payload, "campaign_key": bulk_email.campaign_key(payload), "run_at": when, "confirm_count": count,
+        "subject": bulk_email.render(payload, audience["send"][0])["subject"], "status": "scheduled",
+        "created_by": str(admin["_id"]), "created_at": datetime.now(timezone.utc),
+    }
+    sid = (await db.scheduled_emails.insert_one(doc)).inserted_id
+    await audit_log.record(db, admin, "email.schedule", "campaign", doc["campaign_key"], doc["subject"],
+                           after={"run_at": when.isoformat(), "recipients": count, "audience": payload["audience"]}, request=request)
+    return {"id": str(sid), "run_at": when.isoformat(), "recipients": count}
+
+
+@router.get("/scheduled")
+async def scheduled(request: Request):
+    await _admin(request, "marketing.read")
+    rows = await request.app.state.db.scheduled_emails.find({}).sort("run_at", -1).to_list(50)
+    return {"scheduled": [_row(r) for r in rows]}
+
+
+_TRANSITIONS = {"pause": ("scheduled", "paused"), "resume": ("paused", "scheduled"),
+                "cancel": ("scheduled", "cancelled"), "release": ("needs_review", "scheduled")}
+
+
+@router.post("/scheduled/{sid}/{action}")
+async def change_scheduled(sid: str, action: str, request: Request):
+    """pause, resume or cancel a queued send. `release` re-queues one that was held for review because its audience grew."""
+    admin = await _admin(request)
+    if action not in _TRANSITIONS or not ObjectId.is_valid(sid):
+        raise HTTPException(status_code=404, detail="Not found")
+    before, after = _TRANSITIONS[action]
+    db = request.app.state.db
+    doc = await db.scheduled_emails.find_one({"_id": ObjectId(sid)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Not found")
+    if action == "release":
+        # the admin has looked at it: accept today's audience size as the new confirmed count
+        audience = await bulk_email.build_audience(db, doc["payload"])
+        extra = {"confirm_count": len(audience["send"]), "run_at": datetime.now(timezone.utc) + timedelta(minutes=2)}
+    else:
+        extra = {}
+    res = await db.scheduled_emails.update_one({"_id": doc["_id"], "status": before}, {"$set": {"status": after, **extra}})
+    if not res.matched_count:
+        raise HTTPException(status_code=409, detail=f"It is {doc['status']}, so it cannot be {action}d")
+    await audit_log.record(db, admin, f"email.schedule_{action}", "campaign", doc["campaign_key"], doc["subject"], request=request)
+    return {"id": sid, "status": after}
+
+
+@router.get("/results")
+async def results(request: Request):
+    """Per-campaign results: sent, failed, people who clicked, click rate. Opens and bounces are not tracked."""
+    await _admin(request, "marketing.read")
+    return {"campaigns": await email_tracking.campaign_results(request.app.state.db),
+            "not_tracked": ["opens", "bounces"]}
 
 
 @router.get("/jobs/{job_id}")
@@ -146,6 +241,19 @@ async def recent_jobs(request: Request):
     for j in jobs:
         j["id"] = str(j.pop("_id"))
     return {"jobs": jobs}
+
+
+@public_router.get("/click")
+async def click(request: Request, t: str):
+    """Record one click and send the visitor to the page. A bad or edited link goes to the home page, never elsewhere."""
+    c = email_tracking.decode_click(t)
+    if not c:
+        return RedirectResponse(bulk_email.SITE, status_code=302)
+    try:
+        await email_tracking.record_click(request.app.state.db, c["campaign"], c["user_id"])
+    except Exception:  # noqa: BLE001 - never block the visitor over a stats failure
+        logger.exception("could not record email click")
+    return RedirectResponse(c["destination"], status_code=302)
 
 
 @public_router.get("/unsubscribe", response_class=HTMLResponse)
