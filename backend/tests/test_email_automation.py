@@ -250,3 +250,16 @@ def test_history_and_list_show_what_happened(as_admin, sent):
     assert {(r["email"], r["status"]) for r in h} == {("new@x.com", "sent"), ("opt@x.com", "exited")}
     row = run(routes.list_workflows(req(db)))["workflows"][0]
     assert row["stats"] == {"sent": 1, "failed": 0, "exited": 1} and "payload" not in row
+
+
+def test_list_and_history_responses_are_json_safe(as_admin, sent):
+    """The API encodes responses as JSON: a leftover ObjectId or datetime would be a 500 in the browser."""
+    import json
+    db = Db()
+    db.player("new@x.com", 30)
+    wf = workflow(db)
+    wf["created_at"] = NOW
+    go(db)
+    json.dumps(run(routes.list_workflows(req(db))))
+    json.dumps(run(routes.history(str(wf["_id"]), req(db))))
+    assert "_id" not in run(routes.list_workflows(req(db)))["workflows"][0]

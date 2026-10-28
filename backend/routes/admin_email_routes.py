@@ -142,7 +142,8 @@ def _parse_run_at(raw: str) -> datetime:
 
 
 def _row(d: dict) -> dict:
-    d = {**d, "id": str(d.pop("_id"))}
+    d = {**d}
+    d["id"] = str(d.pop("_id"))
     for k in ("run_at", "created_at"):
         if isinstance(d.get(k), datetime):
             d[k] = d[k].isoformat()

@@ -50,7 +50,8 @@ def _clean(body: WorkflowIn) -> dict:
 
 
 def _out(d: dict, stats: dict | None = None) -> dict:
-    d = {**d, "id": str(d.pop("_id"))}
+    d = {**d}
+    d["id"] = str(d.pop("_id"))
     for k in ("enabled_at", "created_at", "updated_at"):
         if isinstance(d.get(k), datetime):
             d[k] = d[k].isoformat()

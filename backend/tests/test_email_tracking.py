@@ -176,3 +176,13 @@ def test_run_time_must_be_a_sensible_future_time():
         assert e.value.status_code == 400
     ok = (datetime.now(timezone.utc) + timedelta(days=2)).isoformat().replace("+00:00", "Z")
     assert routes._parse_run_at(ok).tzinfo is not None
+
+
+def test_scheduled_list_is_json_safe():
+    """A leftover ObjectId or datetime would be a 500 in the browser, so encode it the strict way."""
+    import json
+    db = Db()
+    queue(db)
+    out = {"scheduled": [routes._row(d) for d in db.scheduled_emails.docs]}
+    json.dumps(out)
+    assert "_id" not in out["scheduled"][0] and "payload" not in out["scheduled"][0]
