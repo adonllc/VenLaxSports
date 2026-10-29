@@ -220,7 +220,7 @@ export default function Home() {
                 </span>
               </motion.h1>
               <motion.p className="mt-8 text-lg md:text-2xl font-medium text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2 }}>
-                Ranked leagues for Tennis &amp; Pickleball
+                Tennis &amp; Pickleball leagues built around your week.
               </motion.p>
               <motion.p className="mt-2 text-base md:text-lg text-white/90" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.25 }}>
                 Flexible leagues. Real competition. Your own schedule.
