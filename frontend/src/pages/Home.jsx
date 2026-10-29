@@ -211,7 +211,7 @@ export default function Home() {
       <div className="min-h-screen flex flex-col bg-white" style={{ color: BODY }}>
         {/* 1. HERO */}
         <section className="relative">
-          <PhotoSlot tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
+          <PhotoSlot tone="ink" overlay={false} className="isolate min-h-[620px] md:min-h-[760px]">
             <HeroSlideshow photos={HERO_SLIDES} label="Players competing in Tennis and Pickleball leagues" />
             <div className="absolute inset-0 z-[5]" style={{ background: "rgba(61,61,61,0.46)" }} />
             <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
@@ -263,7 +263,7 @@ export default function Home() {
             </div>
           </PhotoSlot>
 
-          <div className="relative -mt-24 md:-mt-20 px-4 sm:px-6">
+          <div className="relative z-10 -mt-24 md:-mt-20 px-4 sm:px-6">
             <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-6 justify-between" style={{ background: GREEN }}>
               <div className="text-center md:text-left">
                 <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "#fff" }} data-testid="hero-tagline">Your Game. Your Schedule. Your Community.</h2>
