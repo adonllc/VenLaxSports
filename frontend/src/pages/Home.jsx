@@ -206,15 +206,16 @@ export default function Home() {
             <div className="absolute inset-0" style={{ background: "rgba(61,61,61,0.38)" }} />
             <div className="relative flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
               <motion.h1
-                className="font-bold italic text-6xl sm:text-8xl md:text-[144px] leading-[0.95] text-white"
+                className="font-bold italic text-[52px] sm:text-8xl md:text-[128px] leading-[0.95] text-white"
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
+                data-testid="hero-headline"
               >
-                Play
+                Game On.
                 <span className="block mt-2">
-                  <span className="inline-block px-5 md:px-8" style={{ background: GREEN, transform: "skewX(-8deg)" }}>
-                    <span className="inline-block" style={{ transform: "skewX(8deg)" }}>Ranked</span>
+                  <span className="inline-block px-4 md:px-8" style={{ background: GREEN, transform: "skewX(-8deg)" }}>
+                    <span className="inline-block" style={{ transform: "skewX(8deg)" }}>Your Time.</span>
                   </span>
                 </span>
               </motion.h1>
