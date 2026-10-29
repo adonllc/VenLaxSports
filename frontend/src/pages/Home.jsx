@@ -13,6 +13,7 @@ import { PHOTOS, GALLERY } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
 import Slant from "../components/Slant";
 import HeroSlideshow from "../components/HeroSlideshow";
+import StickyJoinBar from "../components/StickyJoinBar";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
@@ -29,6 +30,10 @@ const fadeUp = {
   viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.6, ease: "easeOut" },
 };
+
+// While any of these is on screen the phone join bar stays hidden (the page already offers a join button there)
+const STICKY_WATCH = ['[data-testid="hero-join-venlax"]', '[data-testid="home-closing-cta"]', "footer"];
+const STICKY_HIDE = ["[data-testid=\"consent-banner\"]"];
 
 // Hero background rotation: alternates the two sports so both show on first visit
 const HERO_SLIDES = [GALLERY.tennis[1], GALLERY.pickleball[0], GALLERY.tennis[2], GALLERY.pickleball[3], GALLERY.tennis[3]];
@@ -546,6 +551,8 @@ export default function Home() {
             </div>
           </div>
         </Section>
+
+        <StickyJoinBar watch={STICKY_WATCH} hideWhilePresent={STICKY_HIDE} label={user ? "Find a league" : "Join a league"} to={user ? "/leagues" : "/auth"} />
 
         {/* 9. FAQ */}
         <Section>
