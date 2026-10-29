@@ -6,6 +6,7 @@ import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
   ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles, UserPlus, Swords,
+  TrendingUp, Clock, MapPin, LayoutDashboard,
 } from "lucide-react";
 import { activeSports, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 import { PHOTOS } from "../config/photos";
@@ -39,6 +40,20 @@ const FEATURES = [
   { slug: "cards", icon: Share2, title: "Shareable match cards", body: "Every result becomes a card with the score and rating change, ready to post.", to: "/auth" },
   { slug: "rewards", icon: Gift, title: "Rewards and referrals", body: "Bring a friend and you both get $5 credit toward your next league.", to: "/rewards" },
   { slug: "safe", icon: ShieldCheck, title: "Safe and fair play", body: "Digital waiver, parental consent for minors, 2FA sign-in and fair disputes.", to: "/terms" },
+];
+
+// The four-step promise, shown straight under the hero
+const PILLARS = [
+  { slug: "match", icon: Users, title: "Find Your Match", body: "Connect with players at your level." },
+  { slug: "way", icon: CalendarCheck, title: "Play Your Way", body: "Schedule matches around your availability." },
+  { slug: "progress", icon: TrendingUp, title: "Track Your Progress", body: "Follow your results, stats, and rankings." },
+  { slug: "compete", icon: Trophy, title: "Compete for More", body: "Compete in leagues and advance to playoffs." },
+];
+
+const FLEX_BENEFITS = [
+  { slug: "when", icon: Clock, title: "Play When It Works for You", body: "Coordinate match times with your opponents instead of relying exclusively on a fixed group schedule." },
+  { slug: "near", icon: MapPin, title: "Find Players Near You", body: "Discover opportunities to play with others in your preferred location, where supported." },
+  { slug: "track", icon: LayoutDashboard, title: "Stay on Track", body: "Keep up with your matches, deadlines, and league progress from your player dashboard." },
 ];
 
 // The three problems players told us about, in their words
@@ -207,7 +222,7 @@ export default function Home() {
                 Ranked leagues for Tennis &amp; Pickleball
               </motion.p>
               <motion.p className="mt-2 text-base md:text-lg text-white/90" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.25 }}>
-                Find a league. Play. Rise.
+                Flexible leagues. Real competition. Your own schedule.
               </motion.p>
               <motion.p className="mt-4 text-base md:text-xl font-bold text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.28 }} data-testid="hero-offer-line">
                 Competitive leagues in your city. No club membership.
@@ -232,15 +247,67 @@ export default function Home() {
           <div className="relative -mt-24 md:-mt-20 px-4 sm:px-6">
             <div className="max-w-[1100px] mx-auto text-white px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-6 justify-between" style={{ background: GREEN }}>
               <div className="text-center md:text-left">
-                <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "#fff" }}>Skill-matched leagues</h2>
-                <p className="mt-1 text-white/90">Live standings and a rating that follows you from match to match.</p>
+                <h2 className="font-bold text-2xl md:text-3xl" style={{ color: "#fff" }} data-testid="hero-tagline">Your Game. Your Schedule. Your Community.</h2>
+                <p className="mt-1 text-white/90">Skill-matched leagues, live standings and a rating that follows you from match to match.</p>
               </div>
               <AmberButton onClick={() => navigate("/leagues")}>Find a league</AmberButton>
             </div>
           </div>
         </section>
 
-        {/* 1b. THE PROBLEM, IN PLAYERS' WORDS */}
+        {/* 1a. THE FOUR-STEP PROMISE */}
+        <section className="px-4 sm:px-6 pt-16 md:pt-20 pb-6" aria-label="How VenLax works">
+          <ol className="max-w-[1100px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x divide-[#E4E4E4]" data-testid="home-pillars">
+            {PILLARS.map((p, i) => (
+              <motion.li key={p.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.08 }} className="flex gap-4 py-6 lg:py-2 lg:px-7 first:lg:pl-0 last:lg:pr-0" data-testid={`home-pillar-${p.slug}`}>
+                <div className="w-12 h-12 shrink-0 flex items-center justify-center" style={{ background: GREEN }}>
+                  <p.icon className="w-6 h-6 text-white" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-xl leading-tight" style={{ color: INK }}>{p.title}</h3>
+                  <p className="mt-1 text-base leading-snug">{p.body}</p>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+        </section>
+
+        {/* 1b. FLEXIBLE SCHEDULING */}
+        <Section tint id="flexible-scheduling">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+            <div>
+              <motion.div {...fadeUp}>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GREEN }}>Flexible scheduling</p>
+                <h2 className="font-bold text-4xl md:text-6xl leading-[1.05]" style={{ color: INK }}>Life is busy. Your game should fit in.</h2>
+                <p className="mt-5 text-lg font-bold" style={{ color: INK }}>Early mornings. Weekend commitments. Busy work schedules.</p>
+                <p className="mt-3 text-lg">Finding time to play should not be the hardest part of being an athlete.</p>
+                <p className="mt-3 text-lg">VenLax helps players coordinate matches around their availability, making organized competition more accessible to people with different schedules.</p>
+              </motion.div>
+              <ul className="mt-8 divide-y divide-[#DADADA]" data-testid="home-flex-benefits">
+                {FLEX_BENEFITS.map((b, i) => (
+                  <motion.li key={b.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.08 }} className="flex gap-4 py-5" data-testid={`home-flex-${b.slug}`}>
+                    <b.icon className="w-6 h-6 shrink-0 mt-0.5" style={{ color: GREEN }} aria-hidden="true" />
+                    <div>
+                      <h3 className="font-bold text-lg" style={{ color: INK }}>{b.title}</h3>
+                      <p className="text-base leading-snug">{b.body}</p>
+                    </div>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+            <motion.div {...fadeUp} className="flex flex-col gap-6">
+              <Slant src={PHOTOS.community} alt="Players finishing a match at sunset" dir="right" className="aspect-[4/5] w-full" />
+              <div className="px-6 py-5 text-white" style={{ background: GREEN }}>
+                <p className="font-bold text-xl md:text-2xl leading-snug" data-testid="home-flex-line">Your opponents. Your preferred time. Your next match.</p>
+                <div className="mt-4">
+                  <AmberButton onClick={() => navigate("/leagues")} testId="home-flex-cta">Find a league <ArrowRight className="w-4 h-4" aria-hidden="true" /></AmberButton>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </Section>
+
+        {/* 1c. THE PROBLEM, IN PLAYERS' WORDS */}
         <Section>
           <Heading eyebrow="Why leagues" title="Sound familiar?" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
