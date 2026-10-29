@@ -9,9 +9,10 @@ import {
   TrendingUp, Clock, MapPin, LayoutDashboard,
 } from "lucide-react";
 import { activeSports, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
-import { PHOTOS } from "../config/photos";
+import { PHOTOS, GALLERY } from "../config/photos";
 import PhotoSlot from "../components/PhotoSlot";
 import Slant from "../components/Slant";
+import HeroSlideshow from "../components/HeroSlideshow";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../components/ui/accordion";
 
@@ -28,6 +29,9 @@ const fadeUp = {
   viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.6, ease: "easeOut" },
 };
+
+// Hero background rotation: alternates the two sports so both show on first visit
+const HERO_SLIDES = [GALLERY.tennis[1], GALLERY.pickleball[0], GALLERY.tennis[2], GALLERY.pickleball[3], GALLERY.tennis[3]];
 
 // ---------------------------------------------------------------- content
 const FEATURES = [
@@ -202,9 +206,10 @@ export default function Home() {
       <div className="min-h-screen flex flex-col bg-white" style={{ color: BODY }}>
         {/* 1. HERO */}
         <section className="relative">
-          <PhotoSlot src={PHOTOS.hero} alt="Players competing in a league match" tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
-            <div className="absolute inset-0" style={{ background: "rgba(61,61,61,0.38)" }} />
-            <div className="relative flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
+          <PhotoSlot tone="ink" overlay={false} className="min-h-[620px] md:min-h-[760px]">
+            <HeroSlideshow photos={HERO_SLIDES} label="Players competing in Tennis and Pickleball leagues" />
+            <div className="absolute inset-0 z-[5]" style={{ background: "rgba(61,61,61,0.46)" }} />
+            <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 pt-24 pb-44 min-h-[620px] md:min-h-[760px]">
               <motion.h1
                 className="font-bold italic text-[52px] sm:text-8xl md:text-[128px] leading-[0.95] text-white"
                 initial={{ opacity: 0, y: 28 }}
@@ -214,8 +219,16 @@ export default function Home() {
               >
                 Game On.
                 <span className="block mt-2">
-                  <span className="inline-block px-4 md:px-8" style={{ background: GREEN, transform: "skewX(-8deg)" }}>
-                    <span className="inline-block" style={{ transform: "skewX(8deg)" }}>Your Time.</span>
+                  <span className="relative inline-block px-4 md:px-8">
+                    <motion.span
+                      aria-hidden="true"
+                      className="absolute inset-0"
+                      style={{ background: GREEN, skewX: -8, originX: 0 }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                    <span className="relative inline-block">Your Time.</span>
                   </span>
                 </span>
               </motion.h1>
