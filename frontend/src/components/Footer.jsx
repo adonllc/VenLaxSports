@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import platformConfig, { activeSports, indexedCities } from "../config/platformConfig";
+import { activeSports, indexedCities } from "../config/platformConfig";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import { cityPath } from "../utils/citySlug";
 import CityStatusTag from "./CityStatusTag";
@@ -35,11 +35,8 @@ export default function Footer() {
             <div className="mb-4">
               <Logo size="md" variant="default" testId="footer-logo" />
             </div>
-            <p className="text-sm font-semibold leading-relaxed text-[#3D3D3D] mb-2" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
+            <p className="text-sm font-semibold leading-relaxed text-[#3D3D3D] mb-3" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
               {BRAND.tagline_short}
-            </p>
-            <p className="text-sm text-[#5C5C5C] mb-3" style={{ fontFamily: "Rubik, sans-serif" }}>
-              {platformConfig.footerTagline}
             </p>
             <div className="flex items-center gap-4">
               {activeSports.map((s) => (
@@ -56,9 +53,9 @@ export default function Footer() {
 
           {/* Links Groups — Compact, 2-column on desktop */}
           <div className="md:col-span-2 flex md:justify-end">
-            <div className="grid grid-cols-2 md:inline-grid md:grid-cols-3 gap-8 md:gap-x-16">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-7 md:inline-grid md:grid-cols-3 md:gap-x-16 md:gap-y-8">
               {/* Sports */}
-              <div aria-label="Sports navigation">
+              <div aria-label="Sports navigation" className="col-start-2 row-start-1 md:col-auto md:row-auto">
                 <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Sports
                 </h3>
@@ -78,7 +75,7 @@ export default function Footer() {
               </div>
 
               {/* Platform */}
-              <div aria-label="Platform navigation">
+              <div aria-label="Platform navigation" className="col-start-1 row-start-1 row-span-2 md:col-auto md:row-auto md:row-span-1">
                 <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Platform
                 </h3>
@@ -104,7 +101,7 @@ export default function Footer() {
               </div>
 
               {/* Legal + Support */}
-              <div aria-label="Legal and support navigation">
+              <div aria-label="Legal and support navigation" className="col-start-2 row-start-2 md:col-auto md:row-auto">
                 <h3 className="font-bold text-xs uppercase tracking-widest mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", fontSize: "11px", letterSpacing: "0.12em" }}>
                   Legal
                 </h3>
@@ -143,7 +140,7 @@ export default function Footer() {
 
         {/* Feedback — bug reports and suggestions go straight to the team inbox */}
         <div
-          className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-white border border-[#3D3D3D]/10"
+          className="mb-8 max-w-4xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 p-4 bg-white border border-[#3D3D3D]/10"
           data-testid="footer-feedback"
         >
           <p className="text-sm text-[#5C5C5C]" style={{ fontFamily: "Rubik, sans-serif" }}>
@@ -152,7 +149,7 @@ export default function Footer() {
           </p>
           <a
             href={`mailto:${BRAND.feedback_email}?subject=${encodeURIComponent("VENLAX Sports feedback")}`}
-            className="shrink-0 text-center px-6 py-3 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
+            className="shrink-0 text-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
             style={{ background: "#F2A922", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
             data-testid="footer-email-team"
           >
