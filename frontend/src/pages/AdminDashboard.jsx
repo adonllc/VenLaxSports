@@ -8,7 +8,7 @@ import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
 import DashboardTab from "../components/DashboardTab";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap } from "lucide-react";
+import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap, Gift } from "lucide-react";
 import platformConfig, { activeSportIds, activeCountry } from "../config/platformConfig";
 import DisputeEscalationPanel from "../components/DisputeEscalationPanel";
 
@@ -311,6 +311,21 @@ export default function AdminDashboard() {
               <p className="text-sm" style={{ color: "#6B7280" }}>Manage leagues, players, and platform analytics</p>
             </div>
           </div>
+          <Link
+            to="/rewards"
+            className="flex items-center justify-between gap-3 bg-white p-4 mt-4"
+            style={{ border: "1px solid #E5E7EB" }}
+            data-testid="admin-rewards-link"
+          >
+            <span className="flex items-center gap-3">
+              <Gift className="w-5 h-5" style={{ color: "#F2A922" }} />
+              <span>
+                <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Rewards & Credits</span>
+                <span className="block text-xs" style={{ color: "#4C4C4C" }}>Share your code. You both get $5 credit.</span>
+              </span>
+            </span>
+            <span className="text-xs font-semibold" style={{ color: "#008F70" }}>View</span>
+          </Link>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-x-1">

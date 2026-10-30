@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff, Share2 } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff, Share2, Gift } from "lucide-react";
 import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
 import useReferralCode from "../hooks/useReferralCode";
@@ -416,6 +416,22 @@ export default function PlayerDashboard() {
             </div>
           </div>
         )}
+
+        <Link
+          to="/rewards"
+          className="flex items-center justify-between gap-3 bg-white p-4 mb-6"
+          style={{ border: "1px solid #E5E7EB" }}
+          data-testid="dashboard-rewards-link"
+        >
+          <span className="flex items-center gap-3">
+            <Gift className="w-5 h-5" style={{ color: "#F2A922" }} />
+            <span>
+              <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Rewards & Credits</span>
+              <span className="block text-xs" style={{ color: "#4C4C4C" }}>Share your code. You both get $5 credit.</span>
+            </span>
+          </span>
+          <span className="text-xs font-semibold" style={{ color: "#008F70" }}>View</span>
+        </Link>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* My Leagues */}

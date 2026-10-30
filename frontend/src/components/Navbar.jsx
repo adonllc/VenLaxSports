@@ -322,6 +322,13 @@ export default function Navbar() {
                 >
                   My Dashboard
                 </Link>
+                <Link
+                  to="/rewards"
+                  className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+                  data-testid="nav-rewards-mobile"
+                >
+                  Rewards & Credits
+                </Link>
                 {user.role === "admin" && (
                   <Link
                     to="/admin"
