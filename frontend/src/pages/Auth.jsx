@@ -26,6 +26,7 @@ export default function Auth() {
     email: "",
     password: "",
     name: "",
+    phone: "",
     country: platformConfig.country,
     city: "",
     skill_level: "",
@@ -465,6 +466,31 @@ export default function Auth() {
                 </div>
               )}
             </div>
+
+            {mode === "register" && (
+              <div>
+                <label htmlFor="input-phone" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "Rubik, sans-serif" }}>Phone Number (optional)</label>
+                <input
+                  id="input-phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={update("phone")}
+                  placeholder="e.g. +1-555-0123"
+                  className="w-full px-4 py-3 rounded-lg text-sm transition-colors"
+                  style={{
+                    border: "1px solid #E5E7EB",
+                    color: "#3D3D3D",
+                    background: "white",
+                    fontFamily: "Rubik, sans-serif"
+                  }}
+                  onFocus={e => e.currentTarget.style.outline = "2px solid #008F70"}
+                  onBlur={e => e.currentTarget.style.outline = "none"}
+                  data-testid="input-phone"
+                  autoComplete="tel"
+                />
+                <p className="text-xs mt-1.5" style={{ color: "#4C4C4C" }}>Add your number to receive match and league notifications.</p>
+              </div>
+            )}
 
             <div>
               <label htmlFor="input-password" className="block text-sm font-medium mb-1.5" style={{ color: "#374151", fontFamily: "Rubik, sans-serif" }}>Password *</label>

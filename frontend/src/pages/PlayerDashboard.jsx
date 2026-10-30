@@ -24,6 +24,10 @@ export default function PlayerDashboard() {
   const [leagues, setLeagues] = useState([]);
   const [matches, setMatches] = useState([]);
   const [togglingNotif, setTogglingNotif] = useState(false);
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneDraft, setPhoneDraft] = useState("");
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   const [togglingPrivacy, setTogglingPrivacy] = useState(false);
   const [interests, setInterests] = useState([]);
   const [shareOpenId, setShareOpenId] = useState(null);
@@ -157,6 +161,20 @@ export default function PlayerDashboard() {
     }
   };
 
+  const savePhone = async () => {
+    setSavingPhone(true);
+    setPhoneError("");
+    try {
+      await axios.patch(`${API}/users/me`, { phone: phoneDraft.trim() || null }, { withCredentials: true });
+      await fetchMe();
+      setEditingPhone(false);
+    } catch (err) {
+      setPhoneError("Could not save phone number. Try again.");
+    } finally {
+      setSavingPhone(false);
+    }
+  };
+
   if (!user) return null;
 
   const wins = matches.filter((m) => m.status === "completed" && (m.winner_id === user.id || m.winner_id === user._id)).length;
@@ -225,6 +243,53 @@ export default function PlayerDashboard() {
               <div className="flex flex-wrap items-center gap-3 mt-1 text-sm" style={{ color: "#6B7280" }}>
                 <span className="truncate">{user.email}</span>
                 {user.city && <span className="flex items-center gap-1 flex-shrink-0"><MapPin className="w-3 h-3" />{user.city}</span>}
+              </div>
+              <div className="mt-2 text-sm" style={{ color: "#4C4C4C" }} data-testid="phone-section">
+                {editingPhone ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="tel"
+                      value={phoneDraft}
+                      onChange={(e) => setPhoneDraft(e.target.value)}
+                      placeholder="e.g. +1-555-0123"
+                      autoComplete="tel"
+                      className="px-3 py-1.5 text-sm"
+                      style={{ border: "1px solid #E5E7EB", color: "#3D3D3D", background: "white" }}
+                      data-testid="input-dashboard-phone"
+                    />
+                    <button
+                      onClick={savePhone}
+                      disabled={savingPhone}
+                      className="px-3 py-1.5 text-xs font-bold disabled:opacity-60"
+                      style={{ background: "#F2A922", color: "#1D1D1D" }}
+                      data-testid="save-phone-btn"
+                    >
+                      {savingPhone ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={() => { setEditingPhone(false); setPhoneError(""); }}
+                      className="text-xs font-semibold"
+                      style={{ color: "#6B7280" }}
+                      data-testid="cancel-phone-btn"
+                    >
+                      Cancel
+                    </button>
+                    {phoneError && <span className="text-xs text-red-600 w-full">{phoneError}</span>}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>{user.phone ? `Phone: ${user.phone}` : "No phone number added"}</span>
+                    <button
+                      onClick={() => { setPhoneDraft(user.phone || ""); setEditingPhone(true); }}
+                      className="text-xs font-semibold"
+                      style={{ color: "#008F70" }}
+                      data-testid="edit-phone-btn"
+                    >
+                      {user.phone ? "Edit" : "Add phone"}
+                    </button>
+                    {!user.phone && <span className="text-xs" style={{ color: "#6B7280" }}>Add it to receive match and league notifications.</span>}
+                  </div>
+                )}
               </div>
               <button
                 onClick={toggleNotifications}

@@ -53,13 +53,21 @@ TEMPLATES: dict[str, dict] = {
     },
     "refer_friend": {
         "label": "Refer a friend",
-        "subject": "Bring a friend. You both get $5",
-        "title": "Play with someone you know",
-        "cta": ("Open your rewards", "/rewards"),
+        "subject": "Your next match is better with someone you know",
+        "title": "Earn credit by referring friends",
+        "cta": ("Get my referral code", "/rewards"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p>Your referral code is on your Rewards page. When a friend signs up with it and plays their first confirmed match, you both get $5 credit.</p>
-          <p>Every third friend earns you an extra $10. Three friends is $25 for you. Credit expires 12 months after it is issued.</p>
+          <p>Think about who you play with every week. The hitting partner who never says no. The coworker who keeps asking when you will go again. The neighbor who just picked up a racket.</p>
+          <p>Right now they are probably still looking for a game. You could be the reason they find one.</p>
+          <p><strong>What happens when you bring them in:</strong></p>
+          <ul style="padding-left:18px;margin:0 0 16px">
+            <li>🎾 You both get <strong>$5 credit</strong> once they play their first confirmed match.</li>
+            <li>🏆 <strong>Every third friend earns you an extra $10.</strong> Three friends is $25 in credit.</li>
+            <li>🤝 More players near you means closer ratings, easier doubles partners and faster matches.</li>
+          </ul>
+          <p><strong>Why now:</strong> registration for a league season closes once the season opens. Friends who join in time start on the same day as you. Friends who wait sit out a whole season. Credit expires 12 months after it is issued, so earn it while it counts.</p>
+          <p>Help a new player get their first league match, and help your local community become the place where everyone has someone to play. Your code is waiting on your Rewards page.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
     "thank_you": {
