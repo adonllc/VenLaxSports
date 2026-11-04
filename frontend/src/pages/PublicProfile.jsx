@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { Trophy, Share2, Swords, MapPin, UserPlus, UserCheck } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import PlayProfileChips from "../components/PlayProfileChips";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -152,6 +153,11 @@ export default function PublicProfile() {
                   <MapPin className="w-3.5 h-3.5 shrink-0" />
                   {profile.city}{profile.country ? `, ${profile.country}` : ""}
                 </p>
+              )}
+              {profile.play_profile && (
+                <div className="mt-3">
+                  <PlayProfileChips profile={profile.play_profile} testId="public-play-profile" />
+                </div>
               )}
             </div>
             <button

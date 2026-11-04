@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Search, User, X } from "lucide-react";
+import { profileChips } from "../config/playProfile";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -124,6 +125,16 @@ export default function OpponentSearch({ leagueId, value, onSelect, testId = "op
                   </span>
                 </p>
                 <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                {(() => {
+                  const bits = profileChips({
+                    court_side: u.court_side,
+                    play_style: u.play_style,
+                    looking_for_partner: u.looking_for_partner,
+                  });
+                  return bits.length ? (
+                    <p className="text-[11px] text-gray-400 truncate" data-testid={`${testId}-play-${u.id}`}>{bits.join(" · ")}</p>
+                  ) : null;
+                })()}
               </div>
             </button>
           ))}
