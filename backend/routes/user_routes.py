@@ -6,9 +6,22 @@ from bson import ObjectId
 from datetime import datetime, timezone
 from auth_utils import get_current_user
 from rating_utils import seed_starting_rating
-from models import UserFollow
+from models import UserFollow, PlayProfile
 
 router = APIRouter()
+
+
+def play_search_fields(u: dict) -> dict:
+    """Play-profile bits shown in opponent search. Empty for private profiles."""
+    empty = {"court_side": None, "play_style": None, "looking_for_partner": False}
+    if not u.get("profile_public", True):
+        return empty
+    pp = u.get("play_profile") or {}
+    return {
+        "court_side": pp.get("court_side"),
+        "play_style": pp.get("play_style"),
+        "looking_for_partner": bool(pp.get("looking_for_partner")),
+    }
 
 
 @router.get("/search")
@@ -58,6 +71,7 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
             "tennis_rating": u.get("tennis_rating"),
             "cricket_rating": u.get("cricket_rating"),
             "pickleball_rating": u.get("pickleball_rating"),
+            **play_search_fields(u),
         })
     return results
 
@@ -71,6 +85,7 @@ class UserProfileUpdate(BaseModel):
     dupr_rating: Optional[str] = None
     gender: Optional[str] = None
     sport_preferences: Optional[List[str]] = None
+    play_profile: Optional[PlayProfile] = None
 
 
 class ProfileSetupIn(BaseModel):
@@ -78,6 +93,7 @@ class ProfileSetupIn(BaseModel):
     skill_level: Optional[str] = None
     home_court: Optional[str] = None
     city: Optional[str] = None
+    play_profile: Optional[PlayProfile] = None
 
 
 @router.patch("/me/setup")
@@ -94,6 +110,8 @@ async def profile_setup(body: ProfileSetupIn, request: Request):
         update["home_court"] = body.home_court
     if body.city is not None:
         update["city"] = body.city
+    if body.play_profile is not None:
+        update["play_profile"] = body.play_profile.model_dump(exclude_unset=True)
     await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
     if body.skill_level is not None:
         await seed_starting_rating(db, str(user["_id"]), body.skill_level)

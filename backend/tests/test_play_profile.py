@@ -45,3 +45,45 @@ class TestPlayProfileModel:
         assert u.play_profile is None
         u2 = User(email="a@b.co", name="A", play_profile={"court_side": "either"})
         assert u2.play_profile.court_side == "either"
+
+
+from routes.user_routes import (
+    UserProfileUpdate, ProfileSetupIn, play_search_fields,
+)
+
+
+class TestRequestModels:
+    def test_profile_update_dumps_only_set_nested_keys(self):
+        body = UserProfileUpdate(play_profile={"court_side": "left"})
+        assert body.model_dump(exclude_unset=True) == {"play_profile": {"court_side": "left"}}
+
+    def test_profile_update_null_clears(self):
+        body = UserProfileUpdate(play_profile=None)
+        assert body.model_dump(exclude_unset=True) == {"play_profile": None}
+
+    def test_profile_update_rejects_bad_enum(self):
+        with pytest.raises(ValidationError):
+            UserProfileUpdate(play_profile={"court_side": "middle"})
+
+    def test_setup_accepts_play_profile(self):
+        body = ProfileSetupIn(play_profile={"looking_for_partner": True})
+        assert body.play_profile.looking_for_partner is True
+
+
+class TestSearchFields:
+    def test_returns_fields_for_public_user(self):
+        u = {"profile_public": True, "play_profile": {
+            "court_side": "right", "play_style": {"tennis": "baseline"}, "looking_for_partner": True,
+            "dominant_hand": "left"}}
+        assert play_search_fields(u) == {
+            "court_side": "right",
+            "play_style": {"tennis": "baseline"},
+            "looking_for_partner": True,
+        }
+
+    def test_hidden_for_private_user(self):
+        u = {"profile_public": False, "play_profile": {"court_side": "right", "looking_for_partner": True}}
+        assert play_search_fields(u) == {"court_side": None, "play_style": None, "looking_for_partner": False}
+
+    def test_missing_profile(self):
+        assert play_search_fields({}) == {"court_side": None, "play_style": None, "looking_for_partner": False}
