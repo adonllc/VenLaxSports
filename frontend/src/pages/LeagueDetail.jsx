@@ -59,6 +59,7 @@ export default function LeagueDetail() {
   const [inviteToken, setInviteToken] = useState(null);
   const [partnerMode, setPartnerMode] = useState("have"); // "have" = pick or invite a partner now, "later" = add partner after registering
   const [partnerLater, setPartnerLater] = useState(false);
+  const [autoAssign, setAutoAssign] = useState(false);
   const [teamPaid, setTeamPaid] = useState(false);
   const [teamDone, setTeamDone] = useState("");
   const [boxStandings, setBoxStandings] = useState(null);
@@ -196,6 +197,7 @@ export default function LeagueDetail() {
       const body = { waiver_accepted: waiverAccepted };
       if (partnerMode === "later") {
         body.partner_later = true;
+        body.auto_assign_partner = autoAssign;
       } else if (selectedPartner) {
         body.partner_id = selectedPartner.id;
       } else {
@@ -565,9 +567,24 @@ export default function LeagueDetail() {
                                   onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
                                 />
                               ) : (
+                                <>
                                 <p className="text-sm" style={{ color: "#4C4C4C", fontFamily: "Rubik, sans-serif" }} data-testid="partner-later-note">
                                   Register and pay now to hold your place. Add your partner any time before the league starts: search for a player, invite by email, or share a link.
                                 </p>
+                                  <label className="flex items-start gap-2.5 cursor-pointer" data-testid="auto-assign-label">
+                                    <input
+                                      type="checkbox"
+                                      checked={autoAssign}
+                                      onChange={(e) => setAutoAssign(e.target.checked)}
+                                      className="mt-0.5 h-4 w-4 accent-[#008F70] flex-shrink-0"
+                                      data-testid="auto-assign-checkbox"
+                                    />
+                                    <span className="text-xs leading-relaxed" style={{ color: "#4C4C4C" }}>
+                                      Let VenLax pick my partner if I do not find one. VenLax may pair me with another waiting player in this league.
+                                      My name, level and city are shared with that partner. I can ask for a change until the league starts.
+                                    </span>
+                                  </label>
+                                </>
                               )}
                               {league.format === "mixed_doubles" && (
                                 <p className="text-xs text-gray-400 mt-2">

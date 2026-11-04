@@ -10,6 +10,7 @@ import AddPartnerPanel from "../components/AddPartnerPanel";
 import SeasonRecaps from "../components/SeasonRecaps";
 import PlayProfileCard from "../components/PlayProfileCard";
 import ZipCodeEditor from "../components/ZipCodeEditor";
+import AssignedTeamNote from "../components/AssignedTeamNote";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -174,6 +175,16 @@ export default function PlayerDashboard() {
       setPhoneError("Could not save phone number. Try again.");
     } finally {
       setSavingPhone(false);
+    }
+  };
+
+  const toggleAutoAssign = async (invite) => {
+    const enabled = !invite.auto_assign;
+    try {
+      await axios.post(`${API}/doubles-invite/${invite.token}/auto-assign`, { enabled }, { withCredentials: true });
+      setPendingInvites((prev) => prev.map((i) => (i.token === invite.token ? { ...i, auto_assign: enabled } : i)));
+    } catch (err) {
+      console.error("Auto-assign toggle failed", err);
     }
   };
 
@@ -468,6 +479,18 @@ export default function PlayerDashboard() {
                       )}
                     </div>
                   </div>
+                  {!invite.partner_email && (
+                    <label className="mt-3 flex items-start gap-2 text-xs cursor-pointer" style={{ color: "#4C4C4C" }}>
+                      <input
+                        type="checkbox"
+                        checked={!!invite.auto_assign}
+                        onChange={() => toggleAutoAssign(invite)}
+                        className="mt-0.5 h-4 w-4 accent-[#008F70]"
+                        data-testid={`auto-assign-toggle-${invite.token}`}
+                      />
+                      Let VenLax pick my partner. VenLax may pair me with another waiting player; my name, level and city are shared with that partner.
+                    </label>
+                  )}
                   {addPartnerFor === invite.token && (
                     <div className="mt-4">
                       <AddPartnerPanel
@@ -568,6 +591,8 @@ export default function PlayerDashboard() {
                           )}
                         </div>
                       )}
+
+                      {l.team && <AssignedTeamNote team={l.team} onChanged={fetchData} />}
 
                       {pr.matches_total > 0 && (
                         <div className="mt-3 ml-8" data-testid={`league-progress-${l.id}`}>
