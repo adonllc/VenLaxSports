@@ -26,6 +26,17 @@ class TestPlayProfileModel:
         assert pp.play_style.tennis == "baseline"
         assert pp.availability == ["weekday_evening", "weekend_morning"]
 
+    def test_flexible_availability_valid(self):
+        assert PlayProfile(availability=["flexible"]).availability == ["flexible"]
+
+    def test_flexible_wins_over_other_slots(self):
+        pp = PlayProfile(availability=["weekday_evening", "flexible"])
+        assert pp.availability == ["flexible"]
+
+    def test_availability_deduped_in_order(self):
+        pp = PlayProfile(availability=["weekend_morning", "weekday_evening", "weekend_morning"])
+        assert pp.availability == ["weekend_morning", "weekday_evening"]
+
     @pytest.mark.parametrize("field,value", [
         ("court_side", "middle"),
         ("dominant_hand", "both"),

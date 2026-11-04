@@ -15,7 +15,7 @@ test.describe('play profile', () => {
     await page.getByTestId('pp-court-side-left').click();
     await page.getByTestId('pp-hand-right').click();
     await page.getByTestId('pp-avail-weekend_morning').click();
-    await page.getByTestId('pp-looking-for-partner').check();
+    await page.getByTestId('pp-looking-for-partner').click();
     await page.getByTestId('save-play-profile-btn').click();
 
     const summary = page.getByTestId('play-profile-summary');

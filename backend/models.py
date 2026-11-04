@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict, Any, Annotated, Literal
-from pydantic import BaseModel, Field, BeforeValidator
+from pydantic import BaseModel, Field, BeforeValidator, field_validator
 from bson import ObjectId
 from datetime import datetime, timezone
 
@@ -41,6 +41,7 @@ CourtSide = Literal["left", "right", "either"]
 AvailabilitySlot = Literal[
     "weekday_morning", "weekday_evening",
     "weekend_morning", "weekend_afternoon", "weekend_evening",
+    "flexible",  # any time; exclusive, replaces the specific slots
 ]
 TennisStyle = Literal["baseline", "serve_volley", "all_court", "aggressive", "counterpuncher"]
 PickleballStyle = Literal["banger", "dinker", "all_court"]
@@ -59,6 +60,15 @@ class PlayProfile(BaseModel):
     availability: Optional[List[AvailabilitySlot]] = None
     looking_for_partner: Optional[bool] = None
     play_style: Optional[PlayStyle] = None
+
+    @field_validator("availability")
+    @classmethod
+    def _normalize_availability(cls, v):
+        if v is None:
+            return v
+        if "flexible" in v:
+            return ["flexible"]
+        return list(dict.fromkeys(v))  # dedupe, keep order
 
 
 # ─── User ───────────────────────────────────────────

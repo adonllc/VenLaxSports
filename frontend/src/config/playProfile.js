@@ -39,6 +39,20 @@ export const AVAILABILITY = [
   { value: "weekend_morning", label: "Weekend mornings" },
   { value: "weekend_afternoon", label: "Weekend afternoons" },
   { value: "weekend_evening", label: "Weekend evenings" },
+  { value: "flexible", label: "Flexible schedule" },
+];
+
+// Grid layout for the editor: row label + the slot values it contains.
+export const AVAILABILITY_ROWS = [
+  { label: "Weekdays", slots: [
+    { value: "weekday_morning", label: "Morning" },
+    { value: "weekday_evening", label: "Evening" },
+  ] },
+  { label: "Weekends", slots: [
+    { value: "weekend_morning", label: "Morning" },
+    { value: "weekend_afternoon", label: "Afternoon" },
+    { value: "weekend_evening", label: "Evening" },
+  ] },
 ];
 
 const labelOf = (list, value) => list.find((o) => o.value === value)?.label;
@@ -66,4 +80,45 @@ export function profileChips(pp) {
   if (pp.years_playing != null) chips.push(`${pp.years_playing} yr${pp.years_playing === 1 ? "" : "s"} playing`);
   (pp.availability || []).forEach((a) => chips.push(labelOf(AVAILABILITY, a)));
   return chips.filter(Boolean);
+}
+
+const hasStyle = (pp) => !!(pp?.play_style?.tennis || pp?.play_style?.pickleball);
+
+/** Core fields that make a profile "complete". Backhand and partner flag are optional extras. */
+const CORE_CHECKS = [
+  (pp) => !!pp.court_side,
+  (pp) => !!pp.dominant_hand,
+  hasStyle,
+  (pp) => pp.years_playing != null,
+  (pp) => !!pp.availability?.length,
+];
+
+export function profileCompletion(pp) {
+  const p = pp || {};
+  const done = CORE_CHECKS.filter((check) => check(p)).length;
+  return { done, total: CORE_CHECKS.length, pct: Math.round((done / CORE_CHECKS.length) * 100) };
+}
+
+/** Labeled rows for the dashboard summary. `value` is null when unset. */
+export function profileRows(pp) {
+  const p = pp || {};
+  const styles = [
+    p.play_style?.tennis && `Tennis: ${labelOf(STYLE_OPTIONS.tennis, p.play_style.tennis)}`,
+    p.play_style?.pickleball && `Pickleball: ${labelOf(STYLE_OPTIONS.pickleball, p.play_style.pickleball)}`,
+  ].filter(Boolean);
+  const rows = [
+    { key: "court_side", label: "Court side", value: p.court_side ? COURT_SIDE_NEUTRAL[p.court_side] : null },
+    { key: "dominant_hand", label: "Hand", value: labelOf(HANDS, p.dominant_hand) || null },
+  ];
+  if (p.backhand) rows.push({ key: "backhand", label: "Backhand", value: labelOf(BACKHANDS, p.backhand) });
+  rows.push(
+    { key: "play_style", label: "Play style", value: styles.length ? styles.join(" · ") : null },
+    { key: "years_playing", label: "Experience", value: p.years_playing != null ? `${p.years_playing} year${p.years_playing === 1 ? "" : "s"}` : null },
+    {
+      key: "availability",
+      label: "Availability",
+      value: p.availability?.length ? p.availability.map((a) => labelOf(AVAILABILITY, a)).join(", ") : null,
+    },
+  );
+  return rows;
 }
