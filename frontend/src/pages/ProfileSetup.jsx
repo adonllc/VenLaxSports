@@ -32,6 +32,7 @@ export default function ProfileSetup() {
     skill_level: user?.skill_level || "",
     home_court: user?.home_court || "",
     city: user?.city || "",
+    zip_code: user?.zip_code || "",
     play_profile: user?.play_profile || {},
   });
 
@@ -171,6 +172,19 @@ export default function ProfileSetup() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                     data-testid="input-city-setup"
                     autoComplete="address-level2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Zip code (optional)</label>
+                  <input
+                    type="text"
+                    value={form.zip_code}
+                    onChange={(e) => setForm((f) => ({ ...f, zip_code: e.target.value }))}
+                    placeholder="e.g. 30350"
+                    maxLength={10}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    data-testid="input-zip-setup"
+                    autoComplete="postal-code"
                   />
                 </div>
               </div>

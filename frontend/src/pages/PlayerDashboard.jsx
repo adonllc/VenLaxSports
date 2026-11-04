@@ -9,6 +9,7 @@ import useReferralCode from "../hooks/useReferralCode";
 import AddPartnerPanel from "../components/AddPartnerPanel";
 import SeasonRecaps from "../components/SeasonRecaps";
 import PlayProfileCard from "../components/PlayProfileCard";
+import ZipCodeEditor from "../components/ZipCodeEditor";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -292,6 +293,7 @@ export default function PlayerDashboard() {
                   </div>
                 )}
               </div>
+              <ZipCodeEditor />
               <button
                 onClick={toggleNotifications}
                 disabled={togglingNotif}
