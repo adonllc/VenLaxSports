@@ -71,8 +71,8 @@ Player (`routes/doubles_routes.py`)
 - `POST /api/leagues/{id}/join` accepts `auto_assign_partner: bool`, used only with `partner_later`.
 
 Admin (`routes/admin_routes.py`, all behind `require_admin`)
-- `GET /api/admin/partner-matches?league_id=&max_gap=` returns `{pairs, unmatched}` (no writes). `max_gap` must be 0, 0.5 or 1.0, else 400. Defaults to 0.
-- `POST /api/admin/partner-matches/assign {pairs: [{token_a, token_b}]}`. Per pair, in one pass: re-load both invites and re-check every rule above (state may have changed). Then reserve 2 spots with the same atomic `find_one_and_update` that `add_partner` uses, call `_create_doubles_pair` for A's initiator and B's initiator, mark A `accepted` with the assignment fields, and mark B `merged` with `refund_due = B.paid`. Returns per-pair `{ok, error}`; one failure does not stop the others.
+- `GET /api/admin/partner-matches?league_id=&max_gap=` returns `{max_gap, leagues: [{league_id, league_name, start_date, spots_left, pairs, unmatched, skipped}]}` (no writes). `league_id` is optional: without it, every league that has opted-in waiting teams is returned, so the UI needs no league picker. `skipped` lists opted-in players left out of matching (for example "Has not paid yet"). `max_gap` must be 0, 0.5 or 1.0, else 400. Defaults to 0.
+- `POST /api/admin/partner-matches/assign {pairs: [{token_a, token_b}]}`. Per pair, in one pass: re-load both invites and re-check every rule above (state may have changed). The level gap is not re-checked: the admin saw it when choosing the pair. Then reserve 2 spots with the same atomic `find_one_and_update` that `add_partner` uses, call `_create_doubles_pair` for A's initiator and B's initiator, mark A `accepted` with the assignment fields, and mark B `merged` with `refund_due = B.paid`. Returns per-pair `{ok, error}`; one failure does not stop the others.
 - `POST /api/admin/partner-matches/{token_b}/mark-refunded`. Sets `refunded_at` and clears `refund_due`.
 - `GET /api/admin/partner-change-requests` lists pending requests with both players, league, reason.
 - `POST /api/admin/partner-change-requests/{token}/resolve {action: "approve"|"decline"}`.
