@@ -463,7 +463,7 @@ async def add_partner(token: str, body: AddPartnerRequest, request: Request):
 # ── Shared helper ─────────────────────────────────────────────────────────────
 
 async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dict,
-                                notify_partner_as_added: bool = False):
+                                notify_partner_as_added: bool = False, send_emails: bool = True):
     """Create PlayerLeague records for both P1 and P2.
 
     Idempotent — duplicate key errors (from the unique index) are silently swallowed.
@@ -528,6 +528,9 @@ async def _create_doubles_pair(db, invite: dict, league: dict, partner_user: dic
         await db.player_leagues.insert_one(p2_record)
     except Exception:
         pass  # already exists — idempotent
+
+    if not send_emails:
+        return
 
     # Confirmation emails (best effort)
     league_name = league.get("name", "your league")

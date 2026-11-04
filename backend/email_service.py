@@ -470,6 +470,34 @@ async def send_partner_declined(initiator_email: str, initiator_name: str, leagu
     )
 
 
+async def send_partner_assigned(to: str, player_name: str, partner_name: str, league_name: str,
+                                start_date: str = "") -> None:
+    url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
+    start_line = f" The league starts on <strong>{start_date}</strong>." if start_date else ""
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>VenLax paired you with <strong>{partner_name}</strong> as your doubles partner in <strong>{league_name}</strong>,
+         based on your level, location and play profile. Your team is registered.{start_line}</p>
+      <p>If you would rather play with someone else, you can ask for a different partner from your dashboard until the
+         league starts. After that, teams are locked.</p>
+    """
+    await send_email(to, f"Your doubles partner for {league_name}", _wrap("You have a partner", body, "Open dashboard", url))
+
+
+async def send_partner_change_resolved(to: str, player_name: str, league_name: str, approved: bool) -> None:
+    url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
+    if approved:
+        title = "Partner change approved"
+        text = (f"Your team in <strong>{league_name}</strong> has been dissolved. You are back on the waiting list "
+                f"and VenLax will look for another partner for you.")
+    else:
+        title = "Partner change declined"
+        text = (f"Your request for a different partner in <strong>{league_name}</strong> was not approved, "
+                f"so your team stays as it is.")
+    body = f"<p>Hi {player_name},</p><p>{text}</p>"
+    await send_email(to, f"{title} — {league_name}", _wrap(title, body, "Open dashboard", url))
+
+
 async def send_weekly_referral_nudge(to: str, player_name: str, referral_code: str) -> None:
     frontend_url = _get_frontend_url() or "https://venlaxsports.com"
     referral_link = f"{frontend_url}/auth?ref={referral_code}"

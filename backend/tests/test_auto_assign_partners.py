@@ -64,3 +64,111 @@ def test_cannot_toggle_once_a_partner_is_attached(env, monkeypatch):
     with pytest.raises(HTTPException) as e:
         toggle(db, token, True)
     assert e.value.status_code == 409
+
+
+import partner_assignment  # noqa: E402
+
+
+def make_waiting(db, name, status="initiator_paid", opt_in=True, level="3.0", gender=None, **profile):
+    uid = db.add_user(name, f"{name.lower()}@example.com", gender=gender)
+    user = next(u for u in db.users.docs if str(u["_id"]) == uid)
+    user.update({"skill_level": level, "city": "Atlanta", "zip_code": profile.pop("zip_code", ""),
+                 "play_profile": profile or None})
+    token = f"tok-{name}"
+    db.doubles_invites.docs.append({
+        "league_id": str(db.lid), "initiator_id": uid, "initiator_name": name, "token": token, "status": status,
+        "partner_email": "", "partner_user_id": None, "partner_later": True, "auto_assign_opt_in": opt_in,
+        "created_at": f"2026-11-0{len(db.doubles_invites.docs) + 1}T00:00:00+00:00", "expires_at": "2027-01-01",
+    })
+    return uid, token
+
+
+def assign(db, a, b):
+    return run(partner_assignment.assign_pair(db, a, b))
+
+
+def test_waiting_candidates_only_opted_in_and_eligible():
+    db = Db()
+    make_waiting(db, "Ann", court_side="left")
+    make_waiting(db, "Bea", opt_in=False)
+    make_waiting(db, "Cy", status="pending")
+    cands, skipped = run(partner_assignment.waiting_candidates(db, db.leagues.docs[0]))
+    assert [c["name"] for c in cands] == ["Ann"]
+    assert cands[0]["level"] == 3.0 and cands[0]["court_side"] == "left" and cands[0]["paid"] is True
+    assert [(s["name"], s["reason"]) for s in skipped] == [("Cy", "Has not paid yet")]
+
+
+def test_assign_pair_builds_the_team_and_flags_the_later_payment(env):
+    db = Db()
+    a_uid, ta = make_waiting(db, "Ann")
+    b_uid, tb = make_waiting(db, "Bea")
+    out = assign(db, ta, tb)
+    assert out["refund_due"] is True and out["team_token"] == ta
+    assert {p["player_id"] for p in db.player_leagues.docs} == {a_uid, b_uid}
+    assert db.leagues.docs[0]["current_players"] == 2
+    a, b = inv(db, ta), inv(db, tb)
+    assert a["status"] == "accepted" and a["assigned_by_admin"] is True and a["partner_user_id"] == b_uid
+    assert a["merged_token"] == tb and a["status_before_assign"] == "initiator_paid"
+    assert b["status"] == "merged" and b["merged_into"] == ta and b["refund_due"] is True
+    assert env == ["ann@example.com", "bea@example.com"]       # one "you were paired" email each, no duplicates
+
+
+def test_the_earlier_registrant_keeps_the_team_even_if_passed_second(env):
+    db = Db()
+    _, ta = make_waiting(db, "Ann")
+    _, tb = make_waiting(db, "Bea")
+    assert assign(db, tb, ta)["team_token"] == ta
+
+
+def test_free_league_has_no_refund(env):
+    db = Db(fee=0)
+    _, ta = make_waiting(db, "Ann", status="pending")
+    _, tb = make_waiting(db, "Bea", status="pending")
+    assert assign(db, ta, tb)["refund_due"] is False
+    assert inv(db, tb)["refund_due"] is False
+
+
+@pytest.mark.parametrize("mutate,message", [
+    (lambda db, a, b: inv(db, b).update(auto_assign_opt_in=False), "has not agreed"),
+    (lambda db, a, b: inv(db, b).update(status="pending"), "has not paid"),
+    (lambda db, a, b: inv(db, b).update(partner_user_id="x"), "no longer waiting"),
+    (lambda db, a, b: inv(db, b).update(status="accepted"), "no longer waiting"),
+    (lambda db, a, b: inv(db, a).update(rejected_partner_ids=[inv(db, b)["initiator_id"]]), "asked not to be paired"),
+    (lambda db, a, b: db.leagues.docs[0].update(current_players=15), "No spots"),
+    (lambda db, a, b: db.leagues.docs[0].update(status="active"), "registration is closed"),
+    (lambda db, a, b: inv(db, b).update(league_id="other"), "same league"),
+])
+def test_assign_refuses_stale_or_illegal_pairs(env, mutate, message):
+    db = Db()
+    _, ta = make_waiting(db, "Ann")
+    _, tb = make_waiting(db, "Bea")
+    mutate(db, ta, tb)
+    with pytest.raises(ValueError) as e:
+        assign(db, ta, tb)
+    assert message in str(e.value)
+    assert db.player_leagues.docs == []
+
+
+def test_mixed_doubles_needs_opposite_genders(env):
+    db = Db()
+    db.leagues.docs[0]["format"] = "mixed_doubles"
+    _, ta = make_waiting(db, "Ann", gender="female")
+    _, tb = make_waiting(db, "Bea", gender="female")
+    with pytest.raises(ValueError) as e:
+        assign(db, ta, tb)
+    assert "one male and one female" in str(e.value)
+    _, tc = make_waiting(db, "Cy", gender="male")
+    assert assign(db, ta, tc)["team_token"] == ta
+
+
+def test_spots_are_given_back_if_building_the_team_fails(env, monkeypatch):
+    db = Db()
+    _, ta = make_waiting(db, "Ann")
+    _, tb = make_waiting(db, "Bea")
+
+    async def boom(*a, **k):
+        raise RuntimeError("db down")
+    monkeypatch.setattr(doubles_routes, "_create_doubles_pair", boom)
+    with pytest.raises(RuntimeError):
+        assign(db, ta, tb)
+    assert db.leagues.docs[0]["current_players"] == 0 and inv(db, ta)["status"] == "initiator_paid"
