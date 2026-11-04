@@ -29,3 +29,90 @@ def test_level_falls_back_to_sport_rating():
 def test_level_defaults_to_three():
     assert player_level({}, "tennis") == 3.0
     assert player_level({"skill_level": "abc"}, "tennis") == 3.0
+
+
+from partner_matching import score_pair, suggest_pairs  # noqa: E402
+
+
+def cand(uid, level=3.0, **kw):
+    base = {
+        "token": f"t-{uid}", "user_id": uid, "name": uid, "gender": None, "city": "Atlanta",
+        "zip_code": "", "level": level, "court_side": None, "availability": [],
+        "registered_at": f"2026-11-0{uid[-1]}", "rejected": [],
+    }
+    base.update(kw)
+    return base
+
+
+def score(a, b, gap=1.0, mixed=False):
+    res = score_pair(a, b, gap, mixed)
+    return None if res is None else res[0]
+
+
+def test_level_gap_is_a_hard_limit_and_scored():
+    assert score(cand("u1", 3.0), cand("u2", 3.5), gap=0.0) is None
+    assert score(cand("u1", 3.0), cand("u2", 3.0)) == 66      # 40 level + 15 city + 6 side unset + 5 availability unset
+    assert score(cand("u1", 3.0), cand("u2", 3.5)) == 51      # 25 level
+    assert score(cand("u1", 3.0), cand("u2", 4.0)) == 36      # 10 level
+
+
+def test_location_zip_beats_city_beats_nothing():
+    assert score(cand("u1", zip_code="30350"), cand("u2", zip_code="30350")) == 76
+    assert score(cand("u1"), cand("u2")) == 66
+    assert score(cand("u1"), cand("u2", city="Marietta")) == 51
+    _, reasons = score_pair(cand("u1", zip_code="30350"), cand("u2", zip_code="30350"), 0.0)
+    assert "Same zip" in reasons
+
+
+def test_court_side_opposites_score_highest():
+    assert score(cand("u1", court_side="left"), cand("u2", court_side="right")) == 80
+    assert score(cand("u1", court_side="left"), cand("u2", court_side="left")) == 60
+    assert score(cand("u1", court_side="either"), cand("u2", court_side="left")) == 72
+
+
+def test_availability_overlap_and_flexible():
+    a = cand("u1", availability=["weekend_morning", "weekday_evening"])
+    b = cand("u2", availability=["weekend_morning"])
+    assert score(a, b) == 76
+    assert "Shared: Weekend mornings" in score_pair(a, b, 0.0)[1]
+    flex = cand("u1", availability=["flexible"])
+    assert score(flex, cand("u2", availability=["weekday_evening"])) == 76
+    assert "Flexible schedule" in score_pair(flex, cand("u2", availability=["weekday_evening"]), 0.0)[1]
+    assert score(cand("u1", availability=["weekday_morning"]), cand("u2", availability=["weekend_evening"])) == 61
+
+
+def test_never_pair_a_player_with_themselves_or_a_rejected_partner():
+    assert score(cand("u1"), cand("u1")) is None
+    assert score(cand("u1", rejected=["u2"]), cand("u2")) is None
+    assert score(cand("u1"), cand("u2", rejected=["u1"])) is None
+
+
+def test_mixed_doubles_needs_one_male_and_one_female():
+    assert score(cand("u1", gender="male"), cand("u2", gender="male"), mixed=True) is None
+    assert score(cand("u1", gender="male"), cand("u2"), mixed=True) is None
+    assert score(cand("u1", gender="male"), cand("u2", gender="female"), mixed=True) == 66
+
+
+def test_suggest_pairs_prefers_exact_levels_and_earlier_registrant_is_a():
+    people = [cand("u1", 3.0), cand("u2", 3.5), cand("u3", 3.0), cand("u4", 3.5)]
+    pairs, unmatched = suggest_pairs(people, 0.5)
+    assert unmatched == []
+    got = {(p["a"]["user_id"], p["b"]["user_id"]) for p in pairs}
+    assert got == {("u1", "u3"), ("u2", "u4")}
+
+
+def test_suggest_pairs_ties_go_to_the_longest_waiting_and_odd_one_is_explained():
+    pairs, unmatched = suggest_pairs([cand("u1"), cand("u2"), cand("u3")], 0.0)
+    assert [(p["a"]["user_id"], p["b"]["user_id"]) for p in pairs] == [("u1", "u2")]
+    assert unmatched == [{"candidate": cand("u3"), "reason": "Every compatible player was paired with someone else"}]
+
+
+def test_unmatched_reasons():
+    _, solo = suggest_pairs([cand("u1")], 0.0)
+    assert solo[0]["reason"] == "Nobody else opted in"
+    _, far = suggest_pairs([cand("u1", 3.0), cand("u2", 3.5)], 0.0)
+    assert {u["reason"] for u in far} == {"No one within the chosen level range, try a wider level"}
+    pairs, widened = suggest_pairs([cand("u1", 3.0), cand("u2", 3.5)], 0.5)
+    assert len(pairs) == 1 and widened == []
+    _, men = suggest_pairs([cand("u1", gender="male"), cand("u2", gender="male")], 0.0, mixed=True)
+    assert {u["reason"] for u in men} == {"Needs an opposite-gender partner"}
