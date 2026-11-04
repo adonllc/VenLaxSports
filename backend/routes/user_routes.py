@@ -1,12 +1,12 @@
 """User search and profile lookups (non-admin)."""
 from fastapi import APIRouter, HTTPException, Request
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from bson import ObjectId
 from datetime import datetime, timezone
 from auth_utils import get_current_user
 from rating_utils import seed_starting_rating
-from models import UserFollow, PlayProfile
+from models import UserFollow, PlayProfile, normalize_zip
 
 router = APIRouter()
 
@@ -86,6 +86,12 @@ class UserProfileUpdate(BaseModel):
     gender: Optional[str] = None
     sport_preferences: Optional[List[str]] = None
     play_profile: Optional[PlayProfile] = None
+    zip_code: Optional[str] = None
+
+    @field_validator("zip_code")
+    @classmethod
+    def _zip(cls, v):
+        return normalize_zip(v)
 
 
 class ProfileSetupIn(BaseModel):
@@ -94,6 +100,12 @@ class ProfileSetupIn(BaseModel):
     home_court: Optional[str] = None
     city: Optional[str] = None
     play_profile: Optional[PlayProfile] = None
+    zip_code: Optional[str] = None
+
+    @field_validator("zip_code")
+    @classmethod
+    def _zip(cls, v):
+        return normalize_zip(v)
 
 
 @router.patch("/me/setup")
@@ -112,6 +124,8 @@ async def profile_setup(body: ProfileSetupIn, request: Request):
         update["city"] = body.city
     if body.play_profile is not None:
         update["play_profile"] = body.play_profile.model_dump(exclude_unset=True)
+    if body.zip_code:
+        update["zip_code"] = body.zip_code
     await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": update})
     if body.skill_level is not None:
         await seed_starting_rating(db, str(user["_id"]), body.skill_level)

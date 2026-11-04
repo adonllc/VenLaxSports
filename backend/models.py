@@ -1,3 +1,4 @@
+import re
 from typing import Optional, List, Dict, Any, Annotated, Literal
 from pydantic import BaseModel, Field, BeforeValidator, field_validator
 from bson import ObjectId
@@ -13,6 +14,21 @@ def coerce_object_id(v: Any) -> Optional[str]:
 
 
 PyObjectId = Annotated[str, BeforeValidator(coerce_object_id)]
+
+
+_ZIP_RE = re.compile(r"[A-Z0-9][A-Z0-9 -]{1,8}[A-Z0-9]")
+
+
+def normalize_zip(v):
+    """Trim and uppercase a zip / postal code. Blank means unset; junk raises ValueError."""
+    if v is None:
+        return None
+    s = str(v).strip().upper()
+    if not s:
+        return None
+    if not _ZIP_RE.fullmatch(s):
+        raise ValueError("Enter a valid zip or postal code")
+    return s
 
 
 class BaseDocument(BaseModel):
@@ -96,6 +112,7 @@ class User(BaseDocument):
     otp_code: Optional[str] = None      # bcrypt-hashed 6-digit OTP
     otp_expires_at: Optional[str] = None
     home_court: Optional[str] = None
+    zip_code: Optional[str] = None
     play_profile: Optional[PlayProfile] = None
     profile_complete: bool = False
     founding_member: bool = False
