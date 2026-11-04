@@ -335,12 +335,40 @@ async def my_doubles_invites(request: Request):
             "entry_fee": entry_fee,
             "partner_email": inv.get("partner_email", ""),
             "partner_later": bool(inv.get("partner_later")),
+            "auto_assign": bool(inv.get("auto_assign_opt_in")),
             "paid": inv.get("status") == "initiator_paid",
             "expires_at": inv.get("expires_at", ""),
             "status": inv.get("status", "pending"),
         })
 
     return {"invites": result}
+
+
+# ── POST /{token}/auto-assign ─────────────────────────────────────────────────
+
+class AutoAssignRequest(BaseModel):
+    enabled: bool
+
+
+@router.post("/{token}/auto-assign")
+async def set_auto_assign(token: str, body: AutoAssignRequest, request: Request):
+    """Initiator (P1) agrees, or stops agreeing, that VenLax may pick the partner of a team still waiting for one."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite not found")
+    if invite["initiator_id"] != user["_id"]:
+        raise HTTPException(status_code=403, detail="Only the initiator can change this")
+    if invite.get("status") not in ("pending", "initiator_paid") or invite.get("partner_user_id"):
+        raise HTTPException(status_code=409, detail="This team already has a partner")
+
+    await db.doubles_invites.update_one({"token": token}, {"$set": {
+        "auto_assign_opt_in": body.enabled,
+        "auto_assign_opt_in_at": datetime.now(timezone.utc).isoformat() if body.enabled else None,
+    }})
+    return {"auto_assign_opt_in": body.enabled}
 
 
 # ── POST /{token}/partner ─────────────────────────────────────────────────────

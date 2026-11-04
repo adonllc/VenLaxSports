@@ -139,6 +139,7 @@ class JoinLeagueRequest(BaseModel):
     partner_email: Optional[str] = None
     partner_id: Optional[str] = None
     partner_later: bool = False
+    auto_assign_partner: bool = False  # only used with partner_later: VenLax may pick the partner
 
 
 
@@ -224,6 +225,8 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "partner_user_id": None,
                 "partner_added_by_initiator": False,
                 "partner_later": True,
+                "auto_assign_opt_in": bool(body.auto_assign_partner),
+                "auto_assign_opt_in_at": now.isoformat() if body.auto_assign_partner else None,
                 "token": token,
                 "status": "pending",
                 "waiver_p1_at": now.isoformat(),
