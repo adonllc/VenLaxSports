@@ -12,9 +12,10 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from auth_utils import get_current_user, get_optional_user
 from models import DoublesConfirmRequest
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 import email_service
+import partner_assignment
 import os
 
 router = APIRouter(redirect_slashes=False)
@@ -369,6 +370,51 @@ async def set_auto_assign(token: str, body: AutoAssignRequest, request: Request)
         "auto_assign_opt_in_at": datetime.now(timezone.utc).isoformat() if body.enabled else None,
     }})
     return {"auto_assign_opt_in": body.enabled}
+
+
+# ── POST /{token}/change-request ──────────────────────────────────────────────
+
+class ChangeRequestBody(BaseModel):
+    reason: Optional[str] = Field(default=None, max_length=500)
+
+
+@router.post("/{token}/change-request")
+async def request_partner_change(token: str, body: ChangeRequestBody, request: Request):
+    """Either player of a team that VenLax paired asks for a different partner. An admin approves or declines.
+    Only possible until the league's start date."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite:
+        raise HTTPException(status_code=404, detail="Team not found")
+    if user["_id"] not in (invite.get("initiator_id"), invite.get("partner_user_id")):
+        raise HTTPException(status_code=403, detail="Only the two players on this team can ask for a change")
+    if not invite.get("assigned_by_admin"):
+        raise HTTPException(status_code=409, detail="Only teams paired by VenLax use this. Change your partner from the league page.")
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])})
+    except Exception:
+        league = None
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+
+    now = datetime.now(timezone.utc)
+    if not partner_assignment.change_window_open(league, now):
+        raise HTTPException(status_code=409, detail="Teams are locked once the league starts.")
+    existing = (invite.get("partner_change_request") or {}).get("status")
+    if existing == "pending":
+        raise HTTPException(status_code=409, detail="You already asked for a change. We will review it soon.")
+    if existing == "declined":
+        raise HTTPException(status_code=409, detail="Your earlier request was reviewed and the team stays as it is.")
+
+    await db.doubles_invites.update_one({"token": token}, {"$set": {"partner_change_request": {
+        "by_user_id": user["_id"],
+        "reason": (body.reason or "").strip(),
+        "requested_at": now.isoformat(),
+        "status": "pending",
+    }}})
+    return {"requested": True}
 
 
 # ── POST /{token}/partner ─────────────────────────────────────────────────────

@@ -146,3 +146,22 @@ async def assign_pair(db, token_a: str, token_b: str, now: datetime | None = Non
         if to:
             email_service.schedule(email_service.send_partner_assigned(to, me, other, league_name, start))
     return {"team_token": token_a, "refund_due": refund_due, "players": [name_a, name_b]}
+
+
+async def team_info(db, league: dict, user_id: str, now: datetime):
+    """What the dashboard shows for a doubles player's team. None unless VenLax paired the team."""
+    rec = await db.player_leagues.find_one({"league_id": str(league["_id"]), "player_id": user_id})
+    token = (rec or {}).get("invite_token")
+    if not token:
+        return None
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite or not invite.get("assigned_by_admin"):
+        return None
+    status = (invite.get("partner_change_request") or {}).get("status")
+    return {
+        "invite_token": token,
+        "partner_name": rec.get("partner_name", ""),
+        "assigned_by_venlax": True,
+        "change_request": status,
+        "can_request_change": change_window_open(league, now) and status not in ("pending", "declined"),
+    }

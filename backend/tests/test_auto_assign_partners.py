@@ -259,3 +259,90 @@ def test_refund_due_list_and_mark_refunded(admin, env):
     with pytest.raises(HTTPException) as e:
         run(partner_match_routes.mark_refunded("tok-Bea", req(db)))
     assert e.value.status_code == 409
+
+
+from datetime import datetime, timezone  # noqa: E402
+
+from routes import league_routes  # noqa: E402
+
+
+def assigned_team(db):
+    db.leagues.docs[0]["start_date"] = "2999-01-01"
+    a_uid, ta = make_waiting(db, "Ann")
+    b_uid, tb = make_waiting(db, "Bea")
+    assign(db, ta, tb)
+    return a_uid, b_uid, ta, tb
+
+
+def request_change(db, token, reason=None):
+    body = doubles_routes.ChangeRequestBody(reason=reason)
+    return run(doubles_routes.request_partner_change(token, body, req(db)))
+
+
+def test_change_window():
+    now = datetime(2026, 11, 4, tzinfo=timezone.utc)
+    lg = {"status": "registration", "start_date": "2026-11-05"}
+    assert partner_assignment.change_window_open(lg, now) is True
+    assert partner_assignment.change_window_open({**lg, "start_date": "2026-11-04"}, now) is False   # start day is locked
+    assert partner_assignment.change_window_open({**lg, "status": "active"}, now) is False
+    assert partner_assignment.change_window_open({"status": "registration"}, now) is False
+
+
+def test_either_player_can_ask_for_a_different_partner(env, monkeypatch):
+    db = Db()
+    a_uid, b_uid, ta, _ = assigned_team(db)
+    as_user(monkeypatch, db, b_uid)
+    assert request_change(db, ta, "  We play at different levels  ") == {"requested": True}
+    r = inv(db, ta)["partner_change_request"]
+    assert r["status"] == "pending" and r["by_user_id"] == b_uid and r["reason"] == "We play at different levels"
+    assert r["requested_at"]
+
+
+@pytest.mark.parametrize("setup,status,fragment", [
+    (lambda db, a, b, t: None, 403, "Only the two players"),
+    (lambda db, a, b, t: inv(db, t).update(assigned_by_admin=False), 409, "paired by VenLax"),
+    (lambda db, a, b, t: db.leagues.docs[0].update(start_date="2000-01-01"), 409, "locked"),
+    (lambda db, a, b, t: db.leagues.docs[0].update(status="active"), 409, "locked"),
+    (lambda db, a, b, t: inv(db, t).update(partner_change_request={"status": "pending"}), 409, "already asked"),
+    (lambda db, a, b, t: inv(db, t).update(partner_change_request={"status": "declined"}), 409, "stays as it is"),
+])
+def test_change_request_is_refused_when_not_allowed(env, monkeypatch, setup, status, fragment):
+    db = Db()
+    a_uid, b_uid, ta, _ = assigned_team(db)
+    outsider = db.p1
+    setup(db, a_uid, b_uid, ta)
+    as_user(monkeypatch, db, outsider if fragment == "Only the two players" else a_uid)
+    with pytest.raises(HTTPException) as e:
+        request_change(db, ta)
+    assert e.value.status_code == status and fragment in e.value.detail
+
+
+def test_team_info_for_the_dashboard(env):
+    db = Db()
+    a_uid, b_uid, ta, _ = assigned_team(db)
+    league = db.leagues.docs[0]
+    now = datetime.now(timezone.utc)
+    info = run(partner_assignment.team_info(db, league, a_uid, now))
+    assert info == {"invite_token": ta, "partner_name": "Bea", "assigned_by_venlax": True,
+                    "change_request": None, "can_request_change": True}
+    inv(db, ta)["partner_change_request"] = {"status": "pending"}
+    info = run(partner_assignment.team_info(db, league, b_uid, now))
+    assert info["partner_name"] == "Ann" and info["change_request"] == "pending" and info["can_request_change"] is False
+    league["start_date"] = "2000-01-01"
+    inv(db, ta)["partner_change_request"] = None
+    assert run(partner_assignment.team_info(db, league, a_uid, now))["can_request_change"] is False
+    inv(db, ta)["assigned_by_admin"] = False
+    assert run(partner_assignment.team_info(db, league, a_uid, now)) is None
+
+
+def test_my_leagues_carries_the_team_info(env, monkeypatch):
+    db = Db()
+    a_uid, _, ta, _ = assigned_team(db)
+    as_user(monkeypatch, db, a_uid)
+
+    async def no_progress(*a, **k):
+        return {}
+    import league_schedule
+    monkeypatch.setattr(league_schedule, "league_progress", no_progress)
+    out = run(league_routes.my_leagues(req(db)))
+    assert out[0]["team"]["invite_token"] == ta and out[0]["team"]["partner_name"] == "Bea"

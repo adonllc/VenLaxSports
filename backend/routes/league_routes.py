@@ -7,6 +7,7 @@ from models import League, LeagueCreate, PlayerLeague, Standing
 from auth_utils import get_current_user, require_admin, get_optional_user
 from phase_config import ACTIVE_SPORTS, ACTIVE_COUNTRY
 import email_service
+import partner_assignment
 import asyncio
 import notification_dispatch
 import qualification
@@ -79,8 +80,13 @@ async def my_leagues(request: Request):
     out = []
     for l in leagues:
         progress = await league_schedule.league_progress(db, l, user["_id"])
+        team = None
+        if l.get("format") in ("doubles", "mixed_doubles"):
+            team = await partner_assignment.team_info(db, l, user["_id"], datetime.now(timezone.utc))
         doc = _serialize(l)
         doc["progress"] = progress
+        if team:
+            doc["team"] = team
         out.append(doc)
     return out
 
