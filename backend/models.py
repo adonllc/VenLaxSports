@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Annotated
+from typing import Optional, List, Dict, Any, Annotated, Literal
 from pydantic import BaseModel, Field, BeforeValidator
 from bson import ObjectId
 from datetime import datetime, timezone
@@ -34,6 +34,33 @@ class BaseDocument(BaseModel):
         return cls(**data)
 
 
+# ─── Play profile ───────────────────────────────────
+# court_side is stored normalized: right = deuce side, left = ad side (tennis);
+# right/left as-is for pickleball. The UI labels it per sport.
+CourtSide = Literal["left", "right", "either"]
+AvailabilitySlot = Literal[
+    "weekday_morning", "weekday_evening",
+    "weekend_morning", "weekend_afternoon", "weekend_evening",
+]
+TennisStyle = Literal["baseline", "serve_volley", "all_court", "aggressive", "counterpuncher"]
+PickleballStyle = Literal["banger", "dinker", "all_court"]
+
+
+class PlayStyle(BaseModel):
+    tennis: Optional[TennisStyle] = None
+    pickleball: Optional[PickleballStyle] = None
+
+
+class PlayProfile(BaseModel):
+    court_side: Optional[CourtSide] = None
+    dominant_hand: Optional[Literal["right", "left"]] = None
+    backhand: Optional[Literal["one_hand", "two_hand"]] = None  # tennis only
+    years_playing: Optional[int] = Field(default=None, ge=0, le=60)
+    availability: Optional[List[AvailabilitySlot]] = None
+    looking_for_partner: Optional[bool] = None
+    play_style: Optional[PlayStyle] = None
+
+
 # ─── User ───────────────────────────────────────────
 class User(BaseDocument):
     email: str
@@ -59,6 +86,7 @@ class User(BaseDocument):
     otp_code: Optional[str] = None      # bcrypt-hashed 6-digit OTP
     otp_expires_at: Optional[str] = None
     home_court: Optional[str] = None
+    play_profile: Optional[PlayProfile] = None
     profile_complete: bool = False
     founding_member: bool = False
     dupr_rating: Optional[str] = None           # "2.0-3.0"|"3.0-3.5"|"3.5-4.5"|"4.5+"
