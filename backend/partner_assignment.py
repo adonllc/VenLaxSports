@@ -165,3 +165,36 @@ async def team_info(db, league: dict, user_id: str, now: datetime):
         "change_request": status,
         "can_request_change": change_window_open(league, now) and status not in ("pending", "declined"),
     }
+
+
+async def dissolve_team(db, league: dict, team: dict) -> dict:
+    """Undo an assignment: both players go back to waiting and are never offered to each other again.
+
+    Raises ValueError when the league has started or the team was not paired by VenLax.
+    If the absorbed player's payment was already refunded, they come back as unpaid (repay_required).
+    """
+    if league.get("status") != "registration":
+        raise ValueError("The league has started. Handle this team by hand.")
+    if not team.get("assigned_by_admin") or not team.get("partner_user_id"):
+        raise ValueError("This team was not paired by VenLax")
+
+    token_a = team["token"]
+    p1, p2 = team["initiator_id"], team["partner_user_id"]
+    await db.player_leagues.delete_many({"league_id": str(league["_id"]), "invite_token": token_a})
+    await db.leagues.update_one({"_id": league["_id"]}, {"$inc": {"current_players": -2}})
+    await db.doubles_invites.update_one({"token": token_a}, {
+        "$set": {"status": team.get("status_before_assign") or "pending", "partner_user_id": None,
+                 "partner_email": "", "assigned_by_admin": False, "merged_token": None},
+        "$push": {"rejected_partner_ids": p2},
+    })
+
+    repay = False
+    absorbed = await db.doubles_invites.find_one({"token": team["merged_token"]}) if team.get("merged_token") else None
+    if absorbed:
+        repay = bool(absorbed.get("refunded_at"))
+        await db.doubles_invites.update_one({"token": absorbed["token"]}, {
+            "$set": {"status": "pending" if repay else (absorbed.get("status_before_merge") or "pending"),
+                     "merged_into": None, "refund_due": False},
+            "$push": {"rejected_partner_ids": p1},
+        })
+    return {"repay_required": repay, "players": [p1, p2]}

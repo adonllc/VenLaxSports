@@ -1,11 +1,12 @@
 """Admin: suggest and assign doubles partners, track refunds, resolve partner change requests."""
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+import email_service
 import partner_assignment
 import partner_matching
 from auth_utils import require_admin
@@ -130,3 +131,82 @@ async def mark_refunded(token_b: str, request: Request):
     await db.doubles_invites.update_one({"token": token_b}, {"$set": {
         "refund_due": False, "refunded_at": datetime.now(timezone.utc).isoformat()}})
     return {"refunded": True}
+
+
+@router.get("/partner-change-requests")
+async def list_change_requests(request: Request):
+    db = request.app.state.db
+    await require_admin(request, db)
+    invites = await db.doubles_invites.find({"partner_change_request.status": "pending"}).to_list(200)
+    rows = []
+    for inv in invites:
+        league = await _league(db, inv.get("league_id", "")) or {}
+        change = inv["partner_change_request"]
+        users = {}
+        for key, uid in (("by", change.get("by_user_id")), ("partner", inv.get("partner_user_id"))):
+            try:
+                users[key] = await db.users.find_one({"_id": ObjectId(uid)}) or {}
+            except Exception:
+                users[key] = {}
+        rows.append({
+            "token": inv["token"],
+            "league_name": league.get("name", ""),
+            "start_date": league.get("start_date", ""),
+            "player_a": inv.get("initiator_name", ""),
+            "player_b": users["partner"].get("name", ""),
+            "requested_by": users["by"].get("name", ""),
+            "reason": change.get("reason", ""),
+            "requested_at": change.get("requested_at", ""),
+        })
+    return {"rows": rows}
+
+
+class ResolveIn(BaseModel):
+    action: Literal["approve", "decline"]
+
+
+@router.post("/partner-change-requests/{token}/resolve")
+async def resolve_change_request(token: str, body: ResolveIn, request: Request):
+    """Approve (the team is dissolved, both players wait for new partners) or decline a change request."""
+    db = request.app.state.db
+    await require_admin(request, db)
+    invite = await db.doubles_invites.find_one({"token": token})
+    change = (invite or {}).get("partner_change_request") or {}
+    if not invite or change.get("status") != "pending":
+        raise HTTPException(status_code=409, detail="No pending request for this team")
+    league = await _league(db, invite["league_id"]) or {}
+    league_name = league.get("name", "the league")
+    now = datetime.now(timezone.utc).isoformat()
+
+    async def players():
+        out = []
+        for uid in (invite["initiator_id"], invite.get("partner_user_id")):
+            try:
+                u = await db.users.find_one({"_id": ObjectId(uid)})
+            except Exception:
+                u = None
+            if u:
+                out.append(u)
+        return out
+
+    if body.action == "decline":
+        await db.doubles_invites.update_one({"token": token}, {"$set": {
+            "partner_change_request": {**change, "status": "declined", "resolved_at": now}}})
+        for u in await players():
+            if str(u["_id"]) == change.get("by_user_id") and u.get("email"):
+                email_service.schedule(email_service.send_partner_change_resolved(
+                    u["email"], u.get("name", ""), league_name, False))
+        return {"resolved": "declined"}
+
+    team_players = await players()
+    try:
+        info = await partner_assignment.dissolve_team(db, league, invite)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    await db.doubles_invites.update_one({"token": token}, {"$set": {
+        "partner_change_request": {**change, "status": "approved", "resolved_at": now}}})
+    for u in team_players:
+        if u.get("email"):
+            email_service.schedule(email_service.send_partner_change_resolved(
+                u["email"], u.get("name", ""), league_name, True))
+    return {"resolved": "approved", "repay_required": info["repay_required"]}

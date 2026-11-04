@@ -346,3 +346,93 @@ def test_my_leagues_carries_the_team_info(env, monkeypatch):
     monkeypatch.setattr(league_schedule, "league_progress", no_progress)
     out = run(league_routes.my_leagues(req(db)))
     assert out[0]["team"]["invite_token"] == ta and out[0]["team"]["partner_name"] == "Bea"
+
+
+def dissolve(db, token):
+    team = dict(inv(db, token))  # a snapshot, as a real find_one returns (the fake returns the live doc)
+    return run(partner_assignment.dissolve_team(db, db.leagues.docs[0], team))
+
+
+def test_dissolve_puts_both_players_back_on_the_waiting_list(env):
+    db = Db()
+    a_uid, b_uid, ta, tb = assigned_team(db)
+    out = dissolve(db, ta)
+    assert out["repay_required"] is False
+    assert db.player_leagues.docs == [] and db.leagues.docs[0]["current_players"] == 0
+    a, b = inv(db, ta), inv(db, tb)
+    assert a["status"] == "initiator_paid" and a["partner_user_id"] is None and a["assigned_by_admin"] is False
+    assert b["status"] == "initiator_paid" and b["merged_into"] is None and b["refund_due"] is False
+    assert a["rejected_partner_ids"] == [b_uid] and b["rejected_partner_ids"] == [a_uid]
+    with pytest.raises(ValueError) as e:                     # the same pair is never offered again
+        assign(db, ta, tb)
+    assert "asked not to be paired" in str(e.value)
+
+
+def test_dissolve_after_the_refund_makes_the_absorbed_player_pay_again(env):
+    db = Db()
+    _, _, ta, tb = assigned_team(db)
+    inv(db, tb).update(refund_due=False, refunded_at="2026-11-05T00:00:00+00:00")
+    out = dissolve(db, ta)
+    assert out["repay_required"] is True and inv(db, tb)["status"] == "pending"
+
+
+def test_dissolve_is_refused_once_the_league_started(env):
+    db = Db()
+    _, _, ta, _ = assigned_team(db)
+    db.leagues.docs[0]["status"] = "active"
+    with pytest.raises(ValueError):
+        dissolve(db, ta)
+    assert len(db.player_leagues.docs) == 2 and inv(db, ta)["status"] == "accepted"
+
+
+def resolve(db, token, action):
+    body = partner_match_routes.ResolveIn(action=action)
+    return run(partner_match_routes.resolve_change_request(token, body, req(db)))
+
+
+def test_admin_sees_pending_requests_and_approves_one(admin, env, monkeypatch):
+    db = Db()
+    a_uid, b_uid, ta, tb = assigned_team(db)
+    as_user(monkeypatch, db, a_uid)
+    request_change(db, ta, "Different levels")
+    rows = run(partner_match_routes.list_change_requests(req(db)))["rows"]
+    assert [(r["token"], r["player_a"], r["player_b"], r["requested_by"], r["reason"]) for r in rows] == [
+        (ta, "Ann", "Bea", "Ann", "Different levels")]
+    env.clear()
+    out = resolve(db, ta, "approve")
+    assert out["resolved"] == "approved" and out["repay_required"] is False
+    assert inv(db, ta)["partner_change_request"]["status"] == "approved"
+    assert sorted(env) == ["ann@example.com", "bea@example.com"]
+    assert run(partner_match_routes.list_change_requests(req(db)))["rows"] == []
+
+
+def test_admin_declines_a_request_and_the_team_stays(admin, env, monkeypatch):
+    db = Db()
+    a_uid, _, ta, _ = assigned_team(db)
+    as_user(monkeypatch, db, a_uid)
+    request_change(db, ta)
+    env.clear()
+    assert resolve(db, ta, "decline") == {"resolved": "declined"}
+    assert inv(db, ta)["partner_change_request"]["status"] == "declined" and inv(db, ta)["status"] == "accepted"
+    assert env == ["ann@example.com"]
+    assert len(db.player_leagues.docs) == 2
+
+
+def test_resolving_without_a_pending_request_is_a_conflict(admin, env):
+    db = Db()
+    _, _, ta, _ = assigned_team(db)
+    with pytest.raises(HTTPException) as e:
+        resolve(db, ta, "approve")
+    assert e.value.status_code == 409
+
+
+def test_approving_after_the_league_started_is_a_conflict_and_changes_nothing(admin, env, monkeypatch):
+    db = Db()
+    a_uid, _, ta, _ = assigned_team(db)
+    as_user(monkeypatch, db, a_uid)
+    request_change(db, ta)
+    db.leagues.docs[0]["status"] = "active"
+    with pytest.raises(HTTPException) as e:
+        resolve(db, ta, "approve")
+    assert e.value.status_code == 409
+    assert len(db.player_leagues.docs) == 2 and inv(db, ta)["partner_change_request"]["status"] == "pending"
