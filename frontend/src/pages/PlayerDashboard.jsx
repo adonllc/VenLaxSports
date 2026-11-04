@@ -8,6 +8,7 @@ import { buildScoreSummary } from "../utils/scoreSummary";
 import useReferralCode from "../hooks/useReferralCode";
 import AddPartnerPanel from "../components/AddPartnerPanel";
 import SeasonRecaps from "../components/SeasonRecaps";
+import PlayProfileCard from "../components/PlayProfileCard";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -333,6 +334,8 @@ export default function PlayerDashboard() {
             </div>
           </div>
         </div>
+
+        <PlayProfileCard />
 
         {/* DUPR Rating */}
         {(user?.sport_preferences?.includes("pickleball") || true) && (
