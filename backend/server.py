@@ -43,6 +43,7 @@ from routes.admin_team_routes import router as admin_team_router
 from routes.admin_player_crm_routes import router as admin_player_crm_router
 from routes.event_routes import router as event_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
+from routes.partner_match_routes import router as partner_match_router
 from routes.recap_routes import router as recap_router
 from routes.admin_ambassador_routes import router as ambassador_router
 from routes.admin_automation_routes import router as admin_automation_router
@@ -61,6 +62,7 @@ api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 api_router.include_router(admin_team_router, prefix="/admin", tags=["admin-team"])
 api_router.include_router(event_router, prefix="/events", tags=["events"])
 api_router.include_router(admin_dashboard_router, prefix="/admin", tags=["admin-dashboard"])
+api_router.include_router(partner_match_router, prefix="/admin", tags=["partner-matching"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
 api_router.include_router(season_router, prefix="/seasons", tags=["seasons"])
 api_router.include_router(playoffs_router, prefix="/playoffs", tags=["playoffs"])

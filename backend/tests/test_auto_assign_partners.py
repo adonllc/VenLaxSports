@@ -172,3 +172,90 @@ def test_spots_are_given_back_if_building_the_team_fails(env, monkeypatch):
     with pytest.raises(RuntimeError):
         assign(db, ta, tb)
     assert db.leagues.docs[0]["current_players"] == 0 and inv(db, ta)["status"] == "initiator_paid"
+
+
+from routes import partner_match_routes  # noqa: E402
+
+
+@pytest.fixture
+def admin(monkeypatch):
+    async def ok(request, db):
+        return {"_id": "admin", "role": "admin"}
+    monkeypatch.setattr(partner_match_routes, "require_admin", ok)
+
+
+def find_matches(db, **kw):
+    return run(partner_match_routes.find_matches(req(db), **{"league_id": None, "max_gap": 0.0, **kw}))
+
+
+def assign_matches(db, *pairs):
+    body = partner_match_routes.AssignIn(pairs=[{"token_a": a, "token_b": b} for a, b in pairs])
+    return run(partner_match_routes.assign_matches(body, req(db)))
+
+
+def test_find_matches_suggests_the_best_pair_and_explains_the_rest(admin):
+    db = Db()
+    make_waiting(db, "Ann")
+    make_waiting(db, "Bea")
+    make_waiting(db, "Cy", level="3.5")
+    out = find_matches(db)
+    assert out["max_gap"] == 0.0 and len(out["leagues"]) == 1
+    lg = out["leagues"][0]
+    assert lg["league_name"] == "Atlanta Doubles" and lg["spots_left"] == 16
+    assert [(p["a"]["name"], p["b"]["name"]) for p in lg["pairs"]] == [("Ann", "Bea")]
+    assert lg["pairs"][0]["token_a"] == "tok-Ann" and lg["pairs"][0]["score"] > 0
+    assert [(u["name"], u["reason"]) for u in lg["unmatched"]] == [
+        ("Cy", "No one within the chosen level range, try a wider level")]
+
+
+def test_wider_level_range_pairs_neighbours(admin):
+    db = Db()
+    make_waiting(db, "Ann")
+    make_waiting(db, "Cy", level="3.5")
+    assert find_matches(db)["leagues"][0]["pairs"] == []
+    pairs = find_matches(db, max_gap=0.5)["leagues"][0]["pairs"]
+    assert len(pairs) == 1 and "Levels 3.0 / 3.5" in pairs[0]["reasons"]
+
+
+def test_bad_max_gap_is_rejected(admin):
+    with pytest.raises(HTTPException) as e:
+        find_matches(Db(), max_gap=0.3)
+    assert e.value.status_code == 400
+
+
+def test_leagues_without_opt_ins_are_not_listed_and_unpaid_are_reported(admin):
+    db = Db()
+    assert find_matches(db)["leagues"] == []
+    make_waiting(db, "Ann", opt_in=False)
+    assert find_matches(db)["leagues"] == []
+    make_waiting(db, "Bea")
+    make_waiting(db, "Cy", status="pending")
+    lg = find_matches(db)["leagues"][0]
+    assert [s["name"] for s in lg["skipped"]] == ["Cy"]
+
+
+def test_assign_reports_each_pair_and_one_failure_does_not_stop_the_rest(admin, env):
+    db = Db()
+    _, ta = make_waiting(db, "Ann")
+    _, tb = make_waiting(db, "Bea")
+    _, tc = make_waiting(db, "Cy")
+    _, td = make_waiting(db, "Dee", opt_in=False)
+    out = assign_matches(db, (tc, td), (ta, tb))
+    assert [(r["ok"], r.get("refund_due")) for r in out["results"]] == [(False, None), (True, True)]
+    assert "has not agreed" in out["results"][0]["error"]
+    assert db.leagues.docs[0]["current_players"] == 2
+
+
+def test_refund_due_list_and_mark_refunded(admin, env):
+    db = Db()
+    _, ta = make_waiting(db, "Ann")
+    _, tb = make_waiting(db, "Bea")
+    assign_matches(db, (ta, tb))
+    rows = run(partner_match_routes.refund_due(req(db)))["rows"]
+    assert [(r["token"], r["player_name"], r["team_with"], r["amount"]) for r in rows] == [("tok-Bea", "Bea", "Ann", 19.99)]
+    assert run(partner_match_routes.mark_refunded("tok-Bea", req(db))) == {"refunded": True}
+    assert run(partner_match_routes.refund_due(req(db)))["rows"] == []
+    assert inv(db, "tok-Bea")["refunded_at"]
+    with pytest.raises(HTTPException) as e:
+        run(partner_match_routes.mark_refunded("tok-Bea", req(db)))
+    assert e.value.status_code == 409
