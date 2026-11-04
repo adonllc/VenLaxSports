@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { CheckCircle, ChevronRight } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
+import PlayProfileForm from "../components/PlayProfileForm";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -19,7 +20,7 @@ const SKILL_LEVELS = [
   { value: "6.0+", label: "6.0+", desc: "Open / Pro" },
 ];
 
-const STEPS = ["Sports", "Skill Level", "Home Court"];
+const STEPS = ["Sports", "Skill Level", "Home Court", "Play Style"];
 
 export default function ProfileSetup() {
   const { user, fetchMe } = useAuth();
@@ -31,6 +32,7 @@ export default function ProfileSetup() {
     skill_level: user?.skill_level || "",
     home_court: user?.home_court || "",
     city: user?.city || "",
+    play_profile: user?.play_profile || {},
   });
 
   const toggleSport = (id) =>
@@ -44,7 +46,9 @@ export default function ProfileSetup() {
   const handleFinish = async () => {
     setSaving(true);
     try {
-      await axios.patch(`${API}/users/me/setup`, form, { withCredentials: true });
+      const { play_profile, ...rest } = form;
+      const payload = Object.keys(play_profile).length ? { ...rest, play_profile } : rest;
+      await axios.patch(`${API}/users/me/setup`, payload, { withCredentials: true });
       await fetchMe();
       navigate("/dashboard");
     } catch (e) {
@@ -172,6 +176,39 @@ export default function ProfileSetup() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)} className="flex-1 py-3.5 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors text-sm">
+                  Back
+                </button>
+                <button
+                  onClick={() => setStep(3)}
+                  className="flex-1 py-3.5 bg-[#008F70] text-white font-semibold rounded-full hover:bg-[#00765C] transition-colors text-sm flex items-center justify-center gap-2"
+                  data-testid="next-step-3"
+                >
+                  Continue <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="w-full text-center text-xs text-gray-400 hover:text-gray-600 mt-4"
+              >
+                Skip for now
+              </button>
+            </>
+          )}
+
+          {/* Step 3: Play style (optional) */}
+          {step === 3 && (
+            <>
+              <h2 className="font-heading font-bold text-2xl text-heading-dark mb-2">How do you play?</h2>
+              <p className="text-sm text-gray-500 mb-6">Optional. Helps opponents and doubles partners find you. Change it anytime on your dashboard.</p>
+              <div className="mb-8">
+                <PlayProfileForm
+                  value={form.play_profile}
+                  onChange={(pp) => setForm((f) => ({ ...f, play_profile: pp }))}
+                  sports={form.sport_preferences}
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep(2)} className="flex-1 py-3.5 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors text-sm">
                   Back
                 </button>
                 <button
