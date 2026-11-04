@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import AutomationsTab from "../components/AutomationsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
+import PartnerMatchingPanel from "../components/PartnerMatchingPanel";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
 import DashboardTab from "../components/DashboardTab";
@@ -585,6 +586,7 @@ export default function AdminDashboard() {
 
         {/* Manage Leagues Tab */}
         {tab === "leagues" && <IncompleteTeamsCard />}
+        {tab === "leagues" && <PartnerMatchingPanel />}
         {tab === "leagues" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
