@@ -87,3 +87,22 @@ class TestSearchFields:
 
     def test_missing_profile(self):
         assert play_search_fields({}) == {"court_side": None, "play_style": None, "looking_for_partner": False}
+
+
+from auth_utils import serialize_public_user
+
+
+class TestPublicSerializer:
+    def test_includes_play_profile_when_public(self):
+        u = {"_id": "1", "name": "A", "profile_public": True,
+             "play_profile": {"court_side": "left"}, "phone": "+1-555"}
+        out = serialize_public_user(u)
+        assert out["play_profile"] == {"court_side": "left"}
+        assert "phone" not in out
+
+    def test_omits_play_profile_when_private(self):
+        u = {"_id": "1", "name": "A", "profile_public": False, "play_profile": {"court_side": "left"}}
+        assert serialize_public_user(u)["play_profile"] is None
+
+    def test_none_when_unset(self):
+        assert serialize_public_user({"_id": "1", "name": "A"})["play_profile"] is None

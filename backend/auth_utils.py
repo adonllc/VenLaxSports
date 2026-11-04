@@ -188,6 +188,7 @@ def serialize_public_user(user: dict) -> dict:
         "avatar": user.get("avatar"),
         "profile_public": user.get("profile_public", True),
         "founding_member": user.get("founding_member", False),
+        "play_profile": (user.get("play_profile") or None) if user.get("profile_public", True) else None,
     }
 
 
