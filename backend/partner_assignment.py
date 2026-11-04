@@ -180,16 +180,18 @@ async def dissolve_team(db, league: dict, team: dict) -> dict:
 
     token_a = team["token"]
     p1, p2 = team["initiator_id"], team["partner_user_id"]
+    merged_token = team.get("merged_token")   # read before any write
+    status_before = team.get("status_before_assign") or "pending"
     await db.player_leagues.delete_many({"league_id": str(league["_id"]), "invite_token": token_a})
     await db.leagues.update_one({"_id": league["_id"]}, {"$inc": {"current_players": -2}})
     await db.doubles_invites.update_one({"token": token_a}, {
-        "$set": {"status": team.get("status_before_assign") or "pending", "partner_user_id": None,
+        "$set": {"status": status_before, "partner_user_id": None,
                  "partner_email": "", "assigned_by_admin": False, "merged_token": None},
         "$push": {"rejected_partner_ids": p2},
     })
 
     repay = False
-    absorbed = await db.doubles_invites.find_one({"token": team["merged_token"]}) if team.get("merged_token") else None
+    absorbed = await db.doubles_invites.find_one({"token": merged_token}) if merged_token else None
     if absorbed:
         repay = bool(absorbed.get("refunded_at"))
         await db.doubles_invites.update_one({"token": absorbed["token"]}, {

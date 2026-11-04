@@ -1419,11 +1419,18 @@ async def request_partner_change(token: str, body: ChangeRequestBody, request: R
 
 ```
 
-- [ ] **Step 3c: `/leagues/my`** — in `backend/routes/league_routes.py` add `import partner_assignment` with the other top-level imports. In `my_leagues`, after `doc["progress"] = progress` add:
+- [ ] **Step 3c: `/leagues/my`** — in `backend/routes/league_routes.py` add `import partner_assignment` with the other top-level imports. `_serialize(l)` pops `_id` from the league dict in place, so compute the team **before** serializing. In `my_leagues`, replace the loop body with:
 
 ```python
+        progress = await league_schedule.league_progress(db, l, user["_id"])
+        team = None
         if l.get("format") in ("doubles", "mixed_doubles"):
-            doc["team"] = await partner_assignment.team_info(db, l, user["_id"], datetime.now(timezone.utc))
+            team = await partner_assignment.team_info(db, l, user["_id"], datetime.now(timezone.utc))
+        doc = _serialize(l)
+        doc["progress"] = progress
+        if team:
+            doc["team"] = team
+        out.append(doc)
 ```
 
 - [ ] **Step 4: Run to verify pass**
