@@ -3,12 +3,13 @@ import PageHero from "../components/PageHero";
 import { GALLERY, PHOTOS } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Search, MapPin, Trophy } from "lucide-react";
+import { Search, MapPin, ArrowRight } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import NotifyMeModal from "../components/NotifyMeModal";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import Slant from "../components/Slant";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -26,6 +27,7 @@ export default function Leagues() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isCityOpen } = useSiteSettings();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,23 +51,21 @@ export default function Leagues() {
     }));
   }, [user?.id]);
 
+  // Sport and city are applied in the browser so the sport cards can show counts for every sport
   useEffect(() => {
     fetchLeagues();
-  }, [filters.sport, filters.country, filters.city, filters.status, filters.season_id, filters.division, filters.format]);
+  }, [filters.country, filters.status, filters.season_id, filters.division]);
 
   const fetchLeagues = async () => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
-      if (filters.sport) params.set("sport", filters.sport);
       if (filters.country) params.set("country", filters.country);
-      if (filters.city) params.set("city", filters.city);
       if (filters.status) params.set("status", filters.status);
       if (filters.season_id) params.set("season_id", filters.season_id);
       if (filters.division) params.set("division", filters.division);
-      if (filters.format) params.set("format", filters.format);
-      params.set("limit", "50");
+      params.set("limit", "200");
       const { data } = await axios.get(`${API}/leagues?${params}`);
       setLeagues(data);
     } catch (e) {
@@ -84,11 +84,31 @@ export default function Leagues() {
     setSearchParams(newParams);
   };
 
-  const filteredLeagues = leagues.filter((l) => {
+  const spotsOf = (l) => l.max_players - (l.current_players || 0);
+  const isClosed = (l) => l.status !== "registration" || spotsOf(l) <= 0;
+  const isOpenNow = (l) => !isClosed(l) && isCityOpen(l.city);
+  const isOpensSoon = (l) => !isClosed(l) && !isCityOpen(l.city);
+
+  const sportLeagues = leagues.filter((l) => !filters.sport || l.sport === filters.sport);
+  const cityOptions = [...new Set(sportLeagues.filter((l) => !isClosed(l)).map((l) => l.city))].sort();
+  const cityActive = filters.city && cityOptions.includes(filters.city) ? filters.city : "";
+  const cityMissing = filters.city && !cityOptions.includes(filters.city);
+
+  const filteredLeagues = sportLeagues.filter((l) => {
+    if (cityActive && l.city !== cityActive) return false;
     if (filters.search && !l.name.toLowerCase().includes(filters.search.toLowerCase()) && !l.city.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.format && l.format !== filters.format) return false;
     return true;
   });
+  const openNow = filteredLeagues.filter(isOpenNow);
+  const opensSoon = filteredLeagues.filter(isOpensSoon);
+  const closed = filteredLeagues.filter(isClosed);
+
+  const sportCard = (s) => {
+    const open = leagues.filter((l) => l.sport === s.id && isOpenNow(l));
+    const mine = user?.city ? open.filter((l) => l.city === user.city).length : 0;
+    return { open: open.length, mine };
+  };
 
   // Real ItemList of the leagues actually rendered below — only emitted once
   // they've loaded, so we never ship a schema block with made-up entries.
@@ -146,37 +166,83 @@ export default function Leagues() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Primary Filters — Search + Sport only */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search leagues..."
-              value={filters.search}
-              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              className="w-full pl-10 pr-4 py-3 rounded-lg text-sm border"
-              style={{ borderColor: "#E5E7EB", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
-              data-testid="filter-search"
-            />
+        {!filters.sport ? (
+          /* Step 1: pick a sport */
+          <div data-testid="sport-picker">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "#008F70" }}>Step 1</p>
+            <h2 className="font-bold text-3xl md:text-4xl mb-8" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>What do you want to play?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {activeSports.map((s) => {
+                const c = sportCard(s);
+                return (
+                  <button key={s.id} onClick={() => updateFilter("sport", s.id)} className="group text-left" data-testid={`sport-card-${s.id}`}>
+                    <Slant src={PHOTOS[s.id]} alt={`${s.label} league play`} dir="right" className="aspect-[16/10] transition-transform group-hover:scale-[1.02]" />
+                    <p className="mt-4 font-bold text-2xl flex items-center gap-2" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>
+                      {s.label} <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                    </p>
+                    <p className="text-sm" style={{ color: "#5C5C5C" }}>
+                      {loading ? "Loading..." : `${c.open} open league${c.open !== 1 ? "s" : ""}${c.mine ? ` · ${c.mine} in ${user.city}` : ""}`}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+        ) : (
+          <>
+            {/* Sport tabs + city */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+              <div className="flex gap-2" role="tablist" aria-label="Sport">
+                {activeSports.map((s) => (
+                  <button
+                    key={s.id}
+                    role="tab"
+                    aria-selected={filters.sport === s.id}
+                    onClick={() => updateFilter("sport", s.id)}
+                    className="px-5 py-2.5 text-sm font-bold border transition-colors"
+                    style={filters.sport === s.id
+                      ? { background: "#008F70", borderColor: "#008F70", color: "white" }
+                      : { background: "white", borderColor: "#E5E7EB", color: "#3D3D3D" }}
+                    data-testid={`sport-tab-${s.id}`}
+                  >
+                    {s.icon} {s.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 sm:ml-auto">
+                <MapPin className="w-4 h-4" style={{ color: "#008F70" }} aria-hidden="true" />
+                <label htmlFor="city-select" className="text-sm font-medium" style={{ color: "#5C5C5C" }}>City</label>
+                <select
+                  id="city-select"
+                  value={cityActive}
+                  onChange={(e) => updateFilter("city", e.target.value)}
+                  className="px-3 py-2.5 text-sm bg-white border focus:outline-none"
+                  style={{ borderColor: "#E5E7EB", color: "#3D3D3D", minWidth: "160px" }}
+                  data-testid="filter-city"
+                >
+                  <option value="">All cities</option>
+                  {cityOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            {cityMissing && (
+              <p className="mb-6 text-sm px-4 py-3" style={{ background: "#F1F1F1", color: "#3D3D3D" }} data-testid="city-missing-note">
+                No open {SPORT_CONFIG[filters.sport]?.label || filters.sport} leagues in {filters.city} yet, so we are showing every city.
+              </p>
+            )}
 
-          {/* Sport Filter */}
-          <select
-            value={filters.sport}
-            onChange={(e) => updateFilter("sport", e.target.value)}
-            className="px-4 py-3 rounded-lg text-sm bg-white border focus:outline-none"
-            style={{ borderColor: "#E5E7EB", color: "#3D3D3D", fontFamily: "Rubik, sans-serif", minWidth: "160px" }}
-            data-testid="filter-sport"
-            aria-label="Filter leagues by sport"
-          >
-            <option value="">All Sports</option>
-            {activeSports.map((s) => (
-              <option key={s.id} value={s.id}>{s.icon} {s.label}</option>
-            ))}
-          </select>
-        </div>
+            <div className="relative mb-8">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search leagues..."
+                value={filters.search}
+                onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 rounded-lg text-sm border"
+                style={{ borderColor: "#E5E7EB", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+                data-testid="filter-search"
+              />
+            </div>
 
         {/* Secondary Filters — Division + Format toggles */}
         <div className="mb-8">
@@ -224,58 +290,73 @@ export default function Leagues() {
           </div>
         </div>
 
-        {/* Results count + Clear */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-sm font-medium" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }} data-testid="leagues-count">
-            {loading ? "Loading..." : `${filteredLeagues.length} league${filteredLeagues.length !== 1 ? "s" : ""} found`}
-          </p>
-          {(filters.sport || filters.city || filters.status || filters.division || filters.format || filters.search) && (
-            <button
-              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
-              className="text-sm font-medium text-gray-600 hover:text-[#3D3D3D] underline"
-              data-testid="clear-filters"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
+            {error && (
+              <div className="px-4 py-4 rounded-lg text-sm mb-6" style={{ background: "#FEE2E2", border: "1px solid #FECACA", color: "#DC2626" }} role="alert" data-testid="leagues-error">
+                ⚠ {error}
+              </div>
+            )}
 
-        {/* Error state */}
-        {error && (
-          <div className="px-4 py-4 rounded-lg text-sm" style={{ background: "#FEE2E2", border: "1px solid #FECACA", color: "#DC2626" }} role="alert" data-testid="leagues-error">
-            ⚠ {error}
-          </div>
-        )}
-
-        {/* League Grid */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-64 bg-white rounded-lg animate-pulse border" style={{ borderColor: "#E5E7EB" }} />
-            ))}
-          </div>
-        ) : filteredLeagues.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredLeagues.map((league) => (
-              <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <Trophy className="w-16 h-16 mx-auto mb-6 opacity-30" />
-            <h3 className="font-bold text-2xl mb-3 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>No leagues found</h3>
-            <p className="text-base mb-6" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif", maxWidth: "400px", margin: "0 auto" }}>No leagues match your current filters. Try clearing them to see all open leagues.</p>
-            <button
-              onClick={() => { setFilters({ sport: "", country: "", city: "", status: "", season_id: "", division: "", format: "", search: "" }); setSearchParams({}); }}
-              className="px-6 py-3 rounded-lg font-semibold transition-all"
-              style={{ background: "#008F70", color: "white", fontFamily: "Rubik, sans-serif" }}
-            >
-              Clear Filters
-            </button>
-          </div>
+            {loading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-64 bg-white rounded-lg animate-pulse border" style={{ borderColor: "#E5E7EB" }} />
+                ))}
+              </div>
+            ) : (
+              <>
+                <LeagueGroup title="Open now" hint="Registration is open. Join any of these." leagues={openNow} testId="group-open-now" navigate={navigate} empty="No open leagues match these filters." />
+                {opensSoon.length > 0 && (
+                  <LeagueGroup title="Opens soon" hint="Not open in these cities yet. Tap Notify me and we will tell you first." leagues={opensSoon} testId="group-opens-soon" navigate={navigate} />
+                )}
+                {closed.length > 0 && (
+                  <details className="mt-12" data-testid="group-closed">
+                    <summary className="cursor-pointer font-bold text-lg" style={{ color: "#5C5C5C", fontFamily: "Rubik, system-ui, sans-serif" }}>
+                      Full or finished ({closed.length})
+                    </summary>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                      {closed.map((league) => (
+                        <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
+                      ))}
+                    </div>
+                  </details>
+                )}
+                {(cityActive || filters.format || filters.division || filters.search) && (
+                  <button
+                    onClick={() => { setFilters((f) => ({ ...f, city: "", division: "", format: "", search: "" })); const np = new URLSearchParams(searchParams); ["city", "division", "format"].forEach((k) => np.delete(k)); setSearchParams(np); }}
+                    className="mt-10 text-sm font-medium text-gray-600 hover:text-[#3D3D3D] underline"
+                    data-testid="clear-filters"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
     </div>
+  );
+}
+
+function LeagueGroup({ title, hint, leagues, testId, navigate, empty }) {
+  if (leagues.length === 0 && !empty) return null;
+  return (
+    <section className="mt-10 first:mt-0" data-testid={testId}>
+      <div className="flex items-baseline gap-3 mb-1">
+        <h2 className="font-bold text-2xl" style={{ color: "#3D3D3D", fontFamily: "Rubik, system-ui, sans-serif" }}>{title}</h2>
+        <span className="text-sm font-medium" style={{ color: "#6B7280" }} data-testid={`${testId}-count`}>{leagues.length}</span>
+      </div>
+      <p className="text-sm mb-5" style={{ color: "#5C5C5C" }}>{hint}</p>
+      {leagues.length > 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {leagues.map((league) => (
+            <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm py-6" style={{ color: "#6B7280" }}>{empty}</p>
+      )}
+    </section>
   );
 }
 
