@@ -513,7 +513,7 @@ function LeagueCard({ league, onClick }) {
               disabled={isFull}
               data-testid={`league-join-${league.id}`}
             >
-              {isFull ? "Full" : "Join"}
+              {isFull ? "Full" : league.status === "active" ? "View" : "Join"}
             </button>
           )}
         </div>
