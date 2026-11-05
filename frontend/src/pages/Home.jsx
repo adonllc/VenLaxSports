@@ -291,6 +291,27 @@ export default function Home() {
           </ol>
         </section>
 
+        {/* 1a. DOUBLES WITHOUT A PARTNER */}
+        <section className="px-4 sm:px-6 pb-16 md:pb-20" aria-label="Doubles without a partner">
+          <motion.div {...fadeUp} className="max-w-[1100px] mx-auto flex flex-col md:flex-row md:items-center gap-6 md:gap-10 p-8 md:p-10" style={{ background: GREY, borderLeft: `6px solid ${AMBER}` }} data-testid="home-doubles-callout">
+            <div className="flex-1">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GREEN }}>Doubles</p>
+              <h2 className="font-bold text-3xl md:text-4xl leading-[1.1]" style={{ color: INK }}>Doubles without the group chat.</h2>
+              <p className="mt-3 text-lg leading-snug">Sign up solo. We'll find your partner.</p>
+              <ul className="mt-5 flex flex-wrap gap-2" data-testid="home-doubles-callout-points">
+                {["Matched on level", "Near you", "Change before it starts"].map((t) => (
+                  <li key={t} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold bg-white" style={{ color: INK }}>
+                    <Check className="w-4 h-4" style={{ color: GREEN }} aria-hidden="true" /> {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <AmberButton onClick={() => navigate("/leagues")} testId="home-doubles-callout-cta" className="self-start md:self-center shrink-0">
+              Find a doubles league <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </AmberButton>
+          </motion.div>
+        </section>
+
         {/* 1b. FLEXIBLE SCHEDULING */}
         <Section tint id="flexible-scheduling">
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
