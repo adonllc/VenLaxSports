@@ -10,6 +10,7 @@ import AddPartnerPanel from "../components/AddPartnerPanel";
 import SeasonRecaps from "../components/SeasonRecaps";
 import PlayProfileCard from "../components/PlayProfileCard";
 import ZipCodeEditor from "../components/ZipCodeEditor";
+import NameEditor from "../components/NameEditor";
 import AssignedTeamNote from "../components/AssignedTeamNote";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -247,6 +248,7 @@ export default function PlayerDashboard() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="font-heading font-bold text-2xl" style={{ color: "#3D3D3D" }}>{user.name}</h1>
+                <NameEditor />
                 {user.founding_member && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold rounded-full" data-testid="founding-member-badge">
                     ★ Founding Member

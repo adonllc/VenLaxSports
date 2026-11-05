@@ -4,6 +4,7 @@ from typing import Optional, List
 from pydantic import BaseModel, field_validator
 from bson import ObjectId
 from datetime import datetime, timezone
+import player_names
 from auth_utils import get_current_user
 from rating_utils import seed_starting_rating
 from models import UserFollow, PlayProfile, normalize_zip
@@ -77,6 +78,8 @@ async def search_users(request: Request, q: str = "", league_id: Optional[str] =
 
 
 class UserProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     city: Optional[str] = None
     phone: Optional[str] = None
     home_court: Optional[str] = None
@@ -158,6 +161,16 @@ async def update_profile(data: UserProfileUpdate, request: Request):
         raise HTTPException(status_code=400, detail="No fields to update")
     if payload.get("gender") not in (None, "male", "female"):
         raise HTTPException(status_code=400, detail="gender must be male or female")
+    new_name = None
+    if "first_name" in payload or "last_name" in payload:
+        # Both parts are needed to build the full name, so they travel together
+        try:
+            first = player_names.clean_name_part(payload.get("first_name"), "first name")
+            last = player_names.clean_name_part(payload.get("last_name"), "last name")
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        payload["first_name"], payload["last_name"] = first, last
+        new_name = payload["name"] = player_names.full_name(first, last)
     set_fields = {k: v for k, v in payload.items() if v is not None}
     unset_fields = {k: "" for k, v in payload.items() if v is None}
     ops: dict = {}
@@ -166,6 +179,8 @@ async def update_profile(data: UserProfileUpdate, request: Request):
     if unset_fields:
         ops["$unset"] = unset_fields
     await db.users.update_one({"_id": ObjectId(user["_id"])}, ops)
+    if new_name and new_name != user.get("name"):
+        await player_names.propagate_name(db, str(user["_id"]), new_name)
     updated = await db.users.find_one({"_id": ObjectId(user["_id"])}, {"password_hash": 0})
     if not updated:
         raise HTTPException(status_code=404, detail="User not found")
