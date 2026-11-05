@@ -24,6 +24,7 @@ api_router = APIRouter(prefix="/api", redirect_slashes=False)
 # Import routers
 from routes.auth_routes import router as auth_router
 from routes.league_routes import router as league_router
+from routes.league_waitlist_routes import router as league_waitlist_router
 from routes.match_routes import router as match_router
 from routes.payment_routes import router as payment_router
 from routes.admin_routes import router as admin_router
@@ -63,6 +64,7 @@ api_router.include_router(admin_team_router, prefix="/admin", tags=["admin-team"
 api_router.include_router(event_router, prefix="/events", tags=["events"])
 api_router.include_router(admin_dashboard_router, prefix="/admin", tags=["admin-dashboard"])
 api_router.include_router(partner_match_router, prefix="/admin", tags=["partner-matching"])
+api_router.include_router(league_waitlist_router, prefix="/league-waitlist", tags=["league-waitlist"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
 api_router.include_router(season_router, prefix="/seasons", tags=["seasons"])
 api_router.include_router(playoffs_router, prefix="/playoffs", tags=["playoffs"])

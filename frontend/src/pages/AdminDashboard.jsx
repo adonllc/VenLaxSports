@@ -587,6 +587,7 @@ export default function AdminDashboard() {
 
         {/* Manage Leagues Tab */}
         {tab === "leagues" && <IncompleteTeamsCard />}
+        {tab === "leagues" && <LeagueWaitlistCard />}
         {tab === "leagues" && <PartnerMatchingPanel />}
         {tab === "leagues" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
@@ -2081,6 +2082,63 @@ function SiteSettingsCard() {
 }
 
 // Which marketing channel produced registrations: new accounts grouped by where the visitor came from.
+function LeagueWaitlistCard() {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [rows, setRows] = useState(null);
+  const [msg, setMsg] = useState("");
+  const load = () => axios.get(`${API}/league-waitlist/admin/list`, { withCredentials: true })
+    .then((r) => setRows(r.data.rows))
+    .catch(() => setRows([]));
+  useEffect(() => { load(); }, []);
+  const act = async (method, r, suffix = "") => {
+    setMsg("");
+    try {
+      await axios({ method, url: `${API}/league-waitlist/admin/${r.league_id}/${r.player_id}${suffix}`, withCredentials: true });
+      await load();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "That did not work.");
+    }
+  };
+  if (!rows || rows.length === 0) return null;
+  return (
+    <div className="mb-6 bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }} data-testid="league-waitlist">
+      <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
+        <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Waitlist for running leagues ({rows.length})</h2>
+        <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Place a player when a registered player drops out and the league has a free spot. Placing adds them to the league and emails them; settle any entry fee with them yourself.</p>
+        {msg && <p className="text-sm mt-2 p-2" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="alert">{msg}</p>}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
+              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Free spots</th><th className="px-5 py-2">Waiting since</th><th className="px-5 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.league_id + r.player_id} style={{ borderTop: "1px solid #F3F4F6" }}>
+                <td className="px-5 py-2">{r.player_name}<div className="text-xs" style={{ color: "#6B7280" }}>{r.player_email}</div></td>
+                <td className="px-5 py-2">{r.league_name}</td>
+                <td className="px-5 py-2">{r.spots_left}</td>
+                <td className="px-5 py-2">{String(r.since).slice(0, 10)}</td>
+                <td className="px-5 py-2 whitespace-nowrap">
+                  <button onClick={() => act("post", r, "/place")} disabled={r.spots_left < 1}
+                    className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+                    style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid={`waitlist-place-${r.player_id}`}>
+                    Place in league
+                  </button>
+                  <button onClick={() => act("delete", r)} className="ml-3 text-xs underline" style={{ color: "#5C5C5C" }} data-testid={`waitlist-remove-${r.player_id}`}>Remove</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function IncompleteTeamsCard() {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [teams, setTeams] = useState(null);

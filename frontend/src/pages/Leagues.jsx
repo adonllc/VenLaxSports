@@ -31,6 +31,7 @@ export default function Leagues() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isCityOpen } = useSiteSettings();
+  const [waitlisted, setWaitlisted] = useState([]);
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,6 +56,24 @@ export default function Leagues() {
       city:  prev.city  || user.city || "",
     }));
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!user) { setWaitlisted([]); return; }
+    axios.get(`${API}/league-waitlist/my`, { withCredentials: true })
+      .then((r) => setWaitlisted(r.data.league_ids || []))
+      .catch(() => {});
+  }, [user?.id]);
+
+  const joinWaitlist = async (league) => {
+    if (!user) { navigate("/auth"); return; }
+    try {
+      await axios.post(`${API}/league-waitlist/${league.id}`, {}, { withCredentials: true });
+      setWaitlisted((w) => (w.includes(league.id) ? w : [...w, league.id]));
+    } catch (err) {
+      setError(err.response?.data?.detail || "Could not join the waitlist. Please try again.");
+    }
+  };
+  const waitlist = { ids: waitlisted, join: joinWaitlist };
 
   // Sport and city are applied in the browser so the sport cards can show counts for every sport
   useEffect(() => {
@@ -107,7 +126,8 @@ export default function Leagues() {
   });
   const openNow = filteredLeagues.filter(isOpenNow);
   const opensSoon = filteredLeagues.filter(isOpensSoon);
-  const closed = filteredLeagues.filter(isClosed);
+  const running = filteredLeagues.filter((l) => l.status === "active");
+  const closed = filteredLeagues.filter((l) => isClosed(l) && l.status !== "active");
 
   const sportCard = (s) => {
     const open = leagues.filter((l) => l.sport === s.id && isOpenNow(l));
@@ -323,9 +343,12 @@ export default function Leagues() {
               </div>
             ) : (
               <>
-                <LeagueGroup title="Open now" hint="Registration is open. Join any of these." leagues={openNow} testId="group-open-now" navigate={navigate} empty="No open leagues match these filters." />
+                <LeagueGroup title="Open now" hint="Registration is open. Join any of these." leagues={openNow} testId="group-open-now" navigate={navigate} waitlist={waitlist} empty="No open leagues match these filters." />
                 {opensSoon.length > 0 && (
-                  <LeagueGroup title="Opens soon" hint="Not open in these cities yet. Tap Notify me and we will tell you first." leagues={opensSoon} testId="group-opens-soon" navigate={navigate} />
+                  <LeagueGroup title="Opens soon" hint="Not open in these cities yet. Tap Notify me and we will tell you first." leagues={opensSoon} testId="group-opens-soon" navigate={navigate} waitlist={waitlist} />
+                )}
+                {running.length > 0 && (
+                  <LeagueGroup title="Running now" hint="These leagues have started. Join the waitlist and we place you if a spot opens." leagues={running} testId="group-running" navigate={navigate} waitlist={waitlist} />
                 )}
                 {closed.length > 0 && (
                   <details className="mt-12" data-testid="group-closed">
@@ -334,7 +357,7 @@ export default function Leagues() {
                     </summary>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                       {closed.map((league) => (
-                        <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
+                        <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} waitlist={waitlist} />
                       ))}
                     </div>
                   </details>
@@ -357,7 +380,7 @@ export default function Leagues() {
   );
 }
 
-function LeagueGroup({ title, hint, leagues, testId, navigate, empty }) {
+function LeagueGroup({ title, hint, leagues, testId, navigate, waitlist, empty }) {
   if (leagues.length === 0 && !empty) return null;
   return (
     <section className="mt-10 first:mt-0" data-testid={testId}>
@@ -369,7 +392,7 @@ function LeagueGroup({ title, hint, leagues, testId, navigate, empty }) {
       {leagues.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {leagues.map((league) => (
-            <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} />
+            <LeagueCard key={league.id} league={league} onClick={() => navigate(`/leagues/${league.id}`)} waitlist={waitlist} />
           ))}
         </div>
       ) : (
@@ -401,7 +424,7 @@ function cardPhoto(league) {
   return set[n % set.length];
 }
 
-function LeagueCard({ league, onClick }) {
+function LeagueCard({ league, onClick, waitlist }) {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const config = SPORT_CONFIG[league.sport] || { icon: "🏆", label: league.sport };
@@ -414,6 +437,8 @@ function LeagueCard({ league, onClick }) {
   const { isCityOpen } = useSiteSettings();
   const opensSoon = league.status === "registration" && !isCityOpen(league.city);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const isRunning = league.status === "active";
+  const onWaitlist = !!waitlist?.ids.includes(league.id);
   const perUnit = league.format === "singles" ? "per player" : "per team";
   const startIso = String(league.start_date || "").slice(0, 10);
   const started = startIso && startIso <= new Date().toISOString().slice(0, 10);
@@ -473,6 +498,12 @@ function LeagueCard({ league, onClick }) {
           </p>
         )}
 
+        {isRunning && (
+          <p className="mt-2 text-xs" style={{ color: "#4C4C4C" }} data-testid={`league-waitlist-note-${league.id}`}>
+            Running now. Join the waitlist and we place you if a spot opens.
+          </p>
+        )}
+
         {isAdmin && (
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1.5" style={{ color: "#6B7280" }}>
@@ -496,6 +527,16 @@ function LeagueCard({ league, onClick }) {
           </div>
           {isEnded ? (
             <span className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6B7280" }} data-testid={`league-ended-${league.id}`}>Season ended</span>
+          ) : isRunning ? (
+            <button
+              onClick={(ev) => { ev.stopPropagation(); if (!onWaitlist) waitlist?.join(league); }}
+              disabled={onWaitlist}
+              className="text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors disabled:opacity-70 hover:brightness-90"
+              style={{ background: onWaitlist ? "#E4E4E4" : theme.accent, color: onWaitlist ? "#4C4C4C" : theme.onAccent }}
+              data-testid={`league-waitlist-${league.id}`}
+            >
+              {onWaitlist ? "On the waitlist" : "Join waitlist"}
+            </button>
           ) : opensSoon ? (
             <button
               onClick={(ev) => { ev.stopPropagation(); setNotifyOpen(true); }}
@@ -513,7 +554,7 @@ function LeagueCard({ league, onClick }) {
               disabled={isFull}
               data-testid={`league-join-${league.id}`}
             >
-              {isFull ? "Full" : league.status === "active" ? "View" : "Join"}
+              {isFull ? "Full" : "Join"}
             </button>
           )}
         </div>

@@ -507,6 +507,17 @@ async def send_partner_nudge(to: str, player_name: str, league_name: str, start_
     await send_email(to, f"Your doubles team still needs a partner - {league_name}", _wrap("Your team needs a partner", body, cta, url))
 
 
+async def send_waitlist_placed(to: str, player_name: str, league_name: str, entry_fee: float = 0.0) -> None:
+    url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
+    fee = (f"<p>The entry fee is ${entry_fee:.2f}. VenLax will be in touch about it.</p>" if entry_fee > 0 else "")
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>A spot opened up in <strong>{league_name}</strong> and you are in. Your matches will show on your dashboard.</p>
+      {fee}
+    """
+    await send_email(to, f"You are in: {league_name}", _wrap("You got a spot", body, "Open dashboard", url))
+
+
 async def send_partner_change_resolved(to: str, player_name: str, league_name: str, approved: bool) -> None:
     url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
     if approved:
