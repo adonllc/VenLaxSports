@@ -443,7 +443,9 @@ function LeagueCard({ league, onClick, waitlist }) {
   const startIso = String(league.start_date || "").slice(0, 10);
   const started = startIso && startIso <= new Date().toISOString().slice(0, 10);
   // Open leagues say when they start; running ones say when they began and end; finished ones show the whole span
-  const dateText = isEnded
+  const dateText = opensSoon
+    ? ""   // the city is not open yet, so any date on the league is a placeholder
+    : isEnded
     ? [shortDate(league.start_date, true), shortDate(league.end_date, true)].filter(Boolean).join(" to ")
     : started
       ? `Started ${shortDate(league.start_date)}${league.end_date ? ` · Ends ${shortDate(league.end_date)}` : ""}`
