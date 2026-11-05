@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 import email_service
 import partner_assignment
 import partner_matching
+import partner_nudges
 from auth_utils import require_admin
 
 router = APIRouter()
@@ -210,3 +211,27 @@ async def resolve_change_request(token: str, body: ResolveIn, request: Request):
             email_service.schedule(email_service.send_partner_change_resolved(
                 u["email"], u.get("name", ""), league_name, True))
     return {"resolved": "approved", "repay_required": info["repay_required"]}
+
+
+REMIND_COOLDOWN_HOURS = 24
+
+
+@router.post("/partner-matches/{token}/remind")
+async def remind_waiting_team(token: str, request: Request):
+    """Email a waiting player now. One reminder per team per 24 hours."""
+    db = request.app.state.db
+    await require_admin(request, db)
+    invite = await db.doubles_invites.find_one({"token": token})
+    if not invite or invite.get("status") not in partner_assignment.WAITING or invite.get("partner_user_id"):
+        raise HTTPException(status_code=404, detail="This team is no longer waiting for a partner")
+    now = datetime.now(timezone.utc)
+    last = invite.get("last_reminded_at")
+    if last and (now - datetime.fromisoformat(last)).total_seconds() < REMIND_COOLDOWN_HOURS * 3600:
+        raise HTTPException(status_code=409, detail="This player was reminded in the last 24 hours")
+    league = await _league(db, invite["league_id"])
+    if not league or league.get("status") != "registration":
+        raise HTTPException(status_code=409, detail="League registration is closed")
+    if not await partner_nudges.send_nudge(db, invite, league, now):
+        raise HTTPException(status_code=409, detail="This player has no email on file")
+    await db.doubles_invites.update_one({"token": token}, {"$set": {"last_reminded_at": now.isoformat()}})
+    return {"reminded": True}

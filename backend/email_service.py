@@ -484,6 +484,29 @@ async def send_partner_assigned(to: str, player_name: str, partner_name: str, le
     await send_email(to, f"Your doubles partner for {league_name}", _wrap("You have a partner", body, "Open dashboard", url))
 
 
+async def send_partner_nudge(to: str, player_name: str, league_name: str, start_date: str,
+                             days_left, opted_in: bool) -> None:
+    url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
+    when = f" The league starts on <strong>{start_date}</strong>" if start_date else " The league is about to start"
+    if days_left is not None:
+        when += f" ({days_left} day{'s' if days_left != 1 else ''} to go)"
+    when += "."
+    if opted_in:
+        ask = ("You asked VenLax to pick your partner, so there is nothing you need to do. If you already know someone "
+               "you would rather play with, you can add them from your dashboard.")
+        cta = "Open dashboard"
+    else:
+        ask = ("Add a partner from your dashboard, or let VenLax pick one for you. VenLax can pair you with another waiting "
+               "player in your league, based on level, location and play profile.")
+        cta = "Find my partner"
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>Your doubles team in <strong>{league_name}</strong> still needs a partner.{when}</p>
+      <p>{ask}</p>
+    """
+    await send_email(to, f"Your doubles team still needs a partner - {league_name}", _wrap("Your team needs a partner", body, cta, url))
+
+
 async def send_partner_change_resolved(to: str, player_name: str, league_name: str, approved: bool) -> None:
     url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
     if approved:

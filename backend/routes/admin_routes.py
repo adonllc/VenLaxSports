@@ -53,6 +53,11 @@ JOB_FLAGS = {
         "description": "On the league start date, refunds the full entry fee (Stripe) of any doubles team whose first player paid but has no partner, and emails them. OFF until you turn it on. Zelle payments are never refunded automatically. Daily 00:20 UTC.",
         "default": False,
     },
+    "nudge_waiting_partners": {
+        "label": "Remind Doubles Players Without a Partner",
+        "description": "Emails a doubles player who still has no partner 7 days and 2 days before the league starts (once each). OFF until you turn it on. Daily 09:00 UTC.",
+        "default": False,
+    },
 }
 
 
@@ -111,6 +116,9 @@ async def incomplete_teams(request: Request):
             pass
         rows.append({
             "token_tail": inv["token"][-6:],
+            "token": inv["token"],
+            "auto_assign": bool(inv.get("auto_assign_opt_in")),
+            "last_reminded_at": inv.get("last_reminded_at", ""),
             "league_id": lid,
             "league_name": lg.get("name", ""),
             "league_start": lg.get("start_date", ""),

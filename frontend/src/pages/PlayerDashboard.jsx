@@ -479,18 +479,33 @@ export default function PlayerDashboard() {
                       )}
                     </div>
                   </div>
-                  {!invite.partner_email && (
-                    <label className="mt-3 flex items-start gap-2 text-xs cursor-pointer" style={{ color: "#4C4C4C" }}>
-                      <input
-                        type="checkbox"
-                        checked={!!invite.auto_assign}
-                        onChange={() => toggleAutoAssign(invite)}
-                        className="mt-0.5 h-4 w-4 accent-[#008F70]"
+                  {!invite.partner_email && (invite.auto_assign ? (
+                    <div className="mt-3 flex items-center justify-between gap-3 flex-wrap px-3 py-2 text-xs" style={{ background: "#F1F1F1", color: "#3D3D3D" }}>
+                      <span>VenLax will look for a partner for you and email you when it has one.</span>
+                      <button
+                        onClick={() => toggleAutoAssign(invite)}
+                        className="underline font-medium"
                         data-testid={`auto-assign-toggle-${invite.token}`}
-                      />
-                      Let VenLax pick my partner. VenLax may pair me with another waiting player; my name, level and city are shared with that partner.
-                    </label>
-                  )}
+                      >
+                        Turn off
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-3 p-3" style={{ background: "#FFF6E0", border: "1px solid #F2A922" }}>
+                      <p className="text-sm font-bold" style={{ color: "#3D3D3D" }}>No partner yet? Let VenLax find one.</p>
+                      <p className="text-xs mt-1" style={{ color: "#4C4C4C" }}>
+                        VenLax may pair you with another waiting player at your level. Your name, level and city are shared with that partner. You can ask for a different partner until the league starts.
+                      </p>
+                      <button
+                        onClick={() => toggleAutoAssign(invite)}
+                        className="mt-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
+                        style={{ background: "#F2A922", color: "#3D3D3D" }}
+                        data-testid={`auto-assign-toggle-${invite.token}`}
+                      >
+                        Let VenLax find me a partner
+                      </button>
+                    </div>
+                  ))}
                   {addPartnerFor === invite.token && (
                     <div className="mt-4">
                       <AddPartnerPanel

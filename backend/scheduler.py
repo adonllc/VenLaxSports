@@ -13,6 +13,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 import logging
 
 import email_automation
+from partner_nudges import nudge_waiting_teams
 import email_schedule
 from email_campaign_scheduler import send_weekly_campaign
 from scheduler_jobs import (
@@ -75,6 +76,15 @@ def start_scheduler(db):
             args=[db],
             id="refund_unpaired_teams",
             name="Refund Doubles Teams Without a Partner",
+            replace_existing=True,
+            max_instances=1,
+        )
+        scheduler.add_job(
+            nudge_waiting_teams,
+            trigger=CronTrigger(hour=9, minute=0),
+            args=[db],
+            id="nudge_waiting_partners",
+            name="Remind Doubles Players Without a Partner",
             replace_existing=True,
             max_instances=1,
         )

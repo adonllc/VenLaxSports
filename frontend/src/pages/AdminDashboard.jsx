@@ -1968,11 +1968,20 @@ function SiteSettingsCard() {
 function IncompleteTeamsCard() {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [teams, setTeams] = useState(null);
+  const [remindMsg, setRemindMsg] = useState({});
   useEffect(() => {
     axios.get(`${API}/admin/incomplete-teams`, { withCredentials: true })
       .then((r) => setTeams(r.data.teams))
       .catch(() => setTeams([]));
   }, []);
+  const remind = async (t) => {
+    try {
+      await axios.post(`${API}/admin/partner-matches/${t.token}/remind`, {}, { withCredentials: true });
+      setRemindMsg((m) => ({ ...m, [t.token]: "Reminder sent" }));
+    } catch (err) {
+      setRemindMsg((m) => ({ ...m, [t.token]: err.response?.data?.detail || "Could not send" }));
+    }
+  };
   if (!teams || teams.length === 0) return null;
   return (
     <div className="mb-6 bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }} data-testid="incomplete-teams">
@@ -1984,7 +1993,7 @@ function IncompleteTeamsCard() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
-              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Starts</th><th className="px-5 py-2">Paid</th><th className="px-5 py-2">Partner invited</th>
+              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Starts</th><th className="px-5 py-2">Paid</th><th className="px-5 py-2">Partner invited</th><th className="px-5 py-2">VenLax pick</th><th className="px-5 py-2">Reminder</th>
             </tr>
           </thead>
           <tbody>
@@ -1995,6 +2004,18 @@ function IncompleteTeamsCard() {
                 <td className="px-5 py-2">{t.league_start}</td>
                 <td className="px-5 py-2">{t.paid ? "Yes" : "No"}</td>
                 <td className="px-5 py-2">{t.partner_email || "Not yet"}</td>
+                <td className="px-5 py-2" data-testid={`incomplete-team-optin-${t.token_tail}`}>{t.auto_assign ? "Opted in" : "No"}</td>
+                <td className="px-5 py-2">
+                  <button
+                    onClick={() => remind(t)}
+                    className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
+                    style={{ background: "#F2A922", color: "#3D3D3D" }}
+                    data-testid={`remind-team-${t.token_tail}`}
+                  >
+                    Remind
+                  </button>
+                  {remindMsg[t.token] && <div className="text-xs mt-1" style={{ color: "#6B7280" }}>{remindMsg[t.token]}</div>}
+                </td>
               </tr>
             ))}
           </tbody>
