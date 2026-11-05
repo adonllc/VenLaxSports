@@ -296,8 +296,8 @@ export default function Home() {
           <motion.div {...fadeUp} className="max-w-[1100px] mx-auto flex flex-col md:flex-row md:items-center gap-6 md:gap-10 p-8 md:p-10" style={{ background: GREY, borderLeft: `6px solid ${AMBER}` }} data-testid="home-doubles-callout">
             <div className="flex-1">
               <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GREEN }}>Doubles</p>
-              <h2 className="font-bold text-3xl md:text-4xl leading-[1.1]" style={{ color: INK }}>Doubles without the group chat.</h2>
-              <p className="mt-3 text-lg leading-snug">Sign up solo. We'll find your partner.</p>
+              <h2 className="font-bold text-3xl md:text-4xl leading-[1.1]" style={{ color: INK }}>Doubles without a partner?</h2>
+              <p className="mt-3 text-lg leading-snug">No problem. Sign up solo. We'll find you a partner.</p>
               <ul className="mt-5 flex flex-wrap gap-2" data-testid="home-doubles-callout-points">
                 {["Matched on level", "Near you", "Change before it starts"].map((t) => (
                   <li key={t} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold bg-white" style={{ color: INK }}>
