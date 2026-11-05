@@ -222,6 +222,7 @@ export default function AdminDashboard() {
   const [adjustLeague, setAdjustLeague] = useState(null);
   const [rulesLeague, setRulesLeague] = useState(null);
   const [startMinLeague, setStartMinLeague] = useState(null);
+  const [datesLeague, setDatesLeague] = useState(null);
 
   const handleOpenToPlay = async (l, regenerate = false) => {
     const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/open-to-play`, { regenerate, ...body }, { withCredentials: true });
@@ -683,6 +684,16 @@ export default function AdminDashboard() {
                               Playoff rules
                             </button>
                           )}
+                          {l.status !== "completed" && l.status !== "cancelled" && (
+                            <button
+                              onClick={() => setDatesLeague(l)}
+                              className="text-xs font-bold" style={{ color: "#008F70" }}
+                              data-testid={`edit-dates-${l.id}`}
+                              title="Move the start date or extend the end date"
+                            >
+                              Edit dates
+                            </button>
+                          )}
                           {l.status === "registration" && (
                             <button
                               onClick={() => setStartMinLeague(l)}
@@ -857,6 +868,7 @@ export default function AdminDashboard() {
         {tab === "audit" && <AuditLogTab />}
         {tab === "players" && <PlayerInsightsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
+        {datesLeague && <LeagueDatesModal league={datesLeague} onClose={() => setDatesLeague(null)} onSaved={() => { setDatesLeague(null); window.location.reload(); }} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}
       </div>
@@ -1811,6 +1823,64 @@ function PlayoffRulesModal({ league, onClose, onSaved }) {
             {busy ? "Saving..." : "Save rule"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function LeagueDatesModal({ league, onClose, onSaved }) {
+  const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
+  const [start, setStart] = useState(String(league.start_date || "").slice(0, 10));
+  const [end, setEnd] = useState(String(league.end_date || "").slice(0, 10));
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const started = league.status !== "registration";
+
+  const save = async () => {
+    if (!start || !end) { setMsg("Pick both dates."); return; }
+    if (end < start) { setMsg("The end date cannot be before the start date."); return; }
+    setBusy(true);
+    setMsg("");
+    try {
+      await axios.put(`${API}/admin/leagues/${league.id}`, { start_date: start, end_date: end }, { withCredentials: true });
+      onSaved();
+    } catch (err) {
+      const d = err.response?.data?.detail;
+      setMsg(typeof d === "string" ? d : "Could not save the dates.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = { border: "1px solid #B5B5B5", color: "#3D3D3D", background: "#fff", padding: "6px 8px", fontSize: "14px", width: "100%" };
+  const label = "block text-xs font-bold uppercase tracking-wider mb-1";
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="league-dates-modal">
+      <div className="bg-white w-full max-w-md p-5">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>League dates</h3>
+            <p className="text-xs" style={{ color: "#5C5C5C" }}>
+              {league.name}. The start date also sets when the partner-change window closes and when unpaired doubles teams are refunded. Players are not emailed about a date change.
+            </p>
+          </div>
+          <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }}>Close</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={label} htmlFor="ld-start" style={{ color: "#5C5C5C" }}>Start date</label>
+            <input id="ld-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} style={field} data-testid="league-start-date" />
+          </div>
+          <div>
+            <label className={label} htmlFor="ld-end" style={{ color: "#5C5C5C" }}>End date</label>
+            <input id="ld-end" type="date" value={end} onChange={(e) => setEnd(e.target.value)} style={field} data-testid="league-end-date" />
+          </div>
+        </div>
+        {started && <p className="text-xs mt-3" style={{ color: "#5C5C5C" }}>This league has already started. Extending the end date keeps it running longer.</p>}
+        {msg && <p className="text-sm p-2 mt-3" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="alert">{msg}</p>}
+        <button onClick={save} disabled={busy} className="mt-4 px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="league-dates-save">
+          {busy ? "Saving..." : "Save dates"}
+        </button>
       </div>
     </div>
   );

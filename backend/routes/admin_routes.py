@@ -350,11 +350,24 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     admin = await _need(request, "leagues.write")
 
     # Capture previous status to detect activation
-    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1})
+    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1, "start_date": 1, "end_date": 1})
     if not prev:
         raise HTTPException(status_code=404, detail="League not found")
 
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if "start_date" in update_data or "end_date" in update_data:
+        if prev.get("status") in ("completed", "cancelled"):
+            raise HTTPException(status_code=409, detail="A finished league's dates cannot be changed")
+        for key in ("start_date", "end_date"):
+            if key in update_data:
+                try:
+                    update_data[key] = datetime.strptime(update_data[key], "%Y-%m-%d").date().isoformat()
+                except ValueError:
+                    raise HTTPException(status_code=400, detail=f"{key} must be a date like 2026-12-20")
+        start = update_data.get("start_date", str(prev.get("start_date") or "")[:10])
+        end = update_data.get("end_date", str(prev.get("end_date") or "")[:10])
+        if start and end and end < start:
+            raise HTTPException(status_code=400, detail="The end date cannot be before the start date")
     if "min_players_to_start" in update_data:
         effective_max = update_data.get("max_players", prev.get("max_players", 16))
         if not 2 <= update_data["min_players_to_start"] <= effective_max:

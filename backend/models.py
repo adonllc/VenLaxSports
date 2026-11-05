@@ -223,6 +223,8 @@ class LeagueCreate(BaseModel):
 class LeagueUpdate(BaseModel):
     name: Optional[str] = None
     status: Optional[str] = None
+    start_date: Optional[str] = None  # YYYY-MM-DD
+    end_date: Optional[str] = None    # YYYY-MM-DD
     description: Optional[str] = None
     venue: Optional[str] = None
     max_players: Optional[int] = None
