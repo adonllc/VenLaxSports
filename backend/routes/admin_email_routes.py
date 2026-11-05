@@ -34,6 +34,7 @@ class EmailPayload(BaseModel):
     body: Optional[str] = None
     cta_label: Optional[str] = None
     cta_url: Optional[str] = None
+    subject_variant: Optional[int] = None   # registered template with several subject lines: which one (0 is the first)
     user_ids: Optional[list[str]] = None   # registered: only these players (one, several, or leave out for everyone matching)
 
 
@@ -58,7 +59,7 @@ def _payload(p: EmailPayload) -> dict:
 @router.get("/templates")
 async def templates(request: Request):
     await _admin(request, "marketing.read")
-    return {"templates": [{"id": k, "label": v["label"]} for k, v in bulk_email.TEMPLATES.items()],
+    return {"templates": [{"id": k, "label": v["label"], "subjects": v.get("subjects") or [v["subject"]]} for k, v in bulk_email.TEMPLATES.items()],
             "segments": list(bulk_email.SEGMENTS), "max_recipients": bulk_email.MAX_RECIPIENTS}
 
 

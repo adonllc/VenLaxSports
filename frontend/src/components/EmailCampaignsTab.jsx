@@ -27,6 +27,7 @@ export default function EmailCampaignsTab() {
   const [templates, setTemplates] = useState([]);
   const [audience, setAudience] = useState("early_1");
   const [template, setTemplate] = useState("season_starts");
+  const [variant, setVariant] = useState(0);
   const [segment, setSegment] = useState("all");
   const [who, setWho] = useState("segment"); // "segment" = everyone matching, "pick" = chosen players only
   const [picked, setPicked] = useState([]);
@@ -50,10 +51,12 @@ export default function EmailCampaignsTab() {
   const registered = audience === "registered";
   const custom = registered && template === "custom";
 
+  const subjectsOf = templates.find((t) => t.id === template)?.subjects || [];
+
   const payload = () => {
     if (!registered) return { audience: "early_list", step: Number(audience.split("_")[1]) };
     const base = { audience: "registered", segment, city: city.trim() || null, user_ids: who === "pick" ? picked.map((p) => p.id) : null };
-    if (!custom) return { ...base, template };
+    if (!custom) return { ...base, template, subject_variant: subjectsOf.length > 1 ? Math.min(variant, subjectsOf.length - 1) : null };
     return { ...base, subject, body, cta_label: ctaLabel.trim() || null, cta_url: ctaUrl.trim() || null };
   };
 
@@ -71,7 +74,7 @@ export default function EmailCampaignsTab() {
   }, []);
 
   // any edit makes the previous preview stale: it must be shown again before sending
-  useEffect(() => { setPreview(null); }, [audience, template, segment, city, subject, body, ctaLabel, ctaUrl, who, picked]);
+  useEffect(() => { setPreview(null); }, [audience, template, variant, segment, city, subject, body, ctaLabel, ctaUrl, who, picked]);
 
   // search for players to pick
   useEffect(() => {
@@ -170,9 +173,18 @@ export default function EmailCampaignsTab() {
           {registered && (
             <div>
               <Label>Email</Label>
-              <select className={field} style={fieldStyle} value={template} onChange={(e) => setTemplate(e.target.value)} data-testid="email-template">
+              <select className={field} style={fieldStyle} value={template} onChange={(e) => { setTemplate(e.target.value); setVariant(0); }} data-testid="email-template">
                 {templates.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                 <option value="custom">Write my own</option>
+              </select>
+            </div>
+          )}
+
+          {registered && !custom && subjectsOf.length > 1 && (
+            <div>
+              <Label>Subject line</Label>
+              <select className={field} style={fieldStyle} value={variant} onChange={(e) => setVariant(Number(e.target.value))} data-testid="email-subject-variant">
+                {subjectsOf.map((sj, i) => <option key={i} value={i}>{sj}</option>)}
               </select>
             </div>
           )}

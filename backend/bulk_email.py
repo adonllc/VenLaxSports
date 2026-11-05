@@ -23,6 +23,7 @@ import jwt as pyjwt
 from bson import ObjectId
 
 import conversion_campaign as cc
+import fomo_templates
 import email_service
 import email_tracking
 import thank_you_coupon
@@ -238,6 +239,9 @@ TEMPLATES: dict[str, dict] = {
 
 # ── unsubscribe tokens for registered users ───────────────────────────────────
 
+TEMPLATES.update(fomo_templates.FOMO_TEMPLATES)
+
+
 def make_user_unsub_token(user_id: str) -> str:
     return pyjwt.encode({"sub": user_id, "type": USER_UNSUB_TYPE}, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
@@ -305,6 +309,10 @@ def validate(payload: dict) -> None:
         if not isinstance(ids, list) or not 1 <= len(ids) <= MAX_SELECTED or not all(isinstance(i, str) and ObjectId.is_valid(i) for i in ids):
             raise PayloadError(f"Pick between 1 and {MAX_SELECTED} players")
     if payload.get("template") in TEMPLATES:
+        subjects = TEMPLATES[payload["template"]].get("subjects")
+        variant = payload.get("subject_variant")
+        if variant is not None and not (subjects and isinstance(variant, int) and 0 <= variant < len(subjects)):
+            raise PayloadError("Pick one of the template's subject lines")
         return
     subject, body = (payload.get("subject") or "").strip(), (payload.get("body") or "").strip()
     if not 3 <= len(subject) <= 150:
@@ -329,14 +337,18 @@ def render(payload: dict, recipient: dict, coupon: dict | None = None) -> dict:
         return {**r, "reason": None}
     template = TEMPLATES.get(payload.get("template"))
     if template:
+        ctx = recipient.get("ctx") or (EXAMPLE_CTX if template.get("needs") else {})
         label, path = template["cta"]
-        body = template["body"].replace("{name}", name)
+        label, path = _fill(label, ctx, name), _fill(path, ctx, name, quote=True)
+        body = _fill(template["body"], ctx, name)
         if template.get("coupon"):
             c = coupon or thank_you_coupon.example()
             code = recipient.get("referral_code")
             link = f'<a href="{SITE}/auth?ref={code}">{SITE}/auth?ref={code}</a>' if code else "shown on your Rewards page"
             body = body.replace("{coupon_code}", c["code"]).replace("{coupon_expires}", c["expires_text"]).replace("{referral_link}", link)
-        return {"subject": template["subject"], "title": template["title"], "body": body,
+        subjects = template.get("subjects")
+        subject = subjects[payload.get("subject_variant") or 0] if subjects else template["subject"]
+        return {"subject": _fill(subject, ctx, name, plain=True), "title": _fill(template["title"], ctx, name), "body": body,
                 "cta_label": label, "cta_url": _tag(path, key), "unsubscribe_url": user_unsub_url(recipient["id"]), "reason": REGISTERED_REASON}
     body = f"<p>Hi {name},</p>" + _paragraphs(payload["body"].replace("{name}", recipient.get("first_name") or "there"))
     url = _tag(_safe_link(payload["cta_url"]), key) if payload.get("cta_url") else None
@@ -346,6 +358,97 @@ def render(payload: dict, recipient: dict, coupon: dict | None = None) -> dict:
 
 
 # ── audiences ─────────────────────────────────────────────────────────────────
+
+# ── real facts for templates that need them ──────────────────────────
+
+EXAMPLE_CTX = {"league": "Atlanta Tennis Doubles", "league_id": "example", "city": "Atlanta", "sport": "tennis",
+               "start_date": "Nov 8", "days_left": 3, "spots_left": 4, "players_in_city": 24}
+
+
+def _days_word(n: int) -> str:
+    return "starts today" if n <= 0 else "starts tomorrow" if n == 1 else f"{n} days to go"
+
+
+def _fill(text: str, ctx: dict, name: str, quote: bool = False, plain: bool = False) -> str:
+    """Replace {tokens} with this player's real facts. plain=True leaves the text unescaped (subject lines)."""
+    esc = (lambda v: str(v)) if plain else (lambda v: html.escape(str(v)))
+    if "{" not in text:
+        return text
+    out = text.replace("{name}", name if not plain else html.unescape(name))
+    if ctx:
+        from urllib.parse import quote as urlquote
+        n, spots = ctx.get("days_left", 0), ctx.get("spots_left", 0)
+        values = {
+            "league": ctx.get("league", ""), "league_id": ctx.get("league_id", ""), "city": ctx.get("city", ""),
+            "sport": ctx.get("sport", ""), "start_date": ctx.get("start_date", ""), "days_left": n,
+            "days_word": _days_word(n) if "days_left" in ctx else "", "spots_left": spots,
+            "spots_word": f"{spots} spot{'s' if spots != 1 else ''}", "players_in_city": ctx.get("players_in_city", ""),
+        }
+        for k, v in values.items():
+            out = out.replace("{" + k + "}", urlquote(str(v)) if quote else esc(v))
+    return out
+
+
+def _fmt_date(iso: str) -> str:
+    try:
+        d = datetime.fromisoformat(str(iso)[:10])
+        return f"{d.strftime('%b')} {d.day}"
+    except ValueError:
+        return str(iso)
+
+
+async def _city_facts(db) -> dict:
+    """Open leagues (soonest first) and how many players have joined in each city. Real data only."""
+    today = datetime.now(timezone.utc).date().isoformat()
+    leagues = await db.leagues.find({}).to_list(None)
+    open_leagues = [l for l in leagues if l.get("status") == "registration" and str(l.get("start_date") or "")[:10] >= today
+                    and (l.get("max_players") or 0) - (l.get("current_players") or 0) > 0]
+    open_leagues.sort(key=lambda l: str(l.get("start_date")))
+    city_of = {str(l["_id"]): (l.get("city") or "").strip().lower() for l in leagues}
+    players: dict[str, set] = {}
+    for d in await db.player_leagues.find({"payment_status": {"$in": ["paid", "free"]}}).to_list(None):
+        players.setdefault(city_of.get(str(d.get("league_id")), ""), set()).add(d.get("player_id"))
+    waiting: dict[str, dict] = {}
+    by_id = {str(l["_id"]): l for l in leagues}
+    for inv in await db.doubles_invites.find({"status": {"$in": ["pending", "initiator_paid"]}}).to_list(None):
+        lg = by_id.get(str(inv.get("league_id")))
+        if inv.get("partner_user_id") or not lg or lg.get("status") != "registration" or str(lg.get("start_date") or "")[:10] < today:
+            continue
+        waiting.setdefault(str(inv.get("initiator_id")), lg)
+    return {"open": open_leagues, "players": {c: len(p) for c, p in players.items()}, "waiting": waiting, "today": today}
+
+
+def _context(user: dict, facts: dict, needs: str):
+    """This player's real numbers for a template, or None when the real data is not there (they are skipped)."""
+    city = (user.get("city") or "").strip()
+    if needs == "waiting_team":
+        lg = facts["waiting"].get(str(user["_id"]))
+        if not lg:
+            return None
+        days = (datetime.fromisoformat(str(lg["start_date"])[:10]).date() - datetime.fromisoformat(facts["today"]).date()).days
+        return {"league": lg.get("name", ""), "league_id": str(lg["_id"]), "city": lg.get("city") or city,
+                "sport": (lg.get("sport") or "").capitalize(), "start_date": _fmt_date(lg["start_date"]), "days_left": days,
+                "spots_left": 0, "players_in_city": 0}
+    if not city:
+        return None
+    prefs = user.get("sport_preferences") or []
+    mine = [l for l in facts["open"] if (l.get("city") or "").strip().lower() == city.lower()]
+    if needs == "doubles_league":
+        mine = [l for l in mine if l.get("format") in ("doubles", "mixed_doubles")]
+    if needs == "few_spots":
+        mine = [l for l in mine if (l["max_players"] - (l.get("current_players") or 0)) <= fomo_templates.FEW_SPOTS]
+    crowd = facts["players"].get(city.lower(), 0)
+    if needs == "crowd" and crowd < fomo_templates.CROWD_MIN:
+        return None
+    mine.sort(key=lambda l: (l.get("sport") not in prefs, str(l.get("start_date"))))
+    if not mine:
+        return None
+    l = mine[0]
+    days = (datetime.fromisoformat(str(l["start_date"])[:10]).date() - datetime.fromisoformat(facts["today"]).date()).days
+    return {"league": l.get("name", ""), "league_id": str(l["_id"]), "city": l.get("city") or city,
+            "sport": (l.get("sport") or "").capitalize(), "start_date": _fmt_date(l["start_date"]),
+            "days_left": days, "spots_left": l["max_players"] - (l.get("current_players") or 0), "players_in_city": crowd}
+
 
 def _first_name(user: dict) -> str:
     n = (user.get("first_name") or user.get("name") or "").strip()
@@ -369,6 +472,8 @@ async def build_audience(db, payload: dict) -> dict:
     city = (payload.get("city") or "").strip().lower()
     segment = payload.get("segment", "all")
     send, skipped = [], {"opted out": 0, "already sent": 0, "outside filter": 0}
+    needs = (TEMPLATES.get(payload.get("template")) or {}).get("needs")
+    facts = await _city_facts(db) if needs else None
     for u in users:
         email = (u.get("email") or "").strip().lower()
         uid = str(u["_id"])
@@ -384,7 +489,13 @@ async def build_audience(db, payload: dict) -> dict:
            (segment == "in_league" and uid not in in_league) or (segment == "no_league" and uid in in_league):
             skipped["outside filter"] += 1
             continue
-        send.append({"id": uid, "email": email, "first_name": _first_name(u), "referral_code": u.get("referral_code")})
+        rec = {"id": uid, "email": email, "first_name": _first_name(u), "referral_code": u.get("referral_code")}
+        if needs:
+            rec["ctx"] = _context(u, facts, needs)
+            if rec["ctx"] is None:
+                skipped["no matching data"] = skipped.get("no matching data", 0) + 1
+                continue
+        send.append(rec)
     return {"send": send, "skipped": skipped}
 
 
