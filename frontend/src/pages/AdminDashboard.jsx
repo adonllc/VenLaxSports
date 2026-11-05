@@ -688,10 +688,10 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => setDatesLeague(l)}
                               className="text-xs font-bold" style={{ color: "#008F70" }}
-                              data-testid={`edit-dates-${l.id}`}
-                              title="Move the start date or extend the end date"
+                              data-testid={`edit-league-${l.id}`}
+                              title="Change dates, capacity, fee, venue, description and rules"
                             >
-                              Edit dates
+                              Edit league
                             </button>
                           )}
                           {l.status === "registration" && (
@@ -868,7 +868,7 @@ export default function AdminDashboard() {
         {tab === "audit" && <AuditLogTab />}
         {tab === "players" && <PlayerInsightsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
-        {datesLeague && <LeagueDatesModal league={datesLeague} onClose={() => setDatesLeague(null)} onSaved={() => { setDatesLeague(null); window.location.reload(); }} />}
+        {datesLeague && <LeagueEditModal league={datesLeague} onClose={() => setDatesLeague(null)} onSaved={() => { setDatesLeague(null); window.location.reload(); }} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}
       </div>
@@ -1828,25 +1828,44 @@ function PlayoffRulesModal({ league, onClose, onSaved }) {
   );
 }
 
-function LeagueDatesModal({ league, onClose, onSaved }) {
+function LeagueEditModal({ league, onClose, onSaved }) {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
-  const [start, setStart] = useState(String(league.start_date || "").slice(0, 10));
-  const [end, setEnd] = useState(String(league.end_date || "").slice(0, 10));
+  const [f, setF] = useState({
+    name: league.name || "",
+    venue: league.venue || "",
+    description: league.description || "",
+    rules: league.rules || "",
+    max_players: String(league.max_players ?? ""),
+    entry_fee: String(league.entry_fee ?? 0),
+    start_date: String(league.start_date || "").slice(0, 10),
+    end_date: String(league.end_date || "").slice(0, 10),
+  });
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const started = league.status !== "registration";
+  const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+  const registered = league.current_players || 0;
 
   const save = async () => {
-    if (!start || !end) { setMsg("Pick both dates."); return; }
-    if (end < start) { setMsg("The end date cannot be before the start date."); return; }
+    if (!f.name.trim()) { setMsg("The league needs a name."); return; }
+    if (!f.start_date || !f.end_date) { setMsg("Pick both dates."); return; }
+    if (f.end_date < f.start_date) { setMsg("The end date cannot be before the start date."); return; }
+    const max = Number(f.max_players);
+    if (!Number.isInteger(max) || max < Math.max(2, registered)) { setMsg(`Max players must be a whole number of at least ${Math.max(2, registered)} (already registered).`); return; }
+    const fee = Number(f.entry_fee);
+    if (Number.isNaN(fee) || fee < 0) { setMsg("Enter an entry fee of 0 or more."); return; }
+    const body = {
+      name: f.name.trim(), venue: f.venue, description: f.description, rules: f.rules,
+      max_players: max, entry_fee: fee, start_date: f.start_date, end_date: f.end_date,
+    };
     setBusy(true);
     setMsg("");
     try {
-      await axios.put(`${API}/admin/leagues/${league.id}`, { start_date: start, end_date: end }, { withCredentials: true });
+      await axios.put(`${API}/admin/leagues/${league.id}`, body, { withCredentials: true });
       onSaved();
     } catch (err) {
       const d = err.response?.data?.detail;
-      setMsg(typeof d === "string" ? d : "Could not save the dates.");
+      setMsg(typeof d === "string" ? d : "Could not save the league.");
     } finally {
       setBusy(false);
     }
@@ -1854,32 +1873,59 @@ function LeagueDatesModal({ league, onClose, onSaved }) {
 
   const field = { border: "1px solid #B5B5B5", color: "#3D3D3D", background: "#fff", padding: "6px 8px", fontSize: "14px", width: "100%" };
   const label = "block text-xs font-bold uppercase tracking-wider mb-1";
+  const lc = { color: "#5C5C5C" };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="league-dates-modal">
-      <div className="bg-white w-full max-w-md p-5">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto" style={{ background: "rgba(61,61,61,0.55)" }} role="dialog" aria-modal="true" data-testid="league-edit-modal">
+      <div className="bg-white w-full max-w-lg p-5">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
-            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>League dates</h3>
-            <p className="text-xs" style={{ color: "#5C5C5C" }}>
-              {league.name}. The start date also sets when the partner-change window closes and when unpaired doubles teams are refunded. Players are not emailed about a date change.
+            <h3 className="font-bold text-lg" style={{ color: "#3D3D3D" }}>Edit league</h3>
+            <p className="text-xs" style={lc}>
+              The start date also sets when the partner-change window closes and when unpaired doubles teams are refunded. Players are not emailed about changes. A new entry fee applies to future sign-ups only; payments already made are not changed.
             </p>
           </div>
-          <button onClick={onClose} className="text-sm underline" style={{ color: "#5C5C5C" }}>Close</button>
+          <button onClick={onClose} className="text-sm underline" style={lc}>Close</button>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3">
           <div>
-            <label className={label} htmlFor="ld-start" style={{ color: "#5C5C5C" }}>Start date</label>
-            <input id="ld-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} style={field} data-testid="league-start-date" />
+            <label className={label} htmlFor="le-name" style={lc}>Name</label>
+            <input id="le-name" value={f.name} onChange={set("name")} style={field} data-testid="league-name" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={label} htmlFor="le-start" style={lc}>Start date</label>
+              <input id="le-start" type="date" value={f.start_date} onChange={set("start_date")} style={field} data-testid="league-start-date" />
+            </div>
+            <div>
+              <label className={label} htmlFor="le-end" style={lc}>End date</label>
+              <input id="le-end" type="date" value={f.end_date} onChange={set("end_date")} style={field} data-testid="league-end-date" />
+            </div>
+            <div>
+              <label className={label} htmlFor="le-max" style={lc}>Max players ({registered} registered)</label>
+              <input id="le-max" type="number" min={Math.max(2, registered)} value={f.max_players} onChange={set("max_players")} style={field} data-testid="league-max-players" />
+            </div>
+            <div>
+              <label className={label} htmlFor="le-fee" style={lc}>Entry fee (USD)</label>
+              <input id="le-fee" type="number" min="0" step="0.01" value={f.entry_fee} onChange={set("entry_fee")} style={field} data-testid="league-entry-fee" />
+            </div>
           </div>
           <div>
-            <label className={label} htmlFor="ld-end" style={{ color: "#5C5C5C" }}>End date</label>
-            <input id="ld-end" type="date" value={end} onChange={(e) => setEnd(e.target.value)} style={field} data-testid="league-end-date" />
+            <label className={label} htmlFor="le-venue" style={lc}>Venue</label>
+            <input id="le-venue" value={f.venue} onChange={set("venue")} style={field} data-testid="league-venue" />
+          </div>
+          <div>
+            <label className={label} htmlFor="le-desc" style={lc}>Description</label>
+            <textarea id="le-desc" rows={3} value={f.description} onChange={set("description")} style={field} data-testid="league-description" />
+          </div>
+          <div>
+            <label className={label} htmlFor="le-rules" style={lc}>Rules</label>
+            <textarea id="le-rules" rows={3} value={f.rules} onChange={set("rules")} style={field} data-testid="league-rules" />
           </div>
         </div>
-        {started && <p className="text-xs mt-3" style={{ color: "#5C5C5C" }}>This league has already started. Extending the end date keeps it running longer.</p>}
+        {started && <p className="text-xs mt-3" style={lc}>This league has already started. Extending the end date keeps it running longer.</p>}
         {msg && <p className="text-sm p-2 mt-3" style={{ background: "#F1F1F1", color: "#3D3D3D" }} role="alert">{msg}</p>}
-        <button onClick={save} disabled={busy} className="mt-4 px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="league-dates-save">
-          {busy ? "Saving..." : "Save dates"}
+        <button onClick={save} disabled={busy} className="mt-4 px-5 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#F2A922", color: "#3D3D3D" }} data-testid="league-edit-save">
+          {busy ? "Saving..." : "Save changes"}
         </button>
       </div>
     </div>

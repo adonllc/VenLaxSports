@@ -26,7 +26,7 @@ class Db:
         self.leagues.update_one = update_one
         self.lid = ObjectId()
         self.leagues.docs.append({"_id": self.lid, "name": "Atlanta Doubles", "status": status,
-                                  "start_date": start, "end_date": end, "max_players": 16})
+                                  "start_date": start, "end_date": end, "max_players": 16, "current_players": 10})
         self.request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(db=self)))
 
     @property
@@ -87,3 +87,18 @@ def test_finished_leagues_are_locked():
     with pytest.raises(HTTPException) as e:
         update(db, end_date="2027-03-20")
     assert e.value.status_code == 409
+
+
+def test_edit_text_fee_and_capacity():
+    db = Db()
+    update(db, name="  Atlanta Doubles Winter ", venue="Piedmont Park", max_players=24, entry_fee=14.99)
+    assert db.league["name"] == "Atlanta Doubles Winter" and db.league["venue"] == "Piedmont Park"
+    assert db.league["max_players"] == 24 and db.league["entry_fee"] == 14.99
+
+
+@pytest.mark.parametrize("fields", [{"max_players": 8}, {"entry_fee": -1}, {"name": "   "}])
+def test_bad_values_are_refused(fields):
+    db = Db()
+    with pytest.raises(HTTPException) as e:
+        update(db, **fields)
+    assert e.value.status_code == 400

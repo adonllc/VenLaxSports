@@ -350,7 +350,7 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
     admin = await _need(request, "leagues.write")
 
     # Capture previous status to detect activation
-    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1, "start_date": 1, "end_date": 1})
+    prev = await db.leagues.find_one({"_id": ObjectId(league_id)}, {"status": 1, "name": 1, "league_type": 1, "max_players": 1, "current_players": 1, "start_date": 1, "end_date": 1})
     if not prev:
         raise HTTPException(status_code=404, detail="League not found")
 
@@ -368,6 +368,14 @@ async def update_league(league_id: str, data: LeagueUpdate, request: Request):
         end = update_data.get("end_date", str(prev.get("end_date") or "")[:10])
         if start and end and end < start:
             raise HTTPException(status_code=400, detail="The end date cannot be before the start date")
+    if "name" in update_data:
+        update_data["name"] = update_data["name"].strip()
+        if not update_data["name"]:
+            raise HTTPException(status_code=400, detail="The league needs a name")
+    if "max_players" in update_data and update_data["max_players"] < max(2, int(prev.get("current_players") or 0)):
+        raise HTTPException(status_code=400, detail=f"Max players cannot be below the {max(2, int(prev.get('current_players') or 0))} already registered")
+    if "entry_fee" in update_data and update_data["entry_fee"] < 0:
+        raise HTTPException(status_code=400, detail="The entry fee cannot be negative")
     if "min_players_to_start" in update_data:
         effective_max = update_data.get("max_players", prev.get("max_players", 16))
         if not 2 <= update_data["min_players_to_start"] <= effective_max:
