@@ -2142,6 +2142,7 @@ function LeagueWaitlistCard() {
 function IncompleteTeamsCard() {
   const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
   const [teams, setTeams] = useState(null);
+  const [filter, setFilter] = useState("all");
   const [remindMsg, setRemindMsg] = useState({});
   useEffect(() => {
     axios.get(`${API}/admin/incomplete-teams`, { withCredentials: true })
@@ -2157,27 +2158,53 @@ function IncompleteTeamsCard() {
     }
   };
   if (!teams || teams.length === 0) return null;
+  const day = (iso) => (iso ? String(iso).slice(0, 10) : "");
+  const STATUS = {
+    solo: { label: "Solo, nobody invited", bg: "#F1F1F1", fg: "#3D3D3D" },
+    invited: { label: "Invite sent", bg: "#FFF6E0", fg: "#8A5F00" },
+    expired: { label: "Invite expired", bg: "#FEE2E2", fg: "#B91C1C" },
+  };
+  const counts = teams.reduce((c, t) => ({ ...c, [t.status]: (c[t.status] || 0) + 1 }), {});
+  const shown = filter === "all" ? teams : teams.filter((t) => t.status === filter);
   return (
     <div className="mb-6 bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }} data-testid="incomplete-teams">
       <div className="p-5" style={{ borderBottom: "1px solid #F3F4F6" }}>
         <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Doubles teams waiting for a partner ({teams.length})</h2>
         <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Paid teams with no partner by the start date need a refund decision.</p>
+        <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Filter by status">
+          {[["all", `All (${teams.length})`], ["solo", `Solo (${counts.solo || 0})`], ["invited", `Invite sent (${counts.invited || 0})`], ["expired", `Expired (${counts.expired || 0})`]].map(([v, label]) => (
+            <button key={v} onClick={() => setFilter(v)} aria-pressed={filter === v}
+              className="px-3 py-1.5 text-xs font-bold border"
+              style={filter === v ? { background: "#008F70", borderColor: "#008F70", color: "#fff" } : { background: "#fff", borderColor: "#E5E7EB", color: "#3D3D3D" }}
+              data-testid={`incomplete-filter-${v}`}>{label}</button>
+          ))}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs uppercase" style={{ color: "#6B7280" }}>
-              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Starts</th><th className="px-5 py-2">Paid</th><th className="px-5 py-2">Partner invited</th><th className="px-5 py-2">VenLax pick</th><th className="px-5 py-2">Reminder</th>
+              <th className="px-5 py-2">Player</th><th className="px-5 py-2">League</th><th className="px-5 py-2">Starts</th><th className="px-5 py-2">Paid</th><th className="px-5 py-2">Status</th><th className="px-5 py-2">Registered</th><th className="px-5 py-2">VenLax pick</th><th className="px-5 py-2">Reminder</th>
             </tr>
           </thead>
           <tbody>
-            {teams.map((t) => (
+            {shown.map((t) => (
               <tr key={t.token_tail + t.league_id} style={{ borderTop: "1px solid #F3F4F6" }}>
                 <td className="px-5 py-2">{t.player_name}<div className="text-xs" style={{ color: "#6B7280" }}>{t.player_email}</div></td>
                 <td className="px-5 py-2">{t.league_name}</td>
                 <td className="px-5 py-2">{t.league_start}</td>
                 <td className="px-5 py-2">{t.paid ? "Yes" : "No"}</td>
-                <td className="px-5 py-2">{t.partner_email || "Not yet"}</td>
+                <td className="px-5 py-2" data-testid={`incomplete-status-${t.token_tail}`}>
+                  <span className="inline-block px-2 py-0.5 text-xs font-bold" style={{ background: STATUS[t.status]?.bg, color: STATUS[t.status]?.fg }}>{STATUS[t.status]?.label || t.status}</span>
+                  {t.partner_email && (
+                    <div className="text-xs mt-1" style={{ color: "#6B7280" }}>
+                      {t.partner_email}{t.partner_has_account ? " (has an account)" : " (no account yet)"}
+                      {t.invited_at && <><br />Invited {day(t.invited_at)}</>}
+                      {t.expires_at && <><br />{t.status === "expired" ? "Expired" : "Expires"} {day(t.expires_at)}</>}
+                    </div>
+                  )}
+                </td>
+                <td className="px-5 py-2">{day(t.created_at)}</td>
                 <td className="px-5 py-2" data-testid={`incomplete-team-optin-${t.token_tail}`}>{t.auto_assign ? "Opted in" : "No"}</td>
                 <td className="px-5 py-2">
                   <button

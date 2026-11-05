@@ -383,6 +383,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "initiator_id": user["_id"],
                 "initiator_name": initiator_name,
                 "partner_email": partner_email,
+                "partner_invited_at": now.isoformat(),
                 "partner_user_id": None,
                 "partner_added_by_initiator": False,
                 "token": token,

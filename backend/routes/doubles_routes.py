@@ -497,7 +497,8 @@ async def add_partner(token: str, body: AddPartnerRequest, request: Request):
     partner_email = body.partner_email.lower().strip()
     if partner_email == (user.get("email") or "").lower():
         raise HTTPException(status_code=400, detail="Cannot invite yourself as partner")
-    await db.doubles_invites.update_one({"token": token}, {"$set": {"partner_email": partner_email}})
+    await db.doubles_invites.update_one({"token": token}, {"$set": {
+        "partner_email": partner_email, "partner_invited_at": datetime.now(timezone.utc).isoformat()}})
     frontend_url = email_service._get_frontend_url() or "https://venlaxsports.com"
     email_service.schedule(email_service.send_partner_invite(
         partner_email, initiator_name, league_name, league.get("sport", "tennis"), entry_fee,

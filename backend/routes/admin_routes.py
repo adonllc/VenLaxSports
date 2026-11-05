@@ -93,6 +93,19 @@ async def get_flags(request: Request):
     return {"jobs": jobs, "env_flags": env_flags}
 
 
+def team_status(invite: dict, now: datetime) -> str:
+    """Where a waiting doubles team stands: "solo" (nobody invited), "invited" (invite out), "expired" (invite ran out)."""
+    if not (invite.get("partner_email") or "").strip():
+        return "solo"
+    expires = invite.get("expires_at")
+    try:
+        if expires and datetime.fromisoformat(expires) < now:
+            return "expired"
+    except ValueError:
+        pass
+    return "invited"
+
+
 @router.get("/incomplete-teams")
 async def incomplete_teams(request: Request):
     """Doubles teams still missing a partner (admin only). Paid ones may need a refund if no partner is found."""
@@ -114,7 +127,13 @@ async def incomplete_teams(request: Request):
             user = await db.users.find_one({"_id": ObjectId(inv["initiator_id"])}, {"email": 1, "name": 1})
         except Exception:
             pass
+        partner_email = (inv.get("partner_email") or "").strip().lower()
+        has_account = bool(partner_email and await db.users.find_one({"email": partner_email}, {"_id": 1}))
         rows.append({
+            "status": team_status(inv, datetime.now(timezone.utc)),
+            "partner_has_account": has_account,
+            "invited_at": inv.get("partner_invited_at", ""),
+            "expires_at": inv.get("expires_at", ""),
             "token_tail": inv["token"][-6:],
             "token": inv["token"],
             "auto_assign": bool(inv.get("auto_assign_opt_in")),
