@@ -388,9 +388,9 @@ const FALLBACK_THEME = SPORT_THEME.tennis;
 
 const FORMAT_LABEL = { singles: "Singles", doubles: "Doubles", mixed_doubles: "Mixed doubles" };
 
-function shortDate(iso) {
+function shortDate(iso, withYear = false) {
   const d = new Date(`${String(iso || "").slice(0, 10)}T00:00:00`);
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) });
 }
 
 // A stable pick from the sport's photos so neighbouring cards do not all show the same shot
@@ -415,7 +415,14 @@ function LeagueCard({ league, onClick }) {
   const opensSoon = league.status === "registration" && !isCityOpen(league.city);
   const [notifyOpen, setNotifyOpen] = useState(false);
   const perUnit = league.format === "singles" ? "per player" : "per team";
-  const start = shortDate(league.start_date);
+  const startIso = String(league.start_date || "").slice(0, 10);
+  const started = startIso && startIso <= new Date().toISOString().slice(0, 10);
+  // Open leagues say when they start; running ones say when they began and end; finished ones show the whole span
+  const dateText = isEnded
+    ? [shortDate(league.start_date, true), shortDate(league.end_date, true)].filter(Boolean).join(" to ")
+    : started
+      ? `Started ${shortDate(league.start_date)}${league.end_date ? ` · Ends ${shortDate(league.end_date)}` : ""}`
+      : shortDate(league.start_date) && `Starts ${shortDate(league.start_date)}`;
 
   return (
     <div
@@ -460,9 +467,9 @@ function LeagueCard({ league, onClick }) {
         <h3 className="font-bold text-xl leading-snug line-clamp-2 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
           {league.name}
         </h3>
-        {start && (
-          <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "#4C4C4C", fontFamily: "'IBM Plex Mono', monospace" }}>
-            <CalendarDays className="w-4 h-4" style={{ color: theme.dark }} aria-hidden="true" /> Starts {start}
+        {dateText && (
+          <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "#4C4C4C", fontFamily: "'IBM Plex Mono', monospace" }} data-testid={`league-dates-${league.id}`}>
+            <CalendarDays className="w-4 h-4 shrink-0" style={{ color: theme.dark }} aria-hidden="true" /> {dateText}
           </p>
         )}
 
@@ -487,7 +494,9 @@ function LeagueCard({ league, onClick }) {
             </span>
             {league.entry_fee > 0 && <span className="ml-1.5 text-xs" style={{ color: "#6B7280" }}>{perUnit}</span>}
           </div>
-          {opensSoon ? (
+          {isEnded ? (
+            <span className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6B7280" }} data-testid={`league-ended-${league.id}`}>Season ended</span>
+          ) : opensSoon ? (
             <button
               onClick={(ev) => { ev.stopPropagation(); setNotifyOpen(true); }}
               className="text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors hover:bg-[#1D1D1D] hover:text-white"
@@ -500,11 +509,11 @@ function LeagueCard({ league, onClick }) {
             <button
               onClick={(ev) => { ev.stopPropagation(); onClick(); }}
               className="text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors disabled:opacity-60 hover:brightness-90"
-              style={{ background: isFull || isEnded ? "#E4E4E4" : theme.accent, color: isFull || isEnded ? "#6B7280" : theme.onAccent }}
+              style={{ background: isFull ? "#E4E4E4" : theme.accent, color: isFull ? "#6B7280" : theme.onAccent }}
               disabled={isFull}
               data-testid={`league-join-${league.id}`}
             >
-              {isFull ? "Full" : isEnded ? "View" : "Join"}
+              {isFull ? "Full" : "Join"}
             </button>
           )}
         </div>
