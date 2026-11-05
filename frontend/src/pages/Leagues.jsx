@@ -3,7 +3,7 @@ import PageHero from "../components/PageHero";
 import { GALLERY, PHOTOS } from "../config/photos";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Search, MapPin, ArrowRight } from "lucide-react";
+import { Search, MapPin, ArrowRight, CalendarDays } from "lucide-react";
 import platformConfig, { activeSports } from "../config/platformConfig";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import NotifyMeModal from "../components/NotifyMeModal";
@@ -18,6 +18,9 @@ const ALL_SPORT_CONFIG = {
   cricket: { badge: "sport-badge-cricket", color: "text-cricket", icon: "🏏", label: "Cricket" },
   pickleball: { badge: "sport-badge-pickleball", color: "text-pickleball", icon: "🏓", label: "Pickleball" },
 };
+
+// "all" shows every active sport; it is the default for a player who opted into more than one
+const ALL_SPORTS = "all";
 
 const SPORT_CONFIG = Object.fromEntries(
   activeSports.map((s) => [s.id, ALL_SPORT_CONFIG[s.id]]).filter(([, v]) => v)
@@ -44,9 +47,11 @@ export default function Leagues() {
 
   useEffect(() => {
     if (!user) return;
+    const preferred = (user.sport_preferences || []).filter((id) => activeSports.some((s) => s.id === id));
+    const byPrefs = preferred.length > 1 ? ALL_SPORTS : preferred[0];
     setFilters(prev => ({
       ...prev,
-      sport: prev.sport || user.sport_preferences?.[0] || platformConfig.defaultSport || "",
+      sport: prev.sport || byPrefs || platformConfig.defaultSport || "",
       city:  prev.city  || user.city || "",
     }));
   }, [user?.id]);
@@ -89,7 +94,7 @@ export default function Leagues() {
   const isOpenNow = (l) => !isClosed(l) && isCityOpen(l.city);
   const isOpensSoon = (l) => !isClosed(l) && !isCityOpen(l.city);
 
-  const sportLeagues = leagues.filter((l) => !filters.sport || l.sport === filters.sport);
+  const sportLeagues = leagues.filter((l) => !filters.sport || filters.sport === ALL_SPORTS || l.sport === filters.sport);
   const cityOptions = [...new Set(sportLeagues.filter((l) => !isClosed(l)).map((l) => l.city))].sort();
   const cityActive = filters.city && cityOptions.includes(filters.city) ? filters.city : "";
   const cityMissing = filters.city && !cityOptions.includes(filters.city);
@@ -193,6 +198,20 @@ export default function Leagues() {
             {/* Sport tabs + city */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
               <div className="flex gap-2" role="tablist" aria-label="Sport">
+                {activeSports.length > 1 && (
+                  <button
+                    role="tab"
+                    aria-selected={filters.sport === ALL_SPORTS}
+                    onClick={() => updateFilter("sport", ALL_SPORTS)}
+                    className="px-5 py-2.5 text-sm font-bold border transition-colors"
+                    style={filters.sport === ALL_SPORTS
+                      ? { background: "#1D1D1D", borderColor: "#1D1D1D", color: "white" }
+                      : { background: "white", borderColor: "#E5E7EB", color: "#3D3D3D" }}
+                    data-testid="sport-tab-all"
+                  >
+                    All sports
+                  </button>
+                )}
                 {activeSports.map((s) => (
                   <button
                     key={s.id}
@@ -227,7 +246,7 @@ export default function Leagues() {
             </div>
             {cityMissing && (
               <p className="mb-6 text-sm px-4 py-3" style={{ background: "#F1F1F1", color: "#3D3D3D" }} data-testid="city-missing-note">
-                No open {SPORT_CONFIG[filters.sport]?.label || filters.sport} leagues in {filters.city} yet, so we are showing every city.
+                No open {filters.sport === ALL_SPORTS ? "" : `${SPORT_CONFIG[filters.sport]?.label || filters.sport} `}leagues in {filters.city} yet, so we are showing every city.
               </p>
             )}
 
@@ -360,10 +379,33 @@ function LeagueGroup({ title, hint, leagues, testId, navigate, empty }) {
   );
 }
 
+// Each sport gets its own look: tennis is green on white, pickleball is amber on warm cream
+const SPORT_THEME = {
+  tennis: { accent: "#008F70", dark: "#00765C", onAccent: "#FFFFFF", tint: "#FFFFFF", chip: "#E6F4F0" },
+  pickleball: { accent: "#F2A922", dark: "#8A5F00", onAccent: "#1D1D1D", tint: "#FFF8E8", chip: "#FCEBC2" },
+};
+const FALLBACK_THEME = SPORT_THEME.tennis;
+
+const FORMAT_LABEL = { singles: "Singles", doubles: "Doubles", mixed_doubles: "Mixed doubles" };
+
+function shortDate(iso) {
+  const d = new Date(`${String(iso || "").slice(0, 10)}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// A stable pick from the sport's photos so neighbouring cards do not all show the same shot
+function cardPhoto(league) {
+  const set = GALLERY[league.sport];
+  if (!set?.length) return PHOTOS[league.sport] || PHOTOS.hero;
+  const n = String(league.id || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return set[n % set.length];
+}
+
 function LeagueCard({ league, onClick }) {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const config = SPORT_CONFIG[league.sport] || { badge: "bg-gray-100", icon: "🏆", label: league.sport };
+  const config = SPORT_CONFIG[league.sport] || { icon: "🏆", label: league.sport };
+  const theme = SPORT_THEME[league.sport] || FALLBACK_THEME;
   const spotsLeft = league.max_players - (league.current_players || 0);
   const fillPct = Math.round(((league.current_players || 0) / league.max_players) * 100);
   const isEnded = league.status === "completed" || league.status === "cancelled";
@@ -372,132 +414,97 @@ function LeagueCard({ league, onClick }) {
   const { isCityOpen } = useSiteSettings();
   const opensSoon = league.status === "registration" && !isCityOpen(league.city);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const perUnit = league.format === "singles" ? "per player" : "per team";
+  const start = shortDate(league.start_date);
 
   return (
     <div
-      className="bg-white rounded-lg border cursor-pointer transition-all duration-300 hover:shadow-2xl overflow-hidden flex flex-col hover:scale-105"
-      style={{ borderColor: "#E5E7EB" }}
+      className="group bg-white border cursor-pointer overflow-hidden flex flex-col transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]"
+      style={{ borderColor: "#E4E4E4", background: theme.tint }}
+      onClick={onClick}
       data-testid={`league-card-${league.id}`}
+      data-sport={league.sport}
     >
-      {/* Sport top bar */}
-      <div
-        className="h-1.5 w-full"
-        style={{
-          backgroundColor:
-            league.sport === "tennis" ? "#008F70" : league.sport === "cricket" ? "#2563EB" : "#F2A922",
-        }}
-      />
-
-      <div className="p-6 flex-1 flex flex-col">
-        {/* Sport badge + status */}
-        <div className="flex items-start justify-between mb-3">
+      {/* Photo with a slanted lower edge */}
+      <div className="relative h-44 overflow-hidden" style={{ clipPath: "polygon(0 0, 100% 0, 100% 90%, 0 100%)" }}>
+        <img src={cardPhoto(league)} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(29,29,29,0.82), rgba(29,29,29,0.05) 65%)" }} />
+        <span
+          className="absolute top-0 left-0 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]"
+          style={{ background: theme.accent, color: theme.onAccent }}
+        >
+          {config.label}
+        </span>
+        {(opensSoon || isEnded || isFull) && (
           <span
-            className="text-xs font-semibold px-3 py-1.5 rounded-md"
-            style={{
-              background:
-                league.sport === "tennis"
-                  ? "#D1FAE5"
-                  : league.sport === "cricket"
-                    ? "#DBEAFE"
-                    : "#FED7AA",
-              color: league.sport === "tennis" ? "#00765C" : league.sport === "cricket" ? "#1E40AF" : "#92400E",
-              fontFamily: "Rubik, sans-serif",
-            }}
+            className="absolute top-3 right-3 px-2.5 py-1 text-xs font-bold bg-white"
+            style={{ color: "#1D1D1D" }}
+            data-testid={opensSoon ? `league-opens-soon-${league.id}` : undefined}
           >
-            {config.icon} {config.label}
+            {opensSoon ? "Opens soon" : isEnded ? "Ended" : "Full"}
           </span>
-          {opensSoon && (
-            <span
-              className="text-xs font-semibold px-2 py-1 rounded-md"
-              style={{ background: "#F1F1F1", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
-              data-testid={`league-opens-soon-${league.id}`}
-            >
-              Opens soon
-            </span>
-          )}
-          {isEnded && (
-            <span
-              className="text-xs font-semibold px-2 py-1 rounded-md"
-              style={{ background: "#F3F4F6", color: "#6B7280", fontFamily: "Rubik, sans-serif" }}
-            >
-              Ended
+        )}
+        <div className="absolute bottom-5 left-4 right-4 flex items-end justify-between gap-3 text-white">
+          <span className="flex items-center gap-1.5 text-sm font-semibold">
+            <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" /> {league.city}
+          </span>
+          {league.format && (
+            <span className="text-xs font-bold uppercase tracking-wider px-2 py-1" style={{ background: "rgba(255,255,255,0.16)", backdropFilter: "blur(4px)" }}>
+              {FORMAT_LABEL[league.format] || league.format}
             </span>
           )}
         </div>
+      </div>
 
-        {/* League name */}
-        <h3
-          className="font-bold text-xl mb-3 line-clamp-2 leading-snug text-[#3D3D3D]"
-          style={{ fontFamily: "Rubik, system-ui, sans-serif" }}
-        >
+      <div className="px-5 pb-5 pt-3 flex-1 flex flex-col">
+        <h3 className="font-bold text-xl leading-snug line-clamp-2 text-[#1D1D1D]" style={{ fontFamily: "Rubik, system-ui, sans-serif" }}>
           {league.name}
         </h3>
+        {start && (
+          <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "#4C4C4C", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <CalendarDays className="w-4 h-4" style={{ color: theme.dark }} aria-hidden="true" /> Starts {start}
+          </p>
+        )}
 
-        {/* City + Format */}
-        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
-          <div className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#008F70" }} />
-            <span className="font-medium">{league.city}</span>
+        {isAdmin && (
+          <div className="mt-3">
+            <div className="flex justify-between text-xs mb-1.5" style={{ color: "#6B7280" }}>
+              <span>{league.current_players || 0}/{league.max_players} players</span>
+              <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>{isFull ? "League Full" : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}</span>
+            </div>
+            <div className="h-1.5 overflow-hidden" style={{ background: "#E4E4E4" }}>
+              <div className="h-full transition-[width] duration-300" style={{ width: `${fillPct}%`, backgroundColor: isFull ? "#DC2626" : theme.accent }} />
+            </div>
           </div>
-          {league.format && (
-            <>
-              <span>•</span>
-              <span className="font-medium">{league.format === "mixed_doubles" ? "Mixed" : league.format.charAt(0).toUpperCase() + league.format.slice(1)}</span>
-            </>
-          )}
-        </div>
+        )}
 
-        {/* Spots available */}
-        <div className="mb-4">
-          <div className="flex justify-between text-xs mb-2" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
-            {isAdmin ? <span>{league.current_players || 0}/{league.max_players} players</span> : <span />}
-            <span style={{ fontWeight: 600, color: isFull ? "#DC2626" : "#6B7280" }}>
-              {isFull ? "League Full" : isAdmin ? `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left` : ""}
-            </span>
-          </div>
-          {isAdmin && (
-          <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F3F4F6" }}>
-            <div
-              className="h-full rounded-full transition-[width] duration-300"
-              style={{
-                width: `${fillPct}%`,
-                backgroundColor: isFull ? "#DC2626" : league.sport === "tennis" ? "#008F70" : league.sport === "cricket" ? "#2563EB" : "#F2A922",
-              }}
-            />
-          </div>
-          )}
-        </div>
-
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Footer: Entry fee + Join button */}
-        <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "#F3F4F6" }}>
-          <span className="text-sm font-bold" style={{ color: league.entry_fee && league.entry_fee > 0 ? "#F2A922" : "#008F70", fontFamily: "Rubik, system-ui, sans-serif" }}>
-            {league.entry_fee && league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
-          </span>
+        <div className="mt-5 pt-4 flex items-center justify-between border-t" style={{ borderColor: "rgba(29,29,29,0.1)" }}>
+          <div>
+            <span className="text-2xl font-bold leading-none" style={{ color: "#1D1D1D", fontFamily: "'IBM Plex Mono', monospace" }}>
+              {league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
+            </span>
+            {league.entry_fee > 0 && <span className="ml-1.5 text-xs" style={{ color: "#6B7280" }}>{perUnit}</span>}
+          </div>
           {opensSoon ? (
             <button
               onClick={(ev) => { ev.stopPropagation(); setNotifyOpen(true); }}
-              className="text-sm font-bold px-4 py-2 transition-colors hover:bg-[#3D3D3D] hover:text-white"
-              style={{ background: "#F2A922", color: "#3D3D3D", fontFamily: "Rubik, sans-serif" }}
+              className="text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors hover:bg-[#1D1D1D] hover:text-white"
+              style={{ background: "#F2A922", color: "#1D1D1D" }}
               data-testid={`league-notify-${league.id}`}
             >
               Notify me
             </button>
           ) : (
             <button
-              onClick={onClick}
-              className="text-sm font-bold px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 hover:scale-110"
-              style={{
-                background: isFull ? "#E5E7EB" : "#008F70",
-                color: isFull ? "#6B7280" : "white",
-                fontFamily: "Rubik, sans-serif",
-              }}
+              onClick={(ev) => { ev.stopPropagation(); onClick(); }}
+              className="text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors disabled:opacity-60 hover:brightness-90"
+              style={{ background: isFull || isEnded ? "#E4E4E4" : theme.accent, color: isFull || isEnded ? "#6B7280" : theme.onAccent }}
               disabled={isFull}
               data-testid={`league-join-${league.id}`}
             >
-              {isFull ? "Full" : "Join"}
+              {isFull ? "Full" : isEnded ? "View" : "Join"}
             </button>
           )}
         </div>
