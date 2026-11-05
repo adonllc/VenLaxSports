@@ -3,6 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { showLeagueDates } from "../utils/leagueDates";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { buildScoreSummary } from "../utils/scoreSummary";
 
@@ -559,6 +561,7 @@ function PlayoffPanel({ summary }) {
 export default function LeagueMatches() {
   const { id } = useParams();
   const { user, loading: authLoading } = useAuth();
+  const { isCityOpen } = useSiteSettings();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   useDocumentMeta({ title: "My matches | VENLAX Sports", description: "Your opponents and schedule for this league." });
@@ -602,7 +605,7 @@ export default function LeagueMatches() {
       <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "#B7791F" }}>My matches</p>
       <h1 className="text-3xl sm:text-4xl font-bold italic" style={{ color: INK }}>{league.name}</h1>
       <p className="mt-2 text-sm" style={{ color: MUTED }}>
-        {fmtDate(league.start_date)} – {fmtDate(league.end_date)} ·{" "}
+        {showLeagueDates(league, isCityOpen) && <>{fmtDate(league.start_date)} – {fmtDate(league.end_date)} · </>}
         <Link to={`/leagues/${league.id}/standings`} className="underline" style={{ color: GREEN }}>Standings</Link>
       </p>
 

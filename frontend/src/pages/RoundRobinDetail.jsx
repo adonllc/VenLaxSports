@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Users, Calendar } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { showLeagueDates } from "../utils/leagueDates";
 import RRScheduleView from "../components/RRScheduleView";
 import RRBracketView from "../components/RRBracketView";
 import PartnerSearch from "../components/PartnerSearch";
@@ -16,6 +18,7 @@ export default function RoundRobinDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isCityOpen } = useSiteSettings();
 
   const [league, setLeague] = useState(null);
   const [schedule, setSchedule] = useState(null);
@@ -125,7 +128,9 @@ export default function RoundRobinDetail() {
                 {user?.role === "admin" && (
                   <span className="flex items-center gap-1"><Users size={14} /> {league.current_players}/{rr.max_players || league.max_players} players</span>
                 )}
-                <span className="flex items-center gap-1"><Calendar size={14} /> Starts {league.start_date}</span>
+                {showLeagueDates(league, isCityOpen) && (
+                  <span className="flex items-center gap-1"><Calendar size={14} /> Starts {league.start_date}</span>
+                )}
               </div>
             </div>
             {!isStarted && !isFull && (
@@ -193,7 +198,7 @@ export default function RoundRobinDetail() {
                 <p className="text-gray-600 text-sm leading-relaxed">{league.description}</p>
               ) : (
                 <div data-testid="league-auto-description">
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">{leagueDescription(league).summary}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">{leagueDescription(showLeagueDates(league, isCityOpen) ? league : { ...league, start_date: null, end_date: null }).summary}</p>
                   <ul className="text-gray-600 text-sm space-y-2 list-disc pl-5">
                     {leagueDescription(league).points.map((pt) => <li key={pt}>{pt}</li>)}
                   </ul>

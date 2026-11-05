@@ -10,6 +10,7 @@ import NotifyMeModal from "../components/NotifyMeModal";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import Slant from "../components/Slant";
+import { showLeagueDates } from "../utils/leagueDates";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -148,8 +149,7 @@ export default function Leagues() {
         "name": l.name,
         "sport": l.sport,
         "image": [`https://venlaxsports.com${PHOTOS[l.sport] || PHOTOS.hero}`],
-        "startDate": l.start_date,
-        "endDate": l.end_date,
+        ...(showLeagueDates(l, isCityOpen) ? { "startDate": l.start_date, "endDate": l.end_date } : {}),
         "eventStatus": "https://schema.org/EventScheduled",
         "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
         "location": {
@@ -443,8 +443,8 @@ function LeagueCard({ league, onClick, waitlist }) {
   const startIso = String(league.start_date || "").slice(0, 10);
   const started = startIso && startIso <= new Date().toISOString().slice(0, 10);
   // Open leagues say when they start; running ones say when they began and end; finished ones show the whole span
-  const dateText = opensSoon
-    ? ""   // the city is not open yet, so any date on the league is a placeholder
+  const dateText = !showLeagueDates(league, isCityOpen)
+    ? ""   // not open yet (or cancelled): any date on the league is a placeholder
     : isEnded
     ? [shortDate(league.start_date, true), shortDate(league.end_date, true)].filter(Boolean).join(" to ")
     : started

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { showLeagueDates } from "../utils/leagueDates";
 import { Trophy, Calendar, Users, TrendingUp, Award, MapPin, Clock, Plus, Bell, BellOff, Share2, Gift } from "lucide-react";
 import RatingHistoryChart from "../components/RatingHistoryChart";
 import { buildScoreSummary } from "../utils/scoreSummary";
@@ -23,6 +25,7 @@ const SPORT_COLORS = {
 
 export default function PlayerDashboard() {
   const { user, loading, fetchMe } = useAuth();
+  const { isCityOpen } = useSiteSettings();
   const navigate = useNavigate();
   const referralCode = useReferralCode();
   const [leagues, setLeagues] = useState([]);
@@ -609,7 +612,7 @@ export default function PlayerDashboard() {
                             {` • ${l.city}`}
                           </p>
                           <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
-                            {dates(l.start_date)} – {dates(l.end_date)}
+                            {showLeagueDates(l, isCityOpen) ? `${dates(l.start_date)} – ${dates(l.end_date)}` : "Dates to be announced"}
                           </p>
                         </div>
                         <span className="text-xs font-bold px-2.5 py-1 whitespace-nowrap" style={chip} data-testid={`league-status-chip-${l.id}`}>

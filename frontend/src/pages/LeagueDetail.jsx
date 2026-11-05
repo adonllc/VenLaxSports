@@ -10,6 +10,7 @@ import GenderPicker from "../components/GenderPicker";
 import MyStandingCard from "../components/MyStandingCard";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { leagueDescription } from "../utils/leagueDescription";
+import { showLeagueDates } from "../utils/leagueDates";
 import { PHOTOS } from "../config/photos";
 import { trackEvent } from "../utils/googleAnalytics";
 import NotifyMeBanner from "../components/NotifyMeBanner";
@@ -341,8 +342,7 @@ export default function LeagueDetail() {
         "name": league.name,
         "sport": league.sport,
         "image": [`https://venlaxsports.com${PHOTOS[league.sport] || PHOTOS.hero}`],
-        "startDate": league.start_date,
-        "endDate": league.end_date,
+        ...(showLeagueDates(league, isCityOpen) ? { "startDate": league.start_date, "endDate": league.end_date } : {}),
         "eventStatus": league.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
         "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
         "location": {
@@ -448,7 +448,7 @@ export default function LeagueDetail() {
               <h1 className="font-bold text-3xl sm:text-4xl mb-4 text-[#3D3D3D]" style={{ fontFamily: "Rubik, system-ui, sans-serif", color: config.accent || "#008F70" }}>{league.name}</h1>
               <div className="flex flex-wrap items-center gap-6 text-sm" style={{ color: "#6B7280", fontFamily: "Rubik, sans-serif" }}>
                 <span className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: "#008F70" }} /> {league.city}</span>
-                {!opensSoon && (
+                {showLeagueDates(league, isCityOpen) && (
                   <span className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" /> {formatDate(league.start_date)} – {formatDate(league.end_date)}</span>
                 )}
                 {user?.role === "admin" && (
@@ -786,7 +786,7 @@ export default function LeagueDetail() {
                 <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{league.description}</p>
               ) : (
                 <div data-testid="league-auto-description">
-                  <p className="text-sm leading-relaxed mb-3" style={{ color: "#374151" }}>{leagueDescription(opensSoon ? { ...league, start_date: null, end_date: null } : league).summary}</p>
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: "#374151" }}>{leagueDescription(showLeagueDates(league, isCityOpen) ? league : { ...league, start_date: null, end_date: null }).summary}</p>
                   <ul className="text-sm space-y-2 list-disc pl-5" style={{ color: "#374151" }}>
                     {leagueDescription(league).points.map((pt) => <li key={pt}>{pt}</li>)}
                   </ul>

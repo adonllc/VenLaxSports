@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import { showLeagueDates } from "../utils/leagueDates";
 import { activeSports } from "../config/platformConfig";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { ChevronRight, ChevronLeft, Users, Calendar, MapPin, Trophy, CheckCircle } from "lucide-react";
@@ -62,6 +64,7 @@ export default function JoinFlow() {
     canonicalPath: "/join",
   });
   const { user } = useAuth();
+  const { isCityOpen } = useSiteSettings();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(0);
@@ -235,7 +238,9 @@ export default function JoinFlow() {
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{lg.city}</span>
                           {user?.role === "admin" && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{spotsLeft} spots left</span>}
-                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(lg.start_date)}</span>
+                          {showLeagueDates(lg, isCityOpen) && (
+                            <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(lg.start_date)}</span>
+                          )}
                         </div>
                       </button>
                     );
