@@ -417,9 +417,9 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {users.map((u, i) => (
-                        <tr key={u._id} style={{ borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }} data-testid="user-row">
+                        <tr key={u._id || u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid #F3F4F6" : "none" }} data-testid="user-row">
                           <td className="px-6 py-4 text-sm" style={{ color: "#3D3D3D" }}>{u.email}</td>
-                          <td className="px-6 py-4 text-sm" style={{ color: "#3D3D3D" }}>{u.full_name || "—"}</td>
+                          <td className="px-6 py-4 text-sm" style={{ color: "#3D3D3D" }}>{[u.first_name, u.last_name].filter(Boolean).join(" ") || u.name || u.full_name || "—"}</td>
                           <td className="px-6 py-4 text-sm" style={{ color: "#3D3D3D" }}>{u.country || "—"}</td>
                           <td className="px-6 py-4 text-sm" style={{ color: "#6B7280" }}>
                             {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
