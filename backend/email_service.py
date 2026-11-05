@@ -261,7 +261,7 @@ async def send_otp(to: str, player_name: str, otp: str) -> None:
                 background:#f3f4f6;border-radius:12px;padding:16px 0;margin:20px 0">
         {otp}
       </p>
-      <p>This code expires in <strong>10 minutes</strong>. If you didn't create a VENLAX account, you can safely ignore this email.</p>
+      <p>This code expires in <strong>30 minutes</strong>. You can ask for a new one from the verify page at any time. If you didn't create a VENLAX account, you can safely ignore this email.</p>
     """
     await send_email(to, f"Your VENLAX verification code: {otp}",
                      _wrap("Verify your email", body))

@@ -134,7 +134,7 @@ async def register(user_data: UserCreate, response: Response, request: Request):
 
     # Send OTP verification email (best-effort, non-blocking)
     otp = "".join(random.choices(string.digits, k=6))
-    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=OTP_MINUTES)).isoformat()
     hashed_otp = hash_password(otp)
     await db.users.update_one(
         {"_id": result.inserted_id},
@@ -519,6 +519,8 @@ async def two_fa_verify(body: TwoFACodeIn, response: Response, request: Request)
 
 # ── OTP Email Verification ──────────────────────────────────────────────
 
+OTP_MINUTES = 30   # how long a verification code stays valid
+
 class OTPVerifyIn(BaseModel):
     otp: str
 
@@ -531,7 +533,7 @@ async def send_otp(request: Request):
     if user.get("email_verified"):
         return {"message": "Email already verified"}
     otp = "".join(random.choices(string.digits, k=6))
-    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    otp_expires = (datetime.now(timezone.utc) + timedelta(minutes=OTP_MINUTES)).isoformat()
     await db.users.update_one(
         {"_id": ObjectId(user["_id"])},
         {"$set": {"otp_code": hash_password(otp), "otp_expires_at": otp_expires}},

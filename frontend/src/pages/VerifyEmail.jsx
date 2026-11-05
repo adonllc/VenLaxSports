@@ -84,6 +84,7 @@ export default function VerifyEmail() {
           <p className="text-sm text-gray-500">
             We sent a 6-digit code to <strong className="text-[#3D3D3D]">{user?.email}</strong>
           </p>
+          <p className="text-xs text-gray-400 mt-1">The code works for 30 minutes. Check your spam folder if you do not see it.</p>
         </div>
 
         {error && (
@@ -136,10 +137,11 @@ export default function VerifyEmail() {
           {resending ? "Sending..." : "Resend code"}
         </button>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          <button onClick={() => navigate("/profile-setup")} className="underline hover:text-gray-600">
-            Skip for now
+        <p className="text-center text-sm text-gray-500 mt-6">
+          <button onClick={() => navigate("/profile-setup")} className="underline hover:text-gray-700" data-testid="verify-later">
+            I will verify later
           </button>
+          <span className="block text-xs text-gray-400 mt-1">You can verify any time from your dashboard.</span>
         </p>
       </div>
     </div>

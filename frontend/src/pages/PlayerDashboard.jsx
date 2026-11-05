@@ -525,6 +525,26 @@ export default function PlayerDashboard() {
           </div>
         )}
 
+        {user && user.email_verified === false && (
+          <div className="flex items-center justify-between gap-3 flex-wrap p-4 mb-6" style={{ background: "#FFF6E0", border: "1px solid #F2A922" }} data-testid="verify-email-banner">
+            <div>
+              <p className="text-sm font-bold" style={{ color: "#3D3D3D" }}>Verify your email</p>
+              <p className="text-xs" style={{ color: "#4C4C4C" }}>Confirm {user.email} so you get match times and league updates.</p>
+            </div>
+            <button
+              onClick={async () => {
+                try { await axios.post(`${API}/auth/send-otp`, {}, { withCredentials: true }); } catch { /* the verify page has a resend button */ }
+                navigate("/verify-email");
+              }}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[#3D3D3D] hover:text-white"
+              style={{ background: "#F2A922", color: "#3D3D3D" }}
+              data-testid="verify-email-banner-btn"
+            >
+              Send me a code
+            </button>
+          </div>
+        )}
+
         <Link
           to="/rewards"
           className="flex items-center justify-between gap-3 bg-white p-4 mb-6"
