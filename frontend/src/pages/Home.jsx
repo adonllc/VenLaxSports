@@ -190,7 +190,7 @@ function SampleChart() {
 export default function Home() {
   const navigate = useNavigate();
   useDocumentMeta({
-    title: "Ranked Tennis & Pickleball Leagues | VENLAX Sports",
+    title: "Flexible Tennis & Pickleball Leagues | VENLAX Sports",
     description: "Ranked Tennis and Pickleball leagues across the USA. No club membership. Singles $9.99 a season, doubles $19.99 per team. Skill-matched opponents, live standings and playoffs.",
     canonicalPath: "/",
     jsonLd: HOME_JSON_LD,
