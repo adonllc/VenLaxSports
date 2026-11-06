@@ -439,7 +439,6 @@ function LeagueCard({ league, onClick, waitlist }) {
   const [notifyOpen, setNotifyOpen] = useState(false);
   const isRunning = league.status === "active";
   const onWaitlist = !!waitlist?.ids.includes(league.id);
-  const perUnit = league.format === "singles" ? "per player" : "per team";
   const startIso = String(league.start_date || "").slice(0, 10);
   const started = startIso && startIso <= new Date().toISOString().slice(0, 10);
   // Open leagues say when they start; running ones say when they began and end; finished ones show the whole span
@@ -520,13 +519,7 @@ function LeagueCard({ league, onClick, waitlist }) {
 
         <div className="flex-1" />
 
-        <div className="mt-5 pt-4 flex items-center justify-between border-t" style={{ borderColor: "rgba(29,29,29,0.1)" }}>
-          <div>
-            <span className="text-2xl font-bold leading-none" style={{ color: "#1D1D1D", fontFamily: "'IBM Plex Mono', monospace" }}>
-              {league.entry_fee > 0 ? `$${league.entry_fee}` : "Free"}
-            </span>
-            {league.entry_fee > 0 && <span className="ml-1.5 text-xs" style={{ color: "#6B7280" }}>{perUnit}</span>}
-          </div>
+        <div className="mt-5 pt-4 flex items-center justify-end border-t" style={{ borderColor: "rgba(29,29,29,0.1)" }}>
           {isEnded ? (
             <span className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6B7280" }} data-testid={`league-ended-${league.id}`}>Season ended</span>
           ) : isRunning ? (
