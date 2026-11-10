@@ -199,3 +199,9 @@ def test_no_template_shows_a_calendar_date():
             text = " ".join([str(t.get("subject", "")), *map(str, t.get("subjects", [])), str(t.get("body", ""))])
             assert "{start_date}" not in text and "{{start_date}}" not in text, key
             assert not month.search(text), (key, month.search(text).group(0))
+
+
+def test_no_template_counts_down_to_the_start():
+    for key, t in fomo_templates.FOMO_TEMPLATES.items():
+        text = " ".join([*map(str, t["subjects"]), str(t["body"])])
+        assert "{days_word}" not in text and "{{days_word}}" not in text and "days to go" not in text, key

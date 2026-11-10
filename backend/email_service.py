@@ -505,10 +505,7 @@ async def send_partner_assigned(to: str, player_name: str, partner_name: str, le
 async def send_partner_nudge(to: str, player_name: str, league_name: str, start_date: str,
                              days_left, opted_in: bool) -> None:
     url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
-    when = " The league will start shortly"
-    if days_left is not None:
-        when += f" ({days_left} day{'s' if days_left != 1 else ''} to go)"
-    when += "."
+    when = " The league will start shortly, and a team without a partner cannot play."
     if opted_in:
         ask = ("You asked VenLax to pick your partner, so there is nothing you need to do. If you already know someone "
                "you would rather play with, you can add them from your dashboard.")

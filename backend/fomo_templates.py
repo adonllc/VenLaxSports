@@ -20,15 +20,16 @@ FOMO_TEMPLATES: dict[str, dict] = {
         "subjects": [
             "{league} starts soon",
             "{name}, a {sport} league in {city} is open for sign-up",
-            "Your {city} {sport} league: {days_word} to join",
+            "Your {city} {sport} league is open: grab your place",
         ],
         "title": "A league in {city} is open",
         "cta": ("See {league}", "/leagues/{league_id}"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p><strong>{{league}}</strong> in {{city}} starts shortly. Registration is open now.</p>
+          <p><strong>{{league}}</strong> in {{city}} starts shortly. Registration is open now, and every league has a limited number of places.</p>
           <p>A VenLax league is a ranked season of {{sport}} matches against players at your level, played when it suits you.</p>
           <p>Singles $9.99 per player. Doubles $19.99 per team, one payment covers you and your partner. Entry fees are refundable until the league starts.</p>
+          <p>When a league fills or starts, registration closes and the next chance is the next season. Don't be the one who waits.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
     "m12_few_spots": {
@@ -43,8 +44,8 @@ FOMO_TEMPLATES: dict[str, dict] = {
         "cta": ("Take a spot", "/leagues/{league_id}"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p><strong>{{league}}</strong> has only a few spots left and starts shortly ({{days_word}}).</p>
-          <p>When the spots are gone, registration for this league closes.</p>
+          <p><strong>{{league}}</strong> has only a few spots left and starts shortly.</p>
+          <p>When the last spots go, registration for this league closes, and the next chance to play is the next season.</p>
           <p>Entry fees are refundable until the league starts, so there is no risk in holding a place. Questions? Write to {cc.SUPPORT}.</p>""",
     },
     "m13_no_partner": {
@@ -62,8 +63,8 @@ FOMO_TEMPLATES: dict[str, dict] = {
           <p>Want to play doubles but have nobody to play with? You can still join <strong>{{league}}</strong>.</p>
           <ul style="padding-left:18px;margin:0 0 16px">
             <li>Sign up on your own and add a friend later, any time before the league starts.</li>
-            <li>Or ask VenLax to pick a partner: we pair waiting players by level and location.</li>
-            <li>One team fee of $19.99 covers you both. Your partner joins free.</li>
+            <li>Or ask VenLax to find a partner: pay your half ($9.99) and we pair you with a waiting player by level and location. They pay the other half.</li>
+            <li>Bringing your own partner? One team fee of $19.99 covers you both, and your partner joins free.</li>
             <li>Not happy with the match? Ask for a different partner until the league starts.</li>
           </ul>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
@@ -97,7 +98,7 @@ FOMO_TEMPLATES: dict[str, dict] = {
         "body": f"""
           <p>Hi {{name}},</p>
           <p><strong>{{players_in_city}} players</strong> in {{city}} have joined a VenLax league. More players near you means closer ratings, easier doubles partners and faster matches.</p>
-          <p>Next up: <strong>{{league}}</strong>, starting shortly.</p>
+          <p>Next up: <strong>{{league}}</strong>, starting shortly. Every league has a limited number of places.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
     "m16_bring_partner": {
@@ -112,11 +113,11 @@ FOMO_TEMPLATES: dict[str, dict] = {
         "cta": ("Open my dashboard", "/dashboard"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p>Your doubles team in <strong>{{league}}</strong> is not active yet because it has no partner. The league starts shortly ({{days_word}}).</p>
+          <p>Your doubles team in <strong>{{league}}</strong> is not active yet because it has no partner. The league starts shortly, and a team without a partner cannot play.</p>
           <p><strong>Two ways to get your team in:</strong></p>
           <ul style="padding-left:18px;margin:0 0 16px">
             <li><strong>Bring your partner.</strong> Add them from your dashboard by email. They join free: your team fee already covers both of you.</li>
-            <li><strong>Let us know and we will pair you.</strong> Tap "Let VenLax find me a partner" on your dashboard. We will pair you with another waiting player in your league at your level, near you.</li>
+            <li><strong>Let us know and we will pair you.</strong> Tap "Let VenLax find me a partner" on your dashboard. We will pair you with another waiting player in your league at your level, near you, and you each end up paying half (anything extra you paid comes back as VenLax Credit).</li>
           </ul>
           <p>You can ask for a different partner any time until the league starts. Questions? Write to {cc.SUPPORT}.</p>""",
     },
