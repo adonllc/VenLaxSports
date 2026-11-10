@@ -380,6 +380,7 @@ export default function LeagueDetail() {
       : undefined,
     canonicalPath: `/leagues/${id}`,
     jsonLd: leagueJsonLd,
+    noindex: true,   // leagues open, fill and end; the city and sport pages are what should rank
   });
 
   if (loading) {

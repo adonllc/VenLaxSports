@@ -5,8 +5,13 @@ import { useEffect } from "react";
  * JSON-LD schema block. Reverts title/description on unmount so navigating
  * away restores the app-wide defaults from index.html.
  */
-export default function useDocumentMeta({ title, description, canonicalPath, jsonLd }) {
+export default function useDocumentMeta({ title, description, canonicalPath, jsonLd, noindex = false }) {
   useEffect(() => {
+    // noindex: pages that should work for visitors and shared links but stay out of search results
+    const robotsTag = document.querySelector('meta[name="robots"]');
+    const prevRobots = robotsTag?.getAttribute("content");
+    if (noindex && robotsTag) robotsTag.setAttribute("content", "noindex, follow");
+
     const prevTitle = document.title;
     const descTag = document.querySelector('meta[name="description"]');
     const prevDescription = descTag?.getAttribute("content");
@@ -83,7 +88,8 @@ export default function useDocumentMeta({ title, description, canonicalPath, jso
       if (twitterTitleTag && prevTwitterTitle != null) twitterTitleTag.setAttribute("content", prevTwitterTitle);
       if (twitterDescTag && prevTwitterDesc != null) twitterDescTag.setAttribute("content", prevTwitterDesc);
       if (canonicalTag) canonicalTag.setAttribute("href", "https://venlaxsports.com");
+      if (robotsTag && prevRobots != null) robotsTag.setAttribute("content", prevRobots);
       scriptTags.forEach((tag) => tag.parentNode?.removeChild(tag));
     };
-  }, [title, description, canonicalPath, jsonLd]);
+  }, [title, description, canonicalPath, jsonLd, noindex]);
 }
