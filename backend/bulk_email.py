@@ -43,12 +43,12 @@ _S = cc.SEASON
 TEMPLATES: dict[str, dict] = {
     "season_starts": {
         "label": "Season starts",
-        "subject": f"{_S['city']}'s {_S['name']} season starts {_S['start']}",
+        "subject": f"{_S['city']}'s {_S['name']} season starts soon",
         "title": f"{_S['city']} leagues are open",
         "cta": ("Pick your league", "/leagues?city=Atlanta"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Pick a Tennis or Pickleball league, Singles or Doubles.</p>
+          <p>The {_S['name']} season in {_S['city']} starts soon. Pick a Tennis or Pickleball league, Singles or Doubles.</p>
           <p>Singles $9.99 per player. Doubles $19.99 per team, one payment covers you and your partner.</p>
           <p>Registration for a season closes once it opens. Entry fees are refundable until the league starts. Questions? Write to {cc.SUPPORT}.</p>""",
     },
@@ -115,7 +115,7 @@ TEMPLATES: dict[str, dict] = {
             <li>A rating that updates after every match, and a shareable match card for every result.</li>
             <li>No club membership needed.</li>
           </ul>
-          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}.</p>
+          <p>The {_S['name']} season in {_S['city']} starts soon.</p>
           <p>Your game. Your time. Your rank.</p>""",
     },
     "m02_acquisition": {
@@ -136,7 +136,7 @@ TEMPLATES: dict[str, dict] = {
         "cta": ("Join a league", "/leagues?city=Atlanta"),
         "body": f"""
           <p>Hi {{name}},</p>
-          <p>Registration is open for the {_S['name']} season in {_S['city']}, starting {_S['start']}.</p>
+          <p>Registration is open for the {_S['name']} season in {_S['city']}, starting soon.</p>
           <p><strong>Pick your lane</strong></p>
           <ul>
             <li>Tennis or Pickleball.</li>
@@ -195,7 +195,7 @@ TEMPLATES: dict[str, dict] = {
             <li>Singles $9.99 per player. Doubles $19.99 per team.</li>
             <li>Not sure about your level? Pick the division closest to your skill rating. Your rating adjusts after every match.</li>
           </ul>
-          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Registration for a season closes once it opens.</p>""",
+          <p>The {_S['name']} season in {_S['city']} starts soon. Registration for a season closes once it opens.</p>""",
     },
     "m08_sport_discovery": {
         "label": "08 Sport discovery: tennis or pickleball",
@@ -231,7 +231,7 @@ TEMPLATES: dict[str, dict] = {
         "body": f"""
           <p>Hi {{name}},</p>
           <p>It has been a while since we saw you on VenLax Sports. Your account and rating are still here.</p>
-          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Pick a league and play at your own pace.</p>
+          <p>The {_S['name']} season in {_S['city']} starts soon. Pick a league and play at your own pace.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
 }

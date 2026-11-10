@@ -186,3 +186,16 @@ def test_no_bring_partner_email_once_the_league_has_started():
     uid = db.user("Atlanta")
     db.doubles_invites.docs.append({"initiator_id": uid, "league_id": lid, "status": "pending", "partner_user_id": None})
     assert audience(db, "m16_bring_partner")["send"] == []
+
+
+def test_no_template_shows_a_calendar_date():
+    """Emails say the league starts shortly; a calendar date goes stale when a league is moved."""
+    import bulk_email
+    import conversion_campaign as cc
+    import re
+    month = re.compile(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}\b")
+    for source in (fomo_templates.FOMO_TEMPLATES, bulk_email.TEMPLATES):
+        for key, t in source.items():
+            text = " ".join([str(t.get("subject", "")), *map(str, t.get("subjects", [])), str(t.get("body", ""))])
+            assert "{start_date}" not in text and "{{start_date}}" not in text, key
+            assert not month.search(text), (key, month.search(text).group(0))

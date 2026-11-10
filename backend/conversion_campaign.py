@@ -50,12 +50,12 @@ _S = SEASON
 
 STEPS: dict[int, dict] = {
     1: {
-        "subject": f"{_S['city']}'s {_S['name']} season starts {_S['start']}",
+        "subject": f"{_S['city']}'s {_S['name']} season starts soon",
         "title": f"{_S['city']} leagues are open",
         "cta": ("Pick your league", tagged("/leagues?city=Atlanta", 1)),
         "body": f"""
           <p>Hi there,</p>
-          <p>You asked to hear when VenLax Sports launched. It is live, and the {_S['name']} season in {_S['city']} starts {_S['start']}.</p>
+          <p>You asked to hear when VenLax Sports launched. It is live, and the {_S['name']} season in {_S['city']} starts soon.</p>
           <p><strong>How it works</strong></p>
           <ul>
             <li>Pick a Tennis or Pickleball league, Singles or Doubles.</li>
@@ -81,15 +81,15 @@ STEPS: dict[int, dict] = {
             <li>Credit expires 12 months after it is issued.</li>
           </ul>
           <p>Playing Doubles? Invite your partner. One team fee of $19.99 covers both of you.</p>
-          <p>The {_S['name']} season in {_S['city']} starts {_S['start']}. Questions? Write to {SUPPORT}.</p>""",
+          <p>The {_S['name']} season in {_S['city']} starts soon. Questions? Write to {SUPPORT}.</p>""",
     },
     3: {
-        "subject": f"Registration closes when the season opens on {_S['start']}",
+        "subject": f"Registration closes when the season opens",
         "title": "Last days to join",
         "cta": ("Pick your league", tagged("/leagues?city=Atlanta", 3)),
         "body": f"""
           <p>Hi there,</p>
-          <p>The {_S['name']} season in {_S['city']} opens on {_S['start']}. Registration for a season closes once it opens, so if you want to play this one, join before then.</p>
+          <p>The {_S['name']} season in {_S['city']} opens soon. Registration for a season closes once it opens, so if you want to play this one, join before then.</p>
           <p>Singles $9.99 per player. Doubles $19.99 per team, one payment covers both of you. Tennis and Pickleball.</p>
           <p>Entry fees are refundable until the league starts. If you miss this season we will tell you when the next one opens. Questions? Write to {SUPPORT}.</p>""",
     },

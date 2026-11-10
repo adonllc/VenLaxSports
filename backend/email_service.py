@@ -183,7 +183,7 @@ async def send_partner_registered(to: str, partner_name: str, initiator_name: st
     fee_line = f"<li><strong>Entry fee:</strong> {sym}{amount:.2f} (paid by {initiator_name})</li>" if paid and amount > 0 else ""
     city_line = f"<li><strong>City:</strong> {city}</li>" if city else ""
     venue_line = f"<li><strong>Venue:</strong> {venue}</li>" if venue else ""
-    date_line = f"<li><strong>Start date:</strong> {start_date}</li>" if start_date else ""
+    date_line = "<li><strong>Starts:</strong> shortly. We will email you when the league opens.</li>"
     body = f"""
       <p>Hi {partner_name},</p>
       <p><strong>{initiator_name}</strong> has registered you as their doubles partner for <strong>{league_name}</strong>. You're all set — no further action needed.</p>
@@ -491,7 +491,7 @@ async def send_partner_declined(initiator_email: str, initiator_name: str, leagu
 async def send_partner_assigned(to: str, player_name: str, partner_name: str, league_name: str,
                                 start_date: str = "") -> None:
     url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
-    start_line = f" The league starts on <strong>{start_date}</strong>." if start_date else ""
+    start_line = " The league will start shortly."
     body = f"""
       <p>Hi {player_name},</p>
       <p>VenLax paired you with <strong>{partner_name}</strong> as your doubles partner in <strong>{league_name}</strong>,
@@ -505,7 +505,7 @@ async def send_partner_assigned(to: str, player_name: str, partner_name: str, le
 async def send_partner_nudge(to: str, player_name: str, league_name: str, start_date: str,
                              days_left, opted_in: bool) -> None:
     url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
-    when = f" The league starts on <strong>{start_date}</strong>" if start_date else " The league is about to start"
+    when = " The league will start shortly"
     if days_left is not None:
         when += f" ({days_left} day{'s' if days_left != 1 else ''} to go)"
     when += "."
