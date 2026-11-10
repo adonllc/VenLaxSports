@@ -2193,7 +2193,11 @@ function IncompleteTeamsCard() {
                 <td className="px-5 py-2">{t.player_name}<div className="text-xs" style={{ color: "#6B7280" }}>{t.player_email}</div></td>
                 <td className="px-5 py-2">{t.league_name}</td>
                 <td className="px-5 py-2">{t.league_start}</td>
-                <td className="px-5 py-2">{t.paid ? "Yes" : "No"}</td>
+                <td className="px-5 py-2" data-testid={`incomplete-payment-${t.token_tail}`}>
+                  {t.payment === "unpaid"
+                    ? <span className="inline-block px-2 py-0.5 text-xs font-bold" style={{ background: "#FEE2E2", color: "#B91C1C" }}>Not paid</span>
+                    : t.payment === "free" ? "Free" : "Paid"}
+                </td>
                 <td className="px-5 py-2" data-testid={`incomplete-status-${t.token_tail}`}>
                   <span className="inline-block px-2 py-0.5 text-xs font-bold" style={{ background: STATUS[t.status]?.bg, color: STATUS[t.status]?.fg }}>{STATUS[t.status]?.label || t.status}</span>
                   {t.partner_email && (

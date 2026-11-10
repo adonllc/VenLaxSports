@@ -144,6 +144,7 @@ async def incomplete_teams(request: Request):
             "player_name": inv.get("initiator_name", ""),
             "player_email": (user or {}).get("email", ""),
             "paid": inv.get("status") == "initiator_paid",
+            "payment": "paid" if inv.get("status") == "initiator_paid" else ("unpaid" if float(lg.get("entry_fee") or 0) > 0 else "free"),
             "partner_email": inv.get("partner_email", ""),
             "created_at": inv.get("created_at", ""),
         })

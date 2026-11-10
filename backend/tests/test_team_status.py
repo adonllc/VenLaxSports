@@ -45,7 +45,7 @@ def test_endpoint_reports_status_account_and_dates(monkeypatch):
 
     db = types.SimpleNamespace(doubles_invites=C(), leagues=C(), users=C())
     lid = ObjectId()
-    db.leagues.docs.append({"_id": lid, "name": "Atlanta Doubles", "start_date": "2027-01-10"})
+    db.leagues.docs.append({"_id": lid, "name": "Atlanta Doubles", "start_date": "2027-01-10", "entry_fee": 19.99})
     uid = ObjectId()
     db.users.docs += [{"_id": uid, "name": "Pat", "email": "pat@x.com"}, {"_id": ObjectId(), "name": "Sam", "email": "sam@x.com"}]
     base = {"league_id": str(lid), "initiator_id": str(uid), "initiator_name": "Pat", "status": "pending", "created_at": real_iso(-3)}
@@ -60,3 +60,4 @@ def test_endpoint_reports_status_account_and_dates(monkeypatch):
     assert by_tail["a"]["status"] == "solo" and not by_tail["a"]["partner_has_account"]
     assert by_tail["b"]["status"] == "invited" and by_tail["b"]["partner_has_account"] and by_tail["b"]["invited_at"]
     assert by_tail["c"]["status"] == "expired" and not by_tail["c"]["partner_has_account"]
+    assert {r["payment"] for r in rows} == {"unpaid"}   # fee is due and the initiator has not paid
