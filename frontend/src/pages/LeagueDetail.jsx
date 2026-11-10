@@ -630,12 +630,31 @@ export default function LeagueDetail() {
                                 <p className="text-sm font-medium" style={{ color: "#B7791F" }}>{teamDone}</p>
                               ) : (
                                 <>
-                                  <p className="text-sm font-medium" style={{ color: "#B7791F" }}>
-                                    {partnerEmail ? `Invite sent to ${partnerEmail}` : "Your place is held. Add your partner."}
-                                  </p>
-                                  <p className="text-xs" style={{ color: "#374151" }}>
-                                    Your team is complete once your partner joins. You can add or change your partner any time before the league starts.
-                                  </p>
+                                  {Number(league.entry_fee) > 0 && !teamPaid ? (
+                                    <>
+                                      <p className="text-sm font-medium" style={{ color: "#B7791F" }} data-testid="team-payment-pending">
+                                        Payment not completed. Your spot is not held yet.
+                                      </p>
+                                      <button
+                                        type="button"
+                                        onClick={() => { setDoublesInviteToken(inviteToken); setPaymentModalOpen(true); }}
+                                        className="w-full text-white rounded-lg py-3 text-sm font-medium transition-all hover:shadow-md"
+                                        style={{ background: config.accent || "#008F70", fontFamily: "Rubik, sans-serif" }}
+                                        data-testid="complete-team-payment-btn"
+                                      >
+                                        Complete payment
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p className="text-sm font-medium" style={{ color: "#B7791F" }}>
+                                        {partnerEmail ? `Invite sent to ${partnerEmail}` : "Your place is held. Add your partner."}
+                                      </p>
+                                      <p className="text-xs" style={{ color: "#374151" }}>
+                                        Your team is complete once your partner joins. You can add or change your partner any time before the league starts.
+                                      </p>
+                                    </>
+                                  )}
                                   {inviteToken && (
                                     <AddPartnerPanel
                                       token={inviteToken}
