@@ -5,6 +5,7 @@ import axios from "axios";
 import { Users, Calendar } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
+import useDocumentMeta from "../hooks/useDocumentMeta";
 import { showLeagueDates } from "../utils/leagueDates";
 import RRScheduleView from "../components/RRScheduleView";
 import RRBracketView from "../components/RRBracketView";
@@ -19,6 +20,7 @@ export default function RoundRobinDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isCityOpen } = useSiteSettings();
+  useDocumentMeta({ noindex: true });   // leagues come and go; the city and sport pages are what should rank
 
   const [league, setLeague] = useState(null);
   const [schedule, setSchedule] = useState(null);
