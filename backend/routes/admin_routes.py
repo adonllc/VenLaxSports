@@ -556,10 +556,12 @@ async def get_payments(request: Request, skip: int = 0, limit: int = 50):
     db = request.app.state.db
     admin = await _need(request, "payments.read")
     txns = await db.payment_transactions.find({}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    import payment_labels
+    leagues = {}
     result = []
     for t in txns:
         t["id"] = str(t.pop("_id"))
-        result.append(t)
+        result.append({**t, **await payment_labels.describe(db, t, leagues)})
     return result
 
 
@@ -601,7 +603,9 @@ async def list_pending_zelle(request: Request):
         {"status": "pending_admin", "method": "zelle"},
         {"_id": 0},
     ).sort("created_at", -1).to_list(200)
-    return txns
+    import payment_labels
+    leagues = {}
+    return [{**t, **await payment_labels.describe(db, t, leagues)} for t in txns]
 
 
 @router.post("/zelle/{session_id}/approve")
@@ -623,6 +627,19 @@ async def approve_zelle(session_id: str, request: Request):
     player = await db.users.find_one({"_id": ObjectId(user_id)})
     if not league or not player:
         raise HTTPException(status_code=404, detail="League or player not found")
+
+    if (txn.get("metadata") or {}).get("invite_token"):
+        # A doubles team payment (full, or a solo player's half): same handling as a confirmed card payment, which
+        # marks the team's invite paid with the exact amount instead of registering a singles entry.
+        from routes.payment_routes import fulfill_paid_session
+        await fulfill_paid_session(db, session_id, {})
+        now = datetime.now(timezone.utc).isoformat()
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"status": "complete", "payment_status": "paid", "admin_approved": True, "updated_at": now}},
+        )
+        await audit_log.record(db, admin, "payment.zelle_approve", "payment", session_id, after={"user_id": user_id, "league_id": league_id, "doubles": True}, request=request)
+        return {"message": "Approved", "user_id": user_id, "league_id": league_id}
 
     already = await db.player_leagues.find_one(
         {"player_id": user_id, "league_id": league_id, "payment_status": "paid"}

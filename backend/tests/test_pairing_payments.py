@@ -182,3 +182,74 @@ def test_zelle_intent_refuses_when_credit_already_covers_the_fee(monkeypatch):
     with pytest.raises(HTTPException) as e:
         run(payment_routes.zelle_intent(payment_routes.ZelleIntentIn(league_id=lid, use_credit=True), request))
     assert e.value.status_code == 400
+
+
+def test_zelle_intent_for_a_venlax_paired_solo_player_asks_for_half(env, monkeypatch):
+    db = Db()
+    db.doubles_invites.docs.append({"token": "t", "initiator_id": db.p1, "pair_by_venlax": True, "status": "pending"})
+    db.payment_transactions = C()
+
+    async def user(request, database):
+        return {"_id": db.p1, "email": "pat@example.com"}
+    monkeypatch.setattr(payment_routes, "get_current_user", user)
+    out = run(payment_routes.zelle_intent(payment_routes.ZelleIntentIn(league_id=str(db.lid), invite_token="t"), req(db)))
+    assert out["amount"] == 9.99
+    txn = db.payment_transactions.docs[0]
+    assert txn["amount"] == 9.99 and txn["metadata"]["invite_token"] == "t"
+
+
+def test_admin_payment_labels_say_singles_full_team_or_half(env):
+    import payment_labels
+    db = Db()
+    db.payment_transactions = C()
+    db.doubles_invites.docs += [
+        {"token": "half", "initiator_id": db.p1, "pair_by_venlax": True},
+        {"token": "full", "initiator_id": db.p1},
+    ]
+    lid = str(db.lid)
+
+    def kind(**txn):
+        return run(payment_labels.describe(db, {"league_id": lid, **txn}))
+
+    half = kind(amount=9.99, metadata={"invite_token": "half"})
+    assert half["entry_type"] == "doubles_half" and half["amount_paid"] == 9.99 and "half" in half["entry_label"]
+    full = kind(amount=19.99, metadata={"invite_token": "full"})
+    assert full["entry_type"] == "doubles_team" and full["total"] == 19.99
+    with_credit = kind(amount=5.99, metadata={"invite_token": "half", "credit_applied": 4.0})
+    assert (with_credit["amount_paid"], with_credit["credit_applied"], with_credit["total"]) == (5.99, 4.0, 9.99)
+    db.leagues.docs[0]["format"] = "singles"
+    assert kind(amount=9.99)["entry_type"] == "singles"
+
+
+class Txns(C):
+    async def find_one_and_update(self, q, upd, return_document=False):
+        d = await self.find_one(q)
+        if not d:
+            return None
+        before = dict(d)
+        d.update(upd.get("$set", {}))
+        return before
+
+
+def test_approving_a_zelle_half_payment_marks_the_invite_paid_with_the_exact_amount(env, monkeypatch):
+    from routes import admin_routes
+    db = Db()
+    db.payment_transactions = Txns()
+    db.doubles_invites.docs.append({"token": "t", "league_id": str(db.lid), "initiator_id": db.p1,
+                                    "pair_by_venlax": True, "status": "pending"})
+    db.payment_transactions.docs.append({
+        "session_id": "zelle_1", "user_id": db.p1, "league_id": str(db.lid), "method": "zelle", "status": "pending_admin",
+        "amount": 9.99, "metadata": {"invite_token": "t", "is_doubles": "true"}})
+
+    async def admin(request, perm):
+        return {"_id": "admin"}
+
+    async def audit(*a, **k):
+        return None
+    monkeypatch.setattr(admin_routes, "_need", admin)
+    monkeypatch.setattr(admin_routes.audit_log, "record", audit)
+    run(admin_routes.approve_zelle("zelle_1", req(db)))
+    invite = db.doubles_invites.docs[0]
+    assert invite["status"] == "initiator_paid" and invite["paid_amount"] == 9.99
+    assert db.player_leagues.docs == []          # no singles entry is created for a team payment
+    assert db.payment_transactions.docs[0]["status"] == "complete"

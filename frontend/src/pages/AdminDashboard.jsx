@@ -1368,7 +1368,7 @@ function ZelleQueueTab() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {["Player", "League", "Amount", "Memo", "Reference #", "Submitted", "Actions"].map((h) => (
+                {["Player", "League", "Type", "Amount paid", "Memo", "Reference #", "Submitted", "Actions"].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -1380,7 +1380,13 @@ function ZelleQueueTab() {
                     <div className="font-medium text-heading-dark">{txn.user_email}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-700">{txn.league_name}</td>
-                  <td className="px-4 py-3 font-semibold text-heading-dark">${Number(txn.amount).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-xs text-gray-700" data-testid={`zelle-type-${txn.session_id}`}>{txn.entry_label || "—"}</td>
+                  <td className="px-4 py-3 font-semibold text-heading-dark" data-testid={`zelle-amount-${txn.session_id}`}>
+                    ${Number(txn.amount_paid ?? txn.amount).toFixed(2)}
+                    {txn.credit_applied > 0 && (
+                      <span className="block text-xs font-normal text-gray-500">+ ${Number(txn.credit_applied).toFixed(2)} VenLax Credit (total ${Number(txn.total).toFixed(2)})</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-600">{txn.memo || "—"}</td>
                   <td className="px-4 py-3 font-mono text-xs text-orange-700 font-semibold">{txn.reference_number || "—"}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs">{txn.updated_at ? new Date(txn.updated_at).toLocaleDateString() : new Date(txn.created_at).toLocaleDateString()}</td>

@@ -78,6 +78,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
       const { data } = await axios.post(`${API}/payments/zelle/intent`, {
         league_id: league.id,
         use_credit: creditOn,
+        invite_token: inviteToken || undefined,
       }, { withCredentials: true });
       setZelleIntent(data);
       setActiveMethod("zelle");

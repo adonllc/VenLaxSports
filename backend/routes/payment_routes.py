@@ -655,6 +655,7 @@ async def pay_with_wallet(data: WalletPaymentIn, request: Request):
 class ZelleIntentIn(BaseModel):
     league_id: str
     use_credit: Optional[bool] = False   # VenLax Credit covers part of the fee; Zelle pays the rest
+    invite_token: Optional[str] = None   # doubles: the team invite this payment is for
 
 
 class ZelleConfirmIn(BaseModel):
@@ -676,6 +677,7 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
     fee = float(league.get("entry_fee", 0))
     if fee <= 0:
         raise HTTPException(status_code=400, detail="This league is free to join")
+    fee = await invite_amount_due(db, league, user["_id"], data.invite_token)   # half for a VenLax-paired solo player
 
     credit_used = 0.0
     if data.use_credit:
@@ -698,7 +700,10 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
         "method": "zelle",
         "status": "pending_zelle",
         "memo": memo,
-        "metadata": {"credit_applied": credit_used} if credit_used > 0 else {},   # taken when the admin approves the deposit
+        "metadata": {
+            **({"credit_applied": credit_used} if credit_used > 0 else {}),   # taken when the admin approves the deposit
+            **({"invite_token": data.invite_token, "is_doubles": "true"} if data.invite_token else {}),
+        },
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.payment_transactions.insert_one({**intent, "session_id": f"zelle_{ObjectId()}"})
