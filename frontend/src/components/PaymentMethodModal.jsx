@@ -23,6 +23,16 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
   const [zelleRef, setZelleRef] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [quote, setQuote] = useState(null);       // { due, credit_available, credit_used, to_pay }
+  const [useCredit, setUseCredit] = useState(true);
+
+  useEffect(() => {
+    if (!open || !league) return;
+    setQuote(null);
+    axios.get(`${API}/payments/quote`, { params: { league_id: league.id, invite_token: inviteToken || undefined }, withCredentials: true })
+      .then(({ data }) => setQuote(data))
+      .catch(() => setQuote(null));
+  }, [open, league?.id, inviteToken]);
 
   useEffect(() => {
     if (!open) return;
@@ -34,6 +44,11 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
 
   if (!open || !league) return null;
 
+  const hasCredit = !!quote && quote.credit_available > 0 && quote.credit_used > 0;
+  const creditOn = hasCredit && useCredit;
+  const coversAll = creditOn && quote.to_pay <= 0;
+  const money = (n) => `$${Number(n).toFixed(2)}`;
+
   const handleStripe = async () => {
     setLoading(true); setError("");
     try {
@@ -41,6 +56,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
       const payload = { league_id: league.id, origin_url: origin };
       if (promoCode) payload.promo_code = promoCode;
       if (inviteToken) { payload.invite_token = inviteToken; payload.is_doubles = true; }
+      if (creditOn) payload.use_credit = true;
       const { data } = await axios.post(`${API}/payments/checkout`, payload, { withCredentials: true });
       if (data.free) {
         onSuccess?.();
@@ -61,6 +77,7 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
     try {
       const { data } = await axios.post(`${API}/payments/zelle/intent`, {
         league_id: league.id,
+        use_credit: creditOn,
       }, { withCredentials: true });
       setZelleIntent(data);
       setActiveMethod("zelle");
@@ -127,6 +144,22 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
           </div>
         )}
 
+        {quote && !activeMethod && !zelleIntent && (
+          <div className="border border-gray-200 rounded-xl px-4 py-3 mb-3 text-sm" data-testid="payment-summary">
+            <div className="flex justify-between"><span className="text-gray-600">Entry fee</span><span className="font-semibold" data-testid="summary-due">{money(quote.due)}</span></div>
+            {hasCredit && (
+              <label className="flex items-start gap-2 mt-2 cursor-pointer" data-testid="use-credit-label">
+                <input type="checkbox" checked={useCredit} onChange={(e) => setUseCredit(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#008F70]" data-testid="use-credit-checkbox" />
+                <span className="text-xs text-gray-700">Use my VenLax Credit first ({money(quote.credit_available)} available)</span>
+              </label>
+            )}
+            {creditOn && (
+              <div className="flex justify-between mt-2 text-emerald-700"><span>VenLax Credit</span><span data-testid="summary-credit">-{money(quote.credit_used)}</span></div>
+            )}
+            <div className="flex justify-between mt-2 pt-2 border-t border-gray-100"><span className="font-semibold text-gray-800">{coversAll ? "Nothing left to pay" : "To pay"}</span><span className="font-bold" data-testid="summary-to-pay">{money(creditOn ? quote.to_pay : quote.due)}</span></div>
+          </div>
+        )}
+
         {!activeMethod && !zelleIntent && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 mb-3 flex items-start gap-2" data-testid="payment-waiver-notice">
             <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
@@ -138,7 +171,15 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
           </div>
         )}
 
-        {!activeMethod && !zelleIntent && (
+        {!activeMethod && !zelleIntent && coversAll && (
+          <button type="button" onClick={handleStripe} disabled={loading}
+            className="w-full px-4 py-3.5 rounded-xl text-sm font-bold text-white bg-[#008F70] hover:bg-[#00765C] disabled:opacity-60"
+            data-testid="pay-with-credit">
+            {loading ? "Paying..." : `Pay ${money(quote.credit_used)} with VenLax Credit`}
+          </button>
+        )}
+
+        {!activeMethod && !zelleIntent && !coversAll && (
           <div className="space-y-2">
             {methods.map((m) => {
               const v = METHOD_VISUALS[m.id] || METHOD_VISUALS.stripe;
@@ -177,6 +218,11 @@ export default function PaymentMethodModal({ open, onClose, league, promoCode, i
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
               Secured by Stripe — we never store or see your card details.
             </p>
+            {inviteToken && (
+              <p className="text-[11px] text-center text-gray-500" data-testid="refund-note">
+                No partner by the start date? Take your money back as <strong>VenLax Credit</strong> (instant, never expires) or to your card (follows your bank's refund timeline).
+              </p>
+            )}
             <p className="text-[11px] text-center text-gray-400">
               Entry fees are <strong>non-refundable</strong> once the league starts.{" "}
               <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms</a>

@@ -346,6 +346,7 @@ async def my_doubles_invites(request: Request):
             "partner_email": inv.get("partner_email", ""),
             "partner_later": bool(inv.get("partner_later")),
             "auto_assign": bool(inv.get("auto_assign_opt_in")),
+            "pair_by_venlax": bool(inv.get("pair_by_venlax")),
             "paid": inv.get("status") == "initiator_paid",
             "expires_at": inv.get("expires_at", ""),
             "status": inv.get("status", "pending"),

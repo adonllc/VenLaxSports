@@ -2196,7 +2196,7 @@ function IncompleteTeamsCard() {
                 <td className="px-5 py-2" data-testid={`incomplete-payment-${t.token_tail}`}>
                   {t.payment === "unpaid"
                     ? <span className="inline-block px-2 py-0.5 text-xs font-bold" style={{ background: "#FEE2E2", color: "#B91C1C" }}>Not paid</span>
-                    : t.payment === "free" ? "Free" : "Paid"}
+                    : t.payment === "free" ? "Free" : t.paid_amount ? `Paid $${Number(t.paid_amount).toFixed(2)}` : "Paid"}
                 </td>
                 <td className="px-5 py-2" data-testid={`incomplete-status-${t.token_tail}`}>
                   <span className="inline-block px-2 py-0.5 text-xs font-bold" style={{ background: STATUS[t.status]?.bg, color: STATUS[t.status]?.fg }}>{STATUS[t.status]?.label || t.status}</span>

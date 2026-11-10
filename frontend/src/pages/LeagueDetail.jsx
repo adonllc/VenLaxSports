@@ -17,6 +17,10 @@ import NotifyMeBanner from "../components/NotifyMeBanner";
 import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import { reportFunnelEvent } from "../utils/funnelEvents";
 
+// Half of the team fee, rounded down to the cent (same rule as the server): what a player pays when VenLax finds their partner
+const pairingHalf = (fee) => Math.floor(Math.round(Number(fee) * 100) / 2) / 100;
+const money = (n) => `$${Number(n).toFixed(2)}`;
+
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const formatDate = (iso) => {
@@ -60,7 +64,6 @@ export default function LeagueDetail() {
   const [inviteToken, setInviteToken] = useState(null);
   const [partnerMode, setPartnerMode] = useState("have"); // "have" = pick or invite a partner now, "later" = add partner after registering
   const [partnerLater, setPartnerLater] = useState(false);
-  const [autoAssign, setAutoAssign] = useState(false);
   const [teamPaid, setTeamPaid] = useState(false);
   const [teamDone, setTeamDone] = useState("");
   const [boxStandings, setBoxStandings] = useState(null);
@@ -196,9 +199,9 @@ export default function LeagueDetail() {
     setJoining(true);
     try {
       const body = { waiver_accepted: waiverAccepted };
-      if (partnerMode === "later") {
+      if (partnerMode === "later" || partnerMode === "venlax") {
         body.partner_later = true;
-        body.auto_assign_partner = autoAssign;
+        body.auto_assign_partner = partnerMode === "venlax";
       } else if (selectedPartner) {
         body.partner_id = selectedPartner.id;
       } else {
@@ -545,8 +548,8 @@ export default function LeagueDetail() {
                           {!inviteSent ? (
                             <div className="space-y-3">
                               {needsGender && <GenderPicker onSaved={fetchMe} />}
-                              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Partner">
-                                {[["have", "I have a partner"], ["later", "Add my partner later"]].map(([mode, label]) => (
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Partner">
+                                {[["have", "I have a partner"], ["later", "Add my partner later"], ["venlax", `VenLax finds my partner${Number(league.entry_fee) > 0 ? ` · ${money(pairingHalf(league.entry_fee))}` : ""}`]].map(([mode, label]) => (
                                   <button
                                     key={mode}
                                     type="button"
@@ -568,25 +571,22 @@ export default function LeagueDetail() {
                                   onPartnerSelect={(p) => { setSelectedPartner(p); setPartnerEmail(""); }}
                                   onEmailChange={(e) => { setPartnerEmail(e); setSelectedPartner(null); }}
                                 />
+                              ) : partnerMode === "venlax" ? (
+                                <div className="space-y-2" data-testid="venlax-pairing-note">
+                                  <p className="text-sm" style={{ color: "#4C4C4C", fontFamily: "Rubik, sans-serif" }}>
+                                    {Number(league.entry_fee) > 0
+                                      ? `You pay your half (${money(pairingHalf(league.entry_fee))}) now to hold your place. VenLax pairs you with another player in this league at a similar level, and they pay their half.`
+                                      : "VenLax pairs you with another player in this league at a similar level."}
+                                  </p>
+                                  <p className="text-xs leading-relaxed" style={{ color: "#4C4C4C" }}>
+                                    Your name, level and city are shared with your partner. You can ask for a change until the league starts.
+                                    {Number(league.entry_fee) > 0 && " If we cannot find you a partner, you choose how to get your money back: VenLax Credit (instant, never expires) or your card (follows your bank's refund timeline)."}
+                                  </p>
+                                </div>
                               ) : (
-                                <>
                                 <p className="text-sm" style={{ color: "#4C4C4C", fontFamily: "Rubik, sans-serif" }} data-testid="partner-later-note">
-                                  Register and pay now to hold your place. Add your partner any time before the league starts: search for a player, invite by email, or share a link.
+                                  Register and pay the team fee now to hold your place. Add your partner any time before the league starts: search for a player, invite by email, or share a link.
                                 </p>
-                                  <label className="flex items-start gap-2.5 cursor-pointer" data-testid="auto-assign-label">
-                                    <input
-                                      type="checkbox"
-                                      checked={autoAssign}
-                                      onChange={(e) => setAutoAssign(e.target.checked)}
-                                      className="mt-0.5 h-4 w-4 accent-[#008F70] flex-shrink-0"
-                                      data-testid="auto-assign-checkbox"
-                                    />
-                                    <span className="text-xs leading-relaxed" style={{ color: "#4C4C4C" }}>
-                                      Let VenLax pick my partner if I do not find one. VenLax may pair me with another waiting player in this league.
-                                      My name, level and city are shared with that partner. I can ask for a change until the league starts.
-                                    </span>
-                                  </label>
-                                </>
                               )}
                               {league.format === "mixed_doubles" && (
                                 <p className="text-xs text-gray-400 mt-2">
@@ -617,6 +617,8 @@ export default function LeagueDetail() {
                               >
                                 {joining
                                   ? "Registering…"
+                                  : partnerMode === "venlax"
+                                  ? "Register and let VenLax find my partner"
                                   : partnerMode === "later"
                                   ? "Register and add partner later"
                                   : selectedPartner
@@ -990,6 +992,7 @@ export default function LeagueDetail() {
             setInviteSent(true);
             setInviteToken(doublesInviteToken);
             setDoublesEmailInvite(false);
+            setTeamPaid(true);
           } else {
             setIsRegistered(true);
             fetchLeague();

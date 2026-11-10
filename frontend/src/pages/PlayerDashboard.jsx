@@ -13,6 +13,7 @@ import SeasonRecaps from "../components/SeasonRecaps";
 import PlayProfileCard from "../components/PlayProfileCard";
 import ZipCodeEditor from "../components/ZipCodeEditor";
 import NameEditor from "../components/NameEditor";
+import VenLaxCreditCard from "../components/VenLaxCreditCard";
 import AssignedTeamNote from "../components/AssignedTeamNote";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -487,19 +488,22 @@ export default function PlayerDashboard() {
                   {!invite.partner_email && (invite.auto_assign ? (
                     <div className="mt-3 flex items-center justify-between gap-3 flex-wrap px-3 py-2 text-xs" style={{ background: "#F1F1F1", color: "#3D3D3D" }}>
                       <span>VenLax will look for a partner for you and email you when it has one.</span>
-                      <button
-                        onClick={() => toggleAutoAssign(invite)}
-                        className="underline font-medium"
-                        data-testid={`auto-assign-toggle-${invite.token}`}
-                      >
-                        Turn off
-                      </button>
+                      {!invite.pair_by_venlax && (
+                        <button
+                          onClick={() => toggleAutoAssign(invite)}
+                          className="underline font-medium"
+                          data-testid={`auto-assign-toggle-${invite.token}`}
+                        >
+                          Turn off
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="mt-3 p-3" style={{ background: "#FFF6E0", border: "1px solid #F2A922" }}>
                       <p className="text-sm font-bold" style={{ color: "#3D3D3D" }}>No partner yet? Let VenLax find one.</p>
                       <p className="text-xs mt-1" style={{ color: "#4C4C4C" }}>
                         VenLax may pair you with another waiting player at your level. Your name, level and city are shared with that partner. You can ask for a different partner until the league starts.
+                        {invite.paid && " You paid the full team fee, so when VenLax pairs you, half comes back to you as VenLax Credit (instant, never expires)."}
                       </p>
                       <button
                         onClick={() => toggleAutoAssign(invite)}
@@ -549,6 +553,8 @@ export default function PlayerDashboard() {
             </button>
           </div>
         )}
+
+        <VenLaxCreditCard />
 
         <Link
           to="/rewards"
