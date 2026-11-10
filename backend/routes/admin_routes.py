@@ -144,6 +144,7 @@ async def incomplete_teams(request: Request):
             "player_name": inv.get("initiator_name", ""),
             "player_email": (user or {}).get("email", ""),
             "paid": inv.get("status") == "initiator_paid",
+            "paid_amount": inv.get("paid_amount"),
             "payment": "paid" if inv.get("status") == "initiator_paid" else ("unpaid" if float(lg.get("entry_fee") or 0) > 0 else "free"),
             "partner_email": inv.get("partner_email", ""),
             "created_at": inv.get("created_at", ""),
@@ -656,6 +657,11 @@ async def approve_zelle(session_id: str, request: Request):
             email_service.schedule(email_service.send_registration_confirmed(
                 player["email"], player["name"], league["name"], league["sport"],
                 league_id, paid=True, amount=float(txn.get("amount", 0)), currency="USD"))
+
+    credit_applied = float((txn.get("metadata") or {}).get("credit_applied") or 0)
+    if credit_applied > 0:   # the part of the fee paid with VenLax Credit; the ref keeps a second approval from taking it twice
+        import venlax_credit
+        await venlax_credit.spend(db, user_id, credit_applied, "Entry fee", ref=f"entry:{session_id}", league_id=league_id)
 
     now = datetime.now(timezone.utc).isoformat()
     await db.payment_transactions.update_one(

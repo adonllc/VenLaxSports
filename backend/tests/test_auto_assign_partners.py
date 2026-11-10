@@ -98,18 +98,25 @@ def test_waiting_candidates_only_opted_in_and_eligible():
     assert [(s["name"], s["reason"]) for s in skipped] == [("Cy", "Has not paid yet")]
 
 
-def test_assign_pair_builds_the_team_and_flags_the_later_payment(env):
+def credit_of(db, uid):
+    return next(u for u in db.users.docs if str(u["_id"]) == uid).get("venlax_credit", 0)
+
+
+def test_assign_pair_builds_the_team_and_credits_the_extra_half_back_to_each_player(env):
     db = Db()
     a_uid, ta = make_waiting(db, "Ann")
     b_uid, tb = make_waiting(db, "Bea")
     out = assign(db, ta, tb)
-    assert out["refund_due"] is True and out["team_token"] == ta
+    assert out["refund_due"] is False and out["team_token"] == ta
+    assert [c["amount"] for c in out["credited"]] == [10.0, 10.0]   # each paid 19.99, owes 9.99
     assert {p["player_id"] for p in db.player_leagues.docs} == {a_uid, b_uid}
     assert db.leagues.docs[0]["current_players"] == 2
     a, b = inv(db, ta), inv(db, tb)
     assert a["status"] == "accepted" and a["assigned_by_admin"] is True and a["partner_user_id"] == b_uid
     assert a["merged_token"] == tb and a["status_before_assign"] == "initiator_paid"
-    assert b["status"] == "merged" and b["merged_into"] == ta and b["refund_due"] is True
+    assert b["status"] == "merged" and b["merged_into"] == ta and b["refund_due"] is False
+    assert credit_of(db, a_uid) == 10.0 and credit_of(db, b_uid) == 10.0
+    assert a["paid_amount"] == 9.99 and b["paid_amount"] == 9.99     # the team is paid for exactly once
     assert env == ["ann@example.com", "bea@example.com"]       # one "you were paired" email each, no duplicates
 
 
@@ -241,7 +248,7 @@ def test_assign_reports_each_pair_and_one_failure_does_not_stop_the_rest(admin, 
     _, tc = make_waiting(db, "Cy")
     _, td = make_waiting(db, "Dee", opt_in=False)
     out = assign_matches(db, (tc, td), (ta, tb))
-    assert [(r["ok"], r.get("refund_due")) for r in out["results"]] == [(False, None), (True, True)]
+    assert [(r["ok"], r.get("refund_due")) for r in out["results"]] == [(False, None), (True, False)]
     assert "has not agreed" in out["results"][0]["error"]
     assert db.leagues.docs[0]["current_players"] == 2
 
@@ -251,6 +258,7 @@ def test_refund_due_list_and_mark_refunded(admin, env):
     _, ta = make_waiting(db, "Ann")
     _, tb = make_waiting(db, "Bea")
     assign_matches(db, (ta, tb))
+    inv(db, tb).update(refund_due=True)     # a refund owed by hand (the pairing itself now credits instead)
     rows = run(partner_match_routes.refund_due(req(db)))["rows"]
     assert [(r["token"], r["player_name"], r["team_with"], r["amount"]) for r in rows] == [("tok-Bea", "Bea", "Ann", 19.99)]
     assert run(partner_match_routes.mark_refunded("tok-Bea", req(db))) == {"refunded": True}

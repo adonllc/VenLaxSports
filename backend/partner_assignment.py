@@ -11,6 +11,8 @@ from bson import ObjectId
 
 import email_service
 import partner_matching
+import venlax_credit
+from pricing_config import pairing_share
 
 WAITING = ("pending", "initiator_paid")
 
@@ -129,7 +131,19 @@ async def assign_pair(db, token_a: str, token_b: str, now: datetime | None = Non
         await db.leagues.update_one({"_id": league["_id"]}, {"$inc": {"current_players": -2}})
         raise
 
-    refund_due = fee > 0 and b.get("status") == "initiator_paid"
+    # Each player owes half the team fee. Anything a player paid above that (a full fee paid before they asked
+    # to be paired) comes back at once as VenLax Credit, so the team ends up paid for exactly once.
+    credited = []
+    share = pairing_share(fee)
+    for invite, player in ((a, pa), (b, pb)):
+        paid = float(invite.get("paid_amount") or fee)
+        excess = round(paid - share, 2)
+        if fee > 0 and excess > 0.004:
+            await venlax_credit.grant(db, str(player["_id"]), excess, f"Paired by VenLax: {league.get('name', 'league')}",
+                                      ref=f"pair:{invite['token']}", league_id=str(league["_id"]))
+            credited.append({"name": player.get("name", ""), "amount": excess})
+            await db.doubles_invites.update_one({"token": invite["token"]}, {"$set": {"paid_amount": share, "pair_by_venlax": True}})
+
     await db.doubles_invites.update_one({"token": token_a}, {"$set": {
         "status": "accepted", "partner_user_id": b_id, "partner_email": pb.get("email", ""),
         "partner_added_by_initiator": False, "assigned_by_admin": True, "assigned_at": now.isoformat(),
@@ -137,7 +151,7 @@ async def assign_pair(db, token_a: str, token_b: str, now: datetime | None = Non
     }})
     await db.doubles_invites.update_one({"token": token_b}, {"$set": {
         "status": "merged", "merged_into": token_a, "status_before_merge": b.get("status"),
-        "refund_due": refund_due, "refunded_at": None,
+        "refund_due": False, "refunded_at": None,
     }})
 
     name_a, name_b = pa.get("name", ""), pb.get("name", "")
@@ -145,7 +159,7 @@ async def assign_pair(db, token_a: str, token_b: str, now: datetime | None = Non
     for to, me, other in ((pa.get("email"), name_a, name_b), (pb.get("email"), name_b, name_a)):
         if to:
             email_service.schedule(email_service.send_partner_assigned(to, me, other, league_name, start))
-    return {"team_token": token_a, "refund_due": refund_due, "players": [name_a, name_b]}
+    return {"team_token": token_a, "refund_due": False, "credited": credited, "players": [name_a, name_b]}
 
 
 async def team_info(db, league: dict, user_id: str, now: datetime):

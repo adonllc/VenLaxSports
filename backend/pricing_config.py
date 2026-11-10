@@ -28,3 +28,9 @@ CADENCES: dict[str, dict] = {
 }
 
 ALL_CITIES_LABEL = "All Cities"
+
+
+def pairing_share(team_fee: float) -> float:
+    """What a solo player pays when VenLax finds their partner: half the team fee, rounded down to the cent so the
+    two halves never add up to more than the team fee ($19.99 team: $9.99 each, the same as a singles entry)."""
+    return int(round(float(team_fee or 0) * 100) // 2) / 100

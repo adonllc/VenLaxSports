@@ -12,6 +12,7 @@ import asyncio
 import notification_dispatch
 import qualification
 from launch_city import require_city_open
+from pricing_config import pairing_share
 import secrets
 from routes.doubles_routes import invite_expiry, mixed_gender_error, GENDERS
 
@@ -218,7 +219,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 }
                 if entry_fee > 0 and existing_invite.get("status") == "pending":
                     resp["requires_payment"] = True
-                    resp["entry_fee"] = float(entry_fee)
+                    resp["entry_fee"] = float(pairing_share(entry_fee) if existing_invite.get("pair_by_venlax") else entry_fee)
                 return resp
 
             token = secrets.token_hex(32)
@@ -233,6 +234,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                 "partner_later": True,
                 "auto_assign_opt_in": bool(body.auto_assign_partner),
                 "auto_assign_opt_in_at": now.isoformat() if body.auto_assign_partner else None,
+                "pair_by_venlax": bool(body.auto_assign_partner),   # pays half the team fee; the paired player pays the other half
                 "token": token,
                 "status": "pending",
                 "waiver_p1_at": now.isoformat(),
@@ -241,7 +243,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
             })
             resp = {"pending_partner": True, "partner_later": True, "invite_token": token, "expires_at": expires_at}
             if entry_fee > 0:
-                resp.update(requires_payment=True, entry_fee=float(entry_fee))
+                resp.update(requires_payment=True, entry_fee=float(pairing_share(entry_fee) if body.auto_assign_partner else entry_fee))
             else:
                 resp["message"] = "You are in. Add your partner any time before the league starts."
             return resp

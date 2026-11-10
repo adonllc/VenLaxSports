@@ -35,6 +35,15 @@ def invite_expiry(league: dict, now: datetime) -> str:
     return (max(start, now) + timedelta(days=30)).isoformat()
 
 
+HALF_PAID_MESSAGE = ("You joined so that VenLax finds your partner, and paid your half. To bring your own partner "
+                     "instead, contact support and we will switch you to a full team payment.")
+
+
+def is_half_paid(invite: dict, team_fee: float) -> bool:
+    """A solo player who chose VenLax pairing and has paid only their half of the team fee."""
+    return bool(invite.get("pair_by_venlax")) and team_fee > 0 and float(invite.get("paid_amount") or 0) + 0.005 < team_fee
+
+
 def mixed_gender_error(gender_a, gender_b) -> Optional[str]:
     """Mixed doubles is one male and one female. Returns the reason a pair is not allowed, or None."""
     if gender_a not in GENDERS or gender_b not in GENDERS:
@@ -351,6 +360,43 @@ class AutoAssignRequest(BaseModel):
     enabled: bool
 
 
+@router.get("/refund-choices")
+async def my_refund_choices(request: Request):
+    """Refunds waiting for this player's choice: VenLax Credit now, or back to the card."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    invites = await db.doubles_invites.find({"initiator_id": user["_id"], "status": "refund_choice"}).to_list(20)
+    rows = []
+    for inv in invites:
+        try:
+            league = await db.leagues.find_one({"_id": ObjectId(inv["league_id"])}) or {}
+        except Exception:
+            league = {}
+        rows.append({
+            "token": inv["token"],
+            "league_name": league.get("name", ""),
+            "amount": float(inv.get("refund_amount") or 0),
+            "card_possible": float(inv.get("card_refundable") or 0) > 0,
+            "offered_at": inv.get("refund_offered_at", ""),
+        })
+    return {"refunds": rows}
+
+
+class RefundChoiceBody(BaseModel):
+    method: str
+
+
+@router.post("/{token}/refund")
+async def choose_refund(token: str, body: RefundChoiceBody, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    import unpaired_refunds
+    try:
+        return await unpaired_refunds.choose(db, token, user["_id"], body.method)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
 @router.post("/{token}/auto-assign")
 async def set_auto_assign(token: str, body: AutoAssignRequest, request: Request):
     """Initiator (P1) agrees, or stops agreeing, that VenLax may pick the partner of a team still waiting for one."""
@@ -365,6 +411,12 @@ async def set_auto_assign(token: str, body: AutoAssignRequest, request: Request)
     if invite.get("status") not in ("pending", "initiator_paid") or invite.get("partner_user_id"):
         raise HTTPException(status_code=409, detail="This team already has a partner")
 
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(invite["league_id"])}) or {}
+    except Exception:
+        league = {}
+    if not body.enabled and is_half_paid(invite, float(league.get("entry_fee") or 0)):
+        raise HTTPException(status_code=409, detail=HALF_PAID_MESSAGE)
     await db.doubles_invites.update_one({"token": token}, {"$set": {
         "auto_assign_opt_in": body.enabled,
         "auto_assign_opt_in_at": datetime.now(timezone.utc).isoformat() if body.enabled else None,
@@ -453,6 +505,8 @@ async def add_partner(token: str, body: AddPartnerRequest, request: Request):
     league_name = league.get("name", "the league")
     entry_fee = float(league.get("entry_fee", 0))
     initiator_name = invite.get("initiator_name", user.get("name", ""))
+    if is_half_paid(invite, entry_fee):
+        raise HTTPException(status_code=409, detail=HALF_PAID_MESSAGE)
 
     # Partner is a VenLax player: complete the team now
     if body.partner_id:

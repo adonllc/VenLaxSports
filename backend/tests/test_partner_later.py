@@ -34,10 +34,23 @@ class InsertColl(Coll):
         self.docs.append(doc)
 
 
+class UserColl(InsertColl):
+    """Users with the $inc / return_document update VenLax Credit uses."""
+    async def find_one_and_update(self, q, upd, return_document=False):
+        d = await self.find_one(q)
+        if not d:
+            return None
+        before = dict(d)
+        for k, v in upd.get("$inc", {}).items():
+            d[k] = round(d.get(k, 0) + v, 2)
+        return d if return_document else before
+
+
 class Db:
     def __init__(self, fee=19.99, current=0, start="2026-11-08"):
         self.leagues = LeagueColl()
-        self.users, self.player_leagues, self.doubles_invites = InsertColl(), InsertColl(), InsertColl()
+        self.users, self.player_leagues, self.doubles_invites = UserColl(), InsertColl(), InsertColl()
+        self.credit_ledger = InsertColl()
         self.lid = ObjectId()
         self.leagues.docs.append({
             "_id": self.lid, "name": "Atlanta Doubles", "sport": "tennis", "format": "doubles", "status": "registration",

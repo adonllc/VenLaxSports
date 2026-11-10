@@ -457,6 +457,24 @@ async def send_team_refunded(to: str, player_name: str, league_name: str, amount
     await send_email(to, f"Your {league_name} entry fee was refunded", _wrap("Entry fee refunded", body))
 
 
+async def send_refund_choice(to: str, player_name: str, league_name: str, amount: float, card_possible: bool) -> None:
+    url = f"{_get_frontend_url()}/dashboard" if _get_frontend_url() else "/dashboard"
+    card_line = (
+        "<li><strong>Refund to my card.</strong> It goes back through Stripe, and your bank decides how long it takes to show "
+        "(usually a few business days).</li>" if card_possible else ""
+    )
+    body = f"""
+      <p>Hi {player_name},</p>
+      <p>{league_name} has started and we could not find a partner for you, so we owe you <strong>${amount:.2f}</strong>. You choose how to get it back:</p>
+      <ul>
+        <li><strong>VenLax Credit.</strong> Added to your account right away. It never expires and pays for any league.</li>
+        {card_line}
+      </ul>
+      <p><a href="{url}">Choose on your dashboard</a>. If you do not choose within 7 days, we add it as VenLax Credit.</p>
+    """
+    await send_email(to, f"Your {league_name} refund: choose how to get it back", _wrap("Choose your refund", body))
+
+
 async def send_partner_declined(initiator_email: str, initiator_name: str, league_name: str) -> None:
     body = f"""
       <p>Hi {initiator_name},</p>

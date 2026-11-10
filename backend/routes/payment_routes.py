@@ -7,7 +7,12 @@ from auth_utils import get_current_user
 from models import PaymentTransaction, PlayerLeague, Standing
 import email_service
 from launch_city import require_city_open
+from pricing_config import pairing_share
+import venlax_credit
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -21,6 +26,43 @@ class CheckoutRequest(BaseModel):
     promo_code: Optional[str] = None
     invite_token: Optional[str] = None
     is_doubles: Optional[bool] = False
+    use_credit: Optional[bool] = False   # take VenLax Credit off the fee first, then charge the rest
+
+
+async def invite_amount_due(db, league: dict, user_id: str, invite_token: Optional[str]) -> float:
+    """The fee this player owes now. A solo player who asked VenLax to find their partner owes half the team fee."""
+    fee = float(league.get("entry_fee", 0))
+    if not invite_token:
+        return fee
+    invite = await db.doubles_invites.find_one({"token": invite_token, "initiator_id": user_id})
+    if invite and invite.get("pair_by_venlax") and not invite.get("partner_user_id"):
+        return pairing_share(fee)
+    return fee
+
+
+@router.get("/credit")
+async def my_credit(request: Request):
+    """VenLax Credit balance and history for the signed-in player."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    return {"balance": await venlax_credit.balance(db, user["_id"]), "history": await venlax_credit.history(db, user["_id"])}
+
+
+@router.get("/quote")
+async def payment_quote(league_id: str, request: Request, invite_token: Optional[str] = None):
+    """What this player would pay for a league now, and how much of it VenLax Credit covers."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    try:
+        league = await db.leagues.find_one({"_id": ObjectId(league_id)})
+    except Exception:
+        league = None
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    due = await invite_amount_due(db, league, user["_id"], invite_token)
+    available = await venlax_credit.balance(db, user["_id"])
+    used, to_pay = _credit_split(due, available)
+    return {"due": due, "credit_available": available, "credit_used": used, "to_pay": to_pay}
 
 
 async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | None:
@@ -55,6 +97,16 @@ async def _validate_promo(db, code: str, user_id: str, league: dict) -> dict | N
 
 
 STRIPE_MIN_CHARGE = 0.50
+
+
+def _credit_split(due: float, available: float) -> tuple[float, float]:
+    """(credit used, left to pay). Credit goes first; a remainder under Stripe's $0.50 minimum is topped up from credit
+    so the card is never asked for less than it can charge."""
+    used, rest = venlax_credit.split_payment(due, available)
+    if 0 < rest < STRIPE_MIN_CHARGE:
+        used = round(max(0.0, used - (STRIPE_MIN_CHARGE - rest)), 2)
+        rest = round(due - used, 2)
+    return used, rest
 
 
 def amount_off_fee(entry_fee: float, off: float, is_doubles: bool = False) -> float:
@@ -137,6 +189,7 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     entry_fee = float(league.get("entry_fee", 0))
     if entry_fee <= 0:
         raise HTTPException(status_code=400, detail="This league is free to join")
+    entry_fee = await invite_amount_due(db, league, user["_id"], data.invite_token)
 
     existing = await db.player_leagues.find_one({"player_id": user["_id"], "league_id": data.league_id})
     if existing and existing.get("payment_status") in ["paid", "free"]:
@@ -172,6 +225,31 @@ async def create_checkout(data: CheckoutRequest, request: Request):
                 await _record_promo_use(db, data.promo_code, user["_id"], data.league_id)
                 return {"free": True, "message": "Promo applied — you're registered!"}
 
+    credit_used, entry_fee_after = 0.0, entry_fee
+    if data.use_credit:
+        credit_used, entry_fee_after = _credit_split(entry_fee, await venlax_credit.balance(db, user["_id"]))
+
+    if data.use_credit and credit_used > 0 and entry_fee_after <= 0:
+        # Credit covers everything: take it now and register without a card payment
+        sid = f"credit_{ObjectId()}"
+        meta = {"league_id": data.league_id, "user_id": user["_id"], "credit_applied": credit_used}
+        if data.promo_code:
+            meta["promo_code"] = data.promo_code.upper()
+        if data.invite_token:
+            meta.update(invite_token=data.invite_token, is_doubles="true")
+        spent = await venlax_credit.spend(db, user["_id"], credit_used, f"Entry fee: {league['name']}",
+                                          ref=f"entry:{sid}", league_id=data.league_id)
+        if spent is None:
+            raise HTTPException(status_code=409, detail="Your VenLax Credit balance changed. Please try again.")
+        await db.payment_transactions.insert_one(PaymentTransaction(
+            user_id=user["_id"], user_email=user["email"], league_id=data.league_id, league_name=league["name"],
+            session_id=sid, amount=0.0, currency="USD", status="complete", payment_status="paid", metadata=meta,
+        ).to_mongo())
+        await fulfill_paid_session(db, sid, {k: str(v) for k, v in meta.items()})
+        return {"free": True, "paid_with_credit": True, "credit_used": credit_used,
+                "invite_pending": bool(data.invite_token), "message": "Paid with VenLax Credit"}
+    entry_fee = entry_fee_after
+
     import stripe
 
     api_key = os.environ.get("STRIPE_API_KEY")
@@ -183,7 +261,7 @@ async def create_checkout(data: CheckoutRequest, request: Request):
     currency = league.get("currency", "USD").lower()
     # Stripe only accepts USD for test; for INR use USD equivalent
     stripe_currency = "usd"
-    stripe_amount = int(entry_fee * 100)  # Convert to cents
+    stripe_amount = int(round(entry_fee * 100))  # Convert to cents
 
     success_url = f"{data.origin_url}/leagues/{data.league_id}?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{data.origin_url}/leagues/{data.league_id}"
@@ -221,6 +299,8 @@ async def create_checkout(data: CheckoutRequest, request: Request):
         raise HTTPException(status_code=503, detail=f"Failed to create checkout session: {str(e)}")
 
     txn_meta = {"league_id": data.league_id, "user_id": user["_id"]}
+    if credit_used > 0:
+        txn_meta["credit_applied"] = credit_used   # spent when the card payment is confirmed
     if data.promo_code:
         txn_meta["promo_code"] = data.promo_code.upper()
     if data.invite_token:
@@ -287,6 +367,15 @@ async def _register_paid_player(db, txn: dict, session_id: str, session_meta: di
     is_doubles = meta.get("is_doubles") == "true" or session_meta.get("is_doubles") == "true"
     invite_token = meta.get("invite_token") or session_meta.get("invite_token")
 
+    # Credit applied at checkout is taken now that the card payment went through. The ref makes this a no-op
+    # when the credit was already taken (credit-only payments) or this runs twice.
+    credit_applied = float(meta.get("credit_applied") or 0)
+    if credit_applied > 0:
+        taken = await venlax_credit.spend(db, user_id, credit_applied, "Entry fee", ref=f"entry:{session_id}", league_id=league_id)
+        if taken is None and not await db.credit_ledger.find_one({"ref": f"entry:{session_id}"}):
+            logger.warning("credit %.2f for session %s could not be taken: balance too low", credit_applied, session_id)
+    paid_total = round(float(txn.get("amount") or 0) + credit_applied, 2)
+
     # -- Doubles paid path ---------------------------------------------------
     if is_doubles and invite_token:
         if meta.get("promo_code"):
@@ -327,7 +416,8 @@ async def _register_paid_player(db, txn: dict, session_id: str, session_meta: di
                 league_doc = {}
             await db.doubles_invites.update_one(
                 {"token": invite_token},
-                {"$set": {"status": "initiator_paid", "expires_at": invite_expiry(league_doc, datetime.now(timezone.utc))}},
+                {"$set": {"status": "initiator_paid", "paid_amount": paid_total, "paid_at": now,
+                          "expires_at": invite_expiry(league_doc, datetime.now(timezone.utc))}},
             )
         return {"status": "paid", "payment_status": "paid", "is_doubles": True, "invite_pending": True}
     # -- End doubles paid path -----------------------------------------------
@@ -564,6 +654,7 @@ async def pay_with_wallet(data: WalletPaymentIn, request: Request):
 
 class ZelleIntentIn(BaseModel):
     league_id: str
+    use_credit: Optional[bool] = False   # VenLax Credit covers part of the fee; Zelle pays the rest
 
 
 class ZelleConfirmIn(BaseModel):
@@ -586,6 +677,12 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
     if fee <= 0:
         raise HTTPException(status_code=400, detail="This league is free to join")
 
+    credit_used = 0.0
+    if data.use_credit:
+        credit_used, fee = _credit_split(fee, await venlax_credit.balance(db, user["_id"]))
+        if fee <= 0:
+            raise HTTPException(status_code=400, detail="Your VenLax Credit covers the whole fee. Pay with credit instead.")
+
     handle = os.environ.get("ZELLE_HANDLE", "payments@leaguepro.com")
     display = os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX Sports Payments")
     memo = f"LP-{data.league_id[-6:]}-{user['_id'][-6:]}".upper()
@@ -601,6 +698,7 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
         "method": "zelle",
         "status": "pending_zelle",
         "memo": memo,
+        "metadata": {"credit_applied": credit_used} if credit_used > 0 else {},   # taken when the admin approves the deposit
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.payment_transactions.insert_one({**intent, "session_id": f"zelle_{ObjectId()}"})
