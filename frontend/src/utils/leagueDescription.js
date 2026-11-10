@@ -16,15 +16,21 @@ function niceDate(iso) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
+// Half of the team fee, rounded down to the cent (same rule as the server)
+const half = (fee) => Math.floor(Math.round(fee * 100) / 2) / 100;
+
 function price(league) {
   const fee = Number(league.entry_fee) || 0;
-  if (fee <= 0) return "Free to join.";
+  if (fee <= 0) return ["Free to join."];
   const symbol = league.currency === "INR" ? "₹" : "$";
   const amount = `${symbol}${fee.toFixed(2)}`;
   const team = ["doubles", "mixed doubles"].includes(formatName(league.format));
   return team
-    ? `Entry fee: ${amount} per team of two. One partner pays and the other joins at no extra charge.`
-    : `Entry fee: ${amount} per player for the season.`;
+    ? [
+        `Entry fee: ${amount} per team of two. One partner pays and the other joins at no extra charge.`,
+        `Signing up solo? Pay half (${symbol}${half(fee).toFixed(2)}) and VenLax pairs you with a partner at your level, who pays the other half.`,
+      ]
+    : [`Entry fee: ${amount} per player for the season.`];
 }
 
 export function leagueDescription(league = {}) {
@@ -62,7 +68,7 @@ export function leagueDescription(league = {}) {
   if (max > 0) {
     points.push(`Up to ${max} players.`);
   }
-  points.push(price(league));
+  points.push(...price(league));
   points.push("Report each score after the match. Standings and your skill rating update automatically.");
   if (type !== "box") {
     points.push("The top 4 advance to the playoffs in leagues of 12 or fewer players, or the top 8 in larger leagues.");
