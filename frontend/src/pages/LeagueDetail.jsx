@@ -549,7 +549,7 @@ export default function LeagueDetail() {
                             <div className="space-y-3">
                               {needsGender && <GenderPicker onSaved={fetchMe} />}
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Partner">
-                                {[["have", "I have a partner"], ["later", "Add my partner later"], ["venlax", `VenLax finds my partner${Number(league.entry_fee) > 0 ? ` · ${money(pairingHalf(league.entry_fee))}` : ""}`]].map(([mode, label]) => (
+                                {[["have", "I have a partner"], ["later", "Add my partner later"], ["venlax", "VenLax finds my partner"]].map(([mode, label]) => (
                                   <button
                                     key={mode}
                                     type="button"
