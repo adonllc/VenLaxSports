@@ -103,7 +103,7 @@ FOMO_TEMPLATES: dict[str, dict] = {
     },
     "m17_joined_not_playing": {
         "label": "17 You joined VenLax, now get in the game (players with no league yet, first league free)",
-        "needs": "league",
+        "needs": "any_league",
         "segment": "no_league",
         "subjects": [
             "You joined VenLax. Now it's time to get in the game!",
@@ -111,11 +111,11 @@ FOMO_TEMPLATES: dict[str, dict] = {
             "Your account is ready. Your next match is waiting.",
         ],
         "title": "You joined VenLax. Now it's time to get in the game!",
-        "cta": ("Join free & start playing", "/leagues?city={city}"),
+        "cta": ("Join free & start playing", "/leagues"),
         "body": f"""
           <p>Hi {{name}},</p>
           <p>You joined VenLax because you love tennis or pickleball. Now it's time to take the next step!</p>
-          <p><strong>🔥 League registration is open in {{city}}. Don't sit this season out!</strong></p>
+          <p><strong>🔥 League registration is open now. Don't sit this season out!</strong></p>
           <p>While other players are joining leagues, finding opponents and building their rankings, you are one step away from getting started. Every league has a limited number of places, and when one fills or starts, the next chance is the next season.</p>
           <p><strong>🎁 Your first league is free.</strong> Use the code <strong>PLAY1FREE</strong> at checkout.</p>
           <p><strong>Here's what makes playing with VenLax different:</strong></p>

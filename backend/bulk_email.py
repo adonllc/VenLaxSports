@@ -429,10 +429,12 @@ def _context(user: dict, facts: dict, needs: str):
         return {"league": lg.get("name", ""), "league_id": str(lg["_id"]), "city": lg.get("city") or city,
                 "sport": (lg.get("sport") or "").capitalize(), "start_date": _fmt_date(lg["start_date"]), "days_left": days,
                 "spots_left": 0, "players_in_city": 0}
-    if not city:
+    if not city and needs != "any_league":
         return None
     prefs = user.get("sport_preferences") or []
     mine = [l for l in facts["open"] if (l.get("city") or "").strip().lower() == city.lower()]
+    if needs == "any_league" and not mine:
+        mine = list(facts["open"])
     if needs == "doubles_league":
         mine = [l for l in mine if l.get("format") in ("doubles", "mixed_doubles")]
     if needs == "few_spots":

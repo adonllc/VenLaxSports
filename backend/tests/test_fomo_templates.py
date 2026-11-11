@@ -142,10 +142,11 @@ def test_joined_not_playing_goes_only_to_players_with_no_league_and_offers_the_f
     db = Db()
     db.league("Atlanta")
     idle, playing = db.user("Atlanta", name="Sam Lee"), db.user("Atlanta", name="Pat Kim")
+    nocity, elsewhere = db.user("", name="Lou Ray"), db.user("Denver", name="Al Poe")
     db.player_leagues = C()
     db.player_leagues.docs.append({"player_id": playing, "league_id": "x", "payment_status": "paid"})
     a = audience(db, "m17_joined_not_playing")
-    assert [r["id"] for r in a["send"]] == [idle] and a["skipped"]["outside filter"] == 1
+    assert {r["id"] for r in a["send"]} == {idle, nocity, elsewhere} and a["skipped"]["outside filter"] == 1
     m = bulk_email.render(payload("m17_joined_not_playing"), a["send"][0])
     assert "PLAY1FREE" in m["body"] and "Hi Sam" in m["body"] and "{" not in m["body"] and "/leagues" in m["cta_url"]
 
