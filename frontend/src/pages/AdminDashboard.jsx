@@ -62,6 +62,11 @@ export default function AdminDashboard() {
   const [ladderForm, setLadderForm] = useState({ city: "", sport: "tennis", division_label: "Intermediate", format: "singles" });
   const [ladderMsg, setLadderMsg] = useState("");
   const [showRRForm, setShowRRForm] = useState(false);
+  const [showClosedLeagues, setShowClosedLeagues] = useState(false);
+  const isOpenLeague = (l) => l.status === "registration" || l.status === "active";
+  const openLeagues = leagues.filter(isOpenLeague);
+  const closedLeagues = leagues.filter((l) => !isOpenLeague(l));
+  const shownLeagues = showClosedLeagues ? [...openLeagues, ...closedLeagues] : openLeagues;
   const [rrFormData, setRRFormData] = useState({
     name: "", sport: "tennis", country: "USA", city: "",
     format: "singles", entry_fee: 0, start_date: "", end_date: "",
@@ -592,8 +597,16 @@ export default function AdminDashboard() {
         {tab === "leagues" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
-              <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>All Leagues ({leagues.length})</h2>
+              <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Active &amp; Registration Open ({openLeagues.length})</h2>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <button
+                  data-testid="btn-toggle-closed-leagues"
+                  onClick={() => setShowClosedLeagues((v) => !v)}
+                  className="px-4 py-2 rounded-md text-sm font-medium transition"
+                  style={{ border: "1px solid #E5E7EB", color: "#4C4C4C" }}
+                >
+                  {showClosedLeagues ? "Hide" : "Show"} closed league history ({closedLeagues.length})
+                </button>
                 <button
                   data-testid="btn-create-rr-league"
                   onClick={() => setShowRRForm(true)}
@@ -621,8 +634,8 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y" style={{ borderColor: "#F3F4F6" }}>
-                  {leagues.map((l) => (
-                    <tr key={l.id} style={{ background: "white" }} onMouseEnter={e => e.currentTarget.style.background = "#FFFFFF"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
+                  {shownLeagues.map((l) => (
+                    <tr key={l.id} data-testid={isOpenLeague(l) ? undefined : `closed-league-row-${l.id}`} style={{ background: "white", opacity: isOpenLeague(l) ? 1 : 0.7 }} onMouseEnter={e => e.currentTarget.style.background = "#FFFFFF"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
                       <td className="px-5 py-3 font-medium max-w-[200px] truncate" style={{ color: "#3D3D3D" }}>{l.name}</td>
                       <td className="px-5 py-3 capitalize" style={{ color: "#374151" }}>{l.sport}</td>
                       <td className="px-5 py-3" style={{ color: "#374151" }}>{l.city}</td>
@@ -744,8 +757,10 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-              {leagues.length === 0 && (
-                <div className="text-center py-12" style={{ color: "#6B7280" }}>No leagues yet. Create one!</div>
+              {shownLeagues.length === 0 && (
+                <div className="text-center py-12" style={{ color: "#6B7280" }}>
+                  {leagues.length === 0 ? "No leagues yet. Create one!" : "No active or registration-open leagues."}
+                </div>
               )}
             </div>
           </div>
