@@ -101,6 +101,40 @@ FOMO_TEMPLATES: dict[str, dict] = {
           <p>Next up: <strong>{{league}}</strong>, starting shortly. Every league has a limited number of places.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
+    "m17_joined_not_playing": {
+        "label": "17 You joined VenLax, now get in the game (players with no league yet, first league free)",
+        "needs": "league",
+        "segment": "no_league",
+        "subjects": [
+            "You joined VenLax. Now it's time to get in the game!",
+            "{name}, your first league is free",
+            "Your account is ready. Your next match is waiting.",
+        ],
+        "title": "You joined VenLax. Now it's time to get in the game!",
+        "cta": ("Join free & start playing", "/leagues?city={city}"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>You joined VenLax because you love tennis or pickleball. Now it's time to take the next step!</p>
+          <p><strong>🔥 League registration is open in {{city}}. Don't sit this season out!</strong></p>
+          <p>While other players are joining leagues, finding opponents and building their rankings, you are one step away from getting started. Every league has a limited number of places, and when one fills or starts, the next chance is the next season.</p>
+          <p><strong>🎁 Your first league is free.</strong> Use the code <strong>PLAY1FREE</strong> at checkout.</p>
+          <p><strong>Here's what makes playing with VenLax different:</strong></p>
+          <ul style="padding-left:18px;margin:0 0 16px">
+            <li>🎾 <strong>Play on your schedule.</strong> No rigid weekend schedules. Coordinate matches when it works for you.</li>
+            <li>📍 <strong>Choose convenient courts.</strong> Play at a location that works for you and your opponent.</li>
+            <li>🏆 <strong>Build your ranking.</strong> Play competitive matches, track your results and work your way up.</li>
+            <li>🥇 <strong>Singles and doubles leagues.</strong> Choose your style of competition.</li>
+            <li>🤝 <strong>No doubles partner? We've got you.</strong> Sign up solo and we will help match you with a partner at a similar level.</li>
+            <li>⚡ <strong>Find players at your level.</strong> Compete against players matched to you for more meaningful matches.</li>
+            <li>📊 <strong>Track your progress.</strong> Keep up with your matches, wins, losses, rankings and league progress.</li>
+          </ul>
+          <p><strong>🔥 Your next match could be the one that moves you up!</strong></p>
+          <p>Don't let another season pass while you wait for the perfect time, the right opponent or a doubles partner. Your game. Your schedule. Your way.</p>
+          <p>Explore available leagues: <a href="https://venlaxsports.com/leagues">venlaxsports.com/leagues</a></p>
+          <p>Already have an account? Log in and find your league.</p>
+          <p>See you on the court!<br>Team VenLax Sports<br><em>Tennis &amp; Pickleball. Competition on your terms.</em></p>
+          <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
     "m16_bring_partner": {
         "label": "16 Bring your doubles partner, or we pair you (needs partner auto-assign live)",
         "needs": "waiting_team",

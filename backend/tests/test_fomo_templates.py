@@ -138,6 +138,18 @@ def test_first_free_needs_no_league_and_reaches_everyone_not_opted_out():
     assert "PLAY1FREE" in m["body"]
 
 
+def test_joined_not_playing_goes_only_to_players_with_no_league_and_offers_the_free_code():
+    db = Db()
+    db.league("Atlanta")
+    idle, playing = db.user("Atlanta", name="Sam Lee"), db.user("Atlanta", name="Pat Kim")
+    db.player_leagues = C()
+    db.player_leagues.docs.append({"player_id": playing, "league_id": "x", "payment_status": "paid"})
+    a = audience(db, "m17_joined_not_playing")
+    assert [r["id"] for r in a["send"]] == [idle] and a["skipped"]["outside filter"] == 1
+    m = bulk_email.render(payload("m17_joined_not_playing"), a["send"][0])
+    assert "PLAY1FREE" in m["body"] and "Hi Sam" in m["body"] and "{" not in m["body"] and "/leagues" in m["cta_url"]
+
+
 def test_subject_variants_pick_the_chosen_line_and_reject_bad_numbers():
     db = Db()
     db.league("Atlanta")

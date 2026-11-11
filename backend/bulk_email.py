@@ -470,9 +470,10 @@ async def build_audience(db, payload: dict) -> dict:
     chosen = set(payload["user_ids"]) if payload.get("user_ids") else None
     in_league = {d["player_id"] for d in await db.player_leagues.find({"payment_status": {"$in": ["paid", "free"]}}).to_list(None)}
     city = (payload.get("city") or "").strip().lower()
-    segment = payload.get("segment", "all")
+    tpl = TEMPLATES.get(payload.get("template")) or {}
+    segment = tpl.get("segment") or payload.get("segment", "all")
     send, skipped = [], {"opted out": 0, "already sent": 0, "outside filter": 0}
-    needs = (TEMPLATES.get(payload.get("template")) or {}).get("needs")
+    needs = tpl.get("needs")
     facts = await _city_facts(db) if needs else None
     for u in users:
         email = (u.get("email") or "").strip().lower()
