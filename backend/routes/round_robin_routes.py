@@ -18,6 +18,15 @@ def _require_rr(league: dict) -> None:
         raise HTTPException(status_code=404, detail="Round Robin league not found")
 
 
+async def _clear_stale_invites(db, user_id: str, league_id: str) -> None:
+    """doubles_invites_active_unique allows one invite per (initiator, league) whatever its status.
+    Cancelled/expired ones are dead records; drop them so the player can register again."""
+    await db.doubles_invites.delete_many(
+        {"league_id": league_id, "status": {"$in": ["cancelled", "expired"]},
+         "$or": [{"initiator_id": user_id}, {"inviter_id": user_id}]}
+    )
+
+
 @router.get("/invite/{token}")
 async def get_invite(token: str, request: Request):
     db = request.app.state.db
@@ -442,8 +451,10 @@ async def invite_partner(league_id: str, request: Request):
 
         p2_name = partner.get("name", "")
 
+        await _clear_stale_invites(db, user["_id"], league_id)
         await db.doubles_invites.insert_one({
             "league_id": league_id,
+            "initiator_id": user["_id"],   # the unique index keys on initiator_id
             "inviter_id": user["_id"],
             "inviter_name": inviter_name,
             "partner_email": partner.get("email", ""),
@@ -495,8 +506,10 @@ async def invite_partner(league_id: str, request: Request):
         return {"registered": True, "message": "Team registered!"}
 
     # ── Invite by email ───────────────────────────────────────────────────────
+    await _clear_stale_invites(db, user["_id"], league_id)
     await db.doubles_invites.insert_one({
         "league_id": league_id,
+        "initiator_id": user["_id"],   # the unique index keys on initiator_id
         "inviter_id": user["_id"],
         "inviter_name": inviter_name,
         "partner_email": partner_email,

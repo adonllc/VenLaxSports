@@ -151,6 +151,14 @@ class JoinLeagueRequest(BaseModel):
 
 
 
+async def _clear_stale_invites(db, initiator_id: str, league_id: str) -> None:
+    """doubles_invites_active_unique allows one invite per (initiator, league) whatever its status.
+    Cancelled/expired ones are dead records; drop them so the player can register again."""
+    await db.doubles_invites.delete_many(
+        {"initiator_id": initiator_id, "league_id": league_id, "status": {"$in": ["cancelled", "expired"]}}
+    )
+
+
 @router.post("/{league_id}/join")
 async def join_league(league_id: str, body: JoinLeagueRequest, request: Request):
     db = request.app.state.db
@@ -222,6 +230,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     resp["entry_fee"] = float(pairing_share(entry_fee) if existing_invite.get("pair_by_venlax") else entry_fee)
                 return resp
 
+            await _clear_stale_invites(db, user["_id"], league_id)
             token = secrets.token_hex(32)
             expires_at = invite_expiry(league, now)
             await db.doubles_invites.insert_one({
@@ -288,6 +297,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     )
                 token = existing_invite["token"]
             else:
+                await _clear_stale_invites(db, user["_id"], league_id)
                 # Atomic spot reservation
                 reserved = await db.leagues.find_one_and_update(
                     {
@@ -379,6 +389,7 @@ async def join_league(league_id: str, body: JoinLeagueRequest, request: Request)
                     resp["entry_fee"] = float(entry_fee)
                 return resp
 
+            await _clear_stale_invites(db, user["_id"], league_id)
             token = secrets.token_hex(32)
             invite_doc = {
                 "league_id": league_id,
