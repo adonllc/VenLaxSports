@@ -108,12 +108,13 @@ async def _one(db, post: dict, user: dict) -> dict:
 @router.get("/")
 async def browse(request: Request, sport: Optional[str] = None, format: Optional[str] = None, city: Optional[str] = None,
                  zip_code: Optional[str] = None, date: Optional[str] = None, time_window: Optional[str] = None,
-                 min_level: Optional[float] = None, max_level: Optional[float] = None, near: Optional[str] = None):
+                 min_level: Optional[float] = None, max_level: Optional[float] = None, near: Optional[str] = None,
+                 q: Optional[str] = None):
     db = request.app.state.db
     user = await get_current_user(request, db)
     return await oc.browse(db, user, {
         "sport": sport, "format": format, "city": city, "zip_code": zip_code, "date": date, "time_window": time_window,
-        "min_level": min_level, "max_level": max_level, "near": near})
+        "min_level": min_level, "max_level": max_level, "near": near, "q": q})
 
 
 @router.get("/mine")

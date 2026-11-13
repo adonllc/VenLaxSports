@@ -7,9 +7,10 @@ import { SPORTS } from "../utils/challengeUi";
 import { WINDOWS } from "../utils/openChallengeUi";
 import { AcceptDialog, OpenChallengeCard } from "../components/OpenChallengeParts";
 import OpenChallengeForm from "../components/OpenChallengeForm";
+import { FindPlayers } from "./Challenges";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
-const EMPTY = { sport: "", format: "", city: "", zip_code: "", date: "", time_window: "", near: "" };
+const EMPTY = { q: "", sport: "", format: "", city: "", zip_code: "", date: "", time_window: "", near: "" };
 const sel = { border: "1px solid #E5E7EB" };
 
 function Section({ title, hint, items, empty, children }) {
@@ -56,7 +57,8 @@ export default function FindOpponent() {
   const setF = (k) => (e) => setFilters((p) => ({ ...p, [k]: e.target.value }));
   const sum = mine?.summary || {};
   const tabs = [
-    { id: "find", label: "Find an opponent" },
+    { id: "find", label: "Open matches" },
+    { id: "player", label: "Challenge a player" },
     { id: "open", label: `My open challenges${mine ? ` (${mine.published.length})` : ""}` },
     { id: "accepted", label: `My accepted challenges${mine ? ` (${mine.accepted.length})` : ""}` },
   ];
@@ -94,6 +96,7 @@ export default function FindOpponent() {
         {tab === "find" && (
           <div className="mt-5" data-testid="board">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-4" style={{ border: "1px solid #E5E7EB" }} role="search" aria-label="Filter challenges">
+              <input value={filters.q} onChange={setF("q")} placeholder="Player name" className="px-3 py-2 text-sm" style={sel} aria-label="Player name" data-testid="filter-name" />
               <select value={filters.sport} onChange={setF("sport")} className="px-3 py-2 text-sm bg-white" style={sel} aria-label="Sport" data-testid="filter-sport"><option value="">Any sport</option>{SPORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}</select>
               <select value={filters.format} onChange={setF("format")} className="px-3 py-2 text-sm bg-white" style={sel} aria-label="Match type" data-testid="filter-format"><option value="">Singles or doubles</option><option value="singles">Singles</option><option value="doubles">Doubles</option></select>
               <input value={filters.city} onChange={setF("city")} placeholder="City" className="px-3 py-2 text-sm" style={sel} aria-label="City" data-testid="filter-city" />
@@ -113,6 +116,13 @@ export default function FindOpponent() {
             ) : (
               <div className="grid md:grid-cols-2 gap-4 mt-4">{board.map((c) => <OpenChallengeCard key={c.id} c={c} onAccept={setAccepting} />)}</div>
             )}
+          </div>
+        )}
+
+        {tab === "player" && (
+          <div className="mt-5" data-testid="challenge-player-tab">
+            <p className="text-sm mb-3" style={{ color: "#4C4C4C" }}>Know who you want to play? Search by name, sport, singles or doubles, city and level, or challenge them by email if they are not on VenLax yet.</p>
+            <FindPlayers onSent={(c) => navigate(`/challenges/${c.id}`)} onEmailSent={loadMine} />
           </div>
         )}
 

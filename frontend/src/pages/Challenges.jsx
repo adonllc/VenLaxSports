@@ -244,7 +244,7 @@ function ChallengeModal({ target, sport, format, onClose, onSent }) {
   );
 }
 
-function FindPlayers({ onSent, onEmailSent }) {
+export function FindPlayers({ onSent, onEmailSent }) {
   const [filters, setFilters] = useState({ q: "", sport: "tennis", format: "singles", city: "", min_level: "", max_level: "" });
   const [players, setPlayers] = useState(null);
   const [error, setError] = useState("");

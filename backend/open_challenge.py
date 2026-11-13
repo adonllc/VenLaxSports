@@ -571,6 +571,8 @@ async def browse(db, viewer: dict, f: dict) -> list:
             continue
         if eligibility_error(p, viewer):
             continue                                   # players only see what they are allowed to accept
+        if f.get("q") and f["q"].strip().lower() not in (p.get("owner_name") or "").lower():
+            continue
         if f.get("time_window") and f["time_window"] != "any" and p["time_window"] not in (f["time_window"], "any"):
             continue
         if f.get("min_level") is not None and p["level"] < f["min_level"]:

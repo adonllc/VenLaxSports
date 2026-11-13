@@ -556,3 +556,13 @@ def test_once_taken_only_the_two_players_and_admins_can_open_the_post():
         assert e.value.status_code == 404
     assert run(routes._load(db, str(p["_id"]), db.user(db.bob)))["_id"] == p["_id"]
     assert run(routes._load(db, str(p["_id"]), {"_id": "adm", "role": "admin"}))["_id"] == p["_id"]
+
+
+def test_board_can_be_searched_by_player_name():
+    db = Db()
+    post(db, date=day(2))
+    post(db, who=db.ed, date=day(3))
+    bob = db.user(db.bob)
+    assert [c["owner"]["name"] for c in run(oc.browse(db, bob, {"q": "ann"}))] == ["Ann Ace"]
+    assert [c["owner"]["name"] for c in run(oc.browse(db, bob, {"q": " EDGE "}))] == ["Ed Edge"]
+    assert run(oc.browse(db, bob, {"q": "zzz"})) == []
