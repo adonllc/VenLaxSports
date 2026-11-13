@@ -7,6 +7,10 @@ const GAPS = [
   { value: 0.5, label: "Within ±0.5" },
   { value: 1, label: "Within ±1.0" },
 ];
+const SCORING = [
+  { key: "location", label: "Same zip / city" },
+  { key: "play_profile", label: "Court side / availability" },
+];
 const box = { border: "1px solid #E5E7EB" };
 const head = { color: "#6B7280" };
 
@@ -30,16 +34,19 @@ export default function PartnerMatchingPanel() {
   const [requests, setRequests] = useState([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [scoring, setScoring] = useState({ location: false, play_profile: false });
 
   const load = useCallback(async () => {
     try {
       const opts = { withCredentials: true };
-      const [m, r, c] = await Promise.all([
+      const [m, r, c, sc] = await Promise.all([
         axios.get(`${API}/admin/partner-matches`, { params: { max_gap: gap }, ...opts }),
         axios.get(`${API}/admin/partner-matches/refund-due`, opts),
         axios.get(`${API}/admin/partner-change-requests`, opts),
+        axios.get(`${API}/admin/partner-matches/scoring`, opts),
       ]);
       setData(m.data);
+      setScoring(sc.data);
       setRefunds(r.data.rows);
       setRequests(c.data.rows);
       setPicked({});
@@ -69,6 +76,18 @@ export default function PartnerMatchingPanel() {
       setMsg(e.response?.data?.detail || "Could not assign.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const toggleScoring = async (name, on) => {
+    const next = { ...scoring, [name]: on };
+    setMsg("");
+    try {
+      const { data: out } = await axios.put(`${API}/admin/partner-matches/scoring`, next, { withCredentials: true });
+      setScoring(out);
+      await load();
+    } catch (e) {
+      setMsg(e.response?.data?.detail || "Could not change the scoring.");
     }
   };
 
@@ -104,6 +123,16 @@ export default function PartnerMatchingPanel() {
             {GAPS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
           </select>
         </label>
+        <div className="basis-full flex flex-wrap items-center gap-x-5 gap-y-1 text-xs" style={head} data-testid="partner-scoring">
+          <span>Also score pairs by:</span>
+          {SCORING.map((f) => (
+            <label key={f.key} className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="h-4 w-4 accent-[#008F70]" checked={!!scoring[f.key]} onChange={(e) => toggleScoring(f.key, e.target.checked)} data-testid={`partner-scoring-${f.key}`} />
+              {f.label}
+            </label>
+          ))}
+          <span>(Level is always scored.)</span>
+        </div>
       </div>
 
       {msg && <p className="px-5 pt-3 text-sm" style={{ color: "#374151" }} role="status" data-testid="partner-matching-msg">{msg}</p>}
