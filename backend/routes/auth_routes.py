@@ -566,6 +566,11 @@ async def verify_otp(body: OTPVerifyIn, request: Request):
         {"_id": ObjectId(user["_id"])},
         {"$set": {"email_verified": True}, "$unset": {"otp_code": "", "otp_expires_at": ""}},
     )
+    try:   # challenges emailed to this address before it had an account attach now
+        import challenge_invite
+        await challenge_invite.attach_for_user(db, user)
+    except Exception:
+        pass
     return {"message": "Email verified", "email_verified": True}
 
 

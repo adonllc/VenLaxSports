@@ -8,9 +8,11 @@ from typing import List, Optional
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 import audit_log
+import challenge_invite as ci
 import direct_challenge as dc
 import notification_center
 from auth_utils import get_current_user, require_admin
@@ -53,6 +55,18 @@ class CreateIn(BaseModel):
     format: str = "singles"
     partner_id: Optional[str] = None
     message: Optional[str] = Field(default=None, max_length=500)
+
+
+class EmailInviteIn(BaseModel):
+    email: str = Field(max_length=200)
+    sport: str
+    format: str = "singles"
+    partner_id: Optional[str] = None
+    message: Optional[str] = Field(default=None, max_length=500)
+
+
+class ClaimIn(BaseModel):
+    token: str = Field(max_length=100)
 
 
 class AcceptIn(BaseModel):
@@ -129,6 +143,62 @@ async def open_count(request: Request):
     return {"waiting": waiting}
 
 
+@router.post("/email-invites")
+async def send_email_invite(body: EmailInviteIn, request: Request):
+    """Challenge someone by email. The answer is the same whether or not the address has an account."""
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    await _wrap(ci.send)(db, user, body.model_dump())
+    return {"ok": True, "message": "Challenge sent. If they are not on VenLax yet, they get an email asking them to join."}
+
+
+@router.get("/email-invites")
+async def waiting_email_invites(request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    return await ci.list_waiting(db, user)
+
+
+@router.get("/email-invites/preview")
+async def email_invite_preview(token: str, request: Request):
+    """Public: what the invitation link shows before the person signs up."""
+    return await ci.preview_by_token(request.app.state.db, token)
+
+
+@router.post("/email-invites/claim")
+async def claim_email_invite(body: ClaimIn, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    inv = await _wrap(ci.claim)(db, user, body.token)
+    return {"challenge_id": inv["challenge_id"]}
+
+
+@router.get("/email-invites/unsubscribe", response_class=HTMLResponse)
+async def email_invite_unsubscribe(token: str, request: Request):
+    ok = await ci.unsubscribe(request.app.state.db, token)
+    msg = ("You will not get any more challenge emails from VenLax Sports at this address." if ok
+           else "This unsubscribe link is not valid. Reply to the email and we will remove you.")
+    return HTMLResponse("<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
+                        "<body style='font-family:system-ui,sans-serif;max-width:480px;margin:15vh auto;padding:0 16px;color:#3D3D3D'>"
+                        f"<h2>VenLax Sports</h2><p>{msg}</p></body>")
+
+
+@router.post("/email-invites/{invite_id}/cancel")
+async def cancel_email_invite(invite_id: str, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    await _wrap(ci.cancel)(db, user, invite_id)
+    return {"ok": True}
+
+
+@router.post("/email-invites/{invite_id}/resend")
+async def resend_email_invite(invite_id: str, request: Request):
+    db = request.app.state.db
+    user = await get_current_user(request, db)
+    await _wrap(ci.resend)(db, user, invite_id)
+    return {"ok": True}
+
+
 @router.post("")
 @router.post("/")
 async def create_challenge(body: CreateIn, request: Request):
@@ -143,7 +213,9 @@ async def create_challenge(body: CreateIn, request: Request):
 async def my_challenges(request: Request):
     db = request.app.state.db
     user = await get_current_user(request, db)
-    return await dc.mine(db, user)
+    out = await dc.mine(db, user)
+    out["waiting"] = await ci.list_waiting(db, user)      # emailed to people who have not joined yet
+    return out
 
 
 @router.get("/{challenge_id}")

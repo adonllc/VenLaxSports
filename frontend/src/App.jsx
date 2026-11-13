@@ -47,6 +47,7 @@ const CommunityLadderCreate = lazy(() => import("./pages/CommunityLadderCreate")
 const CommunityLadderJoin = lazy(() => import("./pages/CommunityLadderJoin"));
 const CommunityLadder = lazy(() => import("./pages/CommunityLadder"));
 const Challenges = lazy(() => import("./pages/Challenges"));
+const ChallengeInvite = lazy(() => import("./pages/ChallengeInvite"));
 const FindOpponent = lazy(() => import("./pages/FindOpponent"));
 const OpenChallengeDetail = lazy(() => import("./pages/OpenChallengeDetail"));
 const ChallengeDetail = lazy(() => import("./pages/ChallengeDetail"));
@@ -104,6 +105,7 @@ function AppRouter() {
           <Route path="/community-ladders/join" element={<CommunityLadderJoin />} />
           <Route path="/community-ladders/:id" element={<CommunityLadder />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges/invite" element={<ChallengeInvite />} />
           <Route path="/find-opponent" element={<FindOpponent />} />
           <Route path="/find-opponent/:id" element={<OpenChallengeDetail />} />
           <Route path="/challenges/:id" element={<ChallengeDetail />} />

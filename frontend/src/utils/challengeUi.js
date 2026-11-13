@@ -35,6 +35,19 @@ export const sportLabel = (c) => `${c.sport[0].toUpperCase()}${c.sport.slice(1)}
 export const scoreText = (result, mySide) =>
   (result?.sets || []).map((s) => (mySide === 2 ? `${s.b}-${s.a}` : `${s.a}-${s.b}`)).join(", ");
 
+// A person who opened a challenge-by-email link comes back to it after signing up or in.
+const INVITE_KEY = "pending_challenge_invite";
+export const rememberChallengeInvite = (token) => { try { localStorage.setItem(INVITE_KEY, token); } catch { /* storage blocked */ } };
+export const pendingChallengeInvitePath = () => {
+  try {
+    const t = localStorage.getItem(INVITE_KEY);
+    return t ? `/challenges/invite?token=${encodeURIComponent(t)}` : null;
+  } catch {
+    return null;
+  }
+};
+export const clearChallengeInvite = () => { try { localStorage.removeItem(INVITE_KEY); } catch { /* nothing to clear */ } };
+
 export const apiError = (e, fallback = "Something went wrong. Try again.") => {
   const d = e?.response?.data?.detail;
   if (typeof d === "string") return d;

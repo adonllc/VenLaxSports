@@ -15,6 +15,7 @@ import logging
 import community_ladder
 import direct_challenge
 import open_challenge
+import challenge_invite
 import ladder_ranking
 import email_automation
 from partner_nudges import nudge_waiting_teams
@@ -136,6 +137,16 @@ def start_scheduler(db):
             args=[db],
             id="run_email_automations",
             name="Run email automation workflows",
+            replace_existing=True,
+            max_instances=1,
+        )
+
+        scheduler.add_job(
+            challenge_invite.process,
+            trigger=IntervalTrigger(hours=1),
+            args=[db],
+            id="challenge_email_invites",
+            name="Remind and expire challenges emailed to people who have not joined",
             replace_existing=True,
             max_instances=1,
         )

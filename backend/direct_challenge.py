@@ -106,7 +106,7 @@ def _usable(u) -> bool:
 # ── Create ────────────────────────────────────────────────────────────────────
 
 async def create(db, challenger: dict, data: dict, ladder: dict | None = None,
-                 my_team: list | None = None, their_team: list | None = None) -> dict:
+                 my_team: list | None = None, their_team: list | None = None, skip_limit: bool = False) -> dict:
     """Send a challenge. For a ladder match (ladder={"id", "name"}) the teams come from the ladder, not from the form."""
     sport, fmt = data["sport"], data["format"]
     if sport not in cfg.CHALLENGE_SPORTS or sport not in ACTIVE_SPORTS:
@@ -142,7 +142,7 @@ async def create(db, challenger: dict, data: dict, ladder: dict | None = None,
     now = _now()
     sent_today = await db.direct_challenges.count_documents(
         {"challenger_id": me, "created_at": {"$gte": (now - timedelta(hours=24)).isoformat()}})
-    if sent_today >= cfg.DAILY_SEND_LIMIT:
+    if sent_today >= cfg.DAILY_SEND_LIMIT and not skip_limit:
         raise ChallengeError(429, f"You can send {cfg.DAILY_SEND_LIMIT} challenges a day. Try again tomorrow.")
 
     ladder_id = ladder["id"] if ladder else None

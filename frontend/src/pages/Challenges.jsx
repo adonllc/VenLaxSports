@@ -5,6 +5,7 @@ import { Search, Swords } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
 import { COURT_SIDE_NEUTRAL, STYLE_OPTIONS } from "../config/playProfile";
+import { PartnerPicker } from "../components/OpenChallengeParts";
 import { SPORTS, STATUS, apiError, fmtWhen, matchup, sportLabel } from "../utils/challengeUi";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -40,6 +41,42 @@ function Chip({ status }) {
   return <span className="px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap" style={{ background: s.bg, color: s.fg }}>{s.label}</span>;
 }
 
+/** A challenge emailed to someone who has not joined yet: shown on the Sent tab as waiting for them to sign up. */
+function WaitingRow({ w, onChanged }) {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const act = async (action) => {
+    setBusy(true);
+    setMsg("");
+    try {
+      await axios.post(`${API}/challenges/email-invites/${w.id}/${action}`, {}, { withCredentials: true });
+      setMsg(action === "resend" ? "Reminder sent." : "");
+      await onChanged();
+    } catch (e) {
+      setMsg(apiError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="bg-white p-4" style={box} data-testid={`waiting-row-${w.id}`}>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <p className="font-semibold text-sm break-all" style={{ color: "#1D1D1D" }}>{w.email}</p>
+          <p className="text-xs mt-0.5" style={muted}>{w.sport[0].toUpperCase() + w.sport.slice(1)} {w.format} · invitation open until {new Date(w.expires_at).toLocaleDateString()}</p>
+        </div>
+        <span className="px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap" style={{ background: "#FFF6E0", color: "#8A5A00" }} data-testid={`waiting-chip-${w.id}`}>Waiting to join VenLax</span>
+      </div>
+      <p className="text-xs mt-2" style={muted}>They have not signed up yet. When they do, they will see your challenge and can accept it.</p>
+      <div className="flex gap-4 mt-3">
+        {w.can_resend && <button disabled={busy} onClick={() => act("resend")} className="text-xs font-bold underline" data-testid={`waiting-resend-${w.id}`}>Resend email</button>}
+        <button disabled={busy} onClick={() => window.confirm("Cancel this challenge?") && act("cancel")} className="text-xs font-bold underline" style={{ color: "#B42318" }} data-testid={`waiting-cancel-${w.id}`}>Cancel</button>
+      </div>
+      {msg && <p className="text-xs mt-2" role="status">{msg}</p>}
+    </div>
+  );
+}
+
 function ChallengeRow({ c }) {
   return (
     <Link to={`/challenges/${c.id}`} className="block bg-white p-4 hover:shadow-sm" style={box} data-testid={`challenge-row-${c.id}`}>
@@ -57,6 +94,46 @@ function ChallengeRow({ c }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+/** Challenge someone who is not in the search: registered or not, they get the challenge (or an invitation to join). */
+function EmailChallenge({ sport, format, onSent }) {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [partner, setPartner] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [done, setDone] = useState("");
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setErr("");
+    setDone("");
+    try {
+      const { data } = await axios.post(`${API}/challenges/email-invites`, {
+        email: email.trim(), sport, format, partner_id: format === "doubles" ? partner?.id : undefined, message: message.trim() || undefined,
+      }, { withCredentials: true });
+      setDone(data.message);
+      setEmail("");
+      setMessage("");
+      onSent();
+    } catch (e2) {
+      setErr(apiError(e2, "Could not send the challenge."));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <form onSubmit={submit} className="bg-white p-4 mt-4 grid gap-3" style={box} data-testid="email-challenge-form">
+      <p className="text-sm" style={{ color: "#4C4C4C" }}>Enter their email. If they are on VenLax they get your challenge; if not, we email them an invitation to join and play. {sport[0].toUpperCase() + sport.slice(1)} {format}.</p>
+      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="friend@example.com" className={input} style={box} aria-label="Their email address" data-testid="email-challenge-email" />
+      {format === "doubles" && <PartnerPicker sport={sport} value={partner} onChange={setPartner} testid="email-challenge-partner" />}
+      <textarea value={message} onChange={(e) => setMessage(e.target.value)} maxLength={500} rows={2} placeholder="Message (optional): free this weekend?" className={input} style={box} aria-label="Message" data-testid="email-challenge-message" />
+      {err && <p className="text-sm" style={{ color: "#B42318" }} role="alert" data-testid="email-challenge-error">{err}</p>}
+      {done && <p className="text-sm" style={{ color: "#00765C" }} role="status" data-testid="email-challenge-done">{done}</p>}
+      <button type="submit" disabled={busy || !email.trim() || (format === "doubles" && !partner)} className="justify-self-start px-4 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-50" style={{ background: "#008F70", color: "#fff" }} data-testid="email-challenge-send">{busy ? "Sending..." : "Send challenge by email"}</button>
+    </form>
   );
 }
 
@@ -167,11 +244,12 @@ function ChallengeModal({ target, sport, format, onClose, onSent }) {
   );
 }
 
-function FindPlayers({ onSent }) {
+function FindPlayers({ onSent, onEmailSent }) {
   const [filters, setFilters] = useState({ q: "", sport: "tennis", format: "singles", city: "", min_level: "", max_level: "" });
   const [players, setPlayers] = useState(null);
   const [error, setError] = useState("");
   const [target, setTarget] = useState(null);
+  const [byEmail, setByEmail] = useState(false);
   const set = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
 
   // Nobody sees a list of every player: results appear only after a search with a name, a city or a level range.
@@ -219,6 +297,10 @@ function FindPlayers({ onSent }) {
         </div>
         <button type="submit" className="px-4 py-2 text-xs font-bold uppercase tracking-wider lg:col-span-6 sm:justify-self-start" style={{ background: "#F2A922", color: "#1D1D1D" }} data-testid="player-search-submit">Search players</button>
       </form>
+      <button type="button" onClick={() => setByEmail((v) => !v)} className="mt-3 text-sm font-semibold underline" style={{ color: "#008F70" }} aria-expanded={byEmail} data-testid="email-challenge-toggle">
+        {byEmail ? "Hide challenge by email" : "Can't find them? Challenge by email"}
+      </button>
+      {byEmail && <EmailChallenge sport={filters.sport} format={filters.format} onSent={onEmailSent} />}
       {error && <p className="text-sm mt-4" style={{ color: "#B42318" }} role="alert" data-testid="player-search-error">{error}</p>}
       {players === null && !error && <p className="text-sm mt-6" style={muted} data-testid="player-search-hint">Search by name, city or level range to find someone to challenge.</p>}
       {players && players.length === 0 && <p className="text-sm mt-6" style={muted} data-testid="player-search-empty">No players match. Try a wider level range or another city.</p>}
@@ -261,6 +343,7 @@ export default function Challenges() {
 
   const goto = (id) => setParams(id === "find" ? {} : { tab: id });
   const list = groups && tab !== "find" ? groups[tab] : [];
+  const waiting = groups?.waiting || [];
 
   return (
     <div className="min-h-screen" style={{ background: "#F9FAFB" }}>
@@ -281,7 +364,7 @@ export default function Challenges() {
 
         <div className="flex gap-1 overflow-x-auto mt-8 mb-5" role="tablist" style={{ borderBottom: "1px solid #E5E7EB" }}>
           {TABS.map((t) => {
-            const n = t.id === "find" || !groups ? 0 : groups[t.id].length;
+            const n = t.id === "find" || !groups ? 0 : groups[t.id].length + (t.id === "sent" ? (groups.waiting || []).length : 0);
             return (
               <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => goto(t.id)} className="px-4 py-2.5 text-sm font-semibold whitespace-nowrap" style={tab === t.id ? { color: "#008F70", borderBottom: "2px solid #008F70" } : { color: "#4C4C4C" }} data-testid={`challenge-tab-${t.id}`}>
                 {t.label}{n > 0 ? ` (${n})` : ""}
@@ -292,11 +375,14 @@ export default function Challenges() {
 
         {error && <p className="text-sm mb-4" style={{ color: "#B42318" }} role="alert">{error}</p>}
         {tab === "find" ? (
-          <FindPlayers onSent={(c) => { load(); navigate(`/challenges/${c.id}`); }} />
-        ) : list.length === 0 ? (
+          <FindPlayers onSent={(c) => { load(); navigate(`/challenges/${c.id}`); }} onEmailSent={load} />
+        ) : list.length === 0 && !(tab === "sent" && waiting.length > 0) ? (
           <p className="text-sm py-8 text-center" style={muted} data-testid={`challenge-empty-${tab}`}>{EMPTY[tab]}</p>
         ) : (
-          <div className="space-y-3" data-testid={`challenge-list-${tab}`}>{list.map((c) => <ChallengeRow key={c.id} c={c} />)}</div>
+          <div className="space-y-3" data-testid={`challenge-list-${tab}`}>
+            {tab === "sent" && waiting.map((w) => <WaitingRow key={w.id} w={w} onChanged={load} />)}
+            {list.map((c) => <ChallengeRow key={c.id} c={c} />)}
+          </div>
         )}
       </div>
     </div>

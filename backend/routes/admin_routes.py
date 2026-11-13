@@ -764,6 +764,7 @@ async def delete_user(user_id: str, request: Request):
     await db.open_challenge_blocks.delete_many({"$or": [{"user_id": user_id}, {"blocked_id": user_id}]})
     await db.open_challenge_reports.delete_many({"reporter_id": user_id})
     await db.open_challenge_shares.delete_many({"user_id": user_id})
+    await db.challenge_email_invites.delete_many({"sender_id": user_id})
     await db.ladder_invites.delete_many({"$or": [{"invitee_user_id": user_id}, {"invited_by": user_id}]})
 
     return {"message": f"User {user['email']} deleted successfully"}

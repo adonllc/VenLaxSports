@@ -59,3 +59,10 @@ OPEN_LEVEL_MIN, OPEN_LEVEL_MAX = 1.0, 7.0
 OPEN_NOTIFY_MAX = _int("OPEN_NOTIFY_MAX", 25)        # nearby players pinged (in-app only) when a post goes live
 OPEN_SHARE_DAILY = _int("OPEN_SHARE_DAILY", 10)      # invitation emails one player can send per day
 OPEN_SHARE_MAX_PER_CALL = 5
+
+# ── Challenges sent by email to people who may not be registered ──────────────
+EMAIL_INVITE_DAILY = _int("EMAIL_INVITE_DAILY", 3)               # invitation emails one player can send per day
+EMAIL_INVITE_EXPIRY_DAYS = _int("EMAIL_INVITE_EXPIRY_DAYS", 14)
+EMAIL_INVITE_REMIND_DAYS = _int("EMAIL_INVITE_REMIND_DAYS", 7)   # one reminder, this long after sending
+EMAIL_INVITE_SAME_ADDRESS_DAYS = _int("EMAIL_INVITE_SAME_ADDRESS_DAYS", 7)  # same sender cannot email one address twice inside this
+EMAIL_INVITE_MAX_RESENDS = 1

@@ -162,6 +162,11 @@ async def google_callback(body: OAuthCallbackIn, response: Response, request: Re
         if body.referral_code:
             from routes.auth_routes import _apply_referral_credit  # same pending-credit rule as email signup
             await _apply_referral_credit(db, body.referral_code, str(result.inserted_id))
+        try:   # challenges emailed to this address before it had an account attach now (Google verified the email)
+            import challenge_invite
+            await challenge_invite.attach_for_user(db, user)
+        except Exception:
+            pass
 
     user_id = str(user["_id"])
     role = user.get("role", "player")

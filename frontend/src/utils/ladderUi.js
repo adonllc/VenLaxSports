@@ -1,4 +1,5 @@
 // Shared options and labels for community ladders. Keep these in step with backend/challenge_config.py.
+import { pendingChallengeInvitePath } from "./challengeUi";
 import { pendingOpenChallengePath } from "./openChallengeUi";
 
 export const SIZES = [4, 8, 16, 32];
@@ -32,7 +33,7 @@ export const pendingLadderPath = () => {
     const t = localStorage.getItem("ladder_invite_token");
     if (t) return `/community-ladders/join?token=${encodeURIComponent(t)}`;
   } catch { /* storage blocked */ }
-  return pendingOpenChallengePath();
+  return pendingChallengeInvitePath() || pendingOpenChallengePath();
 };
 
 export const clearPendingLadder = () => {

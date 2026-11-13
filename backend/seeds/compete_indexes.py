@@ -16,6 +16,12 @@ async def create_compete_indexes(db) -> None:
     await db.direct_challenges.create_index([("challenger_id", 1), ("created_at", -1)])
     await db.user_notifications.create_index([("user_id", 1), ("created_at", -1)])
     await db.user_notifications.create_index([("user_id", 1), ("read_at", 1)])
+    # Challenges sent by email
+    await db.challenge_email_invites.create_index("token", unique=True)
+    await db.challenge_email_invites.create_index([("sender_id", 1), ("created_at", -1)])
+    await db.challenge_email_invites.create_index([("email", 1), ("status", 1)])
+    await db.challenge_email_invites.create_index([("status", 1), ("expires_at", 1)])
+    await db.email_suppressions.create_index("email", unique=True)
     # Open challenge board
     await db.open_challenges.create_index([("status", 1), ("visibility", 1), ("sport", 1), ("city", 1), ("date", 1)])
     await db.open_challenges.create_index([("owner_id", 1), ("status", 1)])
