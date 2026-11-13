@@ -6,6 +6,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+import audit_log
 import email_service
 import partner_assignment
 import partner_matching
@@ -13,6 +14,14 @@ import partner_nudges
 from auth_utils import require_admin
 
 router = APIRouter()
+
+SCORING_FLAG_ID = "partner_scoring"
+
+
+async def _scoring_flags(db) -> dict:
+    """Optional pairing-score factors, off unless an admin switched them on (no deploy needed)."""
+    doc = await db.feature_flags.find_one({"_id": SCORING_FLAG_ID}) or {}
+    return {"location": bool(doc.get("location")), "play_profile": bool(doc.get("play_profile"))}
 
 
 def _person(c: dict) -> dict:
@@ -43,6 +52,7 @@ async def find_matches(request: Request, league_id: Optional[str] = None, max_ga
         ).to_list(2000)
         league_ids = list(dict.fromkeys(i["league_id"] for i in waiting))
 
+    flags = await _scoring_flags(db)
     leagues = []
     for lid in league_ids:
         league = await _league(db, lid)
@@ -52,7 +62,7 @@ async def find_matches(request: Request, league_id: Optional[str] = None, max_ga
         if not candidates and not skipped:
             continue
         pairs, unmatched = partner_matching.suggest_pairs(
-            candidates, max_gap, mixed=league.get("format") == "mixed_doubles")
+            candidates, max_gap, mixed=league.get("format") == "mixed_doubles", **flags)
         leagues.append({
             "league_id": lid,
             "league_name": league.get("name", ""),
@@ -66,6 +76,30 @@ async def find_matches(request: Request, league_id: Optional[str] = None, max_ga
             "skipped": skipped,
         })
     return {"max_gap": max_gap, "leagues": leagues}
+
+
+@router.get("/partner-matches/scoring")
+async def get_scoring(request: Request):
+    db = request.app.state.db
+    await require_admin(request, db)
+    return await _scoring_flags(db)
+
+
+class ScoringIn(BaseModel):
+    location: bool = False
+    play_profile: bool = False
+
+
+@router.put("/partner-matches/scoring")
+async def set_scoring(body: ScoringIn, request: Request):
+    """Switch the optional score factors on or off: location (zip, city) and play profile (court side, availability)."""
+    db = request.app.state.db
+    admin = await require_admin(request, db)
+    await db.feature_flags.update_one(
+        {"_id": SCORING_FLAG_ID}, {"$set": body.model_dump()}, upsert=True)
+    await audit_log.record(db, admin, "settings.flag", "feature_flags", SCORING_FLAG_ID,
+                           "Partner pairing score", after=body.model_dump(), request=request)
+    return body.model_dump()
 
 
 class PairIn(BaseModel):

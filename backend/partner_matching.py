@@ -11,6 +11,11 @@ import math
 ALLOWED_GAPS = (0.0, 0.5, 1.0)
 LEVEL_POINTS = {0.0: 40, 0.5: 25, 1.0: 10}
 
+# Only the level gap is scored by default. Admins can switch the extras on with the
+# db.feature_flags document {_id: "partner_scoring", location: bool, play_profile: bool}:
+#   location     +25 same zip, +15 same city
+#   play_profile +20 court side, +15 availability (collected on the play profile)
+
 AVAILABILITY_LABELS = {
     "weekday_morning": "Weekday mornings",
     "weekday_evening": "Weekday evenings",
@@ -45,7 +50,8 @@ def _norm(s) -> str:
     return (s or "").strip().lower()
 
 
-def score_pair(a: dict, b: dict, max_gap: float, mixed: bool = False):
+def score_pair(a: dict, b: dict, max_gap: float, mixed: bool = False,
+               location: bool = False, play_profile: bool = False):
     """Return (score 0-100, reasons) for a legal pair, or None when a hard rule fails."""
     if a["user_id"] == b["user_id"]:
         return None
@@ -60,39 +66,42 @@ def score_pair(a: dict, b: dict, max_gap: float, mixed: bool = False):
     score = LEVEL_POINTS.get(round(gap, 1), 0)
     reasons = [f"Levels {a['level']:.1f} / {b['level']:.1f}"]
 
-    za, zb = _norm(a.get("zip_code")), _norm(b.get("zip_code"))
-    ca, cb = _norm(a.get("city")), _norm(b.get("city"))
-    if za and za == zb:
-        score += 25
-        reasons.append("Same zip")
-    elif ca and ca == cb:
-        score += 15
-        reasons.append(f"Both {a['city']}")
-
-    sa, sb = a.get("court_side"), b.get("court_side")
-    if not sa or not sb:
-        score += 6
-    elif "either" in (sa, sb):
-        score += 12
-    elif sa != sb:
-        score += 20
-        reasons.append("Left + right side")
-
-    aa, ab = set(a.get("availability") or []), set(b.get("availability") or [])
-    if not aa or not ab:
-        score += 5
-    elif "flexible" in aa or "flexible" in ab:
-        score += 15
-        reasons.append("Flexible schedule")
-    else:
-        shared = aa & ab
-        if shared:
+    if location:
+        za, zb = _norm(a.get("zip_code")), _norm(b.get("zip_code"))
+        ca, cb = _norm(a.get("city")), _norm(b.get("city"))
+        if za and za == zb:
+            score += 25
+            reasons.append("Same zip")
+        elif ca and ca == cb:
             score += 15
-            reasons.append("Shared: " + ", ".join(AVAILABILITY_LABELS.get(s, s) for s in sorted(shared)))
+            reasons.append(f"Both {a['city']}")
+
+    if play_profile:
+        sa, sb = a.get("court_side"), b.get("court_side")
+        if not sa or not sb:
+            score += 6
+        elif "either" in (sa, sb):
+            score += 12
+        elif sa != sb:
+            score += 20
+            reasons.append("Left + right side")
+
+        aa, ab = set(a.get("availability") or []), set(b.get("availability") or [])
+        if not aa or not ab:
+            score += 5
+        elif "flexible" in aa or "flexible" in ab:
+            score += 15
+            reasons.append("Flexible schedule")
+        else:
+            shared = aa & ab
+            if shared:
+                score += 15
+                reasons.append("Shared: " + ", ".join(AVAILABILITY_LABELS.get(s, s) for s in sorted(shared)))
     return score, reasons
 
 
 def _unmatched_reason(c: dict, others: list, max_gap: float, mixed: bool) -> str:
+    # Reasons only concern the hard rules, so the optional scoring never matters here.
     if not others:
         return "Nobody else opted in"
     if any(score_pair(c, o, max_gap, mixed) for o in others):
@@ -104,7 +113,8 @@ def _unmatched_reason(c: dict, others: list, max_gap: float, mixed: bool) -> str
     return "No compatible player in this league"
 
 
-def suggest_pairs(candidates: list, max_gap: float, mixed: bool = False):
+def suggest_pairs(candidates: list, max_gap: float, mixed: bool = False,
+                  location: bool = False, play_profile: bool = False):
     """Greedy best-score-first pairing. Returns (pairs, unmatched).
 
     pair      {"a", "b", "score", "reasons", "gap"}; a is the earlier registrant
@@ -113,7 +123,7 @@ def suggest_pairs(candidates: list, max_gap: float, mixed: bool = False):
     scored = []
     for i, x in enumerate(candidates):
         for y in candidates[i + 1:]:
-            res = score_pair(x, y, max_gap, mixed)
+            res = score_pair(x, y, max_gap, mixed, location, play_profile)
             if res is None:
                 continue
             first, second = sorted((x, y), key=lambda c: c["registered_at"])

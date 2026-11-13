@@ -44,41 +44,44 @@ def cand(uid, level=3.0, **kw):
     return base
 
 
-def score(a, b, gap=1.0, mixed=False):
-    res = score_pair(a, b, gap, mixed)
+def score(a, b, gap=1.0, mixed=False, location=False, play_profile=False):
+    res = score_pair(a, b, gap, mixed, location, play_profile)
     return None if res is None else res[0]
 
 
 def test_level_gap_is_a_hard_limit_and_scored():
     assert score(cand("u1", 3.0), cand("u2", 3.5), gap=0.0) is None
-    assert score(cand("u1", 3.0), cand("u2", 3.0)) == 66      # 40 level + 15 city + 6 side unset + 5 availability unset
-    assert score(cand("u1", 3.0), cand("u2", 3.5)) == 51      # 25 level
-    assert score(cand("u1", 3.0), cand("u2", 4.0)) == 36      # 10 level
+    assert score(cand("u1", 3.0), cand("u2", 3.0)) == 40      # level only (location, court side and availability are not scored)
+    assert score(cand("u1", 3.0), cand("u2", 3.5)) == 25      # 25 level
+    assert score(cand("u1", 3.0), cand("u2", 4.0)) == 10      # 10 level
 
 
 def test_location_zip_beats_city_beats_nothing():
-    assert score(cand("u1", zip_code="30350"), cand("u2", zip_code="30350")) == 76
-    assert score(cand("u1"), cand("u2")) == 66
-    assert score(cand("u1"), cand("u2", city="Marietta")) == 51
-    _, reasons = score_pair(cand("u1", zip_code="30350"), cand("u2", zip_code="30350"), 0.0)
+    L = dict(location=True)
+    assert score(cand("u1", zip_code="30350"), cand("u2", zip_code="30350"), **L) == 65
+    assert score(cand("u1"), cand("u2"), **L) == 55
+    assert score(cand("u1"), cand("u2", city="Marietta"), **L) == 40
+    _, reasons = score_pair(cand("u1", zip_code="30350"), cand("u2", zip_code="30350"), 0.0, location=True)
     assert "Same zip" in reasons
 
 
 def test_court_side_opposites_score_highest():
-    assert score(cand("u1", court_side="left"), cand("u2", court_side="right")) == 80
-    assert score(cand("u1", court_side="left"), cand("u2", court_side="left")) == 60
-    assert score(cand("u1", court_side="either"), cand("u2", court_side="left")) == 72
+    P = dict(location=True, play_profile=True)
+    assert score(cand("u1", court_side="left"), cand("u2", court_side="right"), **P) == 80
+    assert score(cand("u1", court_side="left"), cand("u2", court_side="left"), **P) == 60
+    assert score(cand("u1", court_side="either"), cand("u2", court_side="left"), **P) == 72
 
 
 def test_availability_overlap_and_flexible():
+    P = dict(location=True, play_profile=True)
     a = cand("u1", availability=["weekend_morning", "weekday_evening"])
     b = cand("u2", availability=["weekend_morning"])
-    assert score(a, b) == 76
-    assert "Shared: Weekend mornings" in score_pair(a, b, 0.0)[1]
+    assert score(a, b, **P) == 76
+    assert "Shared: Weekend mornings" in score_pair(a, b, 0.0, play_profile=True)[1]
     flex = cand("u1", availability=["flexible"])
-    assert score(flex, cand("u2", availability=["weekday_evening"])) == 76
-    assert "Flexible schedule" in score_pair(flex, cand("u2", availability=["weekday_evening"]), 0.0)[1]
-    assert score(cand("u1", availability=["weekday_morning"]), cand("u2", availability=["weekend_evening"])) == 61
+    assert score(flex, cand("u2", availability=["weekday_evening"]), **P) == 76
+    assert "Flexible schedule" in score_pair(flex, cand("u2", availability=["weekday_evening"]), 0.0, play_profile=True)[1]
+    assert score(cand("u1", availability=["weekday_morning"]), cand("u2", availability=["weekend_evening"]), **P) == 61
 
 
 def test_never_pair_a_player_with_themselves_or_a_rejected_partner():
@@ -90,7 +93,7 @@ def test_never_pair_a_player_with_themselves_or_a_rejected_partner():
 def test_mixed_doubles_needs_one_male_and_one_female():
     assert score(cand("u1", gender="male"), cand("u2", gender="male"), mixed=True) is None
     assert score(cand("u1", gender="male"), cand("u2"), mixed=True) is None
-    assert score(cand("u1", gender="male"), cand("u2", gender="female"), mixed=True) == 66
+    assert score(cand("u1", gender="male"), cand("u2", gender="female"), mixed=True) == 40
 
 
 def test_suggest_pairs_prefers_exact_levels_and_earlier_registrant_is_a():
@@ -116,3 +119,10 @@ def test_unmatched_reasons():
     assert len(pairs) == 1 and widened == []
     _, men = suggest_pairs([cand("u1", gender="male"), cand("u2", gender="male")], 0.0, mixed=True)
     assert {u["reason"] for u in men} == {"Needs an opposite-gender partner"}
+
+
+def test_court_side_and_availability_are_not_scored_by_default():
+    a = cand("u1", court_side="left", availability=["weekend_morning"])
+    b = cand("u2", court_side="right", availability=["weekend_morning"])
+    assert score(a, b) == score(cand("u1"), cand("u2")) == 40
+    assert score_pair(a, b, 0.0)[1] == ["Levels 3.0 / 3.0"]

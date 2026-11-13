@@ -51,6 +51,7 @@ class Db:
         self.leagues = LeagueColl()
         self.users, self.player_leagues, self.doubles_invites = UserColl(), InsertColl(), InsertColl()
         self.credit_ledger = InsertColl()
+        self.feature_flags = InsertColl()
         self.lid = ObjectId()
         self.leagues.docs.append({
             "_id": self.lid, "name": "Atlanta Doubles", "sport": "tennis", "format": "doubles", "status": "registration",

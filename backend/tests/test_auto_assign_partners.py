@@ -444,3 +444,19 @@ def test_approving_after_the_league_started_is_a_conflict_and_changes_nothing(ad
         resolve(db, ta, "approve")
     assert e.value.status_code == 409
     assert len(db.player_leagues.docs) == 2 and inv(db, ta)["partner_change_request"]["status"] == "pending"
+
+
+def test_scoring_flag_is_off_by_default_and_switches_location_on(admin):
+    db = Db()
+    make_waiting(db, "Ann")
+    make_waiting(db, "Bea")
+    assert partner_match_routes_scoring(db) == {"location": False, "play_profile": False}
+    off = find_matches(db)["leagues"][0]["pairs"][0]["score"]
+    assert off == 40                                  # level only
+    run(partner_match_routes.set_scoring(partner_match_routes.ScoringIn(location=True), req(db)))
+    assert partner_match_routes_scoring(db) == {"location": True, "play_profile": False}
+    assert find_matches(db)["leagues"][0]["pairs"][0]["score"] > off
+
+
+def partner_match_routes_scoring(db):
+    return run(partner_match_routes.get_scoring(req(db)))
