@@ -4,6 +4,7 @@ import axios from "axios";
 import { Search, Swords } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import useDocumentMeta from "../hooks/useDocumentMeta";
+import { COURT_SIDE_NEUTRAL, STYLE_OPTIONS } from "../config/playProfile";
 import { SPORTS, STATUS, apiError, fmtWhen, matchup, sportLabel } from "../utils/challengeUi";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
@@ -60,8 +61,12 @@ function ChallengeRow({ c }) {
 }
 
 /** One player card: level, city, challenge record and your head-to-head against them. */
-function PlayerCard({ p, onChallenge }) {
+function PlayerCard({ p, sport, onChallenge }) {
   const h = p.head_to_head;
+  // play_style is stored per sport ({ tennis, pickleball }); show the one for the sport being searched
+  const styleValue = p.play_style && typeof p.play_style === "object" ? p.play_style[sport] : p.play_style;
+  const styleLabel = STYLE_OPTIONS[sport]?.find((o) => o.value === styleValue)?.label || null;
+  const sideLabel = COURT_SIDE_NEUTRAL[p.court_side] || null;
   return (
     <div className="bg-white p-4 flex flex-col gap-3" style={box} data-testid={`player-card-${p.id}`}>
       <div className="flex items-start justify-between gap-2">
@@ -75,8 +80,8 @@ function PlayerCard({ p, onChallenge }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        {p.court_side && <span className="px-2 py-0.5 text-[11px]" style={{ background: "#F1F1F1", color: "#374151" }}>{p.court_side} side</span>}
-        {p.play_style && <span className="px-2 py-0.5 text-[11px]" style={{ background: "#F1F1F1", color: "#374151" }}>{p.play_style}</span>}
+        {sideLabel && <span className="px-2 py-0.5 text-[11px]" style={{ background: "#F1F1F1", color: "#374151" }}>{sideLabel}</span>}
+        {styleLabel && <span className="px-2 py-0.5 text-[11px]" style={{ background: "#F1F1F1", color: "#374151" }}>{styleLabel}</span>}
         <span className="px-2 py-0.5 text-[11px]" style={{ background: "#F1F1F1", color: "#374151" }}>
           {p.completed ? `${p.wins}W ${p.losses}L in challenges` : "No challenge matches yet"}
         </span>
@@ -213,7 +218,7 @@ function FindPlayers({ onSent, defaultCity }) {
       {error && <p className="text-sm mt-4" style={{ color: "#B42318" }} role="alert">{error}</p>}
       {players && players.length === 0 && <p className="text-sm mt-6" style={muted} data-testid="player-search-empty">No players match. Try a wider level range or another city.</p>}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4" data-testid="player-results">
-        {(players || []).map((p) => <PlayerCard key={p.id} p={p} onChallenge={setTarget} />)}
+        {(players || []).map((p) => <PlayerCard key={p.id} p={p} sport={filters.sport} onChallenge={setTarget} />)}
       </div>
       {target && <ChallengeModal target={target} sport={filters.sport} format={filters.format} onClose={() => setTarget(null)} onSent={(c) => { setTarget(null); onSent(c); }} />}
     </div>
