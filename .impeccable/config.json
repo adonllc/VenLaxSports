@@ -71,6 +71,15 @@
         "value": "montserrat",
         "createdAt": "2026-10-19T23:22:03.201Z",
         "reason": "user chose the reference-style logo lettering (Archivo + Montserrat SPORTS) and confirmed option C; used only for the 'SPORTS' line of the Logo component (Logo.jsx, index.html font link) and the logo preview"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/pages/OAuthCallback.jsx"
+        ],
+        "createdAt": "2026-11-13T11:21:14.267Z",
+        "reason": "claude: L67 is a CSS loading spinner (animate-spin rounded-full border-b-2), pre-existing, border is the spinner itself; user did not weigh in"
       }
     ]
   }

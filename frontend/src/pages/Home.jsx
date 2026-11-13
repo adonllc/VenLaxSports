@@ -6,7 +6,7 @@ import { motion, MotionConfig } from "framer-motion";
 import {
   Target, LayoutGrid, Users, CalendarCheck, Trophy, UserCircle, Share2, Gift, ShieldCheck,
   ArrowRight, Check, Smartphone, MessageCircle, CreditCard, CircleDot, Sparkles, UserPlus, Swords,
-  TrendingUp, Clock, MapPin, LayoutDashboard,
+  TrendingUp, Clock, MapPin, LayoutDashboard, Search,
 } from "lucide-react";
 import { activeSports, FOUNDING_DISPLAY_FLOOR } from "../config/platformConfig";
 import { PHOTOS, GALLERY } from "../config/photos";
@@ -57,6 +57,13 @@ const PILLARS = [
   { slug: "way", icon: CalendarCheck, title: "Play Your Way", body: "Schedule matches around your availability." },
   { slug: "progress", icon: TrendingUp, title: "Track Your Progress", body: "Follow your results, stats, and rankings." },
   { slug: "compete", icon: Trophy, title: "Compete for More", body: "Compete in leagues and advance to playoffs." },
+];
+
+// The three ways to get a match without waiting for a league (signed-in players go straight in; visitors sign up first)
+const PLAY_ANYTIME = [
+  { slug: "challenge", icon: Swords, title: "Challenge a player", body: "Pick any VenLax player, agree a time and play. Friendly matches build your record and never touch a ladder rank.", cta: "Challenge a player", to: "/challenges" },
+  { slug: "board", icon: Search, title: "Find an opponent", body: "Post a match request or accept one near you. The first eligible player to accept gets the match.", cta: "Browse open matches", to: "/find-opponent" },
+  { slug: "ladder", icon: Users, title: "Start your own ladder", body: "Invite your friends or your whole club. VenLax keeps the rankings, the history and the schedule.", cta: "Create a ladder", to: "/community-ladders/new" },
 ];
 
 const FLEX_BENEFITS = [
@@ -311,6 +318,23 @@ export default function Home() {
             </AmberButton>
           </motion.div>
         </section>
+
+        {/* 1a-2. PLAY ANYTIME: direct challenges, open challenge board, community ladders */}
+        <Section id="play-anytime" className="!pt-4 md:!pt-6">
+          <Heading eyebrow="Play & Compete" title="No league required." lead="Want a match this week? Challenge a player, grab an open match, or run your own ladder. Your results still count." />
+          <ul className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="home-play-anytime">
+            {PLAY_ANYTIME.map((c, i) => (
+              <motion.li key={c.slug} {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.08 }} className="p-6 flex flex-col border-t-4" style={{ background: GREY, borderColor: AMBER }} data-testid={`home-play-${c.slug}`}>
+                <span className="inline-flex w-11 h-11 items-center justify-center" style={{ background: AMBER }}><c.icon className="w-6 h-6" style={{ color: INK }} aria-hidden="true" /></span>
+                <h3 className="font-bold text-xl leading-tight mt-4 mb-2" style={{ color: INK }}>{c.title}</h3>
+                <p className="text-base flex-1">{c.body}</p>
+                <AmberButton onClick={() => navigate(user ? c.to : "/auth?mode=register")} testId={`home-play-${c.slug}-cta`} className="mt-6 self-start !px-5 !py-3">
+                  {c.cta} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </AmberButton>
+              </motion.li>
+            ))}
+          </ul>
+        </Section>
 
         {/* 1b. FLEXIBLE SCHEDULING */}
         <Section tint id="flexible-scheduling">
