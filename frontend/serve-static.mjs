@@ -55,6 +55,7 @@ const KNOWN_ROOTS = new Set([
   "", "auth", "reset-password", "sport", "leagues", "rules", "handbook", "terms", "waiver", "dashboard", "admin",
   "matches", "round-robin", "privacy", "city", "players", "verify-email", "profile-setup", "join",
   "doubles-invite", "ladders", "rewards", "tennis-pickleball-leagues", "about", "compare",
+  "play", "challenges", "community-ladders", "find-opponent",
 ]);
 
 const citySlug = (name) => name.toLowerCase().trim().replace(/\s+/g, "-");
