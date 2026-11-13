@@ -167,33 +167,36 @@ function ChallengeModal({ target, sport, format, onClose, onSent }) {
   );
 }
 
-function FindPlayers({ onSent, defaultCity }) {
-  const [filters, setFilters] = useState({ q: "", sport: "tennis", format: "singles", city: defaultCity || "", min_level: "", max_level: "" });
+function FindPlayers({ onSent }) {
+  const [filters, setFilters] = useState({ q: "", sport: "tennis", format: "singles", city: "", min_level: "", max_level: "" });
   const [players, setPlayers] = useState(null);
   const [error, setError] = useState("");
   const [target, setTarget] = useState(null);
   const set = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
 
-  const search = useCallback(async () => {
+  // Nobody sees a list of every player: results appear only after a search with a name, a city or a level range.
+  const search = async (e) => {
+    e?.preventDefault();
     setError("");
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== ""));
-    if (params.q && params.q.length < 2) { setPlayers([]); return; }
+    params.q = (params.q || "").trim();
+    if (!params.q && !params.city?.trim() && !params.min_level && !params.max_level) {
+      setPlayers(null);
+      setError("Enter a name, a city or a level range to search.");
+      return;
+    }
+    if (params.q && params.q.length < 2) { setError("Type at least 2 letters of the name."); return; }
     try {
       const { data } = await axios.get(`${API}/challenges/players`, { params, withCredentials: true });
       setPlayers(data);
-    } catch (e) {
-      setError(apiError(e, "Could not search players."));
+    } catch (err) {
+      setError(apiError(err, "Could not search players."));
     }
-  }, [filters]);
-
-  useEffect(() => {
-    const t = setTimeout(search, 300);
-    return () => clearTimeout(t);
-  }, [search]);
+  };
 
   return (
     <div>
-      <div className="bg-white p-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" style={box}>
+      <form onSubmit={search} className="bg-white p-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" style={box} role="search" aria-label="Find a player">
         <div className="relative lg:col-span-2">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={muted} />
           <input value={filters.q} onChange={set("q")} placeholder="Search by name" className={`${input} pl-9`} style={box} aria-label="Search by name" data-testid="player-search-q" />
@@ -214,8 +217,10 @@ function FindPlayers({ onSent, defaultCity }) {
             {LEVELS.map((l) => <option key={l} value={l}>{l ? `To ${l}` : "Max level"}</option>)}
           </select>
         </div>
-      </div>
-      {error && <p className="text-sm mt-4" style={{ color: "#B42318" }} role="alert">{error}</p>}
+        <button type="submit" className="px-4 py-2 text-xs font-bold uppercase tracking-wider lg:col-span-6 sm:justify-self-start" style={{ background: "#F2A922", color: "#1D1D1D" }} data-testid="player-search-submit">Search players</button>
+      </form>
+      {error && <p className="text-sm mt-4" style={{ color: "#B42318" }} role="alert" data-testid="player-search-error">{error}</p>}
+      {players === null && !error && <p className="text-sm mt-6" style={muted} data-testid="player-search-hint">Search by name, city or level range to find someone to challenge.</p>}
       {players && players.length === 0 && <p className="text-sm mt-6" style={muted} data-testid="player-search-empty">No players match. Try a wider level range or another city.</p>}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4" data-testid="player-results">
         {(players || []).map((p) => <PlayerCard key={p.id} p={p} sport={filters.sport} onChallenge={setTarget} />)}
@@ -287,7 +292,7 @@ export default function Challenges() {
 
         {error && <p className="text-sm mb-4" style={{ color: "#B42318" }} role="alert">{error}</p>}
         {tab === "find" ? (
-          <FindPlayers defaultCity={user?.city} onSent={(c) => { load(); navigate(`/challenges/${c.id}`); }} />
+          <FindPlayers onSent={(c) => { load(); navigate(`/challenges/${c.id}`); }} />
         ) : list.length === 0 ? (
           <p className="text-sm py-8 text-center" style={muted} data-testid={`challenge-empty-${tab}`}>{EMPTY[tab]}</p>
         ) : (

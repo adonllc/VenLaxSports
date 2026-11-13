@@ -402,25 +402,26 @@ def search(db, **kw):
 def test_search_filters_and_hides_private_profiles_and_the_searcher(sent):
     db = Db()
     names = lambda r: sorted(c["name"] for c in r)
-    assert names(search(db)) == ["Bob Baseline", "Cy Court", "Di Drop"]               # never Ann herself
+    assert search(db) == []                                                             # no filter, no list: players are never dumped
+    assert names(search(db, min_level=1.0)) == ["Bob Baseline", "Cy Court", "Di Drop"]  # never Ann herself
     assert names(search(db, city="atlanta")) == ["Bob Baseline", "Di Drop"]            # case-insensitive city
     assert names(search(db, min_level=3.5)) == ["Bob Baseline", "Cy Court"]
     assert names(search(db, max_level=3.0)) == ["Di Drop"]
     assert names(search(db, q="cy")) == ["Cy Court"]
     assert search(db, q="c") == []                                                      # one letter is too short
     db.users.docs[1]["profile_public"] = False
-    assert "Bob Baseline" not in names(search(db))
+    assert "Bob Baseline" not in names(search(db, min_level=1.0))
     db.users.docs[2]["is_active"] = False
-    assert "Cy Court" not in names(search(db))
+    assert "Cy Court" not in names(search(db, min_level=1.0))
 
 
 def test_search_respects_sport_preferences_and_never_returns_email(sent):
     db = Db()
     db.users.docs[1]["sport_preferences"] = ["pickleball"]
-    assert "Bob Baseline" not in [c["name"] for c in search(db, sport="tennis")]
-    assert "Bob Baseline" in [c["name"] for c in search(db, sport="pickleball")]
-    assert all("email" not in c for c in search(db))
-    card = search(db)[0]
+    assert "Bob Baseline" not in [c["name"] for c in search(db, sport="tennis", min_level=1.0)]
+    assert "Bob Baseline" in [c["name"] for c in search(db, sport="pickleball", min_level=1.0)]
+    assert all("email" not in c for c in search(db, min_level=1.0))
+    card = search(db, min_level=1.0)[0]
     assert {"id", "name", "city", "level", "wins", "losses", "head_to_head"} <= set(card)
 
 

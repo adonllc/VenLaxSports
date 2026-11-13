@@ -581,6 +581,8 @@ async def search_players(db, viewer: dict, q: str = "", sport: str | None = None
     from routes.user_routes import play_search_fields
     sport = sport if sport in cfg.CHALLENGE_SPORTS else "tennis"
     limit = max(1, min(int(limit), cfg.SEARCH_LIMIT_MAX))
+    if not (q or "").strip() and not (city or "").strip() and min_level is None and max_level is None:
+        return []        # nobody can list every player: search by name, city or level range
     query: dict = {"is_active": {"$ne": False}, "profile_public": {"$ne": False}, "_id": {"$ne": ObjectId(viewer["_id"])}}
     q = (q or "").strip()
     if q:
