@@ -128,7 +128,7 @@ export default function Ladders() {
                         {ladder.division_label}
                       </span>
                     </div>
-                    <span className="text-xs" style={{ color: SIENNA }}>{ladder.entry_count} players</span>
+                    {ladder.entry_count != null && <span className="text-xs" style={{ color: SIENNA }} data-testid={`ladder-count-${ladder.id}`}>{ladder.entry_count} players</span>}
                   </div>
                   <h3 className="font-semibold mb-1" style={{ color: COFFEE }}>
                     {ladder.city} · {ladder.division_label} {ladder.sport.charAt(0).toUpperCase() + ladder.sport.slice(1)} Ladder

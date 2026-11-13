@@ -78,7 +78,7 @@ export default function LadderDetail() {
           <h1 className="text-2xl font-bold text-heading-dark">
             {ladder.city} · {ladder.division_label} {ladder.sport.charAt(0).toUpperCase() + ladder.sport.slice(1)} Ladder
           </h1>
-          <p className="text-gray-500 mt-1">Singles · {ladder.entry_count} players · Always open</p>
+          <p className="text-gray-500 mt-1">Singles{ladder.entry_count != null ? ` · ${ladder.entry_count} players` : ""} · Always open</p>
         </div>
 
         {/* My rank banner */}
@@ -86,7 +86,7 @@ export default function LadderDetail() {
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-emerald-800">Your Rank</p>
-              <p className="text-2xl font-bold text-emerald-900">#{ladder.my_rank} of {ladder.entry_count}</p>
+              <p className="text-2xl font-bold text-emerald-900">#{ladder.my_rank}{ladder.entry_count != null ? ` of ${ladder.entry_count}` : ""}</p>
             </div>
             {cooldownDisplay && (
               <span className="text-xs text-orange-700 bg-orange-100 px-3 py-1.5 rounded-md font-medium">

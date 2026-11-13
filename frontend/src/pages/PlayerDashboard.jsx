@@ -693,7 +693,7 @@ export default function PlayerDashboard() {
                       <p className="font-semibold" style={{ color: "#3D3D3D" }}>
                         {entry.city} · {entry.division_label} {entry.sport.charAt(0).toUpperCase() + entry.sport.slice(1)}
                       </p>
-                      <p className="text-sm" style={{ color: "#6B7280" }}>Rank #{entry.rank} of {entry.total}</p>
+                      <p className="text-sm" style={{ color: "#6B7280" }}>Rank #{entry.rank}{entry.total != null ? ` of ${entry.total}` : ""}</p>
                     </div>
                     <span className="text-2xl font-bold" style={{ color: "#B7791F" }}>#{entry.rank}</span>
                   </div>

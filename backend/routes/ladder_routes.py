@@ -8,6 +8,10 @@ from auth_utils import get_current_user, get_optional_user, require_admin
 router = APIRouter(redirect_slashes=False)
 
 
+def _is_admin(user) -> bool:
+    return bool(user) and user.get("role") in ("admin", "city_admin")
+
+
 @router.get("")
 @router.get("/")
 async def list_ladders(
@@ -28,11 +32,19 @@ async def list_ladders(
     if format:
         query["format"] = format
     ladders = await db.ladders.find(query).sort("created_at", -1).to_list(50)
+    viewer = await get_optional_user(request, db)
+    is_admin = _is_admin(viewer)
+    viewer_id = str(viewer["_id"]) if viewer else None
     result = []
     for l in ladders:
         l["id"] = str(l.pop("_id"))
-        l["entry_count"] = len(l.get("entries", []))
-        l["top_players"] = l.get("entries", [])[:3]
+        entries = l.get("entries", [])
+        l["top_players"] = entries[:3]
+        if is_admin:
+            l["entry_count"] = len(entries)
+        else:
+            # How many players are in a ladder is for admins only: players get just their own entry back
+            l["entries"] = [e for e in entries if e.get("player_id") == viewer_id]
         result.append(l)
     return result
 
@@ -306,5 +318,6 @@ async def get_ladder(ladder_id: str, request: Request):
         for entry in entries:
             entry["can_challenge"] = False
 
-    ladder["entry_count"] = len(entries)
+    if _is_admin(user):   # how many players are in a ladder is for admins only
+        ladder["entry_count"] = len(entries)
     return ladder
