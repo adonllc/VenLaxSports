@@ -22,7 +22,11 @@ async def list_ladders(
     format: Optional[str] = None,
 ):
     db = request.app.state.db
-    query: dict = {"is_active": True}
+    # Official ladders have no "type". Community ladders appear here only when public and live.
+    query: dict = {"is_active": True, "$or": [
+        {"type": {"$ne": "community"}},
+        {"type": "community", "visibility": "public", "status": "active"},
+    ]}
     if city:
         query["city"] = city
     if sport:
@@ -39,6 +43,15 @@ async def list_ladders(
     for l in ladders:
         l["id"] = str(l.pop("_id"))
         entries = l.get("entries", [])
+        if l.get("type") == "community":
+            # A community ladder shows its own headcount (it is how people see free places) and never its members' ids
+            live = [e for e in entries if e.get("status") in ("provisional", "ranked")]
+            l.pop("invite_token", None)
+            l.pop("history", None)
+            l["entry_count"] = len(live)
+            l["entries"], l["top_players"] = [], []
+            result.append(l)
+            continue
         l["top_players"] = entries[:3]
         if is_admin:
             l["entry_count"] = len(entries)
@@ -85,6 +98,8 @@ async def create_challenge(data: LadderChallengeCreate, request: Request):
     if not ladder:
         raise HTTPException(status_code=404, detail="Ladder not found")
 
+    if ladder.get("type") == "community":
+        raise HTTPException(status_code=400, detail="Community ladders have their own challenge flow")
     entries = ladder.get("entries", [])
     my_entry = next((e for e in entries if e["player_id"] == uid), None)
     if not my_entry:
@@ -241,6 +256,8 @@ async def join_ladder(ladder_id: str, request: Request):
     if not ladder:
         raise HTTPException(status_code=404, detail="Ladder not found")
 
+    if ladder.get("type") == "community":
+        raise HTTPException(status_code=400, detail="Community ladders have their own join flow")
     entries = ladder.get("entries", [])
     if any(e["player_id"] == uid for e in entries):
         raise HTTPException(status_code=400, detail="Already in this ladder")
@@ -285,7 +302,7 @@ async def get_ladder(ladder_id: str, request: Request):
         ladder = await db.ladders.find_one({"_id": ObjectId(ladder_id)})
     except Exception:
         raise HTTPException(status_code=404, detail="Ladder not found")
-    if not ladder:
+    if not ladder or ladder.get("type") == "community":   # community ladders are read through /community-ladders
         raise HTTPException(status_code=404, detail="Ladder not found")
 
     ladder["id"] = str(ladder.pop("_id"))

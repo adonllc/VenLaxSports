@@ -69,6 +69,11 @@ export default function Ladders() {
       <PageHero compact src={GALLERY.pickleball[1]} alt="Pickleball players in an indoor gym" eyebrow="Ladders" title="Challenge Ladders" subtitle="A challenge ladder is an ongoing ranked list: challenge anyone above you, win to swap ranks, and join any time. No season needed." />
       <div className="max-w-5xl mx-auto px-4 py-8">
 
+        <div className="flex items-center justify-between gap-3 flex-wrap p-4 mb-6" style={{ background: "white", border: `1px solid ${BORDER}` }} data-testid="create-ladder-cta">
+          <p className="text-sm" style={{ color: MOCHA }}>Want a ladder of your own? Start one, invite your friends, and VENLAX keeps the rankings.</p>
+          <button onClick={() => navigate("/community-ladders/new")} className="px-4 py-2 text-xs font-bold uppercase tracking-wider" style={{ background: "#008F70", color: "white" }} data-testid="create-ladder-cta-btn">Create your own ladder</button>
+        </div>
+
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-6">
           {["", "tennis", "pickleball"].map((sport) => (
@@ -131,9 +136,13 @@ export default function Ladders() {
                     {ladder.entry_count != null && <span className="text-xs" style={{ color: SIENNA }} data-testid={`ladder-count-${ladder.id}`}>{ladder.entry_count} players</span>}
                   </div>
                   <h3 className="font-semibold mb-1" style={{ color: COFFEE }}>
-                    {ladder.city} · {ladder.division_label} {ladder.sport.charAt(0).toUpperCase() + ladder.sport.slice(1)} Ladder
+                    {ladder.type === "community" ? ladder.name : `${ladder.city} · ${ladder.division_label} ${ladder.sport.charAt(0).toUpperCase() + ladder.sport.slice(1)} Ladder`}
                   </h3>
-                  <p className="text-sm mb-4" style={{ color: MOCHA }}>Singles · Always open · Free to join</p>
+                  <p className="text-sm mb-4" style={{ color: MOCHA }}>
+                    {ladder.type === "community"
+                      ? `Community ladder · ${ladder.city} · ${ladder.format === "doubles" ? "Doubles" : "Singles"} · ${ladder.ranking_method} ranking`
+                      : "Singles · Always open · Free to join"}
+                  </p>
 
                   {ladder.top_players?.length > 0 && (
                     <div className="space-y-1 mb-4">
@@ -150,17 +159,17 @@ export default function Ladders() {
                   <div className="flex gap-2">
                     <button
                       data-testid={`ladder-join-${ladder.id}`}
-                      onClick={() => handleJoin(ladder.id)}
+                      onClick={() => (ladder.type === "community" ? navigate(`/community-ladders/${ladder.id}`) : handleJoin(ladder.id))}
                       className="flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors"
                       style={{ background: ESPRESSO, color: "white" }}
                       onMouseEnter={e => e.currentTarget.style.background = RUST}
                       onMouseLeave={e => e.currentTarget.style.background = ESPRESSO}
                     >
-                      Join Ladder
+                      {ladder.type === "community" ? "Open ladder" : "Join Ladder"}
                     </button>
                     <button
                       data-testid={`ladder-view-${ladder.id}`}
-                      onClick={() => navigate(`/ladders/${ladder.id}`)}
+                      onClick={() => navigate(ladder.type === "community" ? `/community-ladders/${ladder.id}` : `/ladders/${ladder.id}`)}
                       className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
                       style={{ border: `1px solid ${BORDER}`, color: MOCHA, background: "white" }}
                       onMouseEnter={e => e.currentTarget.style.borderColor = RUST}

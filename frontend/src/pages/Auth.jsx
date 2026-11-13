@@ -9,6 +9,7 @@ import WaiverModal from "../components/WaiverModal";
 import ParentalConsentModal from "../components/ParentalConsentModal";
 import axios from "axios";
 import { getAttribution } from "../utils/attribution";
+import { clearPendingLadder, pendingLadderPath } from "../utils/ladderUi";
 import { trackEvent } from "../utils/googleAnalytics";
 import { reportFunnelEvent } from "../utils/funnelEvents";
 
@@ -58,7 +59,7 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) navigate("/dashboard");
+    if (user) navigate(pendingLadderPath() || "/dashboard");
   }, [user, navigate]);
 
   // Preserve doubles invite token across register/login
@@ -134,6 +135,8 @@ export default function Auth() {
           navigate(`/doubles-invite/confirm?token=${pendingToken}`);
           return;
         }
+        const ladderPath = pendingLadderPath();
+        if (ladderPath) { navigate(ladderPath); return; }
         navigate("/dashboard");
       } else {
         if (!form.name.trim()) { setError("Name is required"); setLoading(false); return; }
@@ -146,6 +149,8 @@ export default function Auth() {
           navigate(`/doubles-invite/confirm?token=${pendingToken}`);
           return;
         }
+        const ladderPath = pendingLadderPath();
+        if (ladderPath) { navigate(ladderPath); return; }   // the invitation page finishes the join; email can be verified afterwards
         navigate("/verify-email");
       }
     } catch (err) {
@@ -181,6 +186,8 @@ export default function Auth() {
       navigate(`/doubles-invite/confirm?token=${pendingToken}`);
       return;
     }
+    const ladderPath = pendingLadderPath();
+    if (ladderPath) { navigate(ladderPath); return; }
     navigate("/dashboard");
   };
 

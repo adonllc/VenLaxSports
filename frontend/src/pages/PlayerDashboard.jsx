@@ -556,6 +556,28 @@ export default function PlayerDashboard() {
 
         <VenLaxCreditCard />
 
+        <div className="bg-white p-5 mb-6" style={{ border: "1px solid #E5E7EB" }} data-testid="dashboard-play-compete">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#008F70" }}>Play & Compete</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+            <Link to="/find-opponent" className="px-4 py-3 hover:shadow-sm" style={{ border: "1px solid #E5E7EB" }} data-testid="dashboard-find-opponent">
+              <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Find an Opponent</span>
+              <span className="block text-xs mt-0.5" style={{ color: "#4C4C4C" }}>Browse open match requests or post your own.</span>
+            </Link>
+            <Link to="/ladders" className="px-4 py-3 hover:shadow-sm" style={{ border: "1px solid #E5E7EB" }} data-testid="dashboard-join-ladder">
+              <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Join Existing Ladder</span>
+              <span className="block text-xs mt-0.5" style={{ color: "#4C4C4C" }}>Climb a ranked city ladder.</span>
+            </Link>
+            <Link to="/challenges" className="px-4 py-3 hover:shadow-sm" style={{ border: "1px solid #E5E7EB" }} data-testid="dashboard-challenge-player">
+              <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Challenge a Player</span>
+              <span className="block text-xs mt-0.5" style={{ color: "#4C4C4C" }}>Pick any player, agree a time, play. No ladder needed.</span>
+            </Link>
+            <Link to="/community-ladders/new" className="px-4 py-3 hover:shadow-sm" style={{ border: "1px solid #E5E7EB" }} data-testid="dashboard-create-ladder">
+              <span className="block font-heading font-bold text-sm" style={{ color: "#1D1D1D" }}>Create Your Own Ladder</span>
+              <span className="block text-xs mt-0.5" style={{ color: "#4C4C4C" }}>Invite friends. VENLAX keeps the rankings.</span>
+            </Link>
+          </div>
+        </div>
+
         <Link
           to="/rewards"
           className="flex items-center justify-between gap-3 bg-white p-4 mb-6"

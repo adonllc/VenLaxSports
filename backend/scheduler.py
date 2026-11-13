@@ -12,6 +12,10 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 import logging
 
+import community_ladder
+import direct_challenge
+import open_challenge
+import ladder_ranking
 import email_automation
 from partner_nudges import nudge_waiting_teams
 import email_schedule
@@ -136,9 +140,48 @@ def start_scheduler(db):
             max_instances=1,
         )
 
+        scheduler.add_job(
+            open_challenge.process,
+            trigger=IntervalTrigger(minutes=15),
+            args=[db],
+            id="expire_open_challenges",
+            name="Expire old open challenges",
+            replace_existing=True,
+            max_instances=1,
+        )
+
+        scheduler.add_job(
+            direct_challenge.process_expiries,
+            trigger=IntervalTrigger(minutes=15),
+            args=[db],
+            id="expire_direct_challenges",
+            name="Expire and warn about unanswered direct challenges",
+            replace_existing=True,
+            max_instances=1,
+        )
+
+        scheduler.add_job(
+            community_ladder.process,
+            trigger=IntervalTrigger(minutes=30),
+            args=[db],
+            id="community_ladder_housekeeping",
+            name="Complete, close and expire community ladders and their invitations",
+            replace_existing=True,
+            max_instances=1,
+        )
+        scheduler.add_job(
+            ladder_ranking.reconcile,
+            trigger=IntervalTrigger(minutes=10),
+            args=[db],
+            id="community_ladder_reconcile",
+            name="Apply confirmed ladder results that were missed",
+            replace_existing=True,
+            max_instances=1,
+        )
+
         if not scheduler.running:
             scheduler.start()
-            logger.info("Scheduler started — 10 background jobs registered")
+            logger.info("Scheduler started — 13 background jobs registered")
         else:
             logger.info("Scheduler already running")
 

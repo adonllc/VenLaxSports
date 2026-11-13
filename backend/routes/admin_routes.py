@@ -758,5 +758,12 @@ async def delete_user(user_id: str, request: Request):
     await db.challenges.delete_many({"$or": [{"challenger_id": user_id}, {"challenged_id": user_id}]})
     await db.referral_credits.delete_many({"$or": [{"referrer_id": oid}, {"referee_id": oid}]})
     await db.ladder_challenges.delete_many({"$or": [{"challenger_id": user_id}, {"challenged_id": user_id}]})
+    await db.direct_challenges.delete_many({"$or": [{"side1": user_id}, {"side2": user_id}]})
+    await db.user_notifications.delete_many({"user_id": user_id})
+    await db.open_challenges.delete_many({"owner_id": user_id, "status": {"$in": ["draft", "open", "paused", "expired", "cancelled", "closed", "removed"]}})
+    await db.open_challenge_blocks.delete_many({"$or": [{"user_id": user_id}, {"blocked_id": user_id}]})
+    await db.open_challenge_reports.delete_many({"reporter_id": user_id})
+    await db.open_challenge_shares.delete_many({"user_id": user_id})
+    await db.ladder_invites.delete_many({"$or": [{"invitee_user_id": user_id}, {"invited_by": user_id}]})
 
     return {"message": f"User {user['email']} deleted successfully"}

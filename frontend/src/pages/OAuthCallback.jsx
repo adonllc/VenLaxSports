@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 import { getAttribution } from "../utils/attribution";
 import { trackEvent } from "../utils/googleAnalytics";
+import { pendingLadderPath } from "../utils/ladderUi";
 
 const API = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -39,7 +40,7 @@ export default function OAuthCallback() {
           trackEvent("sign_up", { method: "google" });
         }
         await fetchMe();
-        navigate("/dashboard", { replace: true });
+        navigate(pendingLadderPath() || "/dashboard", { replace: true });
       } catch (err) {
         const detail = err.response?.data?.detail || "Google login failed. Please try again.";
         setError(detail);

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import NotificationBell from "./NotificationBell";
 import { useTheme } from "../contexts/ThemeContext";
-import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon, Users, Gift } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Shield, Sun, Moon, Users, Gift, Swords } from "lucide-react";
 import { activeSports } from "../config/platformConfig";
 import Logo from "./Logo";
 import axios from "axios";
@@ -159,6 +160,7 @@ export default function Navbar() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-2">
+            {user && <NotificationBell />}
             {user ? (
               <div className="relative" ref={userRef}>
                 <button
@@ -188,6 +190,13 @@ export default function Navbar() {
                       data-testid="nav-dashboard"
                     >
                       <LayoutDashboard className="w-4 h-4 text-gray-400" /> My Dashboard
+                    </Link>
+                    <Link
+                      to="/play"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                      data-testid="nav-play"
+                    >
+                      <Swords className="w-4 h-4 text-gray-400" /> Play & Compete
                     </Link>
                     <Link
                       to="/rewards"
@@ -260,13 +269,16 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-gray-500 hover:text-heading-dark hover:bg-gray-50 rounded-lg transition-colors"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            data-testid="nav-mobile-toggle"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-1">
+            {user && <NotificationBell />}
+            <button
+              className="p-2 text-gray-500 hover:text-heading-dark hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              data-testid="nav-mobile-toggle"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -291,6 +303,15 @@ export default function Navbar() {
               <span>{s.icon}</span> {s.label}
             </Link>
           ))}
+          {user && (
+            <Link
+              to="/play"
+              className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              data-testid="nav-play-mobile"
+            >
+              Play & Compete
+            </Link>
+          )}
           <Link
             to="/ladders"
             className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"

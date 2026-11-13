@@ -42,6 +42,14 @@ const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
 const DoublesInviteConfirm = lazy(() => import("./pages/DoublesInviteConfirm"));
 const Ladders = lazy(() => import("./pages/Ladders"));
 const LadderDetail = lazy(() => import("./pages/LadderDetail"));
+const PlayCompete = lazy(() => import("./pages/PlayCompete"));
+const CommunityLadderCreate = lazy(() => import("./pages/CommunityLadderCreate"));
+const CommunityLadderJoin = lazy(() => import("./pages/CommunityLadderJoin"));
+const CommunityLadder = lazy(() => import("./pages/CommunityLadder"));
+const Challenges = lazy(() => import("./pages/Challenges"));
+const FindOpponent = lazy(() => import("./pages/FindOpponent"));
+const OpenChallengeDetail = lazy(() => import("./pages/OpenChallengeDetail"));
+const ChallengeDetail = lazy(() => import("./pages/ChallengeDetail"));
 const RewardsCredits = lazy(() => import("./pages/RewardsCredits"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
@@ -91,6 +99,14 @@ function AppRouter() {
           <Route path="/doubles-invite/confirm" element={<DoublesInviteConfirm />} />
           <Route path="/ladders" element={<Ladders />} />
           <Route path="/ladders/:id" element={<LadderDetail />} />
+          <Route path="/play" element={<PlayCompete />} />
+          <Route path="/community-ladders/new" element={<CommunityLadderCreate />} />
+          <Route path="/community-ladders/join" element={<CommunityLadderJoin />} />
+          <Route path="/community-ladders/:id" element={<CommunityLadder />} />
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/find-opponent" element={<FindOpponent />} />
+          <Route path="/find-opponent/:id" element={<OpenChallengeDetail />} />
+          <Route path="/challenges/:id" element={<ChallengeDetail />} />
           <Route path="/rewards" element={<RewardsCredits />} />
           <Route path="/tennis-pickleball-leagues" element={<TennisPickleballLeagues />} />
           <Route path="/about" element={<About />} />

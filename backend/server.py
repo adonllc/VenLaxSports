@@ -53,6 +53,9 @@ from routes.box_league_routes import router as box_league_router
 from routes.ladder_routes import router as ladder_router
 from routes.legal_routes import router as legal_router
 from routes.referral_routes import router as referral_router
+from routes.direct_challenge_routes import router as direct_challenge_router, inbox_router, admin_router as direct_challenge_admin_router
+from routes.community_ladder_routes import router as community_ladder_router
+from routes.open_challenge_routes import router as open_challenge_router, admin_router as open_challenge_admin_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(social_auth_router, prefix="/auth", tags=["social-auth"])
@@ -86,6 +89,12 @@ api_router.include_router(box_league_router, prefix="/box-leagues", tags=["box-l
 api_router.include_router(ladder_router, prefix="/ladders", tags=["ladders"])
 api_router.include_router(legal_router)  # /api/legal/* endpoints
 api_router.include_router(referral_router, prefix="/referrals", tags=["referrals"])
+api_router.include_router(direct_challenge_router, prefix="/challenges", tags=["direct-challenges"])
+api_router.include_router(inbox_router, prefix="/inbox", tags=["inbox"])
+api_router.include_router(community_ladder_router, prefix="/community-ladders", tags=["community-ladders"])
+api_router.include_router(open_challenge_router, prefix="/open-challenges", tags=["open-challenges"])
+api_router.include_router(open_challenge_admin_router, prefix="/admin/open-challenges", tags=["admin-open-challenges"])
+api_router.include_router(direct_challenge_admin_router, prefix="/admin/direct-challenges", tags=["admin-direct-challenges"])
 
 
 @api_router.get("/")

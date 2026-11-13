@@ -4,6 +4,9 @@ import EmailCampaignsTab from "../components/EmailCampaignsTab";
 import AutomationsTab from "../components/AutomationsTab";
 import AmbassadorsCard from "../components/AmbassadorsCard";
 import PartnerMatchingPanel from "../components/PartnerMatchingPanel";
+import ChallengeDisputesPanel from "../components/ChallengeDisputesPanel";
+import CommunityLaddersPanel from "../components/CommunityLaddersPanel";
+import OpenChallengesPanel from "../components/OpenChallengesPanel";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
 import DashboardTab from "../components/DashboardTab";
@@ -594,6 +597,7 @@ export default function AdminDashboard() {
         {tab === "leagues" && <IncompleteTeamsCard />}
         {tab === "leagues" && <LeagueWaitlistCard />}
         {tab === "leagues" && <PartnerMatchingPanel />}
+        {tab === "leagues" && <ChallengeDisputesPanel />}
         {tab === "leagues" && (
           <div className="bg-white rounded-none overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
             <div className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ borderBottom: "1px solid #F3F4F6" }}>
@@ -842,7 +846,7 @@ export default function AdminDashboard() {
                 <div className="text-center py-12 text-sm" style={{ color: "#6B7280" }}>No ladders yet — create one above</div>
               ) : (
                 <div className="divide-y" style={{ borderColor: "#F3F4F6" }}>
-                  {ladders.map((l) => (
+                  {ladders.filter((l) => l.type !== "community").map((l) => (
                     <div key={l.id} className="px-5 py-4 flex items-center justify-between">
                       <div>
                         <p className="font-medium" style={{ color: "#3D3D3D" }}>{l.city} — {l.division_label} {l.sport.charAt(0).toUpperCase() + l.sport.slice(1)} ({l.format})</p>
@@ -864,6 +868,8 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {tab === "ladders" && <CommunityLaddersPanel />}
+        {tab === "ladders" && <OpenChallengesPanel />}
         {tab === "seasons" && <SeasonsTab />}
         {tab === "playoffs" && <PlayoffsTab leagues={leagues} />}
         {tab === "auto" && <AutoGenerateTab onSuccess={() => { fetchLeagues(); fetchStats(); }} />}
