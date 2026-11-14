@@ -10,6 +10,7 @@ import OpenChallengesPanel from "../components/OpenChallengesPanel";
 import PlayerInsightsTab from "../components/PlayerInsightsTab";
 import { AuditLogTab, TeamTab } from "../components/AdminSecurityTabs";
 import DashboardTab from "../components/DashboardTab";
+import LeagueOverviewDrawer from "../components/LeagueOverviewDrawer";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap, Gift } from "lucide-react";
@@ -231,6 +232,7 @@ export default function AdminDashboard() {
   const [rulesLeague, setRulesLeague] = useState(null);
   const [startMinLeague, setStartMinLeague] = useState(null);
   const [datesLeague, setDatesLeague] = useState(null);
+  const [overviewLeagueId, setOverviewLeagueId] = useState(null);
 
   const handleOpenToPlay = async (l, regenerate = false) => {
     const call = (body) => axios.post(`${API}/admin/leagues/${l.id}/open-to-play`, { regenerate, ...body }, { withCredentials: true });
@@ -661,6 +663,14 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            onClick={() => setOverviewLeagueId(l.id)}
+                            className="text-xs font-bold" style={{ color: "#008F70" }}
+                            data-testid={`league-overview-${l.id}`}
+                            title="Players, payments, coupons, teams and matches for this league"
+                          >
+                            Players &amp; payments
+                          </button>
                           <Link to={`/leagues/${l.id}`} className="text-xs hover:underline" style={{ color: "#B7791F" }}>View</Link>
                           {(l.status === "registration" || (l.status === "active" && !l.matches_per_player)) && (l.league_type || "flex") === "flex" && (
                             <button
@@ -890,6 +900,7 @@ export default function AdminDashboard() {
         {tab === "audit" && <AuditLogTab />}
         {tab === "players" && <PlayerInsightsTab />}
         {adjustLeague && <AdjustScheduleModal league={adjustLeague} onClose={() => setAdjustLeague(null)} />}
+        {overviewLeagueId && <LeagueOverviewDrawer leagueId={overviewLeagueId} leagues={leagues} onClose={() => setOverviewLeagueId(null)} onChanged={fetchLeagues} onGoToZelle={() => { setOverviewLeagueId(null); setTab("zelle"); }} />}
         {datesLeague && <LeagueEditModal league={datesLeague} onClose={() => setDatesLeague(null)} onSaved={() => { setDatesLeague(null); window.location.reload(); }} />}
         {startMinLeague && <StartMinimumModal league={startMinLeague} onClose={() => setStartMinLeague(null)} onSaved={() => { setStartMinLeague(null); window.location.reload(); }} />}
         {rulesLeague && <PlayoffRulesModal league={rulesLeague} onClose={() => setRulesLeague(null)} onSaved={() => { setRulesLeague(null); window.location.reload(); }} />}

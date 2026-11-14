@@ -42,6 +42,7 @@ from routes.waitlist_routes import router as waitlist_router
 from routes.admin_players_routes import router as admin_players_router
 from routes.admin_team_routes import router as admin_team_router
 from routes.admin_player_crm_routes import router as admin_player_crm_router
+from routes.admin_league_overview_routes import router as admin_league_overview_router
 from routes.event_routes import router as event_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.partner_match_routes import router as partner_match_router
@@ -63,6 +64,7 @@ api_router.include_router(league_router, prefix="/leagues", tags=["leagues"])
 api_router.include_router(match_router, prefix="/matches", tags=["matches"])
 api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
 api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
+api_router.include_router(admin_league_overview_router, prefix="/admin/leagues", tags=["admin-league-overview"])
 api_router.include_router(admin_team_router, prefix="/admin", tags=["admin-team"])
 api_router.include_router(event_router, prefix="/events", tags=["events"])
 api_router.include_router(admin_dashboard_router, prefix="/admin", tags=["admin-dashboard"])
