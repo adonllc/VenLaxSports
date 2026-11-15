@@ -196,7 +196,7 @@ async def build(db, league: dict, include_contact: bool = False) -> dict:
             m = by_method.setdefault(p["payment_method"], {"players": 0, "amount": 0.0})
             m["players"] += 1
             m["amount"] = _money(m["amount"] + p["amount_paid"])
-        elif p["payment_status"] in ("pending_zelle", "awaiting_payment"):
+        elif p["payment_status"] == "pending_zelle":   # reference sent: waiting for the admin. A started-but-unsent intent is not counted.
             pending_money += p["amount_paid"]
     coupons: dict[str, dict] = {}
     for p in players:
@@ -235,6 +235,9 @@ async def build(db, league: dict, include_contact: bool = False) -> dict:
     zelle = [p for p in players if p["payment_status"] == "pending_zelle"]
     if zelle:
         flags.append({"key": "zelle_pending", "label": f"{len(zelle)} Zelle payment(s) waiting for approval"})
+    started = [p for p in players if p["payment_status"] == "awaiting_payment"]
+    if started:
+        flags.append({"key": "zelle_started", "label": f"{len(started)} player(s) started Zelle but sent no reference yet"})
     waiting = [p for p in players if p["team_status"] == "waiting_partner"]
     if waiting:
         flags.append({"key": "unpaired_doubles", "label": f"{len(waiting)} doubles player(s) without a partner"})

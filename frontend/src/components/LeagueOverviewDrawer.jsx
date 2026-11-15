@@ -11,7 +11,7 @@ const STATUS = {
   paid: ["Paid", "#065F46", "#D1FAE5"],
   free: ["Free", "#374151", "#F1F1F1"],
   pending_zelle: ["Zelle pending", "#92400E", "#FEF3C7"],
-  awaiting_payment: ["Awaiting payment", "#92400E", "#FEF3C7"],
+  awaiting_payment: ["Zelle started, no reference sent", "#92400E", "#F1F1F1"],
   covered_by_partner: ["Partner paid", "#065F46", "#D1FAE5"],
   refunded: ["Refunded", "#374151", "#F1F1F1"],
   unpaid: ["No payment", "#991B1B", "#FEE2E2"],
@@ -163,6 +163,19 @@ export default function LeagueOverviewDrawer({ leagueId, leagues, onClose, onCha
     }
   };
 
+  const approveZelle = async (p) => {
+    const ok = window.confirm(`Approve ${p.name}'s Zelle payment of ${money(p.amount_paid)}? Only do this once you see the money in your Zelle account. It registers them in the league.`);
+    if (!ok) return;
+    try {
+      await axios.post(`${API}/admin/zelle/${p.session_id}/approve`, {}, { withCredentials: true });
+      setMsg(`${p.name} approved and registered.`);
+      await load();
+      onChanged && onChanged();
+    } catch (e) {
+      setMsg(e.response?.data?.detail || "Could not approve that Zelle payment");
+    }
+  };
+
   const exportPlayers = () => {
     const withContact = data.contact_visible;
     const header = ["Name", ...(withContact ? ["Email", "Phone"] : []), "Registered", "Joined", "Entry", "Payment", "Method", "Paid", "Credit", "Coupon", "Partner", "Team", "Wins", "Losses"];
@@ -212,7 +225,7 @@ export default function LeagueOverviewDrawer({ leagueId, leagues, onClose, onCha
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 <Tile testid="tile-filled" label="Players" value={`${data.summary.filled}/${data.summary.max_players}`} sub={data.summary.min_players_to_start ? `min ${data.summary.min_players_to_start}${data.summary.needs_more ? `, needs ${data.summary.needs_more} more` : ", reached"}` : null} />
                 <Tile testid="tile-collected" label="Collected" value={money(data.summary.collected)} sub={data.summary.credit_used ? `+ ${money(data.summary.credit_used)} credit` : null} />
-                <Tile testid="tile-pending" label="Pending" value={money(data.summary.pending)} sub="Zelle / unpaid" />
+                <Tile testid="tile-pending" label="Pending" value={money(data.summary.pending)} sub="Zelle to approve" />
                 <Tile testid="tile-coupons" label="Coupon entries" value={data.summary.coupon_entries} />
                 <Tile testid="tile-free" label="Free entries" value={data.summary.free_entries} />
                 <Tile testid="tile-start" label="Starts in" value={data.summary.days_to_start == null ? "-" : `${data.summary.days_to_start}d`} sub={day(data.league.start_date)} />
@@ -278,6 +291,7 @@ export default function LeagueOverviewDrawer({ leagueId, leagues, onClose, onCha
                             <td className="px-3 py-2 whitespace-nowrap">{p.registered ? `${p.wins}-${p.losses}` : "-"}</td>
                             <td className="px-3 py-2">
                               <div className="flex gap-2 text-xs font-semibold whitespace-nowrap">
+                                {!p.registered && data.can.mark_paid && p.payment_method === "zelle" && ["awaiting_payment", "pending_zelle"].includes(p.payment_status) && p.session_id && !p.invite_token && <button style={{ color: "#008F70" }} onClick={() => approveZelle(p)} data-testid={`act-approve-zelle-${p.player_id}`}>Approve Zelle</button>}
                                 {p.registered && data.can.mark_paid && !["paid", "free", "covered_by_partner"].includes(p.payment_status) && <button style={{ color: "#008F70" }} onClick={() => setAction({ type: "mark_paid", player: p })} data-testid={`act-markpaid-${p.player_id}`}>Mark paid</button>}
                                 {p.registered && data.can.move && <button style={{ color: "#008F70" }} onClick={() => setAction({ type: "move", player: p })} data-testid={`act-move-${p.player_id}`}>Move</button>}
                                 {p.registered && data.can.remove && <button className="text-red-600" onClick={() => setAction({ type: "remove", player: p })} data-testid={`act-remove-${p.player_id}`}>Remove</button>}

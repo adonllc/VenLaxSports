@@ -254,3 +254,15 @@ def test_a_paired_doubles_player_cannot_be_removed_alone():
     with pytest.raises(league_roster.RosterError) as e:
         run(league_roster.remove_player(db, league(db), a, "none"))
     assert e.value.status == 409
+
+
+def test_a_zelle_intent_with_no_reference_is_not_counted_as_waiting_for_approval():
+    db = Db()
+    z = db.player("Zed")
+    db.txn(z, 9.99, "zelle_3", status="pending_zelle", method="zelle")   # chose Zelle, never entered a reference
+    out = run(league_overview.build(db, league(db)))
+    zed = by_name(out)["Zed"]
+    assert zed["payment_status"] == "awaiting_payment" and zed["payment_method"] == "zelle" and zed["session_id"] == "zelle_3"
+    assert out["summary"]["pending"] == 0
+    keys = {f["key"] for f in out["flags"]}
+    assert "zelle_started" in keys and "zelle_pending" not in keys
