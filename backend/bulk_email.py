@@ -234,6 +234,29 @@ TEMPLATES: dict[str, dict] = {
           <p>The {_S['name']} season in {_S['city']} starts soon. Pick a league and play at your own pace.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
+    # Play & Compete: no league needed. Facts used only: the four options on /play, ladder "free to join", ladder
+    # ranking methods, 72h challenge expiry, league prices. No counts, deadlines or rewards.
+    "m18_play_compete": {
+        "label": "18 Play & Compete: every way to challenge",
+        "subject": "Four ways to play this week, no league needed",
+        "title": "Play & Compete: pick how you play",
+        "cta": ("Open Play & Compete", "/play"),
+        "body": f"""
+          <p>Hi {{name}},</p>
+          <p>You do not have to wait for a season to play a ranked match. Play & Compete gives you four ways to get on court, any day.</p>
+          <p><strong>Step 1. Pick your challenge</strong></p>
+          <ul style="padding-left:18px;margin:0 0 16px">
+            <li>🔎 <strong>Find an opponent.</strong> Browse open match requests near you, or post your own and let a player accept it.</li>
+            <li>⚔️ <strong>Challenge a player.</strong> Pick any VenLax player, or invite a friend by email. Friendly matches never change a ladder rank. An unanswered challenge lapses after 72 hours, so it never hangs.</li>
+            <li>🏆 <strong>Join a ladder.</strong> Climb a ranked city ladder. Ladders are free to join, and your wins move your rank.</li>
+            <li>👥 <strong>Create your own ladder.</strong> Start one for your friends or your city. Choose leapfrog, points or Elo ranking. VenLax keeps the standings for you.</li>
+          </ul>
+          <p><strong>Step 2. Agree a time</strong><br>You and your opponent pick the day, time and court. Tennis or Pickleball, Singles or Doubles.</p>
+          <p><strong>Step 3. Play and report the score</strong><br>Report the result, your opponent confirms it, and your rating updates. Every result gets a shareable match card.</p>
+          <p><strong>Ready for a full season?</strong><br>Leagues add a division at your level, 5 to 7 matches over 6 to 8 weeks, and playoffs for the top of the table. Singles $9.99 per player. Doubles $19.99 per team, one payment covers you and your partner. Entry fees are refundable until the league starts.</p>
+          <p>Challenges and ladders are the fastest way to find out where you stand. A league is where you earn the title.</p>
+          <p>Questions? Write to {cc.SUPPORT}.</p>""",
+    },
 }
 
 
