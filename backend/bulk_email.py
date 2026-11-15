@@ -300,8 +300,10 @@ def validate(payload: dict) -> None:
         if payload.get("step") not in cc.STEPS:
             raise PayloadError("Pick step 1, 2 or 3")
         return
-    if aud != "registered":
-        raise PayloadError("audience must be early_list or registered")
+    if aud not in ("registered", "everyone"):
+        raise PayloadError("audience must be early_list, registered or everyone")
+    if aud == "everyone" and (payload.get("segment", "all") != "all" or (payload.get("city") or "").strip() or payload.get("user_ids")):
+        raise PayloadError("Everyone cannot be narrowed by segment, city or picked players")
     if payload.get("segment", "all") not in SEGMENTS:
         raise PayloadError("Unknown segment")
     ids = payload.get("user_ids")
@@ -349,12 +351,21 @@ def render(payload: dict, recipient: dict, coupon: dict | None = None) -> dict:
         subjects = template.get("subjects")
         subject = subjects[payload.get("subject_variant") or 0] if subjects else template["subject"]
         return {"subject": _fill(subject, ctx, name, plain=True), "title": _fill(template["title"], ctx, name), "body": body,
-                "cta_label": label, "cta_url": _tag(path, key), "unsubscribe_url": user_unsub_url(recipient["id"]), "reason": REGISTERED_REASON}
+                "cta_label": label, "cta_url": _tag(path, key), "unsubscribe_url": _unsub_for(recipient), "reason": _reason_for(recipient)}
     body = f"<p>Hi {name},</p>" + _paragraphs(payload["body"].replace("{name}", recipient.get("first_name") or "there"))
     url = _tag(_safe_link(payload["cta_url"]), key) if payload.get("cta_url") else None
     return {"subject": payload["subject"].strip(), "title": payload["subject"].strip(), "body": body,
             "cta_label": payload.get("cta_label") or None, "cta_url": url,
-            "unsubscribe_url": user_unsub_url(recipient["id"]), "reason": REGISTERED_REASON}
+            "unsubscribe_url": _unsub_for(recipient), "reason": _reason_for(recipient)}
+
+
+def _unsub_for(recipient: dict) -> str:
+    """A waitlist contact unsubscribes from the waitlist; a registered user from their account's marketing email."""
+    return cc.unsub_url(recipient["id"]) if recipient.get("waitlist") else user_unsub_url(recipient["id"])
+
+
+def _reason_for(recipient: dict):
+    return None if recipient.get("waitlist") else REGISTERED_REASON
 
 
 # ── audiences ─────────────────────────────────────────────────────────────────
@@ -499,7 +510,33 @@ async def build_audience(db, payload: dict) -> dict:
                 skipped["no matching data"] = skipped.get("no matching data", 0) + 1
                 continue
         send.append(rec)
+    if payload["audience"] == "everyone":
+        _add_waitlist_contacts(await db.waitlist.find({}).sort("created_at", 1).to_list(None), send, skipped, sent_ids,
+                               {(u.get("email") or "").strip().lower() for u in users}, tpl, segment)
     return {"send": send, "skipped": skipped}
+
+
+def _add_waitlist_contacts(entries: list[dict], send: list[dict], skipped: dict, sent_ids: set, account_emails: set, tpl: dict, segment: str) -> None:
+    """People on the early list with no account. Not for a template that needs a player's league or makes a personal coupon."""
+    if tpl.get("needs") or tpl.get("coupon") or segment == "in_league":
+        n = len([e for e in entries if (e.get("email") or "").strip()])
+        if n:
+            skipped["early list: template is for registered players"] = n
+        return
+    seen = {r["email"] for r in send}
+    for e in entries:
+        email = (e.get("email") or "").strip().lower()
+        cid = str(e["_id"])
+        if not email or email in account_emails or email in seen:
+            continue
+        if e.get("unsubscribed_at"):
+            skipped["early list: unsubscribed"] = skipped.get("early list: unsubscribed", 0) + 1
+            continue
+        if cid in sent_ids:
+            skipped["already sent"] += 1
+            continue
+        seen.add(email)
+        send.append({"id": cid, "email": email, "first_name": "", "referral_code": None, "waitlist": True})
 
 
 # ── sending ───────────────────────────────────────────────────────────────────
@@ -526,7 +563,7 @@ async def send_to(db, payload: dict, rec: dict, record: bool = True, admin_id: s
     if ok and record:
         await db.email_campaigns.insert_one({
             "user_id": rec["id"], "user_email": rec["email"], "campaign": campaign_key(payload),
-            "audience": "early_list" if payload["audience"] == "early_list" else "registered",
+            "audience": "early_list" if payload["audience"] == "early_list" or rec.get("waitlist") else "registered",
             "sent_at": datetime.now(timezone.utc).isoformat(),
         })
     return bool(ok)

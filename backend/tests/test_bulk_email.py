@@ -241,3 +241,58 @@ def test_run_job_counts_sent_and_failed(monkeypatch):
     run(bulk_email.run_job(db, job_id, REG, recs, delay=0))
     job = db.email_jobs.docs[0]
     assert job["status"] == "done" and job["sent"] == 1 and job["failed"] == 1
+
+
+# ── "Everyone": registered users and early-list contacts without an account ──────────────────
+
+def waitlist(db, *entries):
+    for email, extra in entries:
+        db.waitlist.docs.append({"_id": ObjectId(), "email": email, "created_at": "2026-10-01", **extra})
+
+
+CUSTOM_ALL = {"audience": "everyone", "subject": "Big news", "body": "Registration is open for the new season."}
+
+
+def test_everyone_adds_early_list_contacts_who_have_no_account():
+    db = db_with_users()
+    waitlist(db, ("new@x.com", {}), ("ann@x.com", {}), ("gone@x.com", {"unsubscribed_at": "2026-10-02"}), ("NEW@x.com", {}))
+    r = run(bulk_email.build_audience(db, CUSTOM_ALL))
+    assert emails(r) == ["ann@x.com", "di@x.com", "new@x.com"]      # registered users first; Ann is not emailed twice; duplicate and unsubscribed contacts dropped
+    assert r["skipped"]["early list: unsubscribed"] == 1
+    assert [x.get("waitlist") for x in r["send"]] == [None, None, True]
+
+
+def test_everyone_uses_the_right_unsubscribe_link_and_wording_for_each_kind():
+    db = db_with_users()
+    waitlist(db, ("new@x.com", {}))
+    ann, new = run(bulk_email.build_audience(db, CUSTOM_ALL))["send"][0], run(bulk_email.build_audience(db, CUSTOM_ALL))["send"][-1]
+    m_user, m_new = bulk_email.render(CUSTOM_ALL, ann), bulk_email.render(CUSTOM_ALL, new)
+    assert "/api/email/unsubscribe" in m_user["unsubscribe_url"] and "/api/waitlist/unsubscribe" in m_new["unsubscribe_url"]
+    assert m_user["reason"] and m_new["reason"] is None
+    assert "Hi there" in m_new["body"]
+
+
+def test_everyone_cannot_be_narrowed_and_skips_templates_that_need_a_player():
+    for extra in ({"segment": "no_league"}, {"city": "Atlanta"}, {"user_ids": [str(ObjectId())]}):
+        with pytest.raises(bulk_email.PayloadError):
+            bulk_email.validate({**CUSTOM_ALL, **extra})
+    db = db_with_users()
+    waitlist(db, ("new@x.com", {}))
+    r = run(bulk_email.build_audience(db, {"audience": "everyone", "template": "thank_you"}))
+    assert "new@x.com" not in emails(r) and r["skipped"]["early list: template is for registered players"] == 1
+
+
+def test_everyone_send_is_recorded_once_per_person(monkeypatch):
+    db = db_with_users()
+    waitlist(db, ("new@x.com", {}))
+    sent = []
+
+    async def fake(to, subject, title, body, cta_label, cta_url, unsub, reason=None):
+        sent.append(to)
+        return True
+    monkeypatch.setattr(email_service, "send_campaign_email", fake)
+    for rec in run(bulk_email.build_audience(db, CUSTOM_ALL))["send"]:
+        run(bulk_email.send_to(db, CUSTOM_ALL, rec))
+    assert sent == ["ann@x.com", "di@x.com", "new@x.com"]
+    assert {d["user_email"]: d["audience"] for d in db.email_campaigns.docs}["new@x.com"] == "early_list"
+    assert emails(run(bulk_email.build_audience(db, CUSTOM_ALL))) == []   # a second send reaches nobody

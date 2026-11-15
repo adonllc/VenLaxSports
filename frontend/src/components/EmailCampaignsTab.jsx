@@ -9,6 +9,7 @@ const AUDIENCES = [
   { id: "early_2", label: "Early list: step 2, refer a friend" },
   { id: "early_3", label: "Early list: step 3, registration closes" },
   { id: "registered", label: "Registered users" },
+  { id: "everyone", label: "Everyone: all users plus the early list (registered or not)" },
 ];
 const SEGMENTS = [
   { id: "all", label: "All registered users" },
@@ -48,14 +49,17 @@ export default function EmailCampaignsTab() {
   const [results, setResults] = useState([]);
   const timer = useRef(null);
 
-  const registered = audience === "registered";
+  const everyone = audience === "everyone";
+  const registered = audience === "registered" || everyone;
   const custom = registered && template === "custom";
 
   const subjectsOf = templates.find((t) => t.id === template)?.subjects || [];
 
   const payload = () => {
     if (!registered) return { audience: "early_list", step: Number(audience.split("_")[1]) };
-    const base = { audience: "registered", segment, city: city.trim() || null, user_ids: who === "pick" ? picked.map((p) => p.id) : null };
+    const base = everyone
+      ? { audience: "everyone", segment: "all", city: null, user_ids: null }
+      : { audience: "registered", segment, city: city.trim() || null, user_ids: who === "pick" ? picked.map((p) => p.id) : null };
     if (!custom) return { ...base, template, subject_variant: subjectsOf.length > 1 ? Math.min(variant, subjectsOf.length - 1) : null };
     return { ...base, subject, body, cta_label: ctaLabel.trim() || null, cta_url: ctaUrl.trim() || null };
   };
@@ -189,7 +193,13 @@ export default function EmailCampaignsTab() {
             </div>
           )}
 
-          {registered && (
+          {everyone && (
+            <p className="sm:col-span-2 text-xs" style={{ color: "#4C4C4C" }} data-testid="email-everyone-note">
+              Goes to every registered user and every early-list contact who has no account yet, once each. Nobody is emailed twice, and people who unsubscribed are skipped. Early-list contacts get the same message, with their own unsubscribe link. A template built around a player's league or a personal coupon only goes to registered users; use "Write my own" to reach everyone with the same words.
+            </p>
+          )}
+
+          {registered && !everyone && (
             <div className="sm:col-span-2">
               <Label>Send to</Label>
               <div className="flex flex-wrap gap-4 text-sm" role="radiogroup" aria-label="Send to">
@@ -232,7 +242,7 @@ export default function EmailCampaignsTab() {
             </div>
           )}
 
-          {registered && (
+          {registered && !everyone && (
             <>
               <div>
                 <Label>Segment</Label>
@@ -275,7 +285,7 @@ export default function EmailCampaignsTab() {
         )}
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <button onClick={doPreview} disabled={!!busy || (registered && who === "pick" && picked.length === 0)} className="px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: GREEN }} data-testid="email-preview">
+          <button onClick={doPreview} disabled={!!busy || (registered && !everyone && who === "pick" && picked.length === 0)} className="px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: GREEN }} data-testid="email-preview">
             {busy === "preview" ? "Checking…" : "Preview"}
           </button>
           <button onClick={doTest} disabled={!!busy} className="px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ border: `1px solid ${GREEN}`, color: GREEN }} data-testid="email-test">
