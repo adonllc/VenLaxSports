@@ -685,7 +685,9 @@ async def zelle_intent(data: ZelleIntentIn, request: Request):
         if fee <= 0:
             raise HTTPException(status_code=400, detail="Your VenLax Credit covers the whole fee. Pay with credit instead.")
 
-    handle = os.environ.get("ZELLE_HANDLE", "payments@leaguepro.com")
+    handle = os.environ.get("ZELLE_HANDLE", "").strip()
+    if not handle:   # never show players a placeholder address: they would send real money to it
+        raise HTTPException(status_code=503, detail="Zelle payments are not available right now. Please pay by card.")
     display = os.environ.get("ZELLE_DISPLAY_NAME", "VENLAX Sports Payments")
     memo = f"LP-{data.league_id[-6:]}-{user['_id'][-6:]}".upper()
 

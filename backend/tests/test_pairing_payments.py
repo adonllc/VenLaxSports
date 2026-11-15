@@ -170,6 +170,7 @@ def test_quote_shows_what_credit_covers_and_what_is_left(monkeypatch):
 
 
 def test_zelle_intent_asks_only_for_what_credit_does_not_cover(monkeypatch):
+    monkeypatch.setenv("ZELLE_HANDLE", "pay@venlax.test")
     db, lid, uid, request = checkout_env(monkeypatch, credit=4.0)
     out = run(payment_routes.zelle_intent(payment_routes.ZelleIntentIn(league_id=lid, use_credit=True), request))
     assert out["amount"] == 5.99
@@ -185,6 +186,7 @@ def test_zelle_intent_refuses_when_credit_already_covers_the_fee(monkeypatch):
 
 
 def test_zelle_intent_for_a_venlax_paired_solo_player_asks_for_half(env, monkeypatch):
+    monkeypatch.setenv("ZELLE_HANDLE", "pay@venlax.test")
     db = Db()
     db.doubles_invites.docs.append({"token": "t", "initiator_id": db.p1, "pair_by_venlax": True, "status": "pending"})
     db.payment_transactions = C()
@@ -253,3 +255,11 @@ def test_approving_a_zelle_half_payment_marks_the_invite_paid_with_the_exact_amo
     assert invite["status"] == "initiator_paid" and invite["paid_amount"] == 9.99
     assert db.player_leagues.docs == []          # no singles entry is created for a team payment
     assert db.payment_transactions.docs[0]["status"] == "complete"
+
+
+def test_zelle_intent_never_shows_a_placeholder_address_when_no_handle_is_configured(monkeypatch):
+    monkeypatch.delenv("ZELLE_HANDLE", raising=False)
+    db, lid, uid, request = checkout_env(monkeypatch, credit=0)
+    with pytest.raises(HTTPException) as e:
+        run(payment_routes.zelle_intent(payment_routes.ZelleIntentIn(league_id=lid), request))
+    assert e.value.status_code == 503 and db.payment_transactions.docs == []
