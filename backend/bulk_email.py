@@ -38,6 +38,21 @@ MAX_SELECTED = 500
 SEGMENTS = ("all", "no_league", "in_league")
 REGISTERED_REASON = "You are receiving this because you have a VenLax Sports account."
 
+
+def _card(tag: str, title: str, text: str, accent: str = "#008F70") -> str:
+    """One email-safe card (table + inline styles, no CSS classes) with a coloured left bar and a small tag line."""
+    return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px">'
+            f'<tr><td style="background:#F7F7F7;border:1px solid #E5E5E5;border-left:4px solid {accent};padding:14px 16px">'
+            f'<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:{accent};margin:0 0 4px">{tag}</div>'
+            f'<div style="font-size:16px;font-weight:700;color:#1D1D1D;margin:0 0 4px">{title}</div>'
+            f'<div style="font-size:14px;line-height:1.5;color:#4C4C4C">{text}</div>'
+            f'</td></tr></table>')
+
+
+def _step(n: int, title: str) -> str:
+    return (f'<p style="margin:22px 0 10px;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1D1D1D">'
+            f'<span style="display:inline-block;background:#F2A922;color:#1D1D1D;padding:2px 8px;margin-right:8px">STEP {n}</span>{title}</p>')
+
 _S = cc.SEASON
 
 TEMPLATES: dict[str, dict] = {
@@ -244,16 +259,17 @@ TEMPLATES: dict[str, dict] = {
         "body": f"""
           <p>Hi {{name}},</p>
           <p>You do not have to wait for a season to play a ranked match. Play & Compete gives you four ways to get on court, any day.</p>
-          <p><strong>Step 1. Pick your challenge</strong></p>
-          <ul style="padding-left:18px;margin:0 0 16px">
-            <li>🔎 <strong>Find an opponent.</strong> Browse open match requests near you, or post your own and let a player accept it.</li>
-            <li>⚔️ <strong>Challenge a player.</strong> Pick any VenLax player, or invite a friend by email. Friendly matches never change a ladder rank. An unanswered challenge lapses after 72 hours, so it never hangs.</li>
-            <li>🏆 <strong>Join a ladder.</strong> Climb a ranked city ladder. Ladders are free to join, and your wins move your rank.</li>
-            <li>👥 <strong>Create your own ladder.</strong> Start one for your friends or your city. Choose leapfrog, points or Elo ranking. VenLax keeps the standings for you.</li>
-          </ul>
-          <p><strong>Step 2. Agree a time</strong><br>You and your opponent pick the day, time and court. Tennis or Pickleball, Singles or Doubles.</p>
-          <p><strong>Step 3. Play and report the score</strong><br>Report the result, your opponent confirms it, and your rating updates. Every result gets a shareable match card.</p>
-          <p><strong>Ready for a full season?</strong><br>Leagues add a division at your level, 5 to 7 matches over 6 to 8 weeks, and playoffs for the top of the table. Singles $9.99 per player. Doubles $19.99 per team, one payment covers you and your partner. Entry fees are refundable until the league starts.</p>
+          {_step(1, "Pick your challenge")}
+          {_card("Open requests", "🔎 Find an opponent", "Browse open match requests near you, or post your own and let a player accept it.")}
+          {_card("Head to head", "⚔️ Challenge a player", "Pick any VenLax player, or invite a friend by email. Friendly matches never change a ladder rank. An unanswered challenge lapses after 72 hours, so it never hangs.", "#F2A922")}
+          {_card("Ranked", "🏆 Join a ladder", "Climb a ranked city ladder. Ladders are free to join, and your wins move your rank.")}
+          {_card("Your own", "👥 Create your own ladder", "Start one for your friends or your city. Choose leapfrog, points or Elo ranking. VenLax keeps the standings for you.", "#F2A922")}
+          {_step(2, "Agree a time")}
+          {_card("You decide", "📅 Day, time and court", "You and your opponent pick when and where. Tennis or Pickleball, Singles or Doubles.")}
+          {_step(3, "Play and report the score")}
+          {_card("Every result counts", "📈 Rating and match card", "Report the result, your opponent confirms it, and your rating updates. Every result gets a shareable match card.", "#F2A922")}
+          {_step(4, "Ready for a full season?")}
+          {_card("League", "🎾 Join a league", "A division at your level, 5 to 7 matches over 6 to 8 weeks, and playoffs for the top of the table. Singles $9.99 per player. Doubles $19.99 per team, one payment covers you and your partner. Entry fees are refundable until the league starts.")}
           <p>Challenges and ladders are the fastest way to find out where you stand. A league is where you earn the title.</p>
           <p>Questions? Write to {cc.SUPPORT}.</p>""",
     },
