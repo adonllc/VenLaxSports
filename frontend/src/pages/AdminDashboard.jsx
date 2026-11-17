@@ -13,6 +13,7 @@ import DashboardTab from "../components/DashboardTab";
 import LeagueOverviewDrawer from "../components/LeagueOverviewDrawer";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import { useSiteSettings } from "../contexts/SiteSettingsContext";
 import { Users, Trophy, Calendar, DollarSign, Plus, Trash2, Edit, BarChart3, Shield, TrendingUp, Zap, Gift } from "lucide-react";
 import platformConfig, { activeSportIds, activeCountry } from "../config/platformConfig";
 import DisputeEscalationPanel from "../components/DisputeEscalationPanel";
@@ -52,6 +53,7 @@ const DEFAULT_FORM = {
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
+  const { isCityOpen } = useSiteSettings();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [leagues, setLeagues] = useState([]);
@@ -67,10 +69,14 @@ export default function AdminDashboard() {
   const [ladderMsg, setLadderMsg] = useState("");
   const [showRRForm, setShowRRForm] = useState(false);
   const [showClosedLeagues, setShowClosedLeagues] = useState(false);
-  const isOpenLeague = (l) => l.status === "registration" || l.status === "active";
+  // Live = running, or registration open in a city that is open. "Opening soon" = registration in a city not open yet (same rule as the public Leagues page).
+  const isSoonLeague = (l) => l.status === "registration" && !isCityOpen(l.city);
+  const isOpenLeague = (l) => l.status === "active" || (l.status === "registration" && !isSoonLeague(l));
   const openLeagues = leagues.filter(isOpenLeague);
-  const closedLeagues = leagues.filter((l) => !isOpenLeague(l));
-  const shownLeagues = showClosedLeagues ? [...openLeagues, ...closedLeagues] : openLeagues;
+  const soonLeagues = leagues.filter(isSoonLeague);
+  const closedLeagues = leagues.filter((l) => !isOpenLeague(l) && !isSoonLeague(l));
+  const [showSoonLeagues, setShowSoonLeagues] = useState(false);
+  const shownLeagues = [...openLeagues, ...(showSoonLeagues ? soonLeagues : []), ...(showClosedLeagues ? closedLeagues : [])];
   const [rrFormData, setRRFormData] = useState({
     name: "", sport: "tennis", country: "USA", city: "",
     format: "singles", entry_fee: 0, start_date: "", end_date: "",
@@ -606,6 +612,14 @@ export default function AdminDashboard() {
               <h2 className="font-heading font-bold text-lg" style={{ color: "#3D3D3D" }}>Active &amp; Registration Open ({openLeagues.length})</h2>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                 <button
+                  data-testid="btn-toggle-soon-leagues"
+                  onClick={() => setShowSoonLeagues((v) => !v)}
+                  className="px-4 py-2 rounded-md text-sm font-medium transition"
+                  style={{ border: "1px solid #E5E7EB", color: "#4C4C4C" }}
+                >
+                  {showSoonLeagues ? "Hide" : "Show"} opening soon ({soonLeagues.length})
+                </button>
+                <button
                   data-testid="btn-toggle-closed-leagues"
                   onClick={() => setShowClosedLeagues((v) => !v)}
                   className="px-4 py-2 rounded-md text-sm font-medium transition"
@@ -641,7 +655,7 @@ export default function AdminDashboard() {
                 </thead>
                 <tbody className="divide-y" style={{ borderColor: "#F3F4F6" }}>
                   {shownLeagues.map((l) => (
-                    <tr key={l.id} data-testid={isOpenLeague(l) ? undefined : `closed-league-row-${l.id}`} style={{ background: "white", opacity: isOpenLeague(l) ? 1 : 0.7 }} onMouseEnter={e => e.currentTarget.style.background = "#FFFFFF"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
+                    <tr key={l.id} data-testid={isOpenLeague(l) ? undefined : isSoonLeague(l) ? `soon-league-row-${l.id}` : `closed-league-row-${l.id}`} style={{ background: "white", opacity: isOpenLeague(l) ? 1 : 0.7 }} onMouseEnter={e => e.currentTarget.style.background = "#FFFFFF"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
                       <td className="px-5 py-3 font-medium max-w-[200px] truncate" style={{ color: "#3D3D3D" }}>{l.name}</td>
                       <td className="px-5 py-3 capitalize" style={{ color: "#374151" }}>{l.sport}</td>
                       <td className="px-5 py-3" style={{ color: "#374151" }}>{l.city}</td>
